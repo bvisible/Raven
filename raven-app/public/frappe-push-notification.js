@@ -1,4 +1,4 @@
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
     getMessaging,
     getToken,
@@ -9,7 +9,7 @@ import {
 
 
 class FrappePushNotification {
-    static relayServerBaseURL = 'https://push-notification-relay.frappe.cloud';
+    static relayServerBaseURL = 'http://localhost:8018';
 
     // Type definitions
     /**
@@ -125,6 +125,7 @@ class FrappePushNotification {
      * )} callback - Callback function to handle message
      */
     onMessage(callback) {
+        console.log('onMessage', callback)
         if (callback == null) return;
         this.onMessageHandler = callback;
         if (this.messaging == null) return;

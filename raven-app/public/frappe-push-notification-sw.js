@@ -9,10 +9,13 @@ function isChrome() {
 }
 onBackgroundMessage(messaging, (payload) => {
     const notificationTitle = payload.data.title;
+
+    console.log("Background Message", payload)
     let notificationOptions = {
         body: payload.data.body || ''
     };
     if (isChrome()) {
+        console.log('is chrome')
         notificationOptions['data'] = {
             url: payload.data.click_action
         }
@@ -24,6 +27,7 @@ onBackgroundMessage(messaging, (payload) => {
             }]
         }
     }
+    console.log('notificationOptions', notificationOptions)
     self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
@@ -32,6 +36,7 @@ if (isChrome()) {
     self.addEventListener('notificationclick', (event) => {
         event.stopImmediatePropagation();
         event.notification.close();
+        console.log('Notification click Received.', event.notification.data)
         if (event.notification.data && event.notification.data.url) {
             clients.openWindow(event.notification.data.url)
         }
