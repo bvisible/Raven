@@ -135,7 +135,7 @@ const RenderItem = ({ index, replyToMessage, updateMessages, block, onReplyMessa
 
     return <Box>
         {block.block_type === 'date' ? <Box p='4' className="z-10 relative">
-            <DateSeparator><DateMonthYear date={block.data} /></DateSeparator>
+            <DateSeparator><DateMonthYear date={block.date} /></DateSeparator>
         </Box> :
 
             <Box className="w-full overflow-x-clip overflow-y-visible text-ellipsis">

@@ -2,6 +2,7 @@ export type Message = FileMessage | TextMessage | ImageMessage
 
 export interface BaseMessage {
     name: string,
+    key: string,
     owner: string,
     _liked_by: string,
     channel_id: string,
@@ -38,10 +39,10 @@ export interface TextMessage extends BaseMessage {
 
 export type DateBlock = {
     block_type: 'date',
-    data: string
+    date: string
 }
 
-export type MessageBlock = {
+export interface MessageBlock {
     block_type: 'message',
     data: Message
 }

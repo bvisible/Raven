@@ -18,6 +18,7 @@ import { Loader } from "@/components/common/Loader"
 import { Flex, Box, IconButton } from "@radix-ui/themes"
 import { ReplyMessageBox } from "../ChatMessage/ReplyMessageBox/ReplyMessageBox"
 import { BiX } from "react-icons/bi"
+import MessageStream from "./MessageStream"
 
 
 const Tiptap = lazy(() => import("../ChatInput/Tiptap"))
@@ -41,23 +42,24 @@ interface ChatBoxBodyProps {
 export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
 
     const { currentUser } = useContext(UserContext)
-    const { data, error, mutate, isLoading } = useFrappeGetCall<{ message: MessagesWithDate }>("raven.api.raven_message.get_messages_with_dates", {
-        channel_id: channelData.name
-    }, `get_messages_for_channel_${channelData.name}`, {
-        revalidateOnFocus: false
-    })
+    // const { data, error, mutate, isLoading } = useFrappeGetCall<{ message: MessagesWithDate }>("raven.api.raven_message.get_messages_with_dates", {
+    //     channel_id: channelData.name
+    // })
+    // }, `get_messages_for_channel_${channelData.name}`, {
+    //     revalidateOnFocus: false
+    // })
 
     useFrappeDocumentEventListener('Raven Channel', channelData.name, () => { })
 
-    useFrappeEventListener('message_updated', (data) => {
-        //If the message is sent on the current channel
-        if (data.channel_id === channelData.name) {
-            //If the sender is not the current user
-            if (data.sender !== currentUser) {
-                mutate()
-            }
-        }
-    })
+    // useFrappeEventListener('message_updated', (data) => {
+    //     //If the message is sent on the current channel
+    //     if (data.channel_id === channelData.name) {
+    //         //If the sender is not the current user
+    //         if (data.sender !== currentUser) {
+    //             mutate()
+    //         }
+    //     }
+    // })
 
     const { name: user } = useUserData()
     const { channelMembers } = useContext(ChannelMembersContext) as ChannelMembersContextType
@@ -103,64 +105,69 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
         return null
     }
 
-    if (isLoading) {
-        //TODO: Replace with skeleton loader
-        return <FullPageLoader />
-    }
+    // if (isLoading) {
+    //     //TODO: Replace with skeleton loader
+    //     return <FullPageLoader />
+    // }
 
-    if (error) {
-        return <Box p='2' pt='9' className="h-screen"><ErrorBanner error={error} /></Box>
-    }
+    // if (error) {
+    //     return <Box p='2' pt='9' className="h-screen"><ErrorBanner error={error} /></Box>
+    // }
 
-    if (data) {
-        return (
-            <Flex height='100%' direction='column' justify={'end'} p='4' pt='9' className="overflow-hidden">
+    // if (data) {
+    return (
+        <Flex height='100%' direction='column' justify={'end'} p='4' pt='9' className="overflow-hidden">
 
-                <FileDrop
-                    files={files}
-                    ref={fileInputRef}
-                    onFileChange={setFiles}
-                    maxFiles={10}
-                    maxFileSize={10000000}>
-                    {isLoading ? <FullPageLoader className="w-full" /> :
+            <FileDrop
+                files={files}
+                ref={fileInputRef}
+                onFileChange={setFiles}
+                maxFiles={10}
+                maxFileSize={10000000}>
+                {/* {isLoading ? <FullPageLoader className="w-full" /> :
                         <ChatHistory
                             parsedMessages={data.message}
                             replyToMessage={handleReplyAction}
                             channelData={channelData} />
-                    }
-                    {channelData?.is_archived == 0 && (isUserInChannel || channelData?.type === 'Open')
-                        &&
-                        <Suspense fallback={<Flex align='center' justify='center' width='100%' height='9'><Loader /></Flex>}>
-                            <Tiptap
-                                key={channelData.name}
-                                fileProps={{
-                                    fileInputRef,
-                                    addFile
-                                }}
-                                clearReplyMessage={handleCancelReply}
-                                placeholder={randomPlaceholder}
-                                sessionStorageKey={`tiptap-${channelData.name}`}
-                                onMessageSend={sendMessage}
-                                messageSending={loading}
-                                slotBefore={<Flex direction='column' justify='center' hidden={!selectedMessage && !files.length}>
-                                    {selectedMessage && <PreviousMessagePreview selectedMessage={selectedMessage} />}
-                                    {files && files.length > 0 && <Flex gap='2' width='100%' align='end' px='2' p='2' wrap='wrap'>
-                                        {files.map((f: CustomFile) => <Box className="grow-0" key={f.fileID}><FileListItem file={f} uploadProgress={fileUploadProgress} removeFile={() => removeFile(f.fileID)} /></Box>)}
-                                    </Flex>}
-                                </Flex>}
-                            />
-                        </Suspense>
-                    }
-                    {channelData?.is_archived == 0 && (!isUserInChannel && channelData?.type !== 'Open' &&
-                        <JoinChannelBox
-                            channelData={channelData}
-                            channelMembers={channelMembers}
-                            user={user} />)}
-                    {channelData && channelData.is_archived == 1 && <ArchivedChannelBox channelData={channelData} channelMembers={channelMembers} />}
-                </FileDrop>
-            </Flex>
-        )
-    }
+                    } */}
 
-    return null
+                <MessageStream
+                // channelID={channelData.name}
+                />
+
+                {channelData?.is_archived == 0 && (isUserInChannel || channelData?.type === 'Open')
+                    &&
+                    <Suspense fallback={<Flex align='center' justify='center' width='100%' height='9'><Loader /></Flex>}>
+                        <Tiptap
+                            key={channelData.name}
+                            fileProps={{
+                                fileInputRef,
+                                addFile
+                            }}
+                            clearReplyMessage={handleCancelReply}
+                            placeholder={randomPlaceholder}
+                            sessionStorageKey={`tiptap-${channelData.name}`}
+                            onMessageSend={sendMessage}
+                            messageSending={loading}
+                            slotBefore={<Flex direction='column' justify='center' hidden={!selectedMessage && !files.length}>
+                                {selectedMessage && <PreviousMessagePreview selectedMessage={selectedMessage} />}
+                                {files && files.length > 0 && <Flex gap='2' width='100%' align='end' px='2' p='2' wrap='wrap'>
+                                    {files.map((f: CustomFile) => <Box className="grow-0" key={f.fileID}><FileListItem file={f} uploadProgress={fileUploadProgress} removeFile={() => removeFile(f.fileID)} /></Box>)}
+                                </Flex>}
+                            </Flex>}
+                        />
+                    </Suspense>
+                }
+                {channelData?.is_archived == 0 && (!isUserInChannel && channelData?.type !== 'Open' &&
+                    <JoinChannelBox
+                        channelData={channelData}
+                        channelMembers={channelMembers}
+                        user={user} />)}
+                {channelData && channelData.is_archived == 1 && <ArchivedChannelBox channelData={channelData} channelMembers={channelMembers} />}
+            </FileDrop>
+        </Flex>
+    )
+    // }
+
+    // return null
 }
