@@ -28,7 +28,7 @@ export const Login = () => {
         <IonPage>
             <IonHeader translucent>
                 <IonToolbar>
-                    <IonTitle>Raven</IonTitle>
+                    <IonTitle>neochat</IonTitle>
                 </IonToolbar>
             </IonHeader>
             <IonContent className='ion-padding'>

@@ -40,7 +40,7 @@ export const Component = () => {
 
                             <Link to="/" tabIndex={-1}>
                                 <Flex justify="center">
-                                    <Text as='span' size='9' className='cal-sans'>raven</Text>
+                                    <Text as='span' size='9' className='cal-sans'>neochat</Text>
                                 </Flex>
                             </Link>
 

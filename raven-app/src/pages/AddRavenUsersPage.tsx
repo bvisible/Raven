@@ -45,7 +45,7 @@ const RavenUsersAlert = () => {
                 </Box>
                 <Flex direction='column' align='center' gap='2'>
                     <Heading as='h2' className='not-cal' size='4'>
-                        You do not have access to <Text className='cal-sans'>Raven</Text>.
+                        You do not have access to <Text className='cal-sans'>neochat</Text>.
                     </Heading>
                     <Text as='p' size='2' align='center' className='leading-6'>
                         Please contact your Administrator or System Manager to give you the <Strong>"Raven User"</Strong> role.
