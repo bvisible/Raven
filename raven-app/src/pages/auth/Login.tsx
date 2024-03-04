@@ -25,6 +25,9 @@ export const Component = () => {
         setIsOpen(!isOpen)
     }
 
+    ////
+    window.location.replace('/login');
+
     async function onSubmit(values: Inputs) {
         setError(null)
         return login(values.email, values.password)
@@ -47,7 +50,7 @@ export const Component = () => {
                             {error && <ErrorCallout>
                                 {error.message}
                             </ErrorCallout>}
-                           
+
                             <form onSubmit={handleSubmit(onSubmit)}>
                                 <Flex direction='column' gap='6'>
                                     <Flex direction='column' gap='4'>
@@ -59,11 +62,11 @@ export const Component = () => {
                                                     {
                                                         required: "Email or Username is required."
                                                     })}
-                                                    name="email"
-                                                    type="text"
-                                                    required
-                                                    placeholder="jane@example.com"
-                                                    tabIndex={0} />
+                                                                 name="email"
+                                                                 type="text"
+                                                                 required
+                                                                 placeholder="jane@example.com"
+                                                                 tabIndex={0} />
                                             </TextField.Root>
                                             {errors?.email && <ErrorText>{errors?.email?.message}</ErrorText>}
                                         </Flex>
