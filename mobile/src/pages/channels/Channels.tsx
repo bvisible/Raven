@@ -39,13 +39,13 @@ export const Channels = () => {
         <IonPage ref={pageRef}>
             <IonHeader>
                 <IonToolbar>
-                    <IonTitle>Channels</IonTitle>
+                    <IonTitle>Canaux</IonTitle>
                 </IonToolbar>
             </IonHeader>
             <IonContent fullscreen>
                 <IonHeader collapse="condense">
                     <IonToolbar>
-                        <IonTitle size="large">Channels</IonTitle>
+                        <IonTitle size="large">Canaux</IonTitle>
                     </IonToolbar>
                 </IonHeader>
                 <IonToolbar>

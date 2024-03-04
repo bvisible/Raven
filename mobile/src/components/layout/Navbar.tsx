@@ -39,12 +39,12 @@ export const Navbar = () => {
             <IonTabButton tab="channels" href="/channels">
                 <IonIcon hidden />
                 <BiHash size={24} className="mb-0.5" />
-                <IonLabel className="font-semibold">Channels</IonLabel>
+                <IonLabel className="font-semibold">Canaux</IonLabel>
             </IonTabButton>
             <IonTabButton tab="direct-messages" href="/direct-messages">
                 <IonIcon hidden />
                 <BiChat size={24} className="mb-0.5" />
-                <IonLabel className="font-semibold">DM's</IonLabel>
+                <IonLabel className="font-semibold">MD</IonLabel>
             </IonTabButton>
             {/* <IonTabButton tab="search" href="/search">
                 <BiSearch size={30} />
@@ -55,7 +55,7 @@ export const Navbar = () => {
             <IonTabButton tab="profile" href="/profile">
                 <IonIcon hidden />
                 <BiUser size={24} />
-                <IonLabel className="font-semibold">Profile</IonLabel>
+                <IonLabel className="font-semibold">Profil</IonLabel>
             </IonTabButton>
         </IonTabBar>
     </IonTabs>

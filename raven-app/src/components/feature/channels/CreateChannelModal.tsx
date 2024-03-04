@@ -175,7 +175,7 @@ export const CreateChannelButton = ({ updateChannelList }: { updateChannelList: 
                                 })}
                                 aria-invalid={errors.channel_description ? 'true' : 'false'}
                             />
-                            <HelperText>What is this channel about?</HelperText>
+                            <HelperText>Quel est l'objet de ce canal ?</HelperText>
                             {errors?.channel_description && <ErrorText>{errors.channel_description?.message}</ErrorText>}
                         </Box>
                         <Flex gap='2' direction='column'>

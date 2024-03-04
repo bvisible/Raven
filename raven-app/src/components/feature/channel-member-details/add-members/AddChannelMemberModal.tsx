@@ -63,10 +63,10 @@ export const AddChannelMembersModalContent = ({ channelID, channel_name, onClose
       <form onSubmit={handleSubmit(onSubmit)}>
 
         <Dialog.Title>
-          <Text>Add members to&nbsp; <ChannelIcon type={type} size='18' className='inline-block -mb-0.5' /> {channel_name}</Text>
+          <Text>Ajouter des membres à&nbsp; <ChannelIcon type={type} size='18' className='inline-block -mb-0.5' /> {channel_name}</Text>
         </Dialog.Title>
 
-        <Dialog.Description>Anyone you add will be able to see all of the channel’s contents</Dialog.Description>
+        <Dialog.Description>Toute personne que vous ajoutez pourra voir l'ensemble du contenu du canal.</Dialog.Description>
 
         <Flex gap='2' py='4' direction='column' width='100%'>
           <ErrorBanner error={error} />
@@ -92,18 +92,18 @@ export const AddChannelMembersModalContent = ({ channelID, channel_name, onClose
                 </Suspense>
                 <ErrorText>{methods.formState.errors.add_members?.message}</ErrorText>
               </Flex>
-              <Text size='1' weight='light'>New members will be able to see all of <strong>{channel_name}</strong>'s history, including any files that have been shared in the channel.</Text>
+              <Text size='1' weight='light'>Les nouveaux membres pourront voir tout l'historique de <strong>{channel_name}</strong>, y compris les fichiers qui ont été partagés sur le canal.</Text>
             </Flex>
           </Box>
         </Flex>
 
         <Flex gap="3" mt="6" justify="end" align='center'>
           <Dialog.Close disabled={creatingDoc}>
-            <Button variant="soft" color="gray">Cancel</Button>
+            <Button variant="soft" color="gray">Annuler</Button>
           </Dialog.Close>
           <Button type='submit' disabled={creatingDoc}>
             {creatingDoc && <Loader />}
-            {creatingDoc ? "Saving" : "Save"}
+            {creatingDoc ? "Enregistrement" : "Enregistrer"}
           </Button>
         </Flex>
 

@@ -23,7 +23,7 @@ export const ChannelList = ({ unread_count }: { unread_count?: UnreadCountData }
                 <SidebarViewMoreButton onClick={toggle} />
                 <Flex width='100%' justify='between' align='center' gap='2'>
                     <Flex gap='3' align='center'>
-                        <SidebarGroupLabel className='cal-sans'>Channels</SidebarGroupLabel>
+                        <SidebarGroupLabel className='cal-sans'>Canaux</SidebarGroupLabel>
                         <CreateChannelButton updateChannelList={mutate} />
                     </Flex>
                     {!showData && unread_count && unread_count.total_unread_count_in_channels > 0 && <SidebarBadge>{unread_count.total_unread_count_in_channels}</SidebarBadge>}

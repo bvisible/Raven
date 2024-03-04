@@ -26,7 +26,7 @@ export const SidebarBody = () => {
                             <BiBookmark className='text-slate-12 mt-0.5' size='14' />
                         </AccessibleIcon>
                         <Box>
-                            <Text size='2' className='cal-sans' as='span'>Saved Messages</Text>
+                            <Text size='2' className='cal-sans' as='span'>Messages enregistrés</Text>
                         </Box>
                     </SidebarItem>
                 </Box>
