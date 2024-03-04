@@ -57,7 +57,7 @@ const SavedMessages = () => {
     return (
         <>
             <PageHeader>
-                <Heading size='5'>Saved Messages</Heading>
+                <Heading size='5'>Messages sauvegardés</Heading>
                 <SearchButton />
             </PageHeader>
             <Box className="min-h-screen pt-20 pb-8">

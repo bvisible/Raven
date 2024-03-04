@@ -12,7 +12,7 @@ export const ViewFilesButton = () => {
     const [open, { }, setOpen] = useBoolean(false)
 
     return <Dialog.Root open={open} onOpenChange={setOpen}>
-        <Tooltip content='view files'>
+        <Tooltip content='Voir les fichiers'>
             <Dialog.Trigger>
                 <Button
                     color='gray'
@@ -20,7 +20,7 @@ export const ViewFilesButton = () => {
                     variant='soft'
                     aria-label="view files">
                     <BiFile />
-                    Files
+                    Fichiers
                 </Button>
             </Dialog.Trigger>
         </Tooltip>

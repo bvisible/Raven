@@ -80,20 +80,20 @@ export const CreateChannelButton = ({ updateChannelList }: { updateChannelList: 
             case 'Private':
                 return {
                     channelIcon: <BiLockAlt />,
-                    header: 'Create a private channel',
-                    helperText: 'When a channel is set to private, it can only be viewed or joined by invitation.'
+                    header: 'Créer un canal privé',
+                    helperText: 'Lorsqu\'un canal est défini comme privé, il ne peut être consulté ou rejoint que sur invitation.'
                 }
             case 'Open':
                 return {
                     channelIcon: <BiGlobe />,
-                    header: 'Create an open channel',
-                    helperText: 'When a channel is set to open, everyone is a member.'
+                    header: 'Créer un canal ouvert',
+                    helperText: 'Lorsqu\'un canal est ouvert, tout le monde en est membre.'
                 }
             default:
                 return {
                     channelIcon: <BiHash />,
-                    header: 'Create a public channel',
-                    helperText: 'When a channel is set to public, anyone can join the channel and read messages, but only members can post messages.'
+                    header: 'Créer un canal public',
+                    helperText: 'Lorsqu\'un canal est défini comme public, tout le monde peut s\'y inscrire et lire les messages, mais seuls les membres peuvent envoyer des messages.'
                 }
         }
     }, [channelType])
@@ -109,32 +109,32 @@ export const CreateChannelButton = ({ updateChannelList }: { updateChannelList: 
                 {header}
             </Dialog.Title>
             <Dialog.Description size='2'>
-                Channels are where your team communicates. They are best when organized around a topic - #development, for example.
+                Les canaux permettent à votre équipe de communiquer. Ils sont plus efficaces lorsqu'ils sont organisés autour d'un thème - #développement, par exemple.
             </Dialog.Description>
             <FormProvider {...methods}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Flex direction='column' gap='4' py='4'>
                         <ErrorBanner error={channelCreationError} />
                         <Box>
-                            <Label htmlFor='channel_name' isRequired>Name</Label>
+                            <Label htmlFor='channel_name' isRequired>Nom</Label>
                             <Controller
                                 name='channel_name'
                                 control={control}
                                 rules={{
-                                    required: "Please add a channel name",
+                                    required: "Veuillez ajouter un nom de canal",
                                     maxLength: {
                                         value: 50,
-                                        message: "Channel name cannot be more than 50 characters."
+                                        message: "Le nom du canal ne peut pas comporter plus de 50 caractères."
                                     },
                                     minLength: {
                                         value: 3,
-                                        message: "Channel name cannot be less than 3 characters."
+                                        message: "Le nom du canal ne peut être inférieur à 3 caractères."
                                     },
                                     pattern: {
                                         // no special characters allowed
                                         // cannot start with a space
                                         value: /^[a-zA-Z0-9][a-zA-Z0-9-]*$/,
-                                        message: "Channel name can only contain letters, numbers and hyphens."
+                                        message: "Le nom du canal ne peut contenir que des lettres, des chiffres et des traits d'union."
                                     }
                                 }}
                                 render={({ field, fieldState: { error } }) => (
@@ -146,7 +146,7 @@ export const CreateChannelButton = ({ updateChannelList }: { updateChannelList: 
                                             maxLength={50}
                                             required
                                             autoFocus
-                                            placeholder='e.g. red-wedding-planning, joffrey-memes'
+                                            placeholder='exemple : action-seo, compta-24'
                                             color={error ? 'red' : undefined}
                                             {...field}
                                             aria-invalid={error ? 'true' : 'false'}
@@ -162,15 +162,15 @@ export const CreateChannelButton = ({ updateChannelList }: { updateChannelList: 
                         </Box>
 
                         <Box>
-                            <Label htmlFor='channel_description'>Description <Text as='span' weight='light'>(optional)</Text></Label>
+                            <Label htmlFor='channel_description'>Description <Text as='span' weight='light'>(facultatif)</Text></Label>
                             <TextArea
                                 maxLength={140}
                                 id='channel_description'
-                                placeholder='Great wine and food. What could go wrong?'
+                                placeholder='Décrivez l objectif de ce canal'
                                 {...register('channel_description', {
                                     maxLength: {
                                         value: 140,
-                                        message: "Channel description cannot be more than 140 characters."
+                                        message: "La description du canal ne doit pas dépasser 140 caractères."
                                     }
                                 })}
                                 aria-invalid={errors.channel_description ? 'true' : 'false'}
@@ -219,12 +219,12 @@ export const CreateChannelButton = ({ updateChannelList }: { updateChannelList: 
                     <Flex gap="3" mt="4" justify="end">
                         <Dialog.Close disabled={creatingChannel}>
                             <Button variant="soft" color="gray">
-                                Cancel
+                                Annuler
                             </Button>
                         </Dialog.Close>
                         <Button type='submit' disabled={creatingChannel}>
                             {creatingChannel && <Loader />}
-                            {creatingChannel ? "Saving" : "Save"}
+                            {creatingChannel ? "Enregistrement" : "Enregistrer"}
                         </Button>
                     </Flex>
                 </form>

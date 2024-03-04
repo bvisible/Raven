@@ -27,7 +27,7 @@ export const SearchButton = () => {
 
     return (
         <Dialog.Root open={open} onOpenChange={setOpen}>
-            <Tooltip content='search'>
+            <Tooltip content='recherche'>
                 <Dialog.Trigger>
                     <Button
                         color='gray'
@@ -35,7 +35,7 @@ export const SearchButton = () => {
                         variant='soft'
                         aria-label="search">
                         <BiSearch />
-                        Search
+                        Rechercher
                         {/* <Kbd size='3'><KeyboardMetaKeyIcon size='12' />&nbsp;K</Kbd> */}
                     </Button>
                 </Dialog.Trigger>

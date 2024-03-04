@@ -45,7 +45,7 @@ const EmptyStateForChannel = ({ channelData, channelMembers, updateMembers }: Em
                     <ChannelIcon type={channelData?.type} />
                     <Heading size='4'>{channelData?.channel_name}</Heading>
                 </Flex>
-                <Text size='2'>{users[channelData.owner]?.full_name} created this channel on <DateMonthYear date={channelData?.creation} />. This is the very beginning of the <strong>{channelData?.channel_name}</strong> channel.</Text>
+                <Text size='2'>{users[channelData.owner]?.full_name} a créé ce canal le <DateMonthYear date={channelData?.creation} />. Il s'agit du tout début du <strong>{channelData?.channel_name}</strong> canal.</Text>
                 {channelData?.channel_description && <Text size={'1'} color='gray'>{channelData?.channel_description}</Text>}
             </Flex>
             {channelData?.is_archived == 0 && channelMembers[currentUser] && <Flex gap='4' className={'z-1'}>
@@ -78,12 +78,12 @@ const EmptyStateForDM = ({ channelData }: EmptyStateForDMProps) => {
                     </Flex>
                     {channelData?.is_self_message == 1 ?
                         <Flex direction='column' gap='0'>
-                            <Text size='2'><strong>This space is all yours.</strong> Draft messages, list your to-dos, or keep links and files handy. </Text>
-                            <Text size='2'>And if you ever feel like talking to yourself, don't worry, we won't judge - just remember to bring your own banter to the table.</Text>
+                            <Text size='2'><strong>Cet espace est à vous.</strong> Rédigez des messages, dressez la liste de vos tâches ou gardez des liens et des fichiers à portée de main. </Text>
+                            <Text size='2'></Text>
                         </Flex>
                         :
                         <Flex gap='2' align='center'>
-                            <Text size='2'>This is a Direct Message channel between you and <strong>{users?.[peer]?.full_name ?? peer}</strong>. Check out their profile to learn more about them.</Text>
+                            <Text size='2'>Il s'agit d'un canal de messages directs entre vous et <strong>{users?.[peer]?.full_name ?? peer}</strong>. Consultez leur profil pour en savoir plus.</Text>
                             {/* <Button size='2' variant='ghost' className={'z-1'}>View profile</Button> */}
                         </Flex>
                     }

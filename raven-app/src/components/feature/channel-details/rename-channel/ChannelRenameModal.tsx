@@ -52,12 +52,12 @@ export const RenameChannelModalContent = ({ channelID, channelName, type, onClos
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
-                <Dialog.Title>Rename this channel</Dialog.Title>
+                <Dialog.Title>Renommer ce canal</Dialog.Title>
 
                 <Flex gap='2' direction='column' width='100%'>
                     <ErrorBanner error={error} />
                     <Box width='100%'>
-                        <Label htmlFor='channel_name' isRequired>Name</Label>
+                        <Label htmlFor='channel_name' isRequired>Nom</Label>
                         <Controller
                             name='channel_name'
                             control={control}
@@ -105,11 +105,11 @@ export const RenameChannelModalContent = ({ channelID, channelName, type, onClos
 
                 <Flex gap="3" mt="6" justify="end" align='center'>
                     <Dialog.Close disabled={updatingDoc}>
-                        <Button variant="soft" color="gray">Cancel</Button>
+                        <Button variant="soft" color="gray">Annuler</Button>
                     </Dialog.Close>
                     <Button type='submit' disabled={updatingDoc}>
                         {updatingDoc && <Loader />}
-                        {updatingDoc ? "Saving" : "Save"}
+                        {updatingDoc ? "Enregistrement" : "Enregistrer"}
                     </Button>
                 </Flex>
             </form>

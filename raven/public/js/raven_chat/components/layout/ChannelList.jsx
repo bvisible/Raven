@@ -14,7 +14,7 @@ const ChannelList = ({ onSelectChannel }) => {
             {isLoading && <SkeletonLoader />}
             <h4>Channels</h4>
             {channels?.map(channel => <ChannelListItem key={channel.name} channel={channel} onClick={() => onSelectChannel(channel.name)} />)}
-            <h4 style={{ paddingTop: '1rem' }}>Direct Messages</h4>
+            <h4 style={{ paddingTop: '1rem' }}>Messages directs</h4>
             {dm_channels?.map(channel => <DMChannelListItem key={channel.name} channel={channel} onClick={() => onSelectChannel(channel.name)} />)}
         </div>
     )

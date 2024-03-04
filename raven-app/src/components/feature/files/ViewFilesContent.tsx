@@ -62,7 +62,7 @@ const ViewFilesContent = () => {
     return (
         <div>
             <Flex justify='between' gap='2'>
-                <Dialog.Title>Files shared in this channel</Dialog.Title>
+                <Dialog.Title>Fichiers partagés dans ce canal</Dialog.Title>
                 <Dialog.Close>
                     <IconButton size='1' color='gray' variant="soft" aria-label="close dialog">
                         <IoMdClose />

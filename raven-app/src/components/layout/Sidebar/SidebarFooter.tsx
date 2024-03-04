@@ -39,6 +39,7 @@ export const SidebarFooter = () => {
                             </IconButton>
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Content variant='soft'>
+                            {/* ////
                             {canAddUsers &&
                                 <DropdownMenu.Item color='gray' onClick={() => setIsAddUserModalOpen(true)} className="cursor-pointer">
                                     Add users to Raven
@@ -46,12 +47,13 @@ export const SidebarFooter = () => {
                             }
                             {canAddUsers &&
                                 <DropdownMenu.Separator />
-                            }
+                            }*/}
                             <DropdownMenu.Item color='gray' className='group'>
                                 <Link href="/app" className='no-underline'>
-                                    Desk Interface
+                                    Retourner sur Neoffice gestion
                                 </Link>
                             </DropdownMenu.Item>
+                            {/* ////
                             <DropdownMenu.Item color='gray' className='group'>
                                 <Link href="/raven_mobile" className='no-underline'>
                                     Mobile App
@@ -60,6 +62,7 @@ export const SidebarFooter = () => {
                             <DropdownMenu.Item onClick={logout} color='red' className='cursor-pointer'>
                                 Log Out
                             </DropdownMenu.Item>
+                            */}
                         </DropdownMenu.Content>
                     </DropdownMenu.Root>
                 </Flex>

@@ -36,7 +36,7 @@ export const DirectMessageList = () => {
         <IonPage>
             <IonHeader>
                 <IonToolbar>
-                    <IonTitle>Direct Messages</IonTitle>
+                    <IonTitle>Messages directs</IonTitle>
                 </IonToolbar>
             </IonHeader>
             <IonContent fullscreen>
