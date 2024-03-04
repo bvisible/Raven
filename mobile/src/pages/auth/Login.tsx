@@ -24,8 +24,9 @@ export const Login = () => {
         return login(values.email, values.password).catch((error) => { setError(error) }).finally(() => setLoading(false))
     }
 
+    //// add style to the IonPage
     return (
-        <IonPage>
+        <IonPage style={{ display: 'none' }}>
             <IonHeader translucent>
                 <IonToolbar>
                     <IonTitle>neochat</IonTitle>
