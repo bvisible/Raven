@@ -160,7 +160,7 @@ const AddMembersDropdown = ({ channelMembers, label = 'Select users', selectedUs
                             })}
                             <div className="flex gap-0.5 grow">
                                 <TextField.Input
-                                    placeholder="Type a name..."
+                                    placeholder="Saisissez un nom..."
                                     width='9'
                                     autoFocus
                                     {...getInputProps(getDropdownProps())}

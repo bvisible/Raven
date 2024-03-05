@@ -125,7 +125,7 @@ export const AddChannelMembers = ({ presentingElement, isOpen, onDismiss, channe
             <IonContent>
 
                 <IonSearchbar
-                    placeholder="Search"
+                    placeholder="Recherche"
                     debounce={1000}
                     onIonInput={(e) => setSearchText(e.target.value?.toString() || '')}
                 />

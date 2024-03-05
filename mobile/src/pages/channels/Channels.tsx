@@ -61,7 +61,7 @@ export const Channels = () => {
                         <IoAdd size='24' color='var(--ion-color-medium)' />
                     </div>
                     <IonLabel color='medium'>
-                        Add Channel
+                        Ajouter un canal
                     </IonLabel>
                 </IonItem>
                 <ChannelList data={filteredChannels ?? []} unread_count={unread_count?.message}/>

@@ -4,7 +4,7 @@ type Props = {
     text?: string
 }
 
-export const FullPageLoader = ({ text = "Ravens are finding their way to you..." }: Props) => {
+export const FullPageLoader = ({ text = "neochat est actuellement en cours de chargement. Veuillez patienter..." }: Props) => {
     return (
         <div className='h-full w-full flex justify-center items-center flex-col'>
             <IonSpinner color={'dark'} name='crescent' />

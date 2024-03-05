@@ -39,7 +39,7 @@ const ChatInput = ({ channelID }) => {
             <textarea type='text'
                 className='form-control'
                 rows='1'
-                placeholder='Type a message...' value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => {
+                placeholder='Saisissez un message...' value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                         sendMessage()
                     }

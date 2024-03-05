@@ -262,7 +262,7 @@ export const Tiptap = ({ onMessageSend, messageSending, defaultText = '' }: Tipt
             lowlight
         }),
         Placeholder.configure({
-            placeholder: 'Type a message...'
+            placeholder: 'Saisissez un message...'
         }),
     ]
 

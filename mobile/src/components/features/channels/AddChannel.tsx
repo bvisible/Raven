@@ -77,11 +77,11 @@ export const AddChannel = ({ presentingElement, isOpen, onDismiss }: AddChannelP
             <IonHeader>
                 <IonToolbar>
                     <IonButtons slot="start">
-                        <IonButton color={'medium'} onClick={onDismiss}>Cancel</IonButton>
+                        <IonButton color={'medium'} onClick={onDismiss}>Annuler</IonButton>
                     </IonButtons>
-                    <IonTitle>Create Channel</IonTitle>
+                    <IonTitle>Créer un canal</IonTitle>
                     <IonButtons slot="end">
-                        <IonButton color={'primary'} onClick={handleSubmit(onSubmit)}>Create</IonButton>
+                        <IonButton color={'primary'} onClick={handleSubmit(onSubmit)}>Créer</IonButton>
                     </IonButtons>
                 </IonToolbar>
             </IonHeader>
@@ -91,7 +91,7 @@ export const AddChannel = ({ presentingElement, isOpen, onDismiss }: AddChannelP
                     <IonList>
                         <IonItemGroup>
                             <IonItemDivider className="py-1">
-                                <IonLabel>Channel Name</IonLabel>
+                                <IonLabel>Nom du canal</IonLabel>
                             </IonItemDivider>
                             <IonItem lines='none' className="pb-2">
                                 <div slot='start'>
@@ -103,13 +103,13 @@ export const AddChannel = ({ presentingElement, isOpen, onDismiss }: AddChannelP
                                     name='channel_name'
                                     control={control}
                                     rules={{
-                                        required: "Channel name is required",
+                                        required: "Le nom du canal est obligatoire",
                                         maxLength: 50,
                                         pattern: {
                                             // no special characters allowed
                                             // cannot start with a space
                                             value: /^[a-zA-Z0-9][a-zA-Z0-9-]*$/,
-                                            message: "Channel name can only contain letters, numbers and hyphens."
+                                            message: "Le nom du canal ne peut contenir que des lettres, des chiffres et des traits d'union."
                                         }
                                     }}
                                     render={({ field }) => <IonInput
@@ -117,9 +117,9 @@ export const AddChannel = ({ presentingElement, isOpen, onDismiss }: AddChannelP
                                         maxlength={50}
                                         autoCapitalize="off"
                                         value={field.value}
-                                        placeholder='bugs-bugs-bugs'
+                                        placeholder='exemple : action-seo, compta-24'
                                         className={!!errors?.channel_name ? 'ion-invalid ion-touched' : ''}
-                                        aria-label="Channel Name"
+                                        aria-label="Nom du canal"
                                         errorText={errors?.channel_name?.message}
                                         onIonInput={(e) => handleNameChange(e.target.value as string)}
                                     />}
@@ -134,9 +134,9 @@ export const AddChannel = ({ presentingElement, isOpen, onDismiss }: AddChannelP
                             <IonItem lines='none'>
                                 <IonTextarea
                                     {...register("channel_description")}
-                                    placeholder='A channel for reporting bugs'
+                                    placeholder="Décrivez l'objectif de ce canal"
                                     className={errors?.channel_description ? 'ion-invalid' : ''}
-                                    aria-label="Channel Description (optional)"
+                                    aria-label="Description du canal (optionnel)"
                                     autoGrow
                                     rows={4}
                                 />
@@ -144,7 +144,7 @@ export const AddChannel = ({ presentingElement, isOpen, onDismiss }: AddChannelP
                         </IonItemGroup>
                         <IonItemGroup>
                             <IonItemDivider className="py-1">
-                                <IonLabel>Channel Type</IonLabel>
+                                <IonLabel>Type de canal</IonLabel>
                             </IonItemDivider>
                             <IonRadioGroup value={channelType} onIonChange={e => setChannelType(e.detail.value)}>
                                 <IonItem>
@@ -174,9 +174,9 @@ export const AddChannel = ({ presentingElement, isOpen, onDismiss }: AddChannelP
                                 </IonItem>
 
                                 <IonItem lines='none' className="pt-2">
-                                    {channelType === 'Public' && <IonText className="text-sm" color='medium'>When a channel is set to public, anyone can join the channel and read messages, but only members can post messages.</IonText>}
-                                    {channelType === 'Private' && <IonText className="text-sm" color='medium'>When a channel is set to private, it can only be viewed or joined by invitation.</IonText>}
-                                    {channelType === 'Open' && <IonText className="text-sm" color='medium'>When a channel is set to open, everyone is a member.</IonText>}
+                                    {channelType === 'Public' && <IonText className="text-sm" color='medium'>Lorsqu'un canal est défini comme public, tout le monde peut s'y inscrire et lire les messages, mais seuls les membres peuvent publier des messages.</IonText>}
+                                    {channelType === 'Private' && <IonText className="text-sm" color='medium'>Lorsqu'un canal est défini comme privé, il ne peut être consulté ou rejoint que sur invitation.</IonText>}
+                                    {channelType === 'Open' && <IonText className="text-sm" color='medium'>Lorsqu'un canal est ouvert, tout le monde en est membre.</IonText>}
                                 </IonItem>
 
                             </IonRadioGroup>

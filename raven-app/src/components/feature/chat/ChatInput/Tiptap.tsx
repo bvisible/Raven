@@ -73,7 +73,7 @@ export const ChannelMention = Mention.extend({
             pluginKey: new PluginKey('channelMention'),
         }
     })
-const Tiptap = ({ slotBefore, fileProps, onMessageSend, replyMessage, clearReplyMessage, placeholder = 'Type a message...', messageSending, sessionStorageKey = 'tiptap-editor', disableSessionStorage = false, defaultText = '' }: TiptapEditorProps) => {
+const Tiptap = ({ slotBefore, fileProps, onMessageSend, replyMessage, clearReplyMessage, placeholder = 'Saisissez un message...', messageSending, sessionStorageKey = 'tiptap-editor', disableSessionStorage = false, defaultText = '' }: TiptapEditorProps) => {
 
     const { enabledUsers } = useContext(UserListContext)
 

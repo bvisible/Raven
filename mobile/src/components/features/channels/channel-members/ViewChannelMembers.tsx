@@ -93,7 +93,7 @@ export const ViewChannelMembers = ({ presentingElement, isOpen, onDismiss, chann
             <IonContent>
 
                 <IonSearchbar
-                    placeholder="Search"
+                    placeholder="Recherche"
                     debounce={1000}
                     onIonInput={(e) => setSearchText(e.target.value?.toString() || '')}
                 />

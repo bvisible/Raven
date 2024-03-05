@@ -166,7 +166,7 @@ export const CreateChannelButton = ({ updateChannelList }: { updateChannelList: 
                             <TextArea
                                 maxLength={140}
                                 id='channel_description'
-                                placeholder='Décrivez l objectif de ce canal'
+                                placeholder="Décrivez l'objectif de ce canal"
                                 {...register('channel_description', {
                                     maxLength: {
                                         value: 140,
