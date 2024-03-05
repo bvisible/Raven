@@ -50,6 +50,7 @@ export const Channels = () => {
                 </IonHeader>
                 <IonToolbar>
                     <IonSearchbar
+                        placeholder="Recherche"
                         spellCheck
                         onIonInput={(e) => setSearchInput(e.detail.value!)}>
                     </IonSearchbar>

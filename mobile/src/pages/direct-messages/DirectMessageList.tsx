@@ -47,6 +47,7 @@ export const DirectMessageList = () => {
                 </IonHeader>
                 <IonToolbar>
                     <IonSearchbar
+                        placeholder="Recherche"
                         spellCheck
                         onIonInput={(e) => setSearchInput(e.detail.value!)}>
                     </IonSearchbar>
