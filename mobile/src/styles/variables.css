@@ -306,7 +306,7 @@ ion-tab-bar {
 ion-tab-button, ion-footer > div{
     background-color: rgb(255 255 255)!important;
 }
-ion-tab-button[tab="profile"], ion-header.header-ios {
+ion-tab-button[tab="profile"], #root > ion-app > ion-router-outlet > div > ion-tabs > div > ion-router-outlet > div > ion-header{
     display: none!important;
 }
 .bg-zinc-900 {
