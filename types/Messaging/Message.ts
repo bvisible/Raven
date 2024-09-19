@@ -1,4 +1,4 @@
-export type Message = FileMessage | TextMessage | ImageMessage
+export type Message = FileMessage | TextMessage | ImageMessage | PollMessage
 
 export interface BaseMessage {
     name: string,
@@ -7,7 +7,7 @@ export interface BaseMessage {
     channel_id: string,
     creation: string,
     modified: string,
-    message_type: 'Text' | 'File' | 'Image',
+    message_type: 'Text' | 'File' | 'Image' | 'Poll',
     message_reactions?: string | null,
     is_continuation: 1 | 0
     is_reply: 1 | 0
@@ -15,8 +15,14 @@ export interface BaseMessage {
     link_doctype?: string
     link_document?: string
     is_edited: 1 | 0
+    is_forwarded: 1 | 0
     /** JSON as string */
-    replied_message_details?: string
+    replied_message_details?: string,
+    poll_id?: string
+    is_bot_message?: 1 | 0,
+    bot?: string,
+    hide_link_preview?: 1 | 0,
+    is_thread: 1 | 0,
 }
 
 export interface FileMessage extends BaseMessage {
@@ -37,6 +43,13 @@ export interface ImageMessage extends BaseMessage {
 export interface TextMessage extends BaseMessage {
     text: string,
     message_type: 'Text',
+    content?: string
+}
+
+export interface PollMessage extends BaseMessage {
+    text: string,
+    message_type: 'Poll',
+    poll_id: string,
     content?: string
 }
 

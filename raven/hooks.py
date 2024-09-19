@@ -2,10 +2,13 @@ from . import __version__ as app_version
 
 app_name = "raven"
 app_title = "Raven"
-app_publisher = "The Commit Company"
+app_publisher = "The Commit Company (Algocode Technologies Pvt. Ltd.)"
 app_description = "Messaging Application"
 app_email = "support@thecommit.company"
 app_license = "AGPLv3"
+source_link = "https://github.com/The-Commit-Company/Raven"
+app_logo = "/assets/raven/raven-logo.png"
+# app_logo_url = "/assets/raven/raven-logo.png"
 
 # Includes in <head>
 # ------------------
@@ -16,9 +19,23 @@ app_include_css = "raven.bundle.css"
 # app_include_js = "/assets/raven/js/raven.js"                 ]
 app_include_js = "raven.bundle.js"
 
+add_to_apps_screen = [
+	{
+		"name": "raven",
+		"logo": "/assets/raven/raven-logo.png",
+		"title": "Raven",
+		"route": "/raven",
+		"has_permission": "raven.permissions.check_app_permission",
+	}
+]
+
 
 sounds = [
-	{"name": "raven_notification", "src": "/assets/raven/sounds/raven_notification.mp3", "volume": 0.2},
+	{
+		"name": "raven_notification",
+		"src": "/assets/raven/sounds/raven_notification.mp3",
+		"volume": 0.2,
+	},
 ]
 
 extend_bootinfo = "raven.boot.boot_session"
@@ -112,10 +129,21 @@ after_uninstall = "raven.uninstall.after_uninstall"
 # Hook on document methods and events
 
 doc_events = {
-    "User": {
-        "after_insert": "raven.raven.doctype.raven_user.raven_user.add_user_to_raven",
-        "on_update": "raven.raven.doctype.raven_user.raven_user.add_user_to_raven",
-    }
+	"User": {
+		"after_insert": "raven.raven.doctype.raven_user.raven_user.add_user_to_raven",
+		"on_update": "raven.raven.doctype.raven_user.raven_user.add_user_to_raven",
+		"on_trash": "raven.raven.doctype.raven_user.raven_user.remove_user_from_raven",
+	},
+	"Department": {
+		"after_insert": "raven.raven_integrations.controllers.department.after_insert",
+		"on_update": "raven.raven_integrations.controllers.department.on_update",
+		"on_trash": "raven.raven_integrations.controllers.department.on_trash",
+	},
+	"Employee": {
+		"after_insert": "raven.raven_integrations.controllers.employee.after_insert",
+		"on_update": "raven.raven_integrations.controllers.employee.on_update",
+		"on_trash": "raven.raven_integrations.controllers.employee.on_trash",
+	},
 }
 
 # Scheduled Tasks
@@ -165,7 +193,7 @@ doc_events = {
 # Ignore links to specified DocTypes when deleting documents
 # -----------------------------------------------------------
 
-# ignore_links_on_delete = ["Communication", "ToDo"]
+ignore_links_on_delete = ["Raven Message"]
 
 
 # User Data Protection
@@ -199,23 +227,26 @@ doc_events = {
 # "raven.auth.validate"
 # ]
 
-additional_timeline_content = {
-    "*": ['raven.api.raven_message.get_timeline_message_content']
-}
+additional_timeline_content = {"*": ["raven.api.raven_message.get_timeline_message_content"]}
 
 website_route_rules = [
-    {'from_route': '/raven/<path:app_path>', 'to_route': 'raven'},
-    {'from_route': '/raven_mobile/<path:app_path>', 'to_route': 'raven_mobile'}, ]
+	{"from_route": "/raven/<path:app_path>", "to_route": "raven"},
+	{"from_route": "/raven_mobile/<path:app_path>", "to_route": "raven"},
+]
 
 permission_query_conditions = {
-    "Raven Channel": "raven.permissions.raven_channel_query",
-    "Raven Message": "raven.permissions.raven_message_query",
+	"Raven Channel": "raven.permissions.raven_channel_query",
+	"Raven Message": "raven.permissions.raven_message_query",
+	"Raven Poll Vote": "raven.permissions.raven_poll_vote_query",
 }
 
 has_permission = {
-    "Raven Channel": "raven.permissions.channel_has_permission",
-    "Raven Channel Member": "raven.permissions.channel_member_has_permission",
-    "Raven Message": "raven.permissions.message_has_permission",
+	"Raven Channel": "raven.permissions.channel_has_permission",
+	"Raven Channel Member": "raven.permissions.channel_member_has_permission",
+	"Raven Message": "raven.permissions.message_has_permission",
+	"Raven Poll Vote": "raven.permissions.raven_poll_vote_has_permission",
+	"Raven Poll": "raven.permissions.raven_poll_has_permission",
+	"Raven User": "raven.permissions.raven_user_has_permission",
 }
 
 on_session_creation = "raven.api.user_availability.set_user_active"

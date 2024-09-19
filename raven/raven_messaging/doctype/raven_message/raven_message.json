@@ -16,6 +16,7 @@
   "linked_message",
   "replied_message_details",
   "column_break_wvje",
+  "is_thread",
   "message_type",
   "content",
   "file",
@@ -27,7 +28,12 @@
   "link_doctype",
   "link_document",
   "is_edited",
-  "mentions"
+  "is_forwarded",
+  "mentions",
+  "poll_id",
+  "is_bot_message",
+  "bot",
+  "hide_link_preview"
  ],
  "fields": [
   {
@@ -59,7 +65,7 @@
    "fieldname": "message_type",
    "fieldtype": "Select",
    "label": "Message Type",
-   "options": "Text\nImage\nFile"
+   "options": "Text\nImage\nFile\nPoll"
   },
   {
    "fieldname": "message_reactions",
@@ -116,6 +122,20 @@
    "options": "link_doctype"
   },
   {
+   "default": "0",
+   "fieldname": "is_bot_message",
+   "fieldtype": "Check",
+   "label": "Is Bot Message"
+  },
+  {
+   "depends_on": "eval: doc.is_bot_message == 1",
+   "fieldname": "bot",
+   "fieldtype": "Link",
+   "label": "Bot",
+   "mandatory_depends_on": "eval: doc.is_bot_message == 1",
+   "options": "Raven User"
+  },
+  {
    "fieldname": "content",
    "fieldtype": "Long Text",
    "label": "Content",
@@ -141,11 +161,37 @@
    "fieldtype": "Table",
    "label": "Mentions",
    "options": "Raven Mention"
+  },
+  {
+   "fieldname": "poll_id",
+   "fieldtype": "Link",
+   "label": "Poll ID",
+   "options": "Raven Poll",
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "hide_link_preview",
+   "fieldtype": "Check",
+   "label": "Hide link preview"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_forwarded",
+   "fieldtype": "Check",
+   "label": "Is Forwarded"
+  },
+  {
+   "default": "0",
+   "description": "This message starts a thread",
+   "fieldname": "is_thread",
+   "fieldtype": "Check",
+   "label": "Is Thread"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-28 03:48:53.487969",
+ "modified": "2024-08-16 16:09:36.292391",
  "modified_by": "Administrator",
  "module": "Raven Messaging",
  "name": "Raven Message",

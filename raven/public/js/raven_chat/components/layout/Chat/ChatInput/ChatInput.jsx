@@ -13,7 +13,7 @@ const ChatInput = ({ channelID }) => {
         frappe.call('raven.api.raven_message.send_message', {
             channel_id: channelID,
             text: content,
-            json: {
+            json_content: {
                 "content": [
                     {
                         "content": [
@@ -39,7 +39,7 @@ const ChatInput = ({ channelID }) => {
             <textarea type='text'
                 className='form-control'
                 rows='1'
-                placeholder='Saisissez un message...' value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => {
+                placeholder='Type a message...' value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                         sendMessage()
                     }

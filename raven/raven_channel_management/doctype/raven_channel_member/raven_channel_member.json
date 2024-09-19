@@ -11,7 +11,13 @@
   "channel_id",
   "user_id",
   "is_admin",
-  "last_visit"
+  "last_visit",
+  "column_break_adqk",
+  "is_synced",
+  "linked_doctype",
+  "linked_document",
+  "notification_settings_section",
+  "allow_notifications"
  ],
  "fields": [
   {
@@ -20,7 +26,8 @@
    "in_list_view": 1,
    "label": "Channel",
    "options": "Raven Channel",
-   "reqd": 1
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "user_id",
@@ -28,7 +35,8 @@
    "in_list_view": 1,
    "label": "User",
    "options": "Raven User",
-   "reqd": 1
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "default": "0",
@@ -42,11 +50,47 @@
    "fieldtype": "Datetime",
    "label": "Last Visit",
    "reqd": 1
+  },
+  {
+   "fieldname": "notification_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Notification Settings"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_notifications",
+   "fieldtype": "Check",
+   "label": "Allow notifications"
+  },
+  {
+   "fieldname": "column_break_adqk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "linked_doctype",
+   "fieldtype": "Link",
+   "label": "Linked DocType",
+   "options": "DocType",
+   "read_only": 1
+  },
+  {
+   "fieldname": "linked_document",
+   "fieldtype": "Dynamic Link",
+   "label": "Linked Document",
+   "options": "linked_doctype",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_synced",
+   "fieldtype": "Check",
+   "label": "Is Synced",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-06 14:41:27.446983",
+ "modified": "2024-06-20 18:59:02.978086",
  "modified_by": "Administrator",
  "module": "Raven Channel Management",
  "name": "Raven Channel Member",
