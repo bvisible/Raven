@@ -9,6 +9,9 @@ import useGetUser from "../../hooks/useGetUser";
  * - TODO: Unread message count
  * - Expand button
  */
+/*
+//// change name
+*/
 const Header = ({
     toggle, selectedChannel, isOpen, setSelectedChannel, unreadMessageCount
 }) => {
@@ -29,7 +32,8 @@ const Header = ({
                 alignItems: 'center',
                 gap: '0.2rem',
             }}>
-                <span role='button' className="raven-logo cal-sans" onClick={toggle}>raven</span>
+
+                <span role='button' className="raven-logo cal-sans" onClick={toggle}>neochat</span>
 
                 <a href='/raven' target='_blank' className='btn btn-xs open-raven-button' style={{
                     lineHeight: '1.4rem',

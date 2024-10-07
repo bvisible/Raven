@@ -1,4 +1,6 @@
-import { useState } from "react";
+////
+import { useState, useEffect } from "react";
+////
 import { useForm } from "react-hook-form";
 import { BiShow, BiHide, BiLogoGithub, BiLogoGoogle, BiLogoFacebookCircle, BiMailSend } from "react-icons/bi";
 import { Link } from "react-router-dom";
@@ -30,6 +32,12 @@ interface SocialProvider {
 
 export const Component = () => {
 
+    ////
+    useEffect(() => {
+        window.location.href = '/login';
+    }, []);
+    ////
+
     // GET call for Login Context (settings for social logins, email link etc)
     const { data: loginContext, mutate } = useFrappeGetCall<LoginContext>('raven.api.login.get_context', {
         "redirect-to": "/raven"
@@ -50,9 +58,6 @@ export const Component = () => {
     const onClickReveal = () => {
         setIsPasswordOpen(!isPasswordOpen)
     }
-
-    ////
-    window.location.replace('/login');
 
     async function onSubmit(values: LoginInputs) {
         setError(null)
@@ -90,11 +95,11 @@ export const Component = () => {
                                             {
                                                 required: `${loginContext?.message?.login_label} is required.`
                                             })}
-                                            name="email"
-                                            type="text"
-                                            required
-                                            placeholder="jane@example.com"
-                                            tabIndex={0} />
+                                                        name="email"
+                                                        type="text"
+                                                        required
+                                                        placeholder="jane@example.com"
+                                                        tabIndex={0} />
                                         {errors?.email && <ErrorText>{errors?.email.message}</ErrorText>}
                                     </Flex>
 
@@ -104,11 +109,11 @@ export const Component = () => {
                                             {
                                                 required: "Password is required.",
                                             })}
-                                            name="password"
-                                            type={isPasswordOpen ? "text" : "password"}
-                                            autoComplete="current-password"
-                                            required
-                                            placeholder="***********" >
+                                                         name="password"
+                                                         type={isPasswordOpen ? "text" : "password"}
+                                                         autoComplete="current-password"
+                                                         required
+                                                         placeholder="***********" >
                                             <TextField.Slot side='right'>
                                                 <IconButton
                                                     type='button'
@@ -169,11 +174,11 @@ export const Component = () => {
                             loginContext?.message?.login_with_email_link ?
                                 <Flex direction='column' >
                                     <Button type="button"
-                                        asChild
-                                        variant="soft"
-                                        highContrast
-                                        disabled={isSubmitting}
-                                        className="cursor-default"
+                                            asChild
+                                            variant="soft"
+                                            highContrast
+                                            disabled={isSubmitting}
+                                            className="cursor-default"
                                     >
                                         <Link to="/login-with-email">
                                             <BiMailSend size="18" />

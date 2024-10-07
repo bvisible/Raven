@@ -86,8 +86,8 @@ const AddUsers = () => {
 
             <Flex justify='between' align='center'>
                 <Flex direction='column' gap='0'>
-                    <Text size='3' className={'font-semibold'}>Add users to Raven</Text>
-                    <Text size='1' color='gray'>Only System managers have the ability to add users; users you add will be given the <Strong>"Raven User"</Strong> role.</Text>
+                    <Text size='3' className={'font-semibold'}>Add users to neochat</Text>
+                    <Text size='1' color='gray'>Only System managers have the ability to add users; users you add will be given the <Strong>"neochat User"</Strong> role.</Text>
                 </Flex>
                 <Button type='button' disabled={loading || !canAddRavenUsers} onClick={handleAddUsers}>
                     {loading && <Loader />}
