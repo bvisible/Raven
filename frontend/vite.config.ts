@@ -10,9 +10,12 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig(({ command, mode }) => {
 	const env = loadEnv(mode, process.cwd(), '')
 	return {
-		plugins: [react(), svgr(), VitePWA({
+		plugins: [
+			react(),
+			mode !== 'production' && svgr(),
+			VitePWA({
 			registerType: 'autoUpdate',
-			strategies: "injectManifest",
+			strategies: "generateSW",
 			injectRegister: null,
 			outDir: '../raven/public/raven',
 			manifest: {
