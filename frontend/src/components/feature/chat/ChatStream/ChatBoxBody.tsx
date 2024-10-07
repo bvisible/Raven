@@ -18,15 +18,14 @@ import { useParams } from "react-router-dom"
 import clsx from "clsx"
 
 const COOL_PLACEHOLDERS = [
-    /* ////
     "Delivering messages atop dragons 🐉 is available on a chargeable basis.",
     "Note 🚨: Service beyond the wall is currently disrupted due to bad weather.",
     "Pigeons just have better brand recognition tbh 🤷🏻",
     "Ravens double up as spies. Eyes everywhere 👀",
     "Ravens do not 'slack' off. See what we did there? 😉",
     "Were you expecting a funny placeholder? 😂",
-    "Want to know who writes these placeholders? 🤔. No one.",*/
-    "Saisissez un message..."
+    "Want to know who writes these placeholders? 🤔. No one.",
+    "Type a message..."
 ]
 // const randomPlaceholder = COOL_PLACEHOLDERS[Math.floor(Math.random() * (COOL_PLACEHOLDERS.length))]
 interface ChatBoxBodyProps {
@@ -91,6 +90,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                 files={files}
                 ref={fileInputRef}
                 onFileChange={setFiles}
+                width={threadID ? 'w-[calc((100vw-var(--sidebar-width)-var(--space-8))/2)]' : undefined}
                 maxFiles={10}
                 maxFileSize={10000000}>
                 <ChatStream

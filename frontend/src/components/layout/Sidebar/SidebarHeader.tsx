@@ -4,6 +4,7 @@ import { Flex, IconButton, Text, Tooltip } from '@radix-ui/themes'
 import { BiMoon, BiSun } from 'react-icons/bi'
 import { useSetAtom } from 'jotai'
 import { TbSearch } from 'react-icons/tb'
+import { __ } from '@/utils/translations'
 
 export const SidebarHeader = () => {
     return (
@@ -14,7 +15,7 @@ export const SidebarHeader = () => {
                 align='center'
                 pt='1'
                 height='48px'>
-                <Text as='span' size='6' className='cal-sans pl-1'>neochat</Text>
+                <Text as='span' size='6' className='cal-sans pl-1'>raven</Text>
                 <Flex align='center' gap='3' className='pr-1 sm:pr-0'>
                     <SearchButton />
                     <ColorModeToggleButton />
@@ -33,7 +34,7 @@ const SearchButton = () => {
             <IconButton
                 size={{ initial: '2', md: '1' }}
                 aria-label='Open command menu'
-                title='Open command menu'
+                title={__("Open command menu")}
                 color='gray'
                 className='text-gray-11 sm:hover:text-gray-12'
                 variant='ghost'
@@ -53,7 +54,7 @@ const ColorModeToggleButton = () => {
         <IconButton
             size={{ initial: '2', md: '1' }}
             aria-label='Toggle theme'
-            title='Toggle theme'
+            title={__("Toggle theme")}
             color='gray'
             className='text-gray-11 sm:hover:text-gray-12'
             variant='ghost'

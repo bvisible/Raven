@@ -95,11 +95,11 @@ export const Component = () => {
                                             {
                                                 required: `${loginContext?.message?.login_label} is required.`
                                             })}
-                                                        name="email"
-                                                        type="text"
-                                                        required
-                                                        placeholder="jane@example.com"
-                                                        tabIndex={0} />
+                                            name="email"
+                                            type="text"
+                                            required
+                                            placeholder="jane@example.com"
+                                            tabIndex={0} />
                                         {errors?.email && <ErrorText>{errors?.email.message}</ErrorText>}
                                     </Flex>
 
@@ -109,11 +109,11 @@ export const Component = () => {
                                             {
                                                 required: "Password is required.",
                                             })}
-                                                         name="password"
-                                                         type={isPasswordOpen ? "text" : "password"}
-                                                         autoComplete="current-password"
-                                                         required
-                                                         placeholder="***********" >
+                                            name="password"
+                                            type={isPasswordOpen ? "text" : "password"}
+                                            autoComplete="current-password"
+                                            required
+                                            placeholder="***********" >
                                             <TextField.Slot side='right'>
                                                 <IconButton
                                                     type='button'
@@ -174,11 +174,11 @@ export const Component = () => {
                             loginContext?.message?.login_with_email_link ?
                                 <Flex direction='column' >
                                     <Button type="button"
-                                            asChild
-                                            variant="soft"
-                                            highContrast
-                                            disabled={isSubmitting}
-                                            className="cursor-default"
+                                        asChild
+                                        variant="soft"
+                                        highContrast
+                                        disabled={isSubmitting}
+                                        className="cursor-default"
                                     >
                                         <Link to="/login-with-email">
                                             <BiMailSend size="18" />
