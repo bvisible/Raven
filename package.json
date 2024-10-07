@@ -10,7 +10,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cd frontend && yarn dev",
-    "build": "cd frontend && NODE_ENV=production yarn build",
+    "build": "vite build --base=/assets/raven/raven/ && yarn copy-html-entry",
     "postinstall": "yarn install-web && yarn install-desk",
     "install-desk": "cd raven && yarn install",
     "install-web": "cd frontend && yarn install"
