@@ -11,36 +11,36 @@ import { useStickyState } from './hooks/useStickyState'
 import MobileTabsPage from './pages/MobileTabsPage'
 import { UserProfile } from './components/feature/userSettings/UserProfile/UserProfile'
 ////
-import localStorage from 'local-storage';
+import { useState, useEffect } from 'react';
 ////
 
 const router = createBrowserRouter(
-  createRoutesFromElements(
-    <>
-      <Route path='/login' lazy={() => import('@/pages/auth/Login')} />
-      <Route path='/login-with-email' lazy={() => import('@/pages/auth/LoginWithEmail')} />
-      <Route path='/signup' lazy={() => import('@/pages/auth/SignUp')} />
-      <Route path='/forgot-password' lazy={() => import('@/pages/auth/ForgotPassword')} />
-      <Route path="/" element={<ProtectedRoute />}>
-        <Route path="/" element={<ChannelRedirect />}>
-          <Route path="channel" element={<MainPage />} >
-            <Route index element={<MobileTabsPage />} />
-            <Route path="threads" lazy={() => import('./components/feature/threads/Threads')}>
-              <Route path="thread/:threadID" lazy={() => import('./components/feature/threads/ThreadDrawer/ThreadDrawer')} />
-            </Route>
-            <Route path="saved-messages" lazy={() => import('./components/feature/saved-messages/SavedMessages')} />
-            <Route path="settings" lazy={() => import('./pages/settings/Settings')}>
-              <Route index element={<UserProfile />} />
-              <Route path="profile" element={<UserProfile />} />
-              <Route path="users" lazy={() => import('./components/feature/userSettings/Users/AddUsers')} />
-              <Route path="frappe-hr" lazy={() => import('./pages/settings/Integrations/FrappeHR')} />
-              {/* <Route path="bots" lazy={() => import('./components/feature/userSettings/Bots')} /> */}
-            </Route>
-            <Route path=":channelID" lazy={() => import('@/pages/ChatSpace')}>
-              <Route path="thread/:threadID" lazy={() => import('./components/feature/threads/ThreadDrawer/ThreadDrawer')} />
-            </Route>
-          </Route>
-          {/* <Route path='settings' lazy={() => import('./pages/settings/Settings')}>
+    createRoutesFromElements(
+        <>
+          <Route path='/login' lazy={() => import('@/pages/auth/Login')} />
+          <Route path='/login-with-email' lazy={() => import('@/pages/auth/LoginWithEmail')} />
+          <Route path='/signup' lazy={() => import('@/pages/auth/SignUp')} />
+          <Route path='/forgot-password' lazy={() => import('@/pages/auth/ForgotPassword')} />
+          <Route path="/" element={<ProtectedRoute />}>
+            <Route path="/" element={<ChannelRedirect />}>
+              <Route path="channel" element={<MainPage />} >
+                <Route index element={<MobileTabsPage />} />
+                <Route path="threads" lazy={() => import('./components/feature/threads/Threads')}>
+                  <Route path="thread/:threadID" lazy={() => import('./components/feature/threads/ThreadDrawer/ThreadDrawer')} />
+                </Route>
+                <Route path="saved-messages" lazy={() => import('./components/feature/saved-messages/SavedMessages')} />
+                <Route path="settings" lazy={() => import('./pages/settings/Settings')}>
+                  <Route index element={<UserProfile />} />
+                  <Route path="profile" element={<UserProfile />} />
+                  <Route path="users" lazy={() => import('./components/feature/userSettings/Users/AddUsers')} />
+                  <Route path="frappe-hr" lazy={() => import('./pages/settings/Integrations/FrappeHR')} />
+                  {/* <Route path="bots" lazy={() => import('./components/feature/userSettings/Bots')} /> */}
+                </Route>
+                <Route path=":channelID" lazy={() => import('@/pages/ChatSpace')}>
+                  <Route path="thread/:threadID" lazy={() => import('./components/feature/threads/ThreadDrawer/ThreadDrawer')} />
+                </Route>
+              </Route>
+              {/* <Route path='settings' lazy={() => import('./pages/settings/Settings')}>
             <Route path='integrations'>
               <Route path='webhooks' lazy={() => import('./pages/settings/Webhooks/WebhookList')} />
               <Route path='webhooks/create' lazy={() => import('./pages/settings/Webhooks/CreateWebhook')} />
@@ -50,30 +50,38 @@ const router = createBrowserRouter(
               <Route path='scheduled-messages/:ID' lazy={() => import('./pages/settings/ServerScripts/SchedulerEvents/ViewSchedulerEvent')} />
             </Route>
           </Route> */}
-        </Route>
-      </Route>
-    </>
-  ), {
-  basename: `/${import.meta.env.VITE_BASE_NAME}` ?? '',
-}
+            </Route>
+          </Route>
+        </>
+    ), {
+      basename: `/${import.meta.env.VITE_BASE_NAME}` ?? '',
+    }
 )
 function App() {
 
-  ////const [appearance, setAppearance] = useStickyState<'light' | 'dark'>('dark', 'appearance');
-
-  ////const toggleTheme = () => {
-  ////  setAppearance(appearance === 'dark' ? 'light' : 'dark');
-  ////};
-  ////
-  const [themeActive, setThemeActive] = useState< 'light' | 'dark' >(
-      localStorage.get('theme_active') ?? 'dark'
-  );
+  /* ////
+  const [appearance, setAppearance] = useStickyState<'light' | 'dark'>('dark', 'appearance');
 
   const toggleTheme = () => {
-    setThemeActive(themeActive === 'dark' ? 'light' : 'dark');
-    localStorage.set('theme_active', themeActive === 'dark' ? 'light' : 'dark');
+    setAppearance(appearance === 'dark' ? 'light' : 'dark');
+  };
+  */
+  const [themeActive, setThemeActive] = useState<'light' | 'dark'>('dark');
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem('theme_active') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setThemeActive(savedTheme);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = themeActive === 'dark' ? 'light' : 'dark';
+    setThemeActive(newTheme);
+    window.localStorage.setItem('theme_active', newTheme);
   };
   ////
+
   // We need to pass sitename only if the Frappe version is v15 or above.
 
   const getSiteName = () => {
@@ -87,27 +95,27 @@ function App() {
   }
 
   return (
-    <FrappeProvider
-      url={import.meta.env.VITE_FRAPPE_PATH ?? ''}
-      socketPort={import.meta.env.VITE_SOCKET_PORT ? import.meta.env.VITE_SOCKET_PORT : undefined}
-      //@ts-ignore
-      swrConfig={{
-        provider: localStorageProvider
-      }}
-      siteName={getSiteName()}
-    >
-      <UserProvider>
-        <Toaster richColors />
-        <ThemeProvider
-          ////appearance={appearance}
-          // grayColor='slate'
-          accentColor='iris'
-          panelBackground='translucent'
-          toggleTheme={toggleTheme}>
-          <RouterProvider router={router} />
-        </ThemeProvider>
-      </UserProvider>
-    </FrappeProvider>
+      <FrappeProvider
+          url={import.meta.env.VITE_FRAPPE_PATH ?? ''}
+          socketPort={import.meta.env.VITE_SOCKET_PORT ? import.meta.env.VITE_SOCKET_PORT : undefined}
+          //@ts-ignore
+          swrConfig={{
+            provider: localStorageProvider
+          }}
+          siteName={getSiteName()}
+      >
+        <UserProvider>
+          <Toaster richColors />
+          <ThemeProvider
+              appearance={themeActive}
+              // grayColor='slate'
+              accentColor='iris'
+              panelBackground='translucent'
+              toggleTheme={toggleTheme}>
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </UserProvider>
+      </FrappeProvider>
   )
 }
 
