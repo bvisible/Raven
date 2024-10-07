@@ -43,7 +43,7 @@ const Header = ({
                     justifyContent: 'center',
                     // height: "24px",
                     // marginTop: '0.2rem',
-                }} title='Open Raven'>
+                }} title='Open neochat'>
                     <svg
                         width="18"
                         height="18"
