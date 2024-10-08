@@ -17,9 +17,8 @@ import useFetchChannelMembers from "@/hooks/fetchers/useFetchChannelMembers"
 import { useParams } from "react-router-dom"
 import clsx from "clsx"
 import { __ } from '@/utils/translations'
-
+//// add trad
 const COOL_PLACEHOLDERS = [
-    /* ////
     "Delivering messages atop dragons 🐉 is available on a chargeable basis.",
     "Note 🚨: Service beyond the wall is currently disrupted due to bad weather.",
     "Pigeons just have better brand recognition tbh 🤷🏻",
@@ -27,8 +26,7 @@ const COOL_PLACEHOLDERS = [
     "Ravens do not 'slack' off. See what we did there? 😉",
     "Were you expecting a funny placeholder? 😂",
     "Want to know who writes these placeholders? 🤔. No one.",
-    */
-    __("Type a message...")
+    "Type a message..."
 ]
 // const randomPlaceholder = COOL_PLACEHOLDERS[Math.floor(Math.random() * (COOL_PLACEHOLDERS.length))]
 interface ChatBoxBodyProps {
@@ -110,7 +108,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                         }}
                         clearReplyMessage={handleCancelReply}
                         channelMembers={channelMembers}
-                        // placeholder={randomPlaceholder}
+                        placeholder={__("Type a message...")}
                         replyMessage={selectedMessage}
                         sessionStorageKey={`tiptap-${channelData.name}`}
                         onMessageSend={sendMessage}

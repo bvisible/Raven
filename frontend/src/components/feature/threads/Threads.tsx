@@ -3,7 +3,8 @@ import { Box, Flex, Heading } from "@radix-ui/themes"
 import { BiChevronLeft } from "react-icons/bi"
 import { Link } from "react-router-dom"
 import ThreadsList from "./ThreadsList"
-
+import { __ } from '@/utils/translations'
+//// add trad
 export type ThreadMessage = {
     bot: string,
     channel_id: string,
@@ -36,7 +37,7 @@ const Threads = () => {
                     <Link to='/channel' className="block bg-transparent hover:bg-transparent active:bg-transparent sm:hidden">
                         <BiChevronLeft size='24' className="block text-gray-12" />
                     </Link>
-                    <Heading size='5'>Threads</Heading>
+                    <Heading size='5'>{__("Threads")}</Heading>
                 </Flex>
             </PageHeader>
             <Box className="min-h-screen w-full pt-16 pb-8 px-4">
