@@ -8,7 +8,8 @@ import { MessageBox } from "../GlobalSearch/MessageBox"
 import { Heading } from "@radix-ui/themes"
 import { Box, Flex } from '@radix-ui/themes'
 import { BiChevronLeft } from "react-icons/bi"
-
+import { __ } from '@/utils/translations'
+//// add trad
 const SavedMessages = () => {
 
     const navigate = useNavigate()
@@ -36,7 +37,7 @@ const SavedMessages = () => {
                     <Link to='/channel' className="block bg-transparent hover:bg-transparent active:bg-transparent sm:hidden">
                         <BiChevronLeft size='24' className="block text-gray-12" />
                     </Link>
-                    <Heading size='5'>Saved Messages</Heading>
+                    <Heading size='5'>{__("Saved Messages")}</Heading>
                 </Flex>
             </PageHeader>
             <Box className="min-h-screen pt-16 pb-8">

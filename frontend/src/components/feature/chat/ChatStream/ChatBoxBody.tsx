@@ -16,7 +16,8 @@ import Tiptap from "../ChatInput/Tiptap"
 import useFetchChannelMembers from "@/hooks/fetchers/useFetchChannelMembers"
 import { useParams } from "react-router-dom"
 import clsx from "clsx"
-
+import { __ } from '@/utils/translations'
+//// add trad
 const COOL_PLACEHOLDERS = [
     "Delivering messages atop dragons 🐉 is available on a chargeable basis.",
     "Note 🚨: Service beyond the wall is currently disrupted due to bad weather.",
@@ -107,7 +108,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                         }}
                         clearReplyMessage={handleCancelReply}
                         channelMembers={channelMembers}
-                        // placeholder={randomPlaceholder}
+                        placeholder={__("Type a message...")}
                         replyMessage={selectedMessage}
                         sessionStorageKey={`tiptap-${channelData.name}`}
                         onMessageSend={sendMessage}

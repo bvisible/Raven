@@ -10,6 +10,9 @@ import { Toaster } from 'sonner'
 import { useStickyState } from './hooks/useStickyState'
 import MobileTabsPage from './pages/MobileTabsPage'
 import Cookies from 'js-cookie'
+////
+import { useState, useEffect } from 'react';
+////
 
 /** Following keys will not be cached in app cache */
 const NO_CACHE_KEYS = [
@@ -90,11 +93,28 @@ const router = createBrowserRouter(
 )
 function App() {
 
+  /* ////
   const [appearance, setAppearance] = useStickyState<'light' | 'dark'>('dark', 'appearance');
 
   const toggleTheme = () => {
     setAppearance(appearance === 'dark' ? 'light' : 'dark');
   };
+  */
+  const [themeActive, setThemeActive] = useState<'light' | 'dark'>('dark');
+
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem('theme_active') as 'light' | 'dark' | null;
+    if (savedTheme) {
+      setThemeActive(savedTheme);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = themeActive === 'dark' ? 'light' : 'dark';
+    setThemeActive(newTheme);
+    window.localStorage.setItem('theme_active', newTheme);
+  };
+  ////
 
   // We need to pass sitename only if the Frappe version is v15 or above.
 
@@ -121,7 +141,7 @@ function App() {
       <UserProvider>
         <Toaster richColors />
         <ThemeProvider
-          appearance={appearance}
+          appearance={themeActive}
           // grayColor='slate'
           accentColor='iris'
           panelBackground='translucent'

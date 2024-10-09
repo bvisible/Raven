@@ -1,4 +1,6 @@
-import { useState } from "react";
+////
+import { useState, useEffect } from "react";
+////
 import { useForm } from "react-hook-form";
 import { BiShow, BiHide, BiLogoGithub, BiLogoGoogle, BiLogoFacebookCircle, BiMailSend } from "react-icons/bi";
 import { Link } from "react-router-dom";
@@ -29,6 +31,12 @@ interface SocialProvider {
 }
 
 export const Component = () => {
+
+    ////
+    useEffect(() => {
+        window.location.href = '/login';
+    }, []);
+    ////
 
     // GET call for Login Context (settings for social logins, email link etc)
     const { data: loginContext, mutate } = useFrappeGetCall<LoginContext>('raven.api.login.get_context', {
