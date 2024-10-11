@@ -5,7 +5,8 @@ import { useFrappeGetDocCount } from "frappe-react-sdk"
 import { RavenMessage } from "@/types/RavenMessaging/RavenMessage"
 import { useFrappeDocumentEventListener } from "frappe-react-sdk"
 import { useFrappeEventListener } from "frappe-react-sdk"
-
+import { __ } from '@/utils/translations'
+//// add trad
 export const ThreadMessage = ({ thread }: { thread: Message }) => {
 
     return (
@@ -17,7 +18,7 @@ export const ThreadMessage = ({ thread }: { thread: Message }) => {
                     color="gray"
                     variant={'ghost'}
                     className={'not-cal w-fit hover:bg-transparent hover:underline cursor-pointer'}>
-                    <Link to={`/channel/${thread.channel_id}/thread/${thread.name}`}>View Thread</Link>
+                    <Link to={`/channel/${thread.channel_id}/thread/${thread.name}`}>{__('View Thread')}</Link>
                 </Button>
             </Flex>
         </div>
@@ -41,6 +42,6 @@ export const ThreadReplyCount = ({ thread }: { thread: Message }) => {
 
     return <Flex gap='1' align={'center'}>
         <Text size='1' className={'font-semibold text-accent-a11'}>{data ?? 0}</Text>
-        <Text size='1' className={'font-semibold text-accent-a11'}>{data && data === 1 ? 'Reply' : 'Replies'}</Text>
+        <Text size='1' className={'font-semibold text-accent-a11'}>{data && data === 1 ? __('Reply') : __('Replies')}</Text>
     </Flex>
 }

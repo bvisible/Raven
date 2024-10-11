@@ -12,7 +12,8 @@ import { useMemo } from 'react'
 import { DMChannelListItem } from '@/utils/channel/ChannelListProvider'
 import { useGetUserRecords } from '@/hooks/useGetUserRecords'
 import { ThreadReplyCount } from '../chat/ChatMessage/Renderers/ThreadMessage'
-
+import { __ } from '@/utils/translations'
+//// add trad
 export const ThreadPreviewBox = ({ thread }: { thread: ThreadMessage }) => {
 
     const user = useGetUser(thread.owner)
@@ -68,7 +69,7 @@ export const ThreadPreviewBox = ({ thread }: { thread: ThreadMessage }) => {
                     color="gray"
                     variant={'ghost'}
                     className={'not-cal w-fit hover:bg-transparent hover:underline cursor-pointer'}>
-                    <Link to={`/channel/${thread.channel_id}/thread/${thread.name}`}>View Thread</Link>
+                    <Link to={`/channel/${thread.channel_id}/thread/${thread.name}`}>{__('View Thread')}</Link>
                 </Button>
             </Flex>
         </Flex>
