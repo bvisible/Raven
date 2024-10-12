@@ -102,6 +102,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                     &&
                     <Tiptap
                         key={channelData.name}
+                        channelID={channelData.name}
                         fileProps={{
                             fileInputRef,
                             addFile

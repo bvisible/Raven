@@ -16,7 +16,7 @@ from raven.ai.functions import (
 	get_documents,
 	update_document,
 	update_documents,
-	get_list,
+	get_list
 )
 from raven.ai.openai_client import get_open_ai_client
 
@@ -204,6 +204,7 @@ def stream_response(ai_thread_id: str, bot, channel_id: str):
 							fields=args.get("fields"),
 							limit=args.get("limit", 20)
 						)
+					
 					tool_outputs.append(
 						{"tool_call_id": tool.id, "output": json.dumps(function_output, default=str)}
 					)

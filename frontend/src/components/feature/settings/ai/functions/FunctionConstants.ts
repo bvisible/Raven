@@ -12,10 +12,10 @@ export const FUNCTION_TYPES = [
         type: "Bulk Operations"
     },
     {
-         value: "Get List",
-         description: "Fetch a list of documents from the system (using filters).",
-         requires_write_permissions: false,
-         type: "Standard"
+        value: "Get List",
+        description: "Fetch a list of documents from the system (using filters).",
+        requires_write_permissions: false,
+        type: "Standard"
     },
     {
         value: "Create Document",
