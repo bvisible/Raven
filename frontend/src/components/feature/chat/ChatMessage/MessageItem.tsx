@@ -46,6 +46,12 @@ export const MessageItem = ({ message, setDeleteMessage, isHighlighted, onReplyM
 
     const { user, isActive } = useGetUserDetails(is_bot_message && bot ? bot : userID)
 
+    ////
+    const isBot = useMemo(() => {
+        return is_bot_message || (user && user.type === 'Bot');
+    }, [is_bot_message, user]);
+    ////
+
     const onDelete = () => {
         setDeleteMessage(message)
     }

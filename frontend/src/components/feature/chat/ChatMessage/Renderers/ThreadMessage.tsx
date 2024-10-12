@@ -6,8 +6,25 @@ import { RavenMessage } from "@/types/RavenMessaging/RavenMessage"
 import { useFrappeDocumentEventListener } from "frappe-react-sdk"
 import { useFrappeEventListener } from "frappe-react-sdk"
 import { __ } from '@/utils/translations'
-//// add trad
-export const ThreadMessage = ({ thread }: { thread: Message }) => {
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+//// add trad and auto open thread si bot
+////
+export const ThreadMessage = ({ thread, isBot }: { thread: Message, isBot: boolean }) => {
+    const navigate = useNavigate();
+
+    const { data } = useFrappeGetDocCount<RavenMessage>("Raven Message", [["channel_id", "=", thread.name]], undefined, undefined, undefined, {
+        revalidateOnFocus: false,
+        shouldRetryOnError: false,
+        keepPreviousData: false
+    });
+
+    useEffect(() => {
+        if (isBot || (data !== undefined && data === 0)) {
+            navigate(`/channel/${thread.channel_id}/thread/${thread.name}`);
+        }
+    }, [isBot, data, navigate, thread.channel_id, thread.name]);
+    ////
 
     return (
         <div className="mt-2">
