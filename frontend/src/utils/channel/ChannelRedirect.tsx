@@ -1,7 +1,7 @@
 import { Suspense, useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { hasRavenUserRole } from '../roles'
-import { FullPageLoader } from '@/components/layout/Loaders'
+import { FullPageLoader } from '@/components/layout/Loaders/FullPageLoader'
 import AddRavenUsersPage from '@/pages/AddRavenUsersPage'
 import { UserListProvider } from '../users/UserListProvider'
 import { ChannelListProvider } from './ChannelListProvider'
@@ -12,7 +12,7 @@ import { ChannelListProvider } from './ChannelListProvider'
  */
 export const ChannelRedirect = () => {
 
-    const lastChannel = localStorage.getItem('ravenLastChannel') ?? 'general'
+    const lastChannel = localStorage.getItem('ravenLastChannel') ?? ''
 
     const navigate = useNavigate()
     const { pathname } = useLocation()

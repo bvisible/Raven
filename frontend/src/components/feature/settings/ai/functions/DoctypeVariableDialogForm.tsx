@@ -228,7 +228,7 @@ const FieldSelectionField = ({ doctype }: { doctype: string }) => {
 /**
  * Component to render a select field for the fields of a doctype. Could be the main doctype or a child table.
  */
-const DoctypeFieldSelect = ({ doctype, value, onFieldSelect }: { doctype: string, value: string, onFieldSelect: (field: DocField) => void }) => {
+export const DoctypeFieldSelect = ({ doctype, value, onFieldSelect }: { doctype: string, value: string, onFieldSelect: (field: DocField) => void }) => {
 
     const { doc: doctypeMeta } = useDoctypeMeta(doctype)
 

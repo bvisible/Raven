@@ -15,7 +15,7 @@ export const SettingsSidebar = () => {
             <Flex direction="column" gap='2' className='px-4'>
                 <SettingsGroup title="My Account" icon={LuUserCircle2}>
                     <SettingsSidebarItem title="Profile" to='profile' />
-                    {/* <SettingsSidebarItem title="Preferences" to='preferences' /> */}
+                    <SettingsSidebarItem title="Appearance" to='appearance' />
                 </SettingsGroup>
                 <SettingsSeparator />
                 <SettingsGroup title="Workspace" icon={BiBuildings}>
@@ -27,6 +27,7 @@ export const SettingsSidebar = () => {
                     {/* <SettingsSidebarItem title="ERPNext" to='erpnext' /> */}
                     <SettingsSidebarItem title="HR" to='hr' />
                     {/* <SettingsSidebarItem title='Notifications' to='notifications' /> */}
+                    <SettingsSidebarItem title="Message Actions" to='message-actions' />
                     <SettingsSidebarItem title="Scheduled Messages" to='scheduled-messages' />
                     <SettingsSidebarItem title="Webhooks" to='webhooks' />
                     {/* <SettingsSidebarItem title="Frappe LMS" to='frappe-lms' /> */}

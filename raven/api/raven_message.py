@@ -221,6 +221,7 @@ def get_unread_count_for_channels():
 		.where((channel.type == "Open") | (channel_member.user_id == frappe.session.user))
 		.where(channel.is_archived == 0)
 		.where(channel.is_thread == 0)
+		.where(message.message_type != "System")
 		.left_join(message)
 		.on(channel.name == message.channel_id)
 	)
@@ -264,6 +265,7 @@ def get_unread_count_for_channel(channel_id):
 			filters={
 				"channel_id": channel_id,
 				"creation": (">", last_timestamp),
+				"message_type": ["!=", "System"],
 			},
 		)
 	else:
@@ -272,6 +274,7 @@ def get_unread_count_for_channel(channel_id):
 				"Raven Message",
 				filters={
 					"channel_id": channel_id,
+					"message_type": ["!=", "System"],
 				},
 			)
 		else:

@@ -62,6 +62,10 @@ class RavenMessage(Document):
 		except Exception:
 			pass
 
+		if self.message_type in ["File", "Image"] and self.file:
+			# Store the file name in the content field
+			self.content = self.file.split("/")[-1]
+
 		if not self.is_new() and not self.flags.is_ai_streaming:
 			# this is not a new message, so it's a previous message being edited
 			old_doc = self.get_doc_before_save()
@@ -118,7 +122,8 @@ class RavenMessage(Document):
 			}
 
 	def after_insert(self):
-		self.publish_unread_count_event()
+		if self.message_type != "System":
+			self.publish_unread_count_event()
 
 		if self.message_type == "Text":
 			self.handle_ai_message()
@@ -298,6 +303,9 @@ class RavenMessage(Document):
 		# 3. If the message is a reply, send a push notification to the user who is being replied to
 		# 4. If the message is in a channel, send a push notification to all the users in the channel (topic)
 
+		if self.message_type == "System":
+			return
+
 		channel_doc = frappe.get_cached_doc("Raven Channel", self.channel_id)
 
 		if channel_doc.is_direct_message:
@@ -441,7 +449,8 @@ class RavenMessage(Document):
 			docname=self.channel_id,
 		)
 
-		self.publish_unread_count_event()
+		if self.message_type != "System":
+			self.publish_unread_count_event()
 
 		# delete poll if the message is of type poll after deleting the message
 		if self.message_type == "Poll":

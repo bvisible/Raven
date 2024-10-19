@@ -5,11 +5,12 @@ import { Sidebar } from '../components/layout/Sidebar/Sidebar'
 import { ChannelListProvider } from '../utils/channel/ChannelListProvider'
 import { UserListProvider } from '@/utils/users/UserListProvider'
 import { hasRavenUserRole } from '@/utils/roles'
-import { FullPageLoader } from '@/components/layout/Loaders'
+import { FullPageLoader } from '@/components/layout/Loaders/FullPageLoader'
 import CommandMenu from '@/components/feature/CommandMenu/CommandMenu'
 import { useFetchActiveUsersRealtime } from '@/hooks/fetchers/useFetchActiveUsers'
 import { useIsMobile } from '@/hooks/useMediaQuery'
 import { showNotification } from '@/utils/pushNotifications'
+import MessageActionController from '@/components/feature/message-actions/MessageActionController'
 
 const AddRavenUsersPage = lazy(() => import('@/pages/AddRavenUsersPage'))
 
@@ -57,6 +58,7 @@ const MainPageContent = () => {
                 </Box>
             </Flex>
             <CommandMenu />
+            <MessageActionController />
         </ChannelListProvider>
     </UserListProvider>
 }
