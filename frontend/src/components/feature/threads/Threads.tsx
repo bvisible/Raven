@@ -26,6 +26,7 @@ export type ThreadMessage = {
     text: string,
     thread_message_id: string,
     participants: { user_id: string }[],
+    workspace?: string
 }
 
 const Threads = () => {

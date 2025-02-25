@@ -1,10 +1,10 @@
-import { Box, Button, Flex, Text } from '@radix-ui/themes'
+import { Box, Flex, Text } from '@radix-ui/themes'
 import { DateMonthYear } from '@/utils/dateConversions'
 import { MessageContent, MessageSenderAvatar, UserHoverCard } from '../chat/ChatMessage/MessageItem'
 import { useGetUser } from '@/hooks/useGetUser'
 import { useCurrentChannelData } from '@/hooks/useCurrentChannelData'
 import { ChannelIcon } from '@/utils/layout/channelIcon'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { ThreadMessage } from './Threads'
 import { Message } from '../../../../../types/Messaging/Message'
 import { ViewThreadParticipants } from './ThreadParticipants'
@@ -36,8 +36,12 @@ export const ThreadPreviewBox = ({ thread }: { thread: ThreadMessage }) => {
         }
     }, [channelData, users])
 
+    const { workspaceID } = useParams()
+
+    const workspace = thread.workspace ? thread.workspace : workspaceID
+
     return (
-        <Flex direction='column' gap='2' className="group
+        <Link to={`/${workspace}/${thread.channel_id}/thread/${thread.name}`}><Flex direction='column' gap='2' className="group
             hover:bg-gray-100
             dark:hover:bg-gray-4
             px-3
@@ -63,14 +67,8 @@ export const ThreadPreviewBox = ({ thread }: { thread: ThreadMessage }) => {
             <Flex align={'center'} gap='2' className='pl-11'>
                 <ViewThreadParticipants participants={thread.participants ?? []} />
                 <ThreadReplyCount thread={thread as unknown as Message} />
-                <Button size={'1'}
-                    asChild
-                    color="gray"
-                    variant={'ghost'}
-                    className={'not-cal w-fit hover:bg-transparent hover:underline cursor-pointer'}>
-                    <Link to={`/channel/${thread.channel_id}/thread/${thread.name}`}>View Thread</Link>
-                </Button>
             </Flex>
         </Flex>
+        </Link>
     )
 }

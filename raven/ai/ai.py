@@ -74,6 +74,7 @@ def handle_bot_dm(message, bot):
 			"type": "Private",
 			"is_thread": 1,
 			"is_ai_thread": 1,
+			"is_dm_thread": 1,
 			"openai_thread_id": ai_thread.id,
 			"thread_bot": bot.name,
 		}
@@ -208,7 +209,7 @@ def get_content_attachment_for_file(message_type: str, file_id: str, file_url: s
 	attachments = None
 
 	if message_type == "File":
-		content = "Uploaded a file"
+		content = f"Uploaded a file. URL of the file is '{file_url}'"
 
 		FILE_SEARCH_EXCLUSIONS = [".xlsx", ".csv", ".json", ".xls"]
 
@@ -226,6 +227,9 @@ def get_content_attachment_for_file(message_type: str, file_id: str, file_url: s
 			}
 		]
 	else:
-		content = [{"type": "image_file", "image_file": {"file_id": file_id}}]
+		content = [
+			{"type": "text", "text": f"Uploaded an image. URL of the image is '{file_url}'"},
+			{"type": "image_file", "image_file": {"file_id": file_id}},
+		]
 
 	return content, attachments

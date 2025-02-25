@@ -49,10 +49,6 @@
         width: calc(100vw - 96px);
     }
 
-    .tiptap-editor.ProseMirror * {
-        padding-right: 24px;
-    }
-
     .tiptap-editor.replying.ProseMirror {
         border-radius: var(--radius-3);
     }
@@ -127,7 +123,7 @@
     color: #fbbc88;
 }
 
-.tiptap pre .tiptap pre .hljs-string,
+.tiptap pre .hljs-string,
 .tiptap pre .hljs-symbol,
 .tiptap pre .hljs-bullet {
     color: #b9f18d;

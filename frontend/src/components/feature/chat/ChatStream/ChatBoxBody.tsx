@@ -1,23 +1,30 @@
-import { Message } from "../../../../../../types/Messaging/Message"
-import { useMemo, useState } from "react"
-import { ArchivedChannelBox } from "../chat-footer/ArchivedChannelBox"
-import { ChannelListItem, DMChannelListItem } from "@/utils/channel/ChannelListProvider"
-import { JoinChannelBox } from "../chat-footer/JoinChannelBox"
+import { Label } from "@/components/common/Form"
+import { HStack, Stack } from "@/components/layout/Stack"
+import useFetchChannelMembers, { Member } from "@/hooks/fetchers/useFetchChannelMembers"
+import { useIsMobile } from "@/hooks/useMediaQuery"
 import { useUserData } from "@/hooks/useUserData"
-import useFileUpload from "../ChatInput/FileInput/useFileUpload"
+import { RavenMessage } from "@/types/RavenMessaging/RavenMessage"
+import { ChannelListItem, DMChannelListItem } from "@/utils/channel/ChannelListProvider"
+import { Box, Checkbox, Flex, IconButton } from "@radix-ui/themes"
+import clsx from "clsx"
+import { useSWRConfig } from "frappe-react-sdk"
+import { useCallback, useMemo, useRef, useState } from "react"
+import { BiX } from "react-icons/bi"
+import { useParams } from "react-router-dom"
+import { Message } from "../../../../../../types/Messaging/Message"
 import { CustomFile, FileDrop } from "../../file-upload/FileDrop"
 import { FileListItem } from "../../file-upload/FileListItem"
-import { useSendMessage } from "../ChatInput/useSendMessage"
-import { Flex, Box, IconButton } from "@radix-ui/themes"
-import { ReplyMessageBox } from "../ChatMessage/ReplyMessageBox/ReplyMessageBox"
-import { BiX } from "react-icons/bi"
-import ChatStream from "./ChatStream"
+import { ArchivedChannelBox } from "../chat-footer/ArchivedChannelBox"
+import { JoinChannelBox } from "../chat-footer/JoinChannelBox"
+import useFileUpload from "../ChatInput/FileInput/useFileUpload"
 import Tiptap from "../ChatInput/Tiptap"
-import useFetchChannelMembers from "@/hooks/fetchers/useFetchChannelMembers"
-import { useParams } from "react-router-dom"
-import clsx from "clsx"
-import { __ } from '@/utils/translations'
-//// add trad
+import TypingIndicator from "../ChatInput/TypingIndicator/TypingIndicator"
+import { useTyping } from "../ChatInput/TypingIndicator/useTypingIndicator"
+import { useSendMessage } from "../ChatInput/useSendMessage"
+import { ReplyMessageBox } from "../ChatMessage/ReplyMessageBox/ReplyMessageBox"
+import ChatStream from "./ChatStream"
+import { GetMessagesResponse } from "./useChatStream"
+
 const COOL_PLACEHOLDERS = [
     "Delivering messages atop dragons 🐉 is available on a chargeable basis.",
     "Note 🚨: Service beyond the wall is currently disrupted due to bad weather.",
@@ -38,26 +45,112 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
     const { name: user } = useUserData()
     const { channelMembers, isLoading } = useFetchChannelMembers(channelData.name)
 
+    const { onUserType, stopTyping } = useTyping(channelData.name)
+
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null)
 
     const handleReplyAction = (message: Message) => {
         setSelectedMessage(message)
     }
 
-    const handleCancelReply = () => {
+    const clearSelectedMessage = () => {
         setSelectedMessage(null)
     }
 
-    const isUserInChannel = useMemo(() => {
+    const { mutate } = useSWRConfig()
+
+    const scrollRef = useRef<HTMLDivElement>(null)
+
+    const onMessageSendCompleted = (messages: RavenMessage[]) => {
+        // Update the messages in the cache
+
+        mutate({ path: `get_messages_for_channel_${channelData.name}` }, (data?: GetMessagesResponse) => {
+            if (data && data?.message.has_new_messages) {
+                return data
+            }
+
+            const existingMessages = data?.message.messages ?? []
+
+            const newMessages = [...existingMessages]
+
+            messages.forEach(message => {
+                // Check if the message is already present in the messages array
+                const messageIndex = existingMessages.findIndex(m => m.name === message.name)
+
+                if (messageIndex !== -1) {
+                    // If the message is already present, update the message
+                    // @ts-ignore
+                    newMessages[messageIndex] = {
+                        ...message,
+                        _liked_by: "",
+                        is_pinned: 0,
+                        is_continuation: 0
+                    }
+                } else {
+                    // If the message is not present, add the message to the array
+                    // @ts-ignore
+                    newMessages.push({
+                        ...message,
+                        _liked_by: "",
+                        is_pinned: 0,
+                        is_continuation: 0
+                    })
+                }
+            })
+
+            return {
+                message: {
+                    messages: newMessages.sort((a, b) => {
+                        return new Date(b.creation).getTime() - new Date(a.creation).getTime()
+                    }),
+                    has_new_messages: false,
+                    has_old_messages: data?.message.has_old_messages ?? false
+                }
+            }
+
+        }, { revalidate: false }).then(() => {
+            // If the user is focused on the page, then we also need to
+            // If the user is the sender of the message, scroll to the bottom
+            scrollRef.current?.scrollTo(0, scrollRef.current?.scrollHeight)
+        })
+
+        // Stop the typing indicator
+        stopTyping()
+        // Clear the selected message
+        clearSelectedMessage()
+    }
+
+    const channelMemberProfile: Member | null = useMemo(() => {
         if (user && channelMembers) {
-            return user in channelMembers
+            return channelMembers[user] ?? null
         }
-        return false
+        return null
     }, [user, channelMembers])
 
-    const { fileInputRef, files, setFiles, removeFile, uploadFiles, addFile, fileUploadProgress } = useFileUpload(channelData.name)
+    const chatStreamRef = useRef<any>(null)
 
-    const { sendMessage, loading } = useSendMessage(channelData.name, files.length, uploadFiles, handleCancelReply, selectedMessage)
+    const onUpArrowPressed = useCallback(() => {
+        // Call the up arrow function inside the ChatStream component
+        chatStreamRef.current?.onUpArrow()
+    }, [])
+
+    const tiptapRef = useRef<any>(null)
+
+    const isMobile = useIsMobile()
+
+    // When the edit modal is closed, we need to focus the editor again
+    // Don't do this on mobile since that would open the keyboard
+    const onModalClose = useCallback(() => {
+        if (!isMobile) {
+            setTimeout(() => {
+                tiptapRef.current?.focusEditor()
+            }, 50)
+        }
+    }, [isMobile])
+
+    const { fileInputRef, files, setFiles, removeFile, uploadFiles, addFile, fileUploadProgress, compressImages, setCompressImages } = useFileUpload(channelData.name)
+
+    const { sendMessage, loading } = useSendMessage(channelData.name, files.length, uploadFiles, onMessageSendCompleted, selectedMessage)
 
     const PreviousMessagePreview = ({ selectedMessage }: { selectedMessage: any }) => {
 
@@ -71,7 +164,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                     color='gray'
                     size='1'
                     variant="soft"
-                    onClick={handleCancelReply}>
+                    onClick={clearSelectedMessage}>
                     <BiX size='20' />
                 </IconButton>
             </ReplyMessageBox>
@@ -79,14 +172,49 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
         return null
     }
 
+    const { canUserSendMessage, shouldShowJoinBox } = useMemo(() => {
 
-    const isDM = channelData?.is_direct_message === 1 || channelData?.is_self_message === 1
+        if (channelData.is_archived) {
+            return {
+                canUserSendMessage: false,
+                shouldShowJoinBox: false
+            }
+        }
+
+
+        if (channelData.type === 'Open') {
+            return {
+                canUserSendMessage: true,
+                shouldShowJoinBox: false
+            }
+        }
+
+        if (channelMemberProfile) {
+            return {
+                canUserSendMessage: true,
+                shouldShowJoinBox: false
+            }
+        }
+
+        const isDM = channelData?.is_direct_message === 1 || channelData?.is_self_message === 1
+
+        // If the channel data is loaded and the member profile is loaded, then check for this, else don't show anything.
+        if (!channelMemberProfile && !isDM && channelData && !isLoading) {
+            return {
+                shouldShowJoinBox: true,
+                canUserSendMessage: false
+            }
+        }
+
+        return { canUserSendMessage: false, shouldShowJoinBox: false }
+
+    }, [channelMemberProfile, channelData, isLoading])
+
 
     const { threadID } = useParams()
 
     return (
-        <Flex height='100%' direction='column' justify={'end'} pt='9' className={clsx("w-full overflow-hidden px-2", threadID ? "sm:pl-4" : "sm:px-4")}>
-
+        <ChatBoxBodyContainer>
             <FileDrop
                 files={files}
                 ref={fileInputRef}
@@ -96,41 +224,75 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                 maxFileSize={10000000}>
                 <ChatStream
                     channelID={channelData.name}
+                    scrollRef={scrollRef}
+                    ref={chatStreamRef}
+                    onModalClose={onModalClose}
+                    pinnedMessagesString={channelData.pinned_messages_string}
                     replyToMessage={handleReplyAction}
                 />
-                {channelData?.is_archived == 0 && (isUserInChannel || channelData?.type === 'Open')
-                    &&
-                    <Tiptap
-                        key={channelData.name}
-                        fileProps={{
-                            fileInputRef,
-                            addFile
-                        }}
-                        clearReplyMessage={handleCancelReply}
-                        channelMembers={channelMembers}
-                        placeholder={__("Type a message...")}
-                        replyMessage={selectedMessage}
-                        sessionStorageKey={`tiptap-${channelData.name}`}
-                        onMessageSend={sendMessage}
-                        messageSending={loading}
-                        slotBefore={<Flex direction='column' justify='center' hidden={!selectedMessage && !files.length}>
-                            {selectedMessage && <PreviousMessagePreview selectedMessage={selectedMessage} />}
-                            {files && files.length > 0 && <Flex gap='2' width='100%' align='end' px='2' p='2' wrap='wrap'>
-                                {files.map((f: CustomFile) => <Box className="grow-0" key={f.fileID}><FileListItem file={f} uploadProgress={fileUploadProgress} removeFile={() => removeFile(f.fileID)} /></Box>)}
-                            </Flex>}
-                        </Flex>}
-                    />
-                }
-                {channelData && !isLoading && <>
-                    {channelData.is_archived == 0 && !isUserInChannel && channelData.type !== 'Open' && !isDM &&
-                        <JoinChannelBox
-                            channelData={channelData}
+                {canUserSendMessage &&
+                    <Stack>
+                        <TypingIndicator channel={channelData.name} />
+                        <Tiptap
+                            key={channelData.name}
+                            channelID={channelData.name}
+                            fileProps={{
+                                fileInputRef,
+                                addFile
+                            }}
+                            ref={tiptapRef}
+                            onUpArrow={onUpArrowPressed}
+                            clearReplyMessage={clearSelectedMessage}
                             channelMembers={channelMembers}
-                            user={user} />}
-                    {channelData.is_archived == 1 && <ArchivedChannelBox channelData={channelData} channelMembers={channelMembers} />}
-                </>}
+                            onUserType={onUserType}
+                            // placeholder={randomPlaceholder}
+                            replyMessage={selectedMessage}
+                            sessionStorageKey={`tiptap-${channelData.name}`}
+                            onMessageSend={sendMessage}
+                            messageSending={loading}
+                            slotBefore={<Flex direction='column' justify='center' hidden={!selectedMessage && !files.length}>
+                                {selectedMessage && <PreviousMessagePreview selectedMessage={selectedMessage} />}
+                                {files && files.length > 0 && <Flex gap='2' width='100%' align='stretch' px='2' p='2' wrap='wrap'>
+                                    {files.map((f: CustomFile) => <Box className="grow-0" key={f.fileID}><FileListItem file={f} uploadProgress={fileUploadProgress} removeFile={() => removeFile(f.fileID)} /></Box>)}
+                                </Flex>}
+                                {files.length !== 0 && <CompressImageCheckbox compressImages={compressImages} setCompressImages={setCompressImages} />}
+                            </Flex>}
+                        />
+                    </Stack>
+                }
+                {shouldShowJoinBox ?
+                    <JoinChannelBox
+                        channelData={channelData}
+                        user={user} /> : null}
+                <ArchivedChannelBox
+                    channelID={channelData.name}
+                    isArchived={channelData.is_archived}
+                    isMemberAdmin={channelMemberProfile?.is_admin}
+                />
             </FileDrop>
-        </Flex>
+        </ChatBoxBodyContainer>
     )
 
+}
+
+const CompressImageCheckbox = ({ compressImages, setCompressImages }: { compressImages: boolean, setCompressImages: (compressImages: boolean) => void }) => {
+    return <div className="px-3">
+        <Label size='2' weight='regular'>
+            <HStack align='center' gap='2'>
+                <Checkbox checked={compressImages} onCheckedChange={() => { setCompressImages(!compressImages) }} />
+                Compress Images
+            </HStack>
+        </Label>
+    </div>
+}
+
+// Separate container to prevent re-rendering when the threadID changes
+
+const ChatBoxBodyContainer = ({ children }: { children: React.ReactNode }) => {
+
+    const { threadID } = useParams()
+
+    return <div className={clsx("flex flex-col overflow-hidden px-2 pt-16 justify-end h-full", threadID ? "sm:pl-4" : "sm:px-4")}>
+        {children}
+    </div>
 }

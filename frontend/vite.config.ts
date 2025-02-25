@@ -1,23 +1,20 @@
-import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react'
-import proxyOptions from './proxyOptions';
+import react from "@vitejs/plugin-react";
+import path from "path";
+import { defineConfig, loadEnv } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import svgr from "vite-plugin-svgr";
-import { VitePWA } from 'vite-plugin-pwa'
+import proxyOptions from "./proxyOptions";
 
 /// <reference types="vite-plugin-svgr/client" />
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
-	const env = loadEnv(mode, process.cwd(), '')
+	const env = loadEnv(mode, process.cwd(), "")
 	return {
-		plugins: [
-			react(),
-			mode !== 'production' && svgr(),
-			VitePWA({
-			registerType: 'autoUpdate',
-			strategies: "generateSW",
+		plugins: [react(), svgr(), VitePWA({
+			registerType: "autoUpdate",
+			strategies: "injectManifest",
 			injectRegister: null,
-			outDir: '../raven/public/raven',
+			outDir: "../raven/public/raven",
 			manifest: {
 				name: "Raven",
 				start_url: `/${env.VITE_BASE_NAME}`,
@@ -64,24 +61,23 @@ export default defineConfig(({ command, mode }) => {
 		},
 		resolve: {
 			alias: {
-				'@': path.resolve(__dirname, './src')
+				"@": path.resolve(__dirname, "./src")
 			}
 		},
 		build: {
-			outDir: '../raven/public/raven',
+			outDir: "../raven/public/raven",
 			emptyOutDir: true,
 			target: 'es2015',
 			sourcemap: false,
 			rollupOptions: {
 				maxParallelFileOps: 2,
 				onwarn(warning, warn) {
-					if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+					if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
 						return
 					}
 					warn(warning)
 				}
 			}
 		}
-	}
-}
-);
+	};
+});

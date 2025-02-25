@@ -2,9 +2,9 @@ import { Message } from '../../../../../../types/Messaging/Message'
 import { DeleteMessageDialog, useDeleteMessage } from '../ChatMessage/MessageActions/DeleteMessage'
 import { EditMessageDialog, useEditMessage } from '../ChatMessage/MessageActions/EditMessage'
 import { MessageItem } from '../ChatMessage/MessageItem'
-import { ChannelHistoryFirstMessage } from '@/components/layout/EmptyState'
+import { ChannelHistoryFirstMessage } from '@/components/layout/EmptyState/EmptyState'
 import useChatStream from './useChatStream'
-import { useRef } from 'react'
+import { forwardRef, MutableRefObject, useEffect, useImperativeHandle } from 'react'
 import { Loader } from '@/components/common/Loader'
 import ChatStreamLoader from './ChatStreamLoader'
 import clsx from 'clsx'
@@ -12,10 +12,12 @@ import { DateSeparator } from '@/components/layout/Divider/DateSeparator'
 import { useInView } from 'react-intersection-observer'
 import { Button } from '@radix-ui/themes'
 import { FiArrowDown } from 'react-icons/fi'
-import { ErrorBanner } from '@/components/layout/AlertBanner'
+import { ErrorBanner } from '@/components/layout/AlertBanner/ErrorBanner'
 import { ForwardMessageDialog, useForwardMessage } from '../ChatMessage/MessageActions/ForwardMessage'
 import AttachFileToDocumentDialog, { useAttachFileToDocument } from '../ChatMessage/MessageActions/AttachFileToDocument'
 import { ReactionAnalyticsDialog, useMessageReactionAnalytics } from '../ChatMessage/MessageActions/MessageReactionAnalytics'
+import SystemMessageBlock from '../ChatMessage/SystemMessageBlock'
+import { useUserData } from '@/hooks/useUserData'
 
 /**
  * Anatomy of a message
@@ -65,26 +67,42 @@ import { ReactionAnalyticsDialog, useMessageReactionAnalytics } from '../ChatMes
 type Props = {
     channelID: string,
     replyToMessage: (message: Message) => void,
-    showThreadButton?: boolean
+    showThreadButton?: boolean,
+    scrollRef: MutableRefObject<HTMLDivElement | null>,
+    pinnedMessagesString?: string,
+    onModalClose?: () => void
 }
 
-const ChatStream = ({ channelID, replyToMessage, showThreadButton = true }: Props) => {
+const ChatStream = forwardRef(({ channelID, replyToMessage, showThreadButton = true, pinnedMessagesString, scrollRef, onModalClose }: Props, ref) => {
 
+    const { messages, hasOlderMessages, loadOlderMessages, goToLatestMessages, hasNewMessages, error, loadNewerMessages, isLoading, highlightedMessage, scrollToMessage } = useChatStream(channelID, scrollRef, pinnedMessagesString)
+    const { setDeleteMessage, ...deleteProps } = useDeleteMessage(onModalClose)
 
-    const scrollRef = useRef<HTMLDivElement | null>(null)
+    const { setEditMessage, ...editProps } = useEditMessage(onModalClose)
+    const { setForwardMessage, ...forwardProps } = useForwardMessage(onModalClose)
+    const { setAttachDocument, ...attachDocProps } = useAttachFileToDocument(onModalClose)
 
-    const { messages, hasOlderMessages, loadOlderMessages, goToLatestMessages, hasNewMessages, error, loadNewerMessages, isLoading, highlightedMessage, scrollToMessage } = useChatStream(channelID, scrollRef)
-    const { setDeleteMessage, ...deleteProps } = useDeleteMessage()
-
-    const { setEditMessage, ...editProps } = useEditMessage()
-    const { setForwardMessage, ...forwardProps } = useForwardMessage()
-    const { setAttachDocument, ...attachDocProps } = useAttachFileToDocument()
-
-    const { setReactionMessage, ...reactionProps } = useMessageReactionAnalytics()
+    const { setReactionMessage, ...reactionProps } = useMessageReactionAnalytics(onModalClose)
 
     const onReplyMessageClick = (messageID: string) => {
         scrollToMessage(messageID)
     }
+
+    const { name: userID } = useUserData()
+
+    // When the user presses the up arrow, we need to check if the last message is a message sent by the user and is a text message (not system or file)
+    // If so, we need to open the edit modal for that message
+    // This function needs to be called from the parent component
+    useImperativeHandle(ref, () => ({
+        onUpArrow: () => {
+            if (messages && messages.length > 0) {
+                const lastMessage = messages[messages.length - 1]
+                if (lastMessage.message_type === 'Text' && lastMessage.owner === userID && !lastMessage.is_bot_message) {
+                    setEditMessage(lastMessage)
+                }
+            }
+        }
+    }))
 
     const { ref: oldLoaderRef } = useInView({
         fallbackInView: true,
@@ -92,15 +110,17 @@ const ChatStream = ({ channelID, replyToMessage, showThreadButton = true }: Prop
         skip: !hasOlderMessages,
         onChange: (async (inView) => {
             if (inView && hasOlderMessages) {
-                const lastMessage = messages ? messages[0] : null;
-                await loadOlderMessages()
-                // Restore the scroll position to the last message before loading more
-                if (lastMessage?.message_type === 'date') {
-                    document.getElementById(`date-${lastMessage?.creation}`)?.scrollIntoView()
-                } else {
-                    document.getElementById(`message-${lastMessage?.name}`)?.scrollIntoView()
-                }
+                const currentScrollPosition = scrollRef.current?.scrollTop || 0
+                const scrollHeight = scrollRef.current?.scrollHeight || 0
 
+                await loadOlderMessages()
+
+                // After loading, adjust scroll position to maintain the same relative position
+                if (scrollRef.current) {
+                    const newScrollHeight = scrollRef.current.scrollHeight
+                    const heightDiff = newScrollHeight - scrollHeight
+                    scrollRef.current.scrollTop = currentScrollPosition + heightDiff
+                }
             }
         })
     });
@@ -115,6 +135,30 @@ const ChatStream = ({ channelID, replyToMessage, showThreadButton = true }: Prop
             }
         }
     });
+
+    // Add a resize observer so that if the user is near the bottom of the chat, we can scroll to the bottom when the user resizes the window + any link previews are loaded
+    useEffect(() => {
+        if (!scrollRef.current) return
+
+        const observer = new ResizeObserver(() => {
+            const scrollContainer = scrollRef.current
+            if (!scrollContainer) return
+
+            // Check if we're near bottom before adjusting scroll
+            if (scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 100) {
+                scrollContainer.scrollTo({
+                    top: scrollContainer.scrollHeight,
+                    behavior: 'smooth'
+                })
+            }
+        })
+
+        observer.observe(scrollRef.current)
+
+        return () => {
+            observer.disconnect()
+        }
+    }, []) // Only run once on mount since we're just observing the container
 
     return (
         <div className='relative h-full flex flex-col overflow-y-auto pb-16 sm:pb-0' ref={scrollRef}>
@@ -132,9 +176,11 @@ const ChatStream = ({ channelID, replyToMessage, showThreadButton = true }: Prop
                         return <DateSeparator key={`date-${message.creation}`} id={`date-${message.creation}`} className='p-2 z-10 relative'>
                             {message.creation}
                         </DateSeparator>
+                    } else if (message.message_type === 'System') {
+                        return <SystemMessageBlock key={`${message.name}_${message.modified}`} message={message} />
                     } else {
                         return <div key={`${message.name}_${message.modified}`} id={`message-${message.name}`}>
-                            <div className="w-full overflow-x-clip overflow-y-visible text-ellipsis animate-fadein">
+                            <div className="w-full overflow-x-clip overflow-y-visible text-ellipsis">
                                 <MessageItem
                                     message={message}
                                     isHighlighted={highlightedMessage === message.name}
@@ -175,6 +221,6 @@ const ChatStream = ({ channelID, replyToMessage, showThreadButton = true }: Prop
         </div>
 
     )
-}
+})
 
 export default ChatStream

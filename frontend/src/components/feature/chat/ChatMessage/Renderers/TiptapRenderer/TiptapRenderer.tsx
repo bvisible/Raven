@@ -15,7 +15,7 @@ import { common, createLowlight } from 'lowlight'
 import python from 'highlight.js/lib/languages/python'
 import { CustomBold } from './Bold'
 import { ChannelMentionRenderer, UserMentionRenderer } from './Mention'
-import { CustomLink, LinkPreview } from './Link'
+import { CustomLink } from './Link'
 import { CustomUnderline } from './Underline'
 import { Image } from '@tiptap/extension-image'
 import { clsx } from 'clsx'
@@ -27,6 +27,9 @@ import Table from '@tiptap/extension-table'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 import TableRow from '@tiptap/extension-table-row'
+import Details from './Details'
+import TimestampRenderer from './TimestampRenderer'
+import LinkPreview from './LinkPreview'
 
 const lowlight = createLowlight(common)
 
@@ -78,7 +81,7 @@ export const TiptapRenderer = ({ message, user, isScrolling = false, showMiniIma
         },
         paragraph: {
           HTMLAttributes: {
-            class: 'rt-Text leading-relaxed text-sm'
+            class: 'rt-Text leading-tight text-sm'
           }
         },
         code: {
@@ -158,6 +161,8 @@ export const TiptapRenderer = ({ message, user, isScrolling = false, showMiniIma
           pluginKey: new PluginKey('channelMention'),
         },
       }),
+      Details,
+      TimestampRenderer
     ]
   })
 

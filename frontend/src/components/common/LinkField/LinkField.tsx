@@ -4,7 +4,7 @@ import { useCombobox } from "downshift";
 import { Filter, SearchResult, useSearch } from "frappe-react-sdk";
 import { useState } from "react";
 import { Label } from "../Form";
-import { Text, TextField } from "@radix-ui/themes";
+import { Text, TextField, VisuallyHidden } from "@radix-ui/themes";
 import { useIsDesktop } from "@/hooks/useMediaQuery";
 import clsx from "clsx";
 
@@ -19,10 +19,12 @@ export interface LinkFieldProps {
     autofocus?: boolean,
     dropdownClass?: string,
     required?: boolean,
+    suggestedItems?: SearchResult[],
+    hideLabel?: boolean
 }
 
 
-const LinkField = ({ doctype, filters, label, placeholder, value, required, setValue, disabled, autofocus, dropdownClass }: LinkFieldProps) => {
+const LinkField = ({ doctype, filters, hideLabel = false, label, placeholder, value, required, setValue, disabled, autofocus, dropdownClass, suggestedItems }: LinkFieldProps) => {
 
     const [searchText, setSearchText] = useState(value ?? '')
 
@@ -30,7 +32,7 @@ const LinkField = ({ doctype, filters, label, placeholder, value, required, setV
 
     const { data } = useSearch(doctype, searchText, filters)
 
-    const items: SearchResult[] = data?.message ?? []
+    const items: SearchResult[] = [...(suggestedItems ?? []), ...(data?.message ?? [])]
 
     const {
         isOpen,
@@ -44,6 +46,9 @@ const LinkField = ({ doctype, filters, label, placeholder, value, required, setV
     } = useCombobox({
         onInputValueChange({ inputValue }) {
             setSearchText(inputValue ?? '')
+            if (!inputValue) {
+                setValue('')
+            }
         },
         items: items,
         itemToString(item) {
@@ -54,15 +59,18 @@ const LinkField = ({ doctype, filters, label, placeholder, value, required, setV
             setValue(selectedItem?.value ?? '')
         },
         defaultInputValue: value,
-        defaultIsOpen: isDesktop && autofocus,
         defaultSelectedItem: items.find(item => item.value === value),
     })
 
     return <div className="w-full">
         <div className="flex flex-col">
-            <Label className="w-fit" isRequired={required} {...getLabelProps()}>
-                {label}
-            </Label>
+            {hideLabel ? <VisuallyHidden>
+                <Label isRequired={required} {...getLabelProps()}></Label>
+            </VisuallyHidden> :
+                <Label className="w-fit" isRequired={required} {...getLabelProps()}>
+                    {label}
+                </Label>
+            }
             <TextField.Root
                 placeholder={placeholder ?? `Search ${doctype}`}
                 className='w-full'

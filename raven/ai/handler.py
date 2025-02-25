@@ -7,12 +7,14 @@ from openai.types.beta.threads.runs import RunStep
 from typing_extensions import override
 
 from raven.ai.functions import (
+	attach_file_to_document,
 	create_document,
 	create_documents,
 	delete_document,
 	delete_documents,
 	get_document,
 	get_documents,
+	get_list,
 	update_document,
 	update_documents,
 )
@@ -187,16 +189,33 @@ def stream_response(ai_thread_id: str, bot, channel_id: str):
 						for doc_id in function_output.get("documents"):
 							docs_updated.append({"doctype": function.reference_doctype, "document_id": doc_id})
 
+					if function.type == "Attach File to Document":
+						doctype = args.get("doctype")
+						document_id = args.get("document_id")
+						file_path = args.get("file_path")
+						self.publish_event(f"Attaching file to {doctype} {document_id}...")
+						function_output = attach_file_to_document(doctype, document_id, file_path)
+
+					if function.type == "Get List":
+						self.publish_event(f"Fetching list of {function.reference_doctype}...")
+						function_output = get_list(
+							function.reference_doctype,
+							filters=args.get("filters"),
+							fields=args.get("fields"),
+							limit=args.get("limit", 20),
+						)
+
 					tool_outputs.append(
 						{"tool_call_id": tool.id, "output": json.dumps(function_output, default=str)}
 					)
+
 				except Exception as e:
 					frappe.log_error("Raven AI Error", frappe.get_traceback())
 
 					if bot.debug_mode:
 						bot.send_message(
 							channel_id=channel_id,
-							text=f"<details><summary>Error in function call</summary><p>{frappe.get_traceback()}</p></details>",
+							text=f"<details data-summary='Error in function call'><p>{frappe.get_traceback()}</p></details>",
 						)
 					tool_outputs.append(
 						{
@@ -241,6 +260,15 @@ def stream_response(ai_thread_id: str, bot, channel_id: str):
 			bot.send_message(
 				channel_id=channel_id,
 				text=f"There was an error in the AI thread. Please try again.<br/>Error: {str(e)}",
+			)
+			frappe.publish_realtime(
+				"ai_event_clear",
+				{
+					"channel_id": channel_id,
+				},
+				doctype="Raven Channel",
+				docname=channel_id,
+				after_commit=True,
 			)
 
 

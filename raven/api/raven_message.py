@@ -7,7 +7,7 @@ from frappe.query_builder import Case, JoinType, Order
 from frappe.query_builder.functions import Coalesce, Count
 
 from raven.api.raven_channel import create_direct_message_channel, get_peer_user_id
-from raven.utils import get_channel_member, track_channel_visit
+from raven.utils import get_channel_member, is_channel_member, track_channel_visit
 
 
 @frappe.whitelist(methods=["POST"])
@@ -40,7 +40,7 @@ def send_message(channel_id, text, is_reply=False, linked_message=None, json_con
 				}
 			)
 		doc.insert()
-		return "message sent"
+		return doc
 
 
 @frappe.whitelist()
@@ -121,6 +121,43 @@ def save_message(message_id, add=False):
 
 
 @frappe.whitelist()
+def get_pinned_messages(channel_id):
+
+	# check if the user has permission to view the channel
+	frappe.has_permission("Raven Channel", doc=channel_id, ptype="read", throw=True)
+
+	pinnedMessagesString = frappe.db.get_value("Raven Channel", channel_id, "pinned_messages_string")
+	pinnedMessages = pinnedMessagesString.split("\n") if pinnedMessagesString else []
+
+	return frappe.db.get_all(
+		"Raven Message",
+		filters={"name": ["in", pinnedMessages]},
+		fields=[
+			"name",
+			"owner",
+			"creation",
+			"text",
+			"file",
+			"message_type",
+			"message_reactions",
+			"_liked_by",
+			"channel_id",
+			"thumbnail_width",
+			"thumbnail_height",
+			"file_thumbnail",
+			"link_doctype",
+			"link_document",
+			"replied_message_details",
+			"content",
+			"is_edited",
+			"is_thread",
+			"is_forwarded",
+		],
+		order_by="creation asc",
+	)
+
+
+@frappe.whitelist()
 def get_saved_messages():
 	"""
 	Fetches list of all messages liked by the user
@@ -147,6 +184,7 @@ def get_saved_messages():
 			raven_message.message_type,
 			raven_message.message_reactions,
 			raven_message._liked_by,
+			raven_channel.workspace,
 		)
 		.where(raven_message._liked_by.like("%" + frappe.session.user + "%"))
 		.where(
@@ -188,9 +226,7 @@ def parse_messages(messages):
 
 def check_permission(channel_id):
 	if frappe.get_cached_value("Raven Channel", channel_id, "type") == "Private":
-		if frappe.db.exists(
-			"Raven Channel Member", {"channel_id": channel_id, "user_id": frappe.session.user}
-		):
+		if is_channel_member(channel_id):
 			pass
 		elif frappe.session.user == "Administrator":
 			pass
@@ -218,9 +254,10 @@ def get_unread_count_for_channels():
 		.on(
 			(channel.name == channel_member.channel_id) & (channel_member.user_id == frappe.session.user)
 		)
-		.where((channel.type == "Open") | (channel_member.user_id == frappe.session.user))
+		.where(channel_member.user_id == frappe.session.user)
 		.where(channel.is_archived == 0)
 		.where(channel.is_thread == 0)
+		.where(message.message_type != "System")
 		.left_join(message)
 		.on(channel.name == message.channel_id)
 	)
@@ -257,13 +294,16 @@ def get_unread_count_for_channels():
 def get_unread_count_for_channel(channel_id):
 	channel_member = get_channel_member(channel_id=channel_id)
 	if channel_member:
-		last_timestamp = frappe.get_cached_value("Raven Channel Member", channel_member, "last_visit")
+		last_timestamp = frappe.get_cached_value(
+			"Raven Channel Member", channel_member["name"], "last_visit"
+		)
 
 		return frappe.db.count(
 			"Raven Message",
 			filters={
 				"channel_id": channel_id,
 				"creation": (">", last_timestamp),
+				"message_type": ["!=", "System"],
 			},
 		)
 	else:
@@ -272,12 +312,11 @@ def get_unread_count_for_channel(channel_id):
 				"Raven Message",
 				filters={
 					"channel_id": channel_id,
+					"message_type": ["!=", "System"],
 				},
 			)
 		else:
 			return 0
-
-	return 0
 
 
 @frappe.whitelist()
@@ -501,7 +540,7 @@ def forward_message(message_receivers, forwarded_message):
 			add_forwarded_message_to_channel(dm_channel_id, forwarded_message)
 		else:
 			# send forwarded message to the channel
-			add_forwarded_message_to_channel(receiver["channel_name"], forwarded_message)
+			add_forwarded_message_to_channel(receiver["name"], forwarded_message)
 
 	return "messages forwarded"
 
@@ -525,6 +564,7 @@ def add_forwarded_message_to_channel(channel_id, forwarded_message):
 			"is_edited": 0,
 			"is_reply": 0,
 			"is_forwarded": 1,
+			"is_thread": 0,
 			"replied_message_details": None,
 			"message_reactions": None,
 		}

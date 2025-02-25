@@ -1,14 +1,14 @@
 import { BubbleMenu, EditorContent, EditorContext, Extension, ReactRenderer, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
-import React, { Suspense, lazy, useContext, useEffect, useMemo } from 'react'
+import React, { Suspense, forwardRef, lazy, useContext, useEffect, useImperativeHandle, useMemo, useRef } from 'react'
 import { TextFormattingMenu } from './TextFormattingMenu'
 import Highlight from '@tiptap/extension-highlight'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import './tiptap.styles.css'
 import Mention from '@tiptap/extension-mention'
-import { UserListContext } from '@/utils/users/UserListProvider'
+import { UserFields, UserListContext } from '@/utils/users/UserListProvider'
 import MentionList from './MentionList'
 import tippy from 'tippy.js'
 import { PluginKey } from '@tiptap/pm/state'
@@ -26,14 +26,16 @@ import json from 'highlight.js/lib/languages/json'
 import python from 'highlight.js/lib/languages/python'
 import { Plugin } from 'prosemirror-state'
 import { Box, Flex, IconButton } from '@radix-ui/themes'
-import { useSessionStickyState } from '@/hooks/useStickyState'
+import { useStickyState } from '@/hooks/useStickyState'
 import { Message } from '../../../../../../types/Messaging/Message'
 import Image from '@tiptap/extension-image'
 import { EmojiSuggestion } from './EmojiSuggestion'
-import { useIsDesktop } from '@/hooks/useMediaQuery'
+import { useIsMobile } from '@/hooks/useMediaQuery'
 import { BiPlus } from 'react-icons/bi'
 import clsx from 'clsx'
 import { ChannelMembers } from '@/hooks/fetchers/useFetchChannelMembers'
+import TimestampRenderer from '../ChatMessage/Renderers/TiptapRenderer/TimestampRenderer'
+import { useParams } from 'react-router-dom'
 const MobileInputActions = lazy(() => import('./MobileActions/MobileInputActions'))
 
 const lowlight = createLowlight(common)
@@ -61,7 +63,10 @@ type TiptapEditorProps = {
     messageSending: boolean,
     defaultText?: string,
     replyMessage?: Message | null,
-    channelMembers?: ChannelMembers
+    channelMembers?: ChannelMembers,
+    channelID?: string,
+    onUserType?: () => void,
+    onUpArrow?: () => void,
 }
 
 export const UserMention = Mention.extend({
@@ -71,6 +76,13 @@ export const UserMention = Mention.extend({
         suggestion: {
             char: '@',
             pluginKey: new PluginKey('userMention'),
+            // Allow any character to be a prefix for a user mention
+            allowedPrefixes: null,
+            allow: (props) => {
+                // Do not allow mentions if the preceding character is a letter or digit
+                const precedingCharacter = props.state.doc.textBetween(props.range.from - 1, props.range.from, '')
+                return !/[a-zA-Z0-9]/.test(precedingCharacter)
+            }
         }
     })
 
@@ -81,23 +93,46 @@ export const ChannelMention = Mention.extend({
         suggestion: {
             char: '#',
             pluginKey: new PluginKey('channelMention'),
+            // Allow any character to be a prefix for a channel mention
+            allowedPrefixes: null,
+            allow: (props) => {
+                // Do not allow mentions if the preceding character is a letter or digit
+                const precedingCharacter = props.state.doc.textBetween(props.range.from - 1, props.range.from, '')
+                return !/[a-zA-Z0-9]/.test(precedingCharacter)
+            }
         }
     })
 
-const Tiptap = ({ isEdit, slotBefore, fileProps, onMessageSend, channelMembers, replyMessage, clearReplyMessage, placeholder = 'Type a message...', messageSending, sessionStorageKey = 'tiptap-editor', disableSessionStorage = false, defaultText = '' }: TiptapEditorProps) => {
+export interface MemberSuggestions extends UserFields {
+    is_member: boolean
+}
+
+const Tiptap = forwardRef(({ isEdit, slotBefore, fileProps, onMessageSend, onUpArrow, channelMembers, onUserType, channelID, replyMessage, clearReplyMessage, placeholder = 'Type a message...', messageSending, sessionStorageKey = 'tiptap-editor', disableSessionStorage = false, defaultText = '' }: TiptapEditorProps, ref) => {
 
     const { enabledUsers } = useContext(UserListContext)
 
-    const channelMemberUsers = useMemo(() => {
+    const channelMembersRef = useRef<MemberSuggestions[]>([])
+
+    useEffect(() => {
         if (channelMembers) {
-            // Filter enabled users to only include users that are in the channel
-            return enabledUsers.filter((user) => user.name in channelMembers)
+            // Sort the user list so that members are at the top
+            channelMembersRef.current = enabledUsers.map((user) => ({
+                ...user,
+                is_member: user.name in channelMembers
+            })).sort((a, b) => a.is_member ? -1 : 1)
         } else {
-            return enabledUsers
+            channelMembersRef.current = enabledUsers.map((user) => ({
+                ...user,
+                is_member: true
+            }))
         }
     }, [channelMembers, enabledUsers])
 
     const { channels } = useContext(ChannelListContext) as ChannelListContextType
+
+    const { workspaceID } = useParams()
+
+    const isMobile = useIsMobile()
 
     // this is a dummy extension only to create custom keydown behavior
     const KeyboardHandler = Extension.create({
@@ -105,6 +140,15 @@ const Tiptap = ({ isEdit, slotBefore, fileProps, onMessageSend, channelMembers, 
         addKeyboardShortcuts() {
             return {
                 Enter: () => {
+                    //  Check for phone
+                    if (matchMedia('(max-device-width: 768px)').matches) {
+                        return false
+                    }
+
+                    // Check for iPad
+                    if (matchMedia('(max-device-width: 1024px)').matches) {
+                        return false
+                    }
 
                     const isCodeBlockActive = this.editor.isActive('codeBlock');
                     const isListItemActive = this.editor.isActive('listItem');
@@ -192,6 +236,13 @@ const Tiptap = ({ isEdit, slotBefore, fileProps, onMessageSend, channelMembers, 
                         () => commands.splitBlock(),
                     ]);
                 },
+                'ArrowUp': () => {
+                    // If the editor is empty, call the onUpArrow function
+                    if (this.editor.isEmpty) {
+                        onUpArrow?.()
+                    }
+                    return false
+                }
             };
         },
         addProseMirrorPlugins() {
@@ -313,7 +364,7 @@ const Tiptap = ({ isEdit, slotBefore, fileProps, onMessageSend, channelMembers, 
             },
             suggestion: {
                 items: (query) => {
-                    return channelMemberUsers.filter((user) => user.full_name.toLowerCase().startsWith(query.query.toLowerCase()))
+                    return channelMembersRef.current.filter((user) => user.full_name.toLowerCase().startsWith(query.query.toLowerCase()))
                         .slice(0, 10);
                 },
                 // char: '@',
@@ -383,7 +434,7 @@ const Tiptap = ({ isEdit, slotBefore, fileProps, onMessageSend, channelMembers, 
             },
             suggestion: {
                 items: (query) => {
-                    return channels.filter((channel) => channel.channel_name.toLowerCase().startsWith(query.query.toLowerCase()))
+                    return channels.filter((channel) => channel.workspace === workspaceID && channel.channel_name.toLowerCase().startsWith(query.query.toLowerCase()))
                         .slice(0, 10);
                 },
                 // char: '#',
@@ -444,18 +495,20 @@ const Tiptap = ({ isEdit, slotBefore, fileProps, onMessageSend, channelMembers, 
 
             }
         }),
-        EmojiSuggestion
+        EmojiSuggestion,
+        TimestampRenderer
     ]
 
-    const [content, setContent] = useSessionStickyState(defaultText, sessionStorageKey, disableSessionStorage)
-
-    const isDesktop = useIsDesktop()
+    const [content, setContent] = useStickyState(defaultText, sessionStorageKey, disableSessionStorage)
 
     const editor = useEditor({
         extensions,
         autofocus: 'end',
         content,
         editorProps: {
+            handleTextInput() {
+                onUserType?.()
+            },
             attributes: {
                 class: 'tiptap-editor' + (replyMessage ? ' replying' : '') + (isEdit ? ' editing-message' : '')
             }
@@ -463,34 +516,26 @@ const Tiptap = ({ isEdit, slotBefore, fileProps, onMessageSend, channelMembers, 
         onUpdate({ editor }) {
             setContent(editor.getHTML())
         }
-    }, [replyMessage])
+    }, [replyMessage, onUserType])
 
 
 
     useEffect(() => {
-        if (isDesktop || isEdit) {
+        if (!isMobile || isEdit) {
             setTimeout(() => {
                 editor?.chain().focus().run()
             }, 50)
         }
-    }, [replyMessage, editor, isDesktop, isEdit])
+    }, [replyMessage, editor, isMobile, isEdit])
+
+    useImperativeHandle(ref, () => ({
+        focusEditor: () => {
+            editor?.chain().focus().run()
+        }
+    }))
 
 
-    if (isDesktop) {
-        return (
-            <Box className='border rounded-radius2 border-gray-300 dark:border-gray-500 dark:bg-gray-3'>
-                <EditorContext.Provider value={{ editor }}>
-                    {slotBefore}
-                    <EditorContent editor={editor} />
-                    <ToolPanel>
-                        <TextFormattingMenu />
-                        <RightToolbarButtons fileProps={fileProps} setContent={setContent} sendMessage={onMessageSend} messageSending={messageSending} />
-                    </ToolPanel>
-                </EditorContext.Provider>
-            </Box>
-
-        )
-    } else {
+    if (isMobile) {
         return <Box className={clsx('pt-2 pb-8 w-full bg-white dark:bg-gray-2 z-50 border-t border-t-gray-3 dark:border-t-gray-3',
             isEdit ? 'bg-transparent dark:bg-transparent' : 'fixed bottom-0 left-0 px-4'
         )}>
@@ -502,7 +547,7 @@ const Tiptap = ({ isEdit, slotBefore, fileProps, onMessageSend, channelMembers, 
                             <Suspense fallback={<IconButton radius='full' color='gray' variant='soft' size='2' className='mb-1'>
                                 <BiPlus size='20' />
                             </IconButton>}>
-                                <MobileInputActions fileProps={fileProps} setContent={setContent} sendMessage={onMessageSend} messageSending={messageSending} />
+                                <MobileInputActions fileProps={fileProps} setContent={setContent} sendMessage={onMessageSend} messageSending={messageSending} channelID={channelID} />
                             </Suspense>
                         </div>
                     }
@@ -530,8 +575,24 @@ const Tiptap = ({ isEdit, slotBefore, fileProps, onMessageSend, channelMembers, 
         </Box>
     }
 
+    return (
+        <Box className='border rounded-radius2 border-gray-300 dark:border-gray-500 dark:bg-gray-3'>
+            <EditorContext.Provider value={{ editor }}>
+                {slotBefore}
+                <EditorContent editor={editor} />
+                <ToolPanel>
+                    <TextFormattingMenu />
+                    <RightToolbarButtons fileProps={fileProps} setContent={setContent} sendMessage={onMessageSend} messageSending={messageSending}
+                        isEdit={isEdit}
+                        channelID={channelID} />
+                </ToolPanel>
+            </EditorContext.Provider>
+        </Box>
+
+    )
 
 
-}
+
+})
 
 export default Tiptap

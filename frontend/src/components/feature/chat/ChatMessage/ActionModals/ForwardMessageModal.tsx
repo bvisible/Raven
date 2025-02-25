@@ -1,4 +1,4 @@
-import { Flex, Dialog, IconButton, Box, Button } from "@radix-ui/themes"
+import { Flex, Dialog, IconButton, Box, Button, VisuallyHidden } from "@radix-ui/themes"
 import { Suspense } from "react"
 import { BiX } from "react-icons/bi"
 import { Message } from "../../../../../../../types/Messaging/Message"
@@ -10,7 +10,7 @@ import UsersOrChannelsDropdown from "@/components/feature/selectDropdowns/UsersO
 import { ErrorText } from "@/components/common/Form"
 import { Loader } from "@/components/common/Loader"
 import { useFrappePostCall } from "frappe-react-sdk"
-import { ErrorBanner } from "@/components/layout/AlertBanner"
+import { ErrorBanner } from "@/components/layout/AlertBanner/ErrorBanner"
 
 interface ForwardMessageModalProps {
     onClose: () => void,
@@ -61,6 +61,9 @@ const ForwardMessageModal = ({ onClose, message }: ForwardMessageModalProps) => 
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Flex justify={'between'}>
                     <Dialog.Title>Forward Message</Dialog.Title>
+                    <VisuallyHidden>
+                        <Dialog.Description>Forward message to a user or channel</Dialog.Description>
+                    </VisuallyHidden>
                     <Dialog.Close onClick={handleClose}>
                         <IconButton size='1' variant="soft" color="gray">
                             <BiX size='18' />
@@ -99,7 +102,7 @@ const ForwardMessageModal = ({ onClose, message }: ForwardMessageModalProps) => 
                         <Button variant="soft" color="gray">Cancel</Button>
                     </Dialog.Close>
                     <Button type='submit' disabled={loading}>
-                        {loading && <Loader />}
+                        {loading && <Loader className="text-white" />}
                         {loading ? "Sending" : "Send"}
                     </Button>
                 </Flex>

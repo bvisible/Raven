@@ -111,6 +111,13 @@ def attach_file_to_document(doctype: str, document_id: str, file_path: str):
 	"""
 	Attach a file to a document in the database
 	"""
+	if not frappe.db.exists(doctype, document_id):
+		return {
+			"document_id": document_id,
+			"message": f"{doctype} with ID {document_id} not found",
+			"doctype": doctype,
+		}
+
 	file = frappe.get_doc("File", {"file_url": file_path})
 
 	if not file:
@@ -130,3 +137,17 @@ def attach_file_to_document(doctype: str, document_id: str, file_path: str):
 	newFile.insert()
 
 	return {"document_id": document_id, "message": "File attached", "file_id": newFile.name}
+
+
+def get_list(doctype: str, filters: dict = None, fields: list = None, limit: int = 20):
+	"""
+	Get a list of documents from the database
+	"""
+	if filters is None:
+		filters = {}
+
+	if fields is None:
+		fields = ["*"]
+
+	# Use the frappe.get_list method to get the list of documents
+	return frappe.get_list(doctype, filters=filters, fields=fields, limit=limit)

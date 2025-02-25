@@ -1,34 +1,24 @@
+import { Stack } from '@/components/layout/Stack'
+import { Flex, Text } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
-import { FullPageLoader } from '../../components/layout/Loaders'
 import { UserContext } from './UserProvider'
-import { useEffect } from 'react';
 
 export const ProtectedRoute = () => {
 
     const { currentUser, isLoading } = useContext(UserContext)
-    /* ////
+
     if (isLoading) {
-        return <FullPageLoader />
+        return <Flex justify='center' align='center' height='100vh' width='100vw' className='animate-fadein'>
+            <Stack className='text-center' gap='1'>
+                <Text size='7' className='cal-sans tracking-normal'>neoffice</Text>
+                <Text color='gray' weight='medium'>Setting up your workspace...</Text>
+            </Stack>
+        </Flex>
     }
     else if (!currentUser || currentUser === 'Guest') {
-        return <Navigate to="/../login" />
+        return <Navigate to="/login" />
     }
-    */
-    useEffect(() => {
-        if (!isLoading && (!currentUser || currentUser === 'Guest')) {
-            window.location.href = '/login';
-        }
-    }, [isLoading, currentUser]);
-
-    if (isLoading) {
-        return <FullPageLoader />;
-    }
-
-    if (!currentUser || currentUser === 'Guest') {
-        return null;
-    }
-    ////
     return (
         <Outlet />
     )

@@ -2,7 +2,7 @@ import { BiSearch } from 'react-icons/bi'
 import { useFrappeGetCall } from 'frappe-react-sdk'
 import { useContext, useState, useMemo } from 'react'
 import { useDebounce } from '../../../hooks/useDebounce'
-import { ErrorBanner } from '../../layout/AlertBanner'
+import { ErrorBanner } from '../../layout/AlertBanner/ErrorBanner'
 import { EmptyStateForSearch } from '../../layout/EmptyState/EmptyState'
 import { useNavigate } from 'react-router-dom'
 import { MessageBox } from './MessageBox'
@@ -43,17 +43,21 @@ export const MessageSearch = ({ onToggleMyChannels, isOnlyInMyChannels, onToggle
 
     const navigate = useNavigate()
 
-    const handleNavigateToChannel = (channelID: string, baseMessage?: string) => {
+    const handleNavigateToChannel = (channelID: string, baseMessage?: string, workspace?: string) => {
         onClose()
-        navigate(`/channel/${channelID}`, {
+        let path = `/channel/${channelID}`
+        if (workspace) {
+            path = `/${workspace}/${channelID}`
+        }
+        navigate(path, {
             state: {
                 baseMessage
             }
         })
     }
 
-    const handleScrollToMessage = async (messageName: string, channelID: string) => {
-        handleNavigateToChannel(channelID, messageName)
+    const handleScrollToMessage = async (messageName: string, channelID: string, workspace?: string) => {
+        handleNavigateToChannel(channelID, messageName, workspace)
     }
 
     const users = useGetUserRecords()
