@@ -5,6 +5,7 @@ import Cookies from 'js-cookie'
 import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import WorkspaceSwitcherGrid from './components/layout/WorkspaceSwitcherGrid'
+import { useStickyState } from './hooks/useStickyState'
 import ErrorPage from './pages/ErrorPage'
 import { MainPage } from './pages/MainPage'
 import MobileTabsPage from './pages/MobileTabsPage'
@@ -12,9 +13,6 @@ import WorkspaceSwitcher from './pages/WorkspaceSwitcher'
 import { ThemeProvider } from './ThemeProvider'
 import { ProtectedRoute } from './utils/auth/ProtectedRoute'
 import { UserProvider } from './utils/auth/UserProvider'
-////
-import { useEffect, useState } from 'react'
-////
 
 /** Following keys will not be cached in app cache */
 // const NO_CACHE_KEYS = [
@@ -153,23 +151,7 @@ const router = createBrowserRouter(
 )
 function App() {
 
-  //// const [appearance, setAppearance] = useStickyState<'light' | 'dark' | 'inherit'>('dark', 'appearance');
-  ////
-  const [themeActive, setThemeActive] = useState<'light' | 'dark'>('dark');
-
-  useEffect(() => {
-    const savedTheme = window.localStorage.getItem('theme_active') as 'light' | 'dark' | null;
-    if (savedTheme) {
-      setThemeActive(savedTheme);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = themeActive === 'dark' ? 'light' : 'dark';
-    setThemeActive(newTheme);
-    window.localStorage.setItem('theme_active', newTheme);
-  };
-  ////
+  const [appearance, setAppearance] = useStickyState<'light' | 'dark' | 'inherit'>('dark', 'appearance');
 
   // We not need to pass sitename if the Frappe version is v14.
 
@@ -199,7 +181,7 @@ function App() {
       <UserProvider>
         <Toaster richColors />
         <ThemeProvider
-          appearance={themeActive}
+          appearance={appearance}
           // grayColor='slate'
           accentColor='iris'
           panelBackground='translucent'
