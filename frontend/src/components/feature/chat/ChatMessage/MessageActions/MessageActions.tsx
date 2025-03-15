@@ -31,8 +31,6 @@ export const MessageContextMenu = ({ message, onDelete, onEdit, onReply, onForwa
     const copy = useMessageCopy(message)
     const { currentUser } = useContext(UserContext)
 
-    const { workspaceID } = useParams()
-
     const isOwner = currentUser === message?.owner && !message?.is_bot_message
 
     const isReactionsAvailable = Object.keys(JSON.parse(message?.message_reactions ?? '{}')).length !== 0
@@ -96,7 +94,7 @@ export const MessageContextMenu = ({ message, onDelete, onEdit, onReply, onForwa
                         </ContextMenu.Group>
                     }
 
-                    <PinMessageAction message={message} />
+                    {showThreadButton && <PinMessageAction message={message} />}
                     <SaveMessageAction message={message} />
 
                 </ContextMenu.Group>
@@ -139,7 +137,10 @@ const CopyMessageLink = ({ message }: { message: Message }) => {
     const { workspaceID, threadID } = useParams()
 
     const onClick = () => {
-        const basePath = `${import.meta.env.VITE_BASE_NAME}`
+        let basePath = `${import.meta.env.VITE_BASE_NAME}`
+        if (!window.location.origin.endsWith("/")) {
+            basePath = "/" + basePath
+        }
 
         const isMessageInThread = threadID === message.channel_id
         if (isMessageInThread) {
