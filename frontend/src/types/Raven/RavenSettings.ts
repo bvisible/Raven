@@ -27,12 +27,16 @@ export interface RavenSettings{
 	openai_project_id?: string
 	/**	Use Azure OpenAI : Check	*/
 	use_azure_openai?: 0 | 1
-	/**	Azure OpenAI API Key : Password	*/
+	/**	Azure OpenAI API Key (Primary) : Password	*/
 	azure_openai_api_key?: string
+	/**	Azure OpenAI API Key (Secondary) : Password - Optional secondary key for key rotation	*/
+	azure_openai_api_key_2?: string
 	/**	Azure OpenAI Endpoint : Data - Format: https://YOUR_RESOURCE_NAME.openai.azure.com	*/
 	azure_openai_endpoint?: string
 	/**	Azure OpenAI API Version : Data	*/
 	azure_openai_api_version?: string
+	/**	Azure OpenAI Deployment ID : Data - The deployment name you chose when you deployed the model	*/
+	azure_openai_deployment_id?: string
 	/**	Automatically Create a Channel for each Department : Check - If checked, a channel will be created in Raven for each department and employees will be synced with Raven Users.	*/
 	auto_create_department_channel?: 0 | 1
 	/**	Department Channel Type : Select	*/

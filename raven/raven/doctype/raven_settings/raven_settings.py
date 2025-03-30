@@ -34,8 +34,10 @@ class RavenSettings(Document):
 		tenor_api_key: DF.Data | None
 		use_azure_openai: DF.Check
 		azure_openai_api_key: DF.Password | None
+		azure_openai_api_key_2: DF.Password | None
 		azure_openai_endpoint: DF.Data | None
 		azure_openai_api_version: DF.Data | None
+		azure_openai_deployment_id: DF.Data | None
 	# end: auto-generated types
 
 	def validate(self):

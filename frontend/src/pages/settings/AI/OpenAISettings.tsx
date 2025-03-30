@@ -195,7 +195,7 @@ const OpenAISettings = () => {
                         {isAIEnabled && useAzureOpenAI && (
                             <>
                                 <Box>
-                                    <Label htmlFor='azure_openai_api_key' isRequired>Azure OpenAI API Key</Label>
+                                    <Label htmlFor='azure_openai_api_key' isRequired>Azure OpenAI API Key (Primary)</Label>
                                     <TextField.Root
                                         className={'w-48 sm:w-96'}
                                         id='azure_openai_api_key'
@@ -209,6 +209,23 @@ const OpenAISettings = () => {
                                         aria-invalid={errors.azure_openai_api_key ? 'true' : 'false'}
                                     />
                                     {errors?.azure_openai_api_key && <ErrorText>{errors.azure_openai_api_key?.message}</ErrorText>}
+                                </Box>
+                                
+                                <Box>
+                                    <Label htmlFor='azure_openai_api_key_2'>Azure OpenAI API Key (Secondary)</Label>
+                                    <TextField.Root
+                                        className={'w-48 sm:w-96'}
+                                        id='azure_openai_api_key_2'
+                                        type='password'
+                                        autoComplete='off'
+                                        placeholder='••••••••••••••••••••••••••••••••'
+                                        {...register('azure_openai_api_key_2')}
+                                        aria-invalid={errors.azure_openai_api_key_2 ? 'true' : 'false'}
+                                    />
+                                    {errors?.azure_openai_api_key_2 && <ErrorText>{errors.azure_openai_api_key_2?.message}</ErrorText>}
+                                    <HelperText>
+                                        Optional secondary key for key rotation
+                                    </HelperText>
                                 </Box>
                                 
                                 <Box>
@@ -231,18 +248,34 @@ const OpenAISettings = () => {
                                 </Box>
                                 
                                 <Box>
+                                    <Label htmlFor='azure_openai_deployment_id'>Azure OpenAI Deployment ID</Label>
+                                    <TextField.Root
+                                        className={'w-48 sm:w-96'}
+                                        id='azure_openai_deployment_id'
+                                        autoComplete='off'
+                                        placeholder='your-deployment-name'
+                                        {...register('azure_openai_deployment_id')}
+                                        aria-invalid={errors.azure_openai_deployment_id ? 'true' : 'false'}
+                                    />
+                                    {errors?.azure_openai_deployment_id && <ErrorText>{errors.azure_openai_deployment_id?.message}</ErrorText>}
+                                    <HelperText>
+                                        The deployment name you chose when you deployed the model
+                                    </HelperText>
+                                </Box>
+                                
+                                <Box>
                                     <Label htmlFor='azure_openai_api_version'>Azure OpenAI API Version</Label>
                                     <TextField.Root
                                         className={'w-48 sm:w-96'}
                                         id='azure_openai_api_version'
                                         autoComplete='off'
-                                        placeholder='2023-05-15'
+                                        placeholder='2025-03-01-preview'
                                         {...register('azure_openai_api_version')}
                                         aria-invalid={errors.azure_openai_api_version ? 'true' : 'false'}
                                     />
                                     {errors?.azure_openai_api_version && <ErrorText>{errors.azure_openai_api_version?.message}</ErrorText>}
                                     <HelperText>
-                                        Default is 2023-05-15 if not specified
+                                        Default is 2025-03-01-preview if not specified
                                     </HelperText>
                                 </Box>
                             </>

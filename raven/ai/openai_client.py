@@ -15,18 +15,29 @@ def get_open_ai_client():
 
 	# Check if Azure OpenAI is enabled
 	if raven_settings.get("use_azure_openai") and raven_settings.get("azure_openai_api_key"):
+		# Use the primary key
 		azure_api_key = raven_settings.get_password("azure_openai_api_key")
+		# The secondary key is optional and can be used for key rotation
+		# azure_api_key_2 = raven_settings.get_password("azure_openai_api_key_2")
+		
 		azure_endpoint = raven_settings.get("azure_openai_endpoint")
-		azure_api_version = raven_settings.get("azure_openai_api_version") or "2023-05-15"
+		azure_api_version = raven_settings.get("azure_openai_api_version") or "2025-03-01-preview"
+		azure_deployment = raven_settings.get("azure_openai_deployment_id")
 		
 		if not azure_endpoint:
 			frappe.throw(_("Azure OpenAI Endpoint is required when using Azure OpenAI"))
 		
-		client = AzureOpenAI(
-			api_key=azure_api_key,
-			api_version=azure_api_version,
-			azure_endpoint=azure_endpoint
-		)
+		client_params = {
+			"api_key": azure_api_key,
+			"api_version": azure_api_version,
+			"azure_endpoint": azure_endpoint
+		}
+		
+		# Ajout de l'ID de déploiement si spécifié
+		if azure_deployment:
+			client_params["azure_deployment"] = azure_deployment
+		
+		client = AzureOpenAI(**client_params)
 		
 		return client
 	
