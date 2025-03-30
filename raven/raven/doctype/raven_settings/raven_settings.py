@@ -32,6 +32,10 @@ class RavenSettings(Document):
 		show_if_a_user_is_on_leave: DF.Check
 		show_raven_on_desk: DF.Check
 		tenor_api_key: DF.Data | None
+		use_azure_openai: DF.Check
+		azure_openai_api_key: DF.Password | None
+		azure_openai_endpoint: DF.Data | None
+		azure_openai_api_version: DF.Data | None
 	# end: auto-generated types
 
 	def validate(self):
@@ -43,3 +47,7 @@ class RavenSettings(Document):
 				# Check if the company exists since it's a Data field
 				if not frappe.db.exists("Company", row.company):
 					frappe.throw(f"Company {row.company} does not exist.")
+
+		if self.enable_ai_integration and self.use_azure_openai:
+			if not self.azure_openai_endpoint:
+				frappe.throw(_("Azure OpenAI Endpoint is required when using Azure OpenAI"))

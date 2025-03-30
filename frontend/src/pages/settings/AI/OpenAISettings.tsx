@@ -64,6 +64,7 @@ const OpenAISettings = () => {
     }, [])
 
     const isAIEnabled = watch('enable_ai_integration')
+    const useAzureOpenAI = watch('use_azure_openai')
 
     const { data: openaiVersion } = useFrappeGetCall<{ message: string }>('raven.api.ai_features.get_open_ai_version')
 
@@ -102,75 +103,150 @@ const OpenAISettings = () => {
                             </Text>
                         </Flex>
                         <Separator size='4' />
-                        {isAIEnabled ?
-                            <Box>
-                                <Label htmlFor='openai_organisation_id' isRequired>OpenAI Organization ID</Label>
-                                <TextField.Root
-                                    autoFocus
-                                    maxLength={140}
-                                    className={'w-48 sm:w-96'}
-                                    id='openai_organisation_id'
-                                    autoComplete='off'
-                                    required
-                                    placeholder='org-************************'
-                                    {...register('openai_organisation_id', {
-                                        required: isAIEnabled ? "Please add your OpenAI Organization ID" : false,
-                                        maxLength: {
-                                            value: 140,
-                                            message: "ID cannot be more than 140 characters."
-                                        }
-                                    })}
-                                    aria-invalid={errors.openai_organisation_id ? 'true' : 'false'}
-                                />
-                                {errors?.openai_organisation_id && <ErrorText>{errors.openai_organisation_id?.message}</ErrorText>}
-                            </Box>
-                            : null
-                        }
+                        
+                        {isAIEnabled && (
+                            <Box mb="4">
+                                <Text as="label" size="2">
+                                    <Flex gap="2">
+                                        <Controller
+                                            control={control}
+                                            defaultValue={ravenSettings?.use_azure_openai}
+                                            name='use_azure_openai'
+                                            render={({ field }) => (
+                                                <Checkbox
+                                                    checked={field.value ? true : false}
+                                                    name={field.name}
+                                                    disabled={field.disabled}
+                                                    onCheckedChange={(v) => field.onChange(v ? 1 : 0)}
+                                                />
+                                            )} />
 
-                        {isAIEnabled ?
-                            <Box>
-                                <Label htmlFor='openai_api_key' isRequired>OpenAI API Key</Label>
-                                <TextField.Root
-                                    className={'w-48 sm:w-96'}
-                                    id='openai_api_key'
-                                    required
-                                    type='password'
-                                    autoComplete='off'
-                                    placeholder='••••••••••••••••••••••••••••••••'
-                                    {...register('openai_api_key', {
-                                        required: isAIEnabled ? "Please add your OpenAI API Key" : false,
-                                    })}
-                                    aria-invalid={errors.openai_api_key ? 'true' : 'false'}
-                                />
-                                {errors?.openai_api_key && <ErrorText>{errors.openai_api_key?.message}</ErrorText>}
+                                        Use Azure OpenAI
+                                    </Flex>
+                                </Text>
                             </Box>
-                            : null
-                        }
+                        )}
+                        
+                        {isAIEnabled && !useAzureOpenAI && (
+                            <>
+                                <Box>
+                                    <Label htmlFor='openai_organisation_id' isRequired>OpenAI Organization ID</Label>
+                                    <TextField.Root
+                                        autoFocus
+                                        maxLength={140}
+                                        className={'w-48 sm:w-96'}
+                                        id='openai_organisation_id'
+                                        autoComplete='off'
+                                        required
+                                        placeholder='org-************************'
+                                        {...register('openai_organisation_id', {
+                                            required: isAIEnabled && !useAzureOpenAI ? "Please add your OpenAI Organization ID" : false,
+                                            maxLength: {
+                                                value: 140,
+                                                message: "ID cannot be more than 140 characters."
+                                            }
+                                        })}
+                                        aria-invalid={errors.openai_organisation_id ? 'true' : 'false'}
+                                    />
+                                    {errors?.openai_organisation_id && <ErrorText>{errors.openai_organisation_id?.message}</ErrorText>}
+                                </Box>
 
-                        {isAIEnabled ?
-                            <Box>
-                                <Label htmlFor='openai_project_id'>OpenAI Project ID</Label>
-                                <TextField.Root
-                                    maxLength={140}
-                                    className={'w-48 sm:w-96'}
-                                    id='openai_project_id'
-                                    autoComplete='off'
-                                    placeholder='proj_************************'
-                                    {...register('openai_project_id', {
-                                        maxLength: {
-                                            value: 140,
-                                            message: "ID cannot be more than 140 characters."
-                                        }
-                                    })}
-                                    aria-invalid={errors.openai_project_id ? 'true' : 'false'}
-                                />
-                                {errors?.openai_project_id && <ErrorText>{errors.openai_project_id?.message}</ErrorText>}
-                                <HelperText>
-                                    If not set, the integration will use the default project.
-                                </HelperText>
-                            </Box>
-                            : null
-                        }
+                                <Box>
+                                    <Label htmlFor='openai_api_key' isRequired>OpenAI API Key</Label>
+                                    <TextField.Root
+                                        className={'w-48 sm:w-96'}
+                                        id='openai_api_key'
+                                        required
+                                        type='password'
+                                        autoComplete='off'
+                                        placeholder='••••••••••••••••••••••••••••••••'
+                                        {...register('openai_api_key', {
+                                            required: isAIEnabled && !useAzureOpenAI ? "Please add your OpenAI API Key" : false,
+                                        })}
+                                        aria-invalid={errors.openai_api_key ? 'true' : 'false'}
+                                    />
+                                    {errors?.openai_api_key && <ErrorText>{errors.openai_api_key?.message}</ErrorText>}
+                                </Box>
+
+                                <Box>
+                                    <Label htmlFor='openai_project_id'>OpenAI Project ID</Label>
+                                    <TextField.Root
+                                        maxLength={140}
+                                        className={'w-48 sm:w-96'}
+                                        id='openai_project_id'
+                                        autoComplete='off'
+                                        placeholder='proj_************************'
+                                        {...register('openai_project_id', {
+                                            maxLength: {
+                                                value: 140,
+                                                message: "ID cannot be more than 140 characters."
+                                            }
+                                        })}
+                                        aria-invalid={errors.openai_project_id ? 'true' : 'false'}
+                                    />
+                                    {errors?.openai_project_id && <ErrorText>{errors.openai_project_id?.message}</ErrorText>}
+                                    <HelperText>
+                                        If not set, the integration will use the default project.
+                                    </HelperText>
+                                </Box>
+                            </>
+                        )}
+                        
+                        {isAIEnabled && useAzureOpenAI && (
+                            <>
+                                <Box>
+                                    <Label htmlFor='azure_openai_api_key' isRequired>Azure OpenAI API Key</Label>
+                                    <TextField.Root
+                                        className={'w-48 sm:w-96'}
+                                        id='azure_openai_api_key'
+                                        required
+                                        type='password'
+                                        autoComplete='off'
+                                        placeholder='••••••••••••••••••••••••••••••••'
+                                        {...register('azure_openai_api_key', {
+                                            required: isAIEnabled && useAzureOpenAI ? "Please add your Azure OpenAI API Key" : false,
+                                        })}
+                                        aria-invalid={errors.azure_openai_api_key ? 'true' : 'false'}
+                                    />
+                                    {errors?.azure_openai_api_key && <ErrorText>{errors.azure_openai_api_key?.message}</ErrorText>}
+                                </Box>
+                                
+                                <Box>
+                                    <Label htmlFor='azure_openai_endpoint' isRequired>Azure OpenAI Endpoint</Label>
+                                    <TextField.Root
+                                        className={'w-48 sm:w-96'}
+                                        id='azure_openai_endpoint'
+                                        required
+                                        autoComplete='off'
+                                        placeholder='https://YOUR_RESOURCE_NAME.openai.azure.com'
+                                        {...register('azure_openai_endpoint', {
+                                            required: isAIEnabled && useAzureOpenAI ? "Please add your Azure OpenAI Endpoint" : false,
+                                        })}
+                                        aria-invalid={errors.azure_openai_endpoint ? 'true' : 'false'}
+                                    />
+                                    {errors?.azure_openai_endpoint && <ErrorText>{errors.azure_openai_endpoint?.message}</ErrorText>}
+                                    <HelperText>
+                                        Format: https://YOUR_RESOURCE_NAME.openai.azure.com
+                                    </HelperText>
+                                </Box>
+                                
+                                <Box>
+                                    <Label htmlFor='azure_openai_api_version'>Azure OpenAI API Version</Label>
+                                    <TextField.Root
+                                        className={'w-48 sm:w-96'}
+                                        id='azure_openai_api_version'
+                                        autoComplete='off'
+                                        placeholder='2023-05-15'
+                                        {...register('azure_openai_api_version')}
+                                        aria-invalid={errors.azure_openai_api_version ? 'true' : 'false'}
+                                    />
+                                    {errors?.azure_openai_api_version && <ErrorText>{errors.azure_openai_api_version?.message}</ErrorText>}
+                                    <HelperText>
+                                        Default is 2023-05-15 if not specified
+                                    </HelperText>
+                                </Box>
+                            </>
+                        )}
 
                         {openaiVersion && <Text color='gray' size='2'>OpenAI Python SDK Version: {openaiVersion.message}</Text>}
                     </SettingsContentContainer>
