@@ -65,10 +65,12 @@ export default defineConfig(({ command, mode }) => {
 			}
 		},
 		build: {
+			sourcemap: false,
 			outDir: "../raven/public/raven",
 			emptyOutDir: true,
 			target: "es2015",
 			rollupOptions: {
+				maxParallelFileOps: 2,
 				onwarn(warning, warn) {
 					if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
 						return
