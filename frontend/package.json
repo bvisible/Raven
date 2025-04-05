@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/assets/raven/raven/ && yarn copy-html-entry",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 vite build --base=/assets/raven/raven/ && yarn copy-html-entry",
     "preview": "vite preview",
     "copy-html-entry": "cp ../raven/public/raven/index.html ../raven/www/raven.html"
   },
