@@ -11,6 +11,7 @@ import { MainPage } from './pages/MainPage'
 import MobileTabsPage from './pages/MobileTabsPage'
 import WorkspaceSwitcher from './pages/WorkspaceSwitcher'
 import { ThemeProvider } from './ThemeProvider'
+import AppUpdateProvider from './utils/AppUpdateProvider'
 import { ProtectedRoute } from './utils/auth/ProtectedRoute'
 import { UserProvider } from './utils/auth/UserProvider'
 
@@ -187,6 +188,7 @@ function App() {
           panelBackground='translucent'
           setAppearance={setAppearance}>
           <RouterProvider router={router} />
+          <AppUpdateProvider />
         </ThemeProvider>
       </UserProvider>
     </FrappeProvider>
