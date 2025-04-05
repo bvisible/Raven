@@ -38,7 +38,7 @@ export const SidebarHeader = () => {
                 align='center'
                 pt='1'
                 height='48px'>
-                <Text as='span' size='6' className='cal-sans pl-1'>neochat</Text>
+                <Text as='span' size='6' className='cal-sans pl-1'>synk</Text>
                 <Flex align='center' gap='4' className='pr-1 sm:pr-0'>
                     <MentionsButton />
                     <SearchButton />

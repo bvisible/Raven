@@ -1,8 +1,8 @@
 import * as React from "react";
 import useGetChannel from "../../hooks/useGetChannel";
-import ChannelIcon from "../common/ChannelIcon";
-import Avatar from "../common/Avatar";
 import useGetUser from "../../hooks/useGetUser";
+import Avatar from "../common/Avatar";
+import ChannelIcon from "../common/ChannelIcon";
 /**
  * Header will have the following:
  * - Logo
@@ -33,7 +33,7 @@ const Header = ({
                 gap: '0.2rem',
             }}>
 
-                <span role='button' className="raven-logo cal-sans" onClick={toggle}>neochat</span>
+                <span role='button' className="raven-logo cal-sans" onClick={toggle}>synk</span>
 
                 <a href='/raven' target='_blank' className='btn btn-xs open-raven-button' style={{
                     lineHeight: '1.4rem',
@@ -43,7 +43,7 @@ const Header = ({
                     justifyContent: 'center',
                     // height: "24px",
                     // marginTop: '0.2rem',
-                }} title='Open neochat'>
+                }} title='Open synk'>
                     <svg
                         width="18"
                         height="18"

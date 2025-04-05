@@ -1,22 +1,22 @@
+import { Loader } from '@/components/common/Loader'
+import { PageLengthSelector } from '@/components/feature/pagination/PageLengthSelector'
+import { PageSelector } from '@/components/feature/pagination/PageSelector'
+import { Sort } from '@/components/feature/sorting/Sort'
+import { UsersTable } from '@/components/feature/userSettings/Users/UsersTable'
+import { ErrorBanner } from '@/components/layout/AlertBanner/ErrorBanner'
+import { TableLoader } from '@/components/layout/Loaders/TableLoader'
 import { useDebounce } from '@/hooks/useDebounce'
 import { usePaginationWithDoctype } from '@/hooks/usePagination'
+import { User } from '@/types/Core/User'
+import { UserContext } from '@/utils/auth/UserProvider'
 import { isSystemManager } from '@/utils/roles'
 import { Box, Button, Card, Container, Flex, Heading, Link, Strong, Text, TextField } from '@radix-ui/themes'
 import { clsx } from 'clsx'
 import { Filter, useFrappeGetDocList, useFrappePostCall } from 'frappe-react-sdk'
 import { ChangeEvent, useContext, useState } from 'react'
-import { FaInfo } from 'react-icons/fa'
-import { PageLengthSelector } from '@/components/feature/pagination/PageLengthSelector'
-import { PageSelector } from '@/components/feature/pagination/PageSelector'
-import { Sort } from '@/components/feature/sorting/Sort'
-import { ErrorBanner } from '@/components/layout/AlertBanner/ErrorBanner'
-import { TableLoader } from '@/components/layout/Loaders/TableLoader'
 import { BiLeftArrowAlt, BiSearch } from 'react-icons/bi'
-import { UserContext } from '@/utils/auth/UserProvider'
-import { Loader } from '@/components/common/Loader'
+import { FaInfo } from 'react-icons/fa'
 import { toast } from 'sonner'
-import { User } from '@/types/Core/User'
-import { UsersTable } from '@/components/feature/userSettings/Users/UsersTable'
 
 const AddRavenUsersPage = () => {
 
@@ -45,7 +45,7 @@ const RavenUsersAlert = () => {
                 </Box>
                 <Flex direction='column' align='center' gap='2'>
                     <Heading as='h2' className='not-cal' size='4'>
-                        You do not have access to <Text className='cal-sans'>neochat</Text>.
+                        You do not have access to <Text className='cal-sans'>synk</Text>.
                     </Heading>
                     <Text as='p' size='2' align='center' className='leading-6'>
                         Please contact your Administrator or System Manager to give you the <Strong>"Raven User"</Strong> role.
@@ -106,7 +106,7 @@ const AddRavenUsersCard = () => {
     return <Box className={clsx(BOX_STYLE, 'bg-accent-a2')}>
         <Card className={clsx(CARD_STYLE, 'max-w-xl min-w-[720px]')}>
             <Flex gap='2' direction='column'>
-                <Heading as='h1'>Add users to neochat</Heading>
+                <Heading as='h1'>Add users to synk</Heading>
                 <Text as='p' size='2' className='leading-6'>
                     Users you add will be given the <Strong>"Raven User"</Strong> role.
                 </Text>

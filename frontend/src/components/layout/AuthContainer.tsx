@@ -18,7 +18,7 @@ const AuthContainer = ({ children, ...props }: PropsWithChildren) => {
 
                                 <Link to="/" tabIndex={-1}>
                                     <Flex>
-                                        <Heading size='9' className='cal-sans leading-normal tracking-normal w-fit'>neochat</Heading>
+                                        <Heading size='9' className='cal-sans leading-normal tracking-normal w-fit'>synk</Heading>
                                     </Flex>
                                 </Link>
                                 {children}
