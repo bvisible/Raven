@@ -70,7 +70,7 @@ export default defineConfig(({ command, mode }) => {
 			emptyOutDir: true,
 			target: "es2015",
 			rollupOptions: {
-				maxParallelFileOps: 2,
+				maxParallelFileOps: 1,
 				onwarn(warning, warn) {
 					if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
 						return
