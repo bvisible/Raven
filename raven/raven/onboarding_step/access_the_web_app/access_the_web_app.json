@@ -4,7 +4,7 @@
  "callback_message": "To open synk, click <a href=\"/raven\">here</a>.",
  "callback_title": "Access synk",
  "creation": "2025-01-06 19:30:54.625335",
- "description": "### Access the web and mobile apps\n\n\synk is available at <a href=\"/raven\">**/synk**</a> for both web and mobile. On mobile, synk can be installed as a PWA.",
+ "description": "### Access the web and mobile apps\n\n\\synk is available at <a href=\"/raven\">**/synk**</a> for both web and mobile. On mobile, synk can be installed as a PWA.",
  "docstatus": 0,
  "doctype": "Onboarding Step",
  "idx": 0,
