@@ -5,10 +5,22 @@ import os
 import tempfile
 from abc import ABC, abstractmethod
 
+# Define fallback types/classes for when the SDK is not available
+class DummyFunctionTool:
+    """Dummy FunctionTool class for when the SDK is not available"""
+    def __init__(self, function=None, name=None, description=None, parameter_schema=None):
+        self.function = function
+        self.name = name
+        self.description = description
+        self.parameter_schema = parameter_schema
+
+# Attempt to import the real SDK
 try:
     from agents import FunctionTool
     AGENTS_SDK_AVAILABLE = True
 except ImportError:
+    # If import fails, use dummy class
+    FunctionTool = DummyFunctionTool
     AGENTS_SDK_AVAILABLE = False
     frappe.log_error("OpenAI Agents SDK not installed. Run 'pip install openai-agents'")
 

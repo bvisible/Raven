@@ -4,6 +4,7 @@ import asyncio
 from raven.ai.handler import stream_response as openai_stream_response
 from raven.ai.sdk_handler import stream_response as sdk_stream_response
 from raven.ai.openai_client import get_open_ai_client
+from raven.ai.sdk_agents import AGENTS_SDK_AVAILABLE
 
 
 def handle_bot_dm(message, bot):
@@ -106,7 +107,7 @@ def handle_bot_dm(message, bot):
 	)
 
 	# Check if we should use SDK Agents or the old OpenAI Assistants API
-	if hasattr(bot, "model_provider") and bot.model_provider != "OpenAI":
+	if AGENTS_SDK_AVAILABLE and hasattr(bot, "model_provider") and bot.model_provider != "OpenAI":
 		# Use SDK Agents with local LLM
 		asyncio.run(sdk_stream_response(
 			bot=bot, 
@@ -190,7 +191,7 @@ def handle_ai_thread_message(message, channel):
 	)
 
 	# Check if we should use SDK Agents or the old OpenAI Assistants API
-	if hasattr(bot, "model_provider") and bot.model_provider != "OpenAI":
+	if AGENTS_SDK_AVAILABLE and hasattr(bot, "model_provider") and bot.model_provider != "OpenAI":
 		# Use SDK Agents with local LLM
 		asyncio.run(sdk_stream_response(
 			bot=bot, 

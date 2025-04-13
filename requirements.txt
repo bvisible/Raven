@@ -1,3 +1,19 @@
 # frappe -- https://github.com/frappe/frappe is installed via 'bench init'
 linkpreview
 openai
+
+# OpenAI Agents SDK and RAG dependencies
+openai-agents>=0.0.9
+langchain>=0.3.0,<0.4.0
+langchain-community>=0.3.0,<0.4.0
+langchain-openai>=0.3.0,<0.4.0
+
+# Vector database backends for RAG
+chromadb>=1.0.0
+faiss-cpu>=1.10.0
+weaviate-client>=4.0.0
+
+# Document processing
+unstructured>=0.17.0
+pdf2image>=1.16.3
+pytesseract>=0.3.10

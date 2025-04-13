@@ -3,7 +3,7 @@ import frappe
 import asyncio
 from typing import Dict, Any, List, Optional
 
-from .sdk_agents import RavenAgentManager
+from .sdk_agents import RavenAgentManager, AGENTS_SDK_AVAILABLE
 from .handler import get_instructions, get_variables_for_instructions
 
 
@@ -21,6 +21,13 @@ async def handle_message(bot, channel_id: str, message: str, files: List[Dict] =
         Dict[str, Any]: Response from the agent
     """
     try:
+        # Check if the SDK is available
+        if not AGENTS_SDK_AVAILABLE:
+            return {
+                "text": "OpenAI Agents SDK is not installed. Please run 'pip install openai-agents' on the server.",
+                "error": True
+            }
+        
         # Create agent manager
         agent_manager = RavenAgentManager(bot=bot)
         
@@ -82,6 +89,17 @@ async def stream_response(bot, channel_id: str, message: str, files: List[Dict] 
     try:
         # Publish initial thinking state
         publish_thinking_state(channel_id, bot.name)
+        
+        # Check if the SDK is available
+        if not AGENTS_SDK_AVAILABLE:
+            # Send error message
+            bot.send_message(
+                channel_id=channel_id,
+                text="OpenAI Agents SDK is not installed. Please run 'pip install openai-agents' on the server.",
+            )
+            # Clear the thinking state
+            clear_thinking_state(channel_id)
+            return
         
         # Create agent manager
         agent_manager = RavenAgentManager(bot=bot)

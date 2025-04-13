@@ -4,11 +4,59 @@ import json
 import os
 from enum import Enum
 
+# Define fallback types/classes for when the SDK is not available
+class DummyAgent:
+    """Dummy Agent class for when the SDK is not available"""
+    pass
+
+class DummyModelSettings:
+    """Dummy ModelSettings class for when the SDK is not available"""
+    pass
+
+class DummyFileSearchTool:
+    """Dummy FileSearchTool class for when the SDK is not available"""
+    pass
+
+class DummyComputerTool:
+    """Dummy ComputerTool class for when the SDK is not available"""
+    pass
+
+class DummyFunctionTool:
+    """Dummy FunctionTool class for when the SDK is not available"""
+    pass
+
+class DummyRunner:
+    """Dummy Runner class for when the SDK is not available"""
+    pass
+
+# Define dummy module namespace
+class DummyInterface:
+    """Dummy interface module for when the SDK is not available"""
+    class Model:
+        """Dummy Model class for when the SDK is not available"""
+        pass
+
+class DummyOpenAIChatCompletions:
+    """Dummy openai_chatcompletions module for when the SDK is not available"""
+    class OpenAIChatCompletionsModel:
+        """Dummy OpenAIChatCompletionsModel class for when the SDK is not available"""
+        pass
+
+# Attempt to import the real SDK
 try:
     from agents import Agent, ModelSettings, FileSearchTool, ComputerTool, FunctionTool, Runner
     from agents.models import interface, openai_chatcompletions
     AGENTS_SDK_AVAILABLE = True
 except ImportError:
+    # If import fails, use dummy classes
+    Agent = DummyAgent
+    ModelSettings = DummyModelSettings
+    FileSearchTool = DummyFileSearchTool
+    ComputerTool = DummyComputerTool
+    FunctionTool = DummyFunctionTool
+    Runner = DummyRunner
+    interface = DummyInterface
+    openai_chatcompletions = DummyOpenAIChatCompletions
     AGENTS_SDK_AVAILABLE = False
     frappe.log_error("OpenAI Agents SDK not installed. Run 'pip install openai-agents'")
 
