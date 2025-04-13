@@ -10,6 +10,12 @@ from frappe.model.document import Document
 from raven.ai.openai_client import get_open_ai_client
 from raven.utils import get_raven_user
 
+# Check if the SDK is available
+try:
+    from raven.ai.sdk_agents import AGENTS_SDK_AVAILABLE, create_agent
+except ImportError:
+    AGENTS_SDK_AVAILABLE = False
+
 
 class RavenBot(Document):
 	# begin: auto-generated types
@@ -34,6 +40,12 @@ class RavenBot(Document):
 		instruction: DF.LongText | None
 		is_ai_bot: DF.Check
 		is_standard: DF.Check
+		model_name: DF.Data | None
+		model_provider: DF.Select | None
+		enable_local_rag: DF.Check
+		local_rag_provider: DF.Select | None
+		vector_store_ids: DF.Data | None
+		agent_settings: DF.JSON | None
 		module: DF.Link | None
 		openai_assistant_id: DF.Data | None
 		raven_user: DF.Link | None
@@ -59,8 +71,6 @@ class RavenBot(Document):
 	def on_update(self):
 		"""
 		When a bot is updated, create/update the Raven User for it
-
-		TODO: Generate JSON files when a Standard Bot is created or updated
 		"""
 		if self.raven_user:
 			raven_user = frappe.get_doc("Raven User", self.raven_user)
@@ -83,105 +93,33 @@ class RavenBot(Document):
 
 			self.db_set("raven_user", raven_user.name)
 
-		if self.is_ai_bot:
-			if not self.openai_assistant_id:
-				self.create_openai_assistant()
-			else:
-				self.update_openai_assistant()
-
 	def before_insert(self):
-		if self.is_ai_bot and not self.openai_assistant_id:
-			self.create_openai_assistant()
+		# Nothing to do here - agent creation is handled by the SDK
+		pass
 
 	def on_trash(self):
-		if self.openai_assistant_id:
-			self.delete_openai_assistant()
-
 		if self.raven_user:
 			frappe.db.set_value("Raven User", self.raven_user, "bot", None)
 			self.db_set("raven_user", None)
 			frappe.delete_doc("Raven User", self.raven_user)
 
-	def create_openai_assistant(self):
-		# Create an OpenAI Assistant for the bot
-		client = get_open_ai_client()
-
-		# Sometimes users face an issue with the OpenAI API returning an error for "model_not_found"
-		# This is usually because the user has not added funds to their OpenAI account.
-		# We need to show this error to the user if the openAI API returns an error for "model_not_found"
-
-		try:
-			assistant = client.beta.assistants.create(
-				instructions=self.instruction,
-				model="gpt-4o",
-				name=self.bot_name,
-				description=self.description or "",
-				tools=self.get_tools_for_assistant(),
-			)
-		except Exception as e:
-			if "model_not_found" in str(e):
-				frappe.throw(
-					_(
-						f"<strong>There was an error creating the agent in OpenAI.</strong><br/>It is possible that your OpenAI account does not have enough funds. Please add funds to your OpenAI account and try again.<br><br/>Error: {e}"
-					)
-				)
-			else:
-				frappe.throw(e)
-
-		self.db_set("openai_assistant_id", assistant.id)
-
-	def update_openai_assistant(self):
-		# Update the OpenAI Assistant for the bot
-
-		# Additional check because it is being used in Raven AI Function
-		if not self.is_ai_bot:
-			return
-
-		client = get_open_ai_client()
-
-		assistant = client.beta.assistants.update(
-			self.openai_assistant_id,
-			instructions=self.instruction,
-			name=self.bot_name,
-			description=self.description or "",
-			tools=self.get_tools_for_assistant(),
-			model="gpt-4o",
-		)
-
-	def get_tools_for_assistant(self):
-		# Add the function to the assistant
+	def get_tools_config(self):
+		"""Get tools configuration for SDK Agent"""
 		tools = []
 
 		if self.enable_file_search:
-			tools.append(
-				{
-					"type": "file_search",
-				}
-			)
+			tools.append("file_search")
 
 		if self.enable_code_interpreter:
-			tools.append(
-				{
-					"type": "code_interpreter",
-				}
-			)
+			tools.append("code_interpreter")
 
+		# Add function tools
 		for f in self.bot_functions:
 			function_def = frappe.db.get_value("Raven AI Function", f.function, "function_definition")
 			if function_def:
-				tools.append({"type": "function", "function": json.loads(function_def)})
+				tools.append({"type": "function", "definition": json.loads(function_def)})
 
 		return tools
-
-	def delete_openai_assistant(self):
-		# Delete the OpenAI Assistant for the bot
-		try:
-			client = get_open_ai_client()
-			client.beta.assistants.delete(self.openai_assistant_id)
-		except Exception:
-			frappe.log_error(
-				f"Error deleting OpenAI Assistant {self.openai_assistant_id} for bot {self.name}"
-			)
 
 	# Raven Bot Methods
 

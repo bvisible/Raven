@@ -113,11 +113,12 @@
    "label": "Model Name"
   },
   {
-   "depends_on": "eval: doc.is_ai_bot && doc.model_provider === 'OpenAI'",
+   "depends_on": "eval: false",
    "documentation_url": "https://platform.openai.com/docs/assistants/overview",
    "fieldname": "openai_assistant_id",
    "fieldtype": "Data",
-   "label": "OpenAI Assistant ID"
+   "hidden": 1,
+   "label": "OpenAI Assistant ID (Legacy)"
   },
   {
    "fieldname": "column_break_khmi",
@@ -147,8 +148,7 @@
   },
   {
    "default": "0",
-   "description": "Enable this if you want the bot to be able to read PDF files and scan them.\n\nFile search enables the assistant with knowledge from files that you upload. Once a file is uploaded, the assistant automatically decides when to retrieve content based on user requests.",
-   "documentation_url": "https://platform.openai.com/docs/assistants/tools/file-search",
+   "description": "Enable this if you want the bot to be able to read PDF files and other documents.\n\nFile search enables the agent with knowledge from files that you upload, allowing it to answer questions based on document content.",
    "fieldname": "enable_file_search",
    "fieldtype": "Check",
    "label": "Enable File Search"
@@ -203,8 +203,7 @@
   },
   {
    "default": "0",
-   "description": " Enable this if you want the bot to be able to process files like Excel sheets or data from Insights.\n                    <br>\n                    OpenAI Assistants run code in a sandboxed environment (on OpenAI servers) to do this.",
-   "documentation_url": "https://platform.openai.com/docs/assistants/tools/code-interpreter",
+   "description": "Enable this if you want the bot to be able to process data files and execute code to analyze them.\n\nCode interpreter allows the agent to run code to perform tasks such as data analysis, visualization, or calculations.",
    "fieldname": "enable_code_interpreter",
    "fieldtype": "Check",
    "label": "Enable Code Interpreter"

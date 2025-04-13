@@ -27,17 +27,27 @@ export interface RavenBot{
 	is_ai_bot?: 0 | 1
 	/**	Debug Mode : Check - If enabled, stack traces of errors will be sent as messages by the bot 	*/
 	debug_mode?: 0 | 1
-	/**	OpenAI Assistant ID : Data	*/
+	/**	Model Provider : Select - Select the model provider for this bot	*/
+	model_provider?: "OpenAI" | "LM Studio" | "Ollama" | "LocalAI"
+	/**	Model Name : Data - The name of the model to use	*/
+	model_name?: string
+	/**	Vector Store IDs : Small Text - Comma-separated list of OpenAI vector store IDs to search in	*/
+	vector_store_ids?: string
+	/**	Enable Local RAG : Check - Enable to use local RAG implementation instead of OpenAI's file search	*/
+	enable_local_rag?: 0 | 1
+	/**	Local RAG Provider : Select - The vector store provider to use for local RAG	*/
+	local_rag_provider?: "Chroma" | "FAISS" | "Weaviate"
+	/**	Agent Settings : JSON - JSON configuration for the agent (temperature, top_p, etc.)	*/
+	agent_settings?: string
+	/**	OpenAI Assistant ID (Legacy) : Data	*/
 	openai_assistant_id?: string
-	/**	Enable Code Interpreter : Check -  Enable this if you want the bot to be able to process files like Excel sheets or data from Insights.
-                    <br>
-                    OpenAI Assistants run code in a sandboxed environment (on OpenAI servers) to do this.	*/
+	/**	Enable Code Interpreter : Check - Enable this if you want the bot to be able to process data files and execute code to analyze them.	*/
 	enable_code_interpreter?: 0 | 1
 	/**	Allow Bot to Write Documents : Check	*/
 	allow_bot_to_write_documents?: 0 | 1
-	/**	Enable File Search : Check - Enable this if you want the bot to be able to read PDF files and scan them.
+	/**	Enable File Search : Check - Enable this if you want the bot to be able to read PDF files and other documents.
 
-File search enables the assistant with knowledge from files that you upload. Once a file is uploaded, the assistant automatically decides when to retrieve content based on user requests.	*/
+File search enables the agent with knowledge from files that you upload, allowing it to answer questions based on document content.	*/
 	enable_file_search?: 0 | 1
 	/**	Instruction : Long Text - You can use Jinja variables here to customize the instruction to the bot at run time if dynamic instructions are enabled.	*/
 	instruction?: string
