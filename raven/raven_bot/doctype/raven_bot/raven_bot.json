@@ -20,14 +20,20 @@
   "is_ai_bot",
   "debug_mode",
   "ai_section",
+  "model_provider",
+  "model_name",
   "openai_assistant_id",
   "enable_code_interpreter",
   "column_break_khmi",
   "allow_bot_to_write_documents",
   "enable_file_search",
+  "vector_store_ids",
+  "enable_local_rag",
+  "local_rag_provider",
   "section_break_lwkx",
   "instruction",
   "dynamic_instructions",
+  "agent_settings",
   "bot_functions"
  ],
  "fields": [
@@ -90,7 +96,24 @@
    "label": "Is AI Bot?"
   },
   {
+   "default": "OpenAI",
    "depends_on": "eval: doc.is_ai_bot",
+   "description": "Select the model provider for this bot",
+   "fieldname": "model_provider",
+   "fieldtype": "Select",
+   "label": "Model Provider",
+   "options": "OpenAI\nLM Studio\nOllama\nLocalAI"
+  },
+  {
+   "default": "gpt-4o",
+   "depends_on": "eval: doc.is_ai_bot",
+   "description": "The name of the model to use",
+   "fieldname": "model_name",
+   "fieldtype": "Data",
+   "label": "Model Name"
+  },
+  {
+   "depends_on": "eval: doc.is_ai_bot && doc.model_provider === 'OpenAI'",
    "documentation_url": "https://platform.openai.com/docs/assistants/overview",
    "fieldname": "openai_assistant_id",
    "fieldtype": "Data",
@@ -131,12 +154,45 @@
    "label": "Enable File Search"
   },
   {
+   "depends_on": "eval: doc.enable_file_search && doc.model_provider === 'OpenAI' && !doc.enable_local_rag",
+   "description": "Comma-separated list of OpenAI vector store IDs to search in",
+   "fieldname": "vector_store_ids",
+   "fieldtype": "Small Text",
+   "label": "Vector Store IDs"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.enable_file_search",
+   "description": "Enable to use local RAG implementation instead of OpenAI's file search",
+   "fieldname": "enable_local_rag",
+   "fieldtype": "Check",
+   "label": "Enable Local RAG"
+  },
+  {
+   "default": "Chroma",
+   "depends_on": "eval: doc.enable_local_rag",
+   "description": "The vector store provider to use for local RAG",
+   "fieldname": "local_rag_provider",
+   "fieldtype": "Select",
+   "label": "Local RAG Provider",
+   "options": "Chroma\nFAISS\nWeaviate"
+  },
+  {
    "default": "0",
    "depends_on": "eval: doc.is_ai_bot;",
    "description": "Dynamic Instructions allow you to embed Jinja tags in your instruction to the bot. Hence the instruction would be different based on the user who is calling the bot or the data in your system. These instructions are computed every time the bot is called. Check this if you want to embed things like Employee ID, Company Name etc in your instructions dynamically",
    "fieldname": "dynamic_instructions",
    "fieldtype": "Check",
    "label": "Dynamic Instructions"
+  },
+  {
+   "default": "{\"temperature\": 0.7, \"top_p\": 1.0}",
+   "depends_on": "eval: doc.is_ai_bot",
+   "description": "JSON configuration for the agent (temperature, top_p, etc.)",
+   "fieldname": "agent_settings",
+   "fieldtype": "Code",
+   "label": "Agent Settings",
+   "options": "JSON"
   },
   {
    "depends_on": "eval: doc.is_ai_bot;",

@@ -1,6 +1,8 @@
 import frappe
+import asyncio
 
-from raven.ai.handler import stream_response
+from raven.ai.handler import stream_response as openai_stream_response
+from raven.ai.sdk_handler import stream_response as sdk_stream_response
 from raven.ai.openai_client import get_open_ai_client
 
 
@@ -103,7 +105,18 @@ def handle_bot_dm(message, bot):
 		after_commit=True,
 	)
 
-	stream_response(ai_thread_id=ai_thread.id, bot=bot, channel_id=thread_channel.name)
+	# Check if we should use SDK Agents or the old OpenAI Assistants API
+	if hasattr(bot, "model_provider") and bot.model_provider != "OpenAI":
+		# Use SDK Agents with local LLM
+		asyncio.run(sdk_stream_response(
+			bot=bot, 
+			channel_id=thread_channel.name, 
+			message=message.content,
+			files=[{"file_path": frappe.get_doc("File", {"file_url": message.file}).get_full_path(), "file_name": message.file_name}] if message.message_type in ["File", "Image"] else None
+		))
+	else:
+		# Use the old OpenAI Assistants API
+		openai_stream_response(ai_thread_id=ai_thread.id, bot=bot, channel_id=thread_channel.name)
 
 
 def handle_ai_thread_message(message, channel):
@@ -176,7 +189,18 @@ def handle_ai_thread_message(message, channel):
 		docname=channel.name,
 	)
 
-	stream_response(ai_thread_id=channel.openai_thread_id, bot=bot, channel_id=channel.name)
+	# Check if we should use SDK Agents or the old OpenAI Assistants API
+	if hasattr(bot, "model_provider") and bot.model_provider != "OpenAI":
+		# Use SDK Agents with local LLM
+		asyncio.run(sdk_stream_response(
+			bot=bot, 
+			channel_id=channel.name, 
+			message=message.content,
+			files=[{"file_path": frappe.get_doc("File", {"file_url": message.file}).get_full_path(), "file_name": message.file_name}] if message.message_type in ["File", "Image"] else None
+		))
+	else:
+		# Use the old OpenAI Assistants API
+		openai_stream_response(ai_thread_id=channel.openai_thread_id, bot=bot, channel_id=channel.name)
 
 
 def check_if_bot_has_file_search(bot, channel_id):

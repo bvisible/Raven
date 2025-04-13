@@ -17,6 +17,11 @@
   "openai_organisation_id",
   "openai_api_key",
   "openai_project_id",
+  "local_llm_section",
+  "enable_local_llm",
+  "lm_studio_api_url",
+  "ollama_api_url",
+  "localai_api_url",
   "column_break_occp",
   "frappe_hr_tab",
   "auto_create_department_channel",
@@ -122,6 +127,38 @@
    "fieldname": "openai_project_id",
    "fieldtype": "Data",
    "label": "OpenAI Project ID"
+  },
+  {
+   "fieldname": "local_llm_section",
+   "fieldtype": "Section Break",
+   "label": "Local LLM Configuration"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_local_llm",
+   "fieldtype": "Check",
+   "label": "Enable Local LLM Integration"
+  },
+  {
+   "depends_on": "eval:doc.enable_local_llm;",
+   "fieldname": "lm_studio_api_url",
+   "fieldtype": "Password",
+   "label": "LM Studio API URL",
+   "description": "URL for the local LM Studio API (e.g., http://localhost:1234/v1)"
+  },
+  {
+   "depends_on": "eval:doc.enable_local_llm;",
+   "fieldname": "ollama_api_url",
+   "fieldtype": "Password",
+   "label": "Ollama API URL",
+   "description": "URL for the local Ollama API (e.g., http://localhost:11434/api)"
+  },
+  {
+   "depends_on": "eval:doc.enable_local_llm;",
+   "fieldname": "localai_api_url",
+   "fieldtype": "Password",
+   "label": "LocalAI API URL",
+   "description": "URL for the local LocalAI API (e.g., http://localhost:8080/v1)"
   },
   {
    "fieldname": "column_break_occp",
