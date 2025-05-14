@@ -3,6 +3,12 @@ import asyncio
 
 from raven.ai.sdk_handler import stream_response as sdk_stream_response
 from raven.ai.sdk_agents import AGENTS_SDK_AVAILABLE
+from raven.ai.handler import stream_response
+from raven.ai.openai_client import (
+	code_interpreter_file_types,
+	file_search_file_types,
+	get_open_ai_client,
+)
 
 
 def handle_bot_dm(message, bot):
@@ -156,3 +162,61 @@ def check_if_bot_has_file_search(bot, channel_id):
 		return False
 
 	return True
+
+
+def create_file_in_openai(file_url: str, message_type: str, client):
+	"""
+	Function to create a file in OpenAI
+
+	We need to upload the file to OpenAI and return the file ID
+	"""
+
+	file_doc = frappe.get_doc("File", {"file_url": file_url})
+	file_path = file_doc.get_full_path()
+
+	file = client.files.create(
+		file=open(file_path, "rb"), purpose="assistants" if message_type == "File" else "vision"
+	)
+
+	return file
+
+
+def get_content_attachment_for_file(message_type: str, file_id: str, file_url: str):
+
+	attachments = None
+
+	if message_type == "File":
+		content = f"Uploaded a file. URL of the file is '{file_url}'."
+
+		file_extension = file_url.split(".")[-1].lower()
+
+		if file_extension == "pdf":
+			content += (
+				" The file is a PDF. If it's not machine readable, you can extract the text via images."
+			)
+
+		attachments = []
+
+		if file_extension in code_interpreter_file_types:
+			attachments.append(
+				{
+					"file_id": file_id,
+					"tools": [{"type": "code_interpreter"}],
+				}
+			)
+
+		if file_extension in file_search_file_types:
+			attachments.append(
+				{
+					"file_id": file_id,
+					"tools": [{"type": "file_search"}],
+				}
+			)
+
+	else:
+		content = [
+			{"type": "text", "text": f"Uploaded an image. URL of the image is '{file_url}'"},
+			{"type": "image_file", "image_file": {"file_id": file_id}},
+		]
+
+	return content, attachments

@@ -6,8 +6,13 @@ import json
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from openai import APIConnectionError
 
-from raven.ai.openai_client import get_open_ai_client
+from raven.ai.openai_client import (
+	code_interpreter_file_types,
+	file_search_file_types,
+	get_open_ai_client,
+)
 from raven.utils import get_raven_user
 
 # Check if the SDK is available
@@ -26,6 +31,7 @@ class RavenBot(Document):
 	if TYPE_CHECKING:
 		from frappe.types import DF
 
+		from raven.raven_ai.doctype.raven_ai_bot_files.raven_ai_bot_files import RavenAIBotFiles
 		from raven.raven_ai.doctype.raven_bot_functions.raven_bot_functions import RavenBotFunctions
 
 		allow_bot_to_write_documents: DF.Check
@@ -36,6 +42,7 @@ class RavenBot(Document):
 		dynamic_instructions: DF.Check
 		enable_code_interpreter: DF.Check
 		enable_file_search: DF.Check
+		file_sources: DF.Table[RavenAIBotFiles]
 		image: DF.AttachImage | None
 		instruction: DF.LongText | None
 		is_ai_bot: DF.Check
@@ -46,9 +53,12 @@ class RavenBot(Document):
 		local_rag_provider: DF.Select | None
 		vector_store_ids: DF.Data | None
 		agent_settings: DF.JSON | None
+		model: DF.Data | None
 		module: DF.Link | None
 		openai_assistant_id: DF.Data | None
+		openai_vector_store_id: DF.Data | None
 		raven_user: DF.Link | None
+		reasoning_effort: DF.Literal["low", "medium", "high"]
 	# end: auto-generated types
 
 	def validate(self):
@@ -120,6 +130,104 @@ class RavenBot(Document):
 				tools.append({"type": "function", "definition": json.loads(function_def)})
 
 		return tools
+
+	def get_tool_resources_for_assistant(self):
+		if not self.enable_file_search and not self.enable_code_interpreter:
+			return None
+
+		# Check if the bot has any file sources
+		if not self.file_sources:
+			return None
+
+		# Join file sources with Raven AI Bot Files
+		file_source_ids = [f.file for f in self.file_sources]
+
+		files = frappe.get_all(
+			"Raven AI File Source",
+			filters={"name": ["in", file_source_ids]},
+			fields=["file_type", "openai_file_id"],
+		)
+
+		# Some files can be added as a resource for both file search and code interpreter
+
+		code_interpreter_files = [
+			f.openai_file_id for f in files if f.file_type.lower() in code_interpreter_file_types
+		]
+
+		tool_resources = {}
+
+		if code_interpreter_files:
+			tool_resources["code_interpreter"] = {"file_ids": code_interpreter_files}
+
+		file_search_files = [
+			f.openai_file_id for f in files if f.file_type.lower() in file_search_file_types
+		]
+
+		# Create a vector store for the assistant if it doesn't exist. Else update the existing vector store
+
+		if file_search_files:
+			if not self.openai_vector_store_id:
+				self.create_vector_store(file_search_files)
+			else:
+				self.update_vector_store(file_search_files)
+
+			tool_resources["file_search"] = {"vector_store_ids": [self.openai_vector_store_id]}
+
+		# Check if the tool resources are empty
+		if tool_resources.get("file_search") or tool_resources.get("code_interpreter"):
+			return tool_resources
+		else:
+			return None
+
+	def create_vector_store(self, file_ids: list[str]):
+		# Create a new vector store for the assistant
+		client = get_open_ai_client()
+		vector_store = client.vector_stores.create(
+			name=self.name,
+			file_ids=file_ids,
+		)
+
+		self.openai_vector_store_id = vector_store.id
+
+	def update_vector_store(self, file_ids: list[str]):
+		# Update the vector store for the assistant
+		client = get_open_ai_client()
+
+		existing_vector_store_files = client.vector_stores.files.list(
+			vector_store_id=self.openai_vector_store_id, limit=100
+		)
+
+		existing_vector_store_file_ids = [f.id for f in existing_vector_store_files.data]
+
+		deleted_files = [f for f in existing_vector_store_file_ids if f not in file_ids]
+
+		added_files = [f for f in file_ids if f not in existing_vector_store_file_ids]
+
+		if added_files:
+			vector_store_file_batch = client.vector_stores.file_batches.create(
+				vector_store_id=self.openai_vector_store_id,
+				file_ids=added_files,
+			)
+
+		if deleted_files:
+			for file_id in deleted_files:
+				client.vector_stores.files.delete(
+					vector_store_id=self.openai_vector_store_id,
+					file_id=file_id,
+				)
+
+	def delete_openai_assistant(self):
+		# Delete the OpenAI Assistant for the bot
+		# Delete the vector store for the assistant
+		try:
+			client = get_open_ai_client()
+			client.beta.assistants.delete(self.openai_assistant_id)
+			if self.openai_vector_store_id:
+				client.vector_stores.delete(self.openai_vector_store_id)
+		except Exception:
+			frappe.log_error(
+				f"Error deleting OpenAI Assistant {self.openai_assistant_id} for bot {self.name}"
+			)
 
 	# Raven Bot Methods
 

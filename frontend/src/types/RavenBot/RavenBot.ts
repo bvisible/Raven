@@ -1,3 +1,4 @@
+import { RavenAIBotFiles } from '../RavenAI/RavenAIBotFiles'
 import { RavenBotFunctions } from '../RavenAI/RavenBotFunctions'
 
 export interface RavenBot{
@@ -40,6 +41,11 @@ export interface RavenBot{
 	/**	Agent Settings : JSON - JSON configuration for the agent (temperature, top_p, etc.)	*/
 	agent_settings?: string
 	/**	OpenAI Assistant ID (Legacy) : Data	*/
+	/**	Model : Data	*/
+	model?: string
+	/**	Reasoning Effort : Select - Only applicable for OpenAI o-series models	*/
+	reasoning_effort?: "low" | "medium" | "high"
+	/**	OpenAI Assistant ID : Data	*/
 	openai_assistant_id?: string
 	/**	Enable Code Interpreter : Check - Enable this if you want the bot to be able to process data files and execute code to analyze them.	*/
 	enable_code_interpreter?: 0 | 1
@@ -55,4 +61,8 @@ File search enables the agent with knowledge from files that you upload, allowin
 	dynamic_instructions?: 0 | 1
 	/**	Bot Functions : Table - Raven Bot Functions	*/
 	bot_functions?: RavenBotFunctions[]
+	/**	OpenAI Vector Store ID : Data	*/
+	openai_vector_store_id?: string
+	/**	File Sources : Table - Raven AI Bot Files	*/
+	file_sources?: RavenAIBotFiles[]
 }

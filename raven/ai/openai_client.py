@@ -17,6 +17,8 @@ def get_open_ai_client():
 		frappe.throw(_("OpenAI services are not enabled"))
 
 	openai_api_key = raven_settings.get_password("openai_api_key")
+	openai_organisation_id = (raven_settings.openai_organisation_id or "").strip()
+	openai_project_id = (raven_settings.openai_project_id or "").strip()
 
 	if raven_settings.openai_project_id:
 		client = OpenAI(
@@ -25,9 +27,6 @@ def get_open_ai_client():
 			api_key=openai_api_key,
 			max_retries=1  # Limit retries to prevent duplicate responses
 		)
-
-		return client
-
 	else:
 		client = OpenAI(
 			api_key=openai_api_key, 
@@ -35,4 +34,28 @@ def get_open_ai_client():
 			max_retries=1  # Limit retries to prevent duplicate responses
 		)
 
-		return client
+def get_openai_models():
+	"""
+	Get the available OpenAI models
+	"""
+	client = get_open_ai_client()
+	return client.models.list()
+
+
+code_interpreter_file_types = [
+	"pdf",
+	"csv",
+	"docx",
+	"doc",
+	"xlsx",
+	"pptx",
+	"txt",
+	"png",
+	"jpg",
+	"jpeg",
+	"md",
+	"json",
+	"html",
+]
+
+file_search_file_types = ["pdf", "csv", "doc", "docx", "json", "txt", "md", "html", "pptx"]
