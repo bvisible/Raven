@@ -82,9 +82,9 @@ const SettingsList = (props: Props) => {
                 Commands
             </Command.Item>
 
-            <Command.Item value='openai-settings' onSelect={onSelect}>
+            <Command.Item value='llm-settings' onSelect={onSelect}>
                 <PiOpenAiLogo size={ICON_SIZE} />
-                OpenAI Settings
+                LLM Settings
             </Command.Item>
         </Command.Group>
     )

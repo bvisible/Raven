@@ -1,18 +1,79 @@
-import { Label, ErrorText, HelperText } from '@/components/common/Form'
-import { Stack, HStack } from '@/components/layout/Stack'
+import { ErrorText, HelperText, Label } from '@/components/common/Form'
+import { Loader } from '@/components/common/Loader'
+import { HStack, Stack } from '@/components/layout/Stack'
 import { RavenBot } from '@/types/RavenBot/RavenBot'
-import { TextField, Checkbox, Text, Separator, Tooltip, Heading, Select } from '@radix-ui/themes'
-import { useFormContext, Controller } from 'react-hook-form'
+import { Button, Card, Checkbox, Dialog, Flex, Heading, Select, Separator, Text, TextField, Tooltip } from '@radix-ui/themes'
+import { CheckCircledIcon, CrossCircledIcon } from '@radix-ui/react-icons'
+import { useFrappePostCall } from 'frappe-react-sdk'
+import { useState } from 'react'
+import { Controller, useFormContext } from 'react-hook-form'
 import { BiInfoCircle } from 'react-icons/bi'
+import { toast } from 'sonner'
 
 type Props = {}
 
+// Define types for model compatibility test results
+interface ModelCompatibilityResult {
+    status: 'not_tested' | 'success' | 'warning' | 'error';
+    message: string;
+    tool_support: boolean;
+    details: string;
+}
+
 const AIFeaturesBotForm = (props: Props) => {
-    const { register, control, formState: { errors }, watch } = useFormContext<RavenBot>()
+    const { register, control, formState: { errors }, watch, getValues } = useFormContext<RavenBot>()
+    const [isTesting, setIsTesting] = useState(false)
+    const [showTestResults, setShowTestResults] = useState(false)
+    const [modelTestResult, setModelTestResult] = useState<ModelCompatibilityResult | null>(null)
 
     const isAiBot = watch('is_ai_bot')
     const modelProvider = watch('model_provider')
+    const modelName = watch('model_name')
     const enableLocalRAG = watch('enable_local_rag')
+
+    // Hook to call the model compatibility test API
+    const { call: testModelCompatibility } = useFrappePostCall('raven.api.ai_features.test_model_compatibility')
+
+    // Function to test model compatibility
+    const handleTestModel = async () => {
+        const currentProvider = getValues('model_provider')
+        const currentModelName = getValues('model_name')
+        
+        if (!currentModelName) {
+            toast.error("Please enter a model name to test")
+            return
+        }
+        
+        setIsTesting(true)
+        
+        try {
+            const result = await testModelCompatibility({
+                provider: currentProvider,
+                model_name: currentModelName
+            })
+            
+            // Log the result for debugging
+            console.log("Model compatibility test result:", result)
+            
+            // Process the result
+            if (result && typeof result === 'object') {
+                // Handle the Frappe API response format
+                const processedResult = result.message && typeof result.message === 'object' 
+                    ? result.message  // Frappe API sometimes wraps the response in a message property
+                    : result
+                    
+                setModelTestResult(processedResult as ModelCompatibilityResult)
+                setShowTestResults(true)
+            } else {
+                toast.error("Received invalid response format from server")
+            }
+        } catch (error) {
+            console.error("Error testing model compatibility:", error)
+            toast.error("Error testing model compatibility")
+        } finally {
+            setIsTesting(false)
+        }
+    }
 
     return (
         <Stack gap='4'>
@@ -25,38 +86,127 @@ const AIFeaturesBotForm = (props: Props) => {
                     render={({ field }) => (
                         <Select.Root
                             value={field.value || ''}
-                            onValueChange={field.onChange}
+                            onValueChange={(value) => {
+                                // When selecting "LocalLLM", get the provider type from settings
+                                if (value === "LocalLLM") {
+                                    // The actual provider type will be determined at runtime from settings
+                                    field.onChange(value);
+                                } else {
+                                    field.onChange(value);
+                                }
+                            }}
                         >
                             <Select.Trigger id='model_provider' />
                             <Select.Content>
-                                <Select.Item value="OpenAI">OpenAI</Select.Item>
-                                <Select.Item value="LMStudio">LM Studio</Select.Item>
-                                <Select.Item value="Ollama">Ollama</Select.Item>
-                                <Select.Item value="LocalAI">LocalAI</Select.Item>
+                                <Select.Item value="OpenAI">OpenAI (Cloud)</Select.Item>
+                                <Select.Item value="LocalLLM">Local LLM</Select.Item>
                             </Select.Content>
                         </Select.Root>
                     )}
                 />
                 <HelperText>
-                    Select the model provider for this agent. OpenAI uses cloud-based models, while other providers use local models.
+                    Select the model provider for this agent. OpenAI uses cloud-based models, while Local LLM uses the provider configured in LLM Settings.
                 </HelperText>
             </Stack>
             
             <Stack maxWidth={'480px'}>
-                <Label htmlFor='model_name'>Model Name</Label>
+                <Flex align="center" justify="between">
+                    <Label htmlFor='model_name'>Model Name</Label>
+                    <Button 
+                        size="1" 
+                        variant="soft" 
+                        onClick={handleTestModel} 
+                        disabled={isTesting || !modelName}
+                    >
+                        {isTesting ? <Loader className="mr-1" size={14} /> : null}
+                        {isTesting ? "Testing..." : "Test Tool Support"}
+                    </Button>
+                </Flex>
+                
                 <TextField.Root
                     id='model_name'
                     {...register('model_name')}
-                    placeholder={modelProvider === 'OpenAI' ? 'gpt-4o' : 'llama3-8b'}
+                    placeholder={
+                        modelProvider === 'OpenAI' ? 'gpt-4o' : 
+                        modelProvider === 'LocalLLM' ? 'llama3-8b or other model name' : 
+                        'llama3-8b'
+                    }
                     aria-invalid={errors.model_name ? 'true' : 'false'}
                 />
                 <HelperText>
                     {modelProvider === 'OpenAI' ? 
                         'For OpenAI, use model names like "gpt-4o", "gpt-4-turbo", or "gpt-3.5-turbo".' : 
-                        'For local models, use the name of the model as it appears in your local provider.'}
+                        modelProvider === 'LocalLLM' ? 
+                        'For Local LLM, enter the name of the model as it appears in your configured provider (LM Studio, Ollama, etc.).' :
+                        'For specific local providers, use the name of the model as it appears in that provider.'}
                 </HelperText>
                 {errors.model_name && <ErrorText>{errors.model_name?.message}</ErrorText>}
             </Stack>
+            
+            {/* Test Results Dialog */}
+            <Dialog.Root open={showTestResults} onOpenChange={setShowTestResults}>
+                <Dialog.Content size="3">
+                    <Dialog.Title>Model Compatibility Test Results</Dialog.Title>
+                    <Dialog.Description>
+                        Test results for model {modelName} with {modelProvider}
+                    </Dialog.Description>
+                    
+                    {/* Main results card */}
+                    {modelTestResult && (
+                        <Card size="1" className="mt-2 mb-2">
+                            <Flex direction="column" gap="2">
+                                <Flex align="center" gap="2">
+                                    {modelTestResult.status === 'success' ? (
+                                        <CheckCircledIcon className="text-green-500" />
+                                    ) : modelTestResult.status === 'error' ? (
+                                        <CrossCircledIcon className="text-red-500" />
+                                    ) : (
+                                        <BiInfoCircle className="text-yellow-500" />
+                                    )}
+                                    <Text size="2" weight="bold">Tool Support: </Text>
+                                    <Text>
+                                        {modelTestResult.tool_support ? 
+                                            "Compatible with SDK Agent tools" : 
+                                            "Not fully compatible with SDK Agent tools"}
+                                    </Text>
+                                </Flex>
+                                
+                                <Text size="2" weight="bold">Result:</Text>
+                                <Text size="2">{modelTestResult.message}</Text>
+                                
+                                {modelTestResult.details && (
+                                    <>
+                                        <Text size="2" weight="bold" mt="1">Details:</Text>
+                                        <Text size="2">{modelTestResult.details}</Text>
+                                    </>
+                                )}
+                                
+                                {/* Special callout for recommendations */}
+                                {!modelTestResult.tool_support && (
+                                    <Card variant="classic" color="amber" size="1" mt="2">
+                                        <Flex direction="column" gap="1">
+                                            <Text weight="bold" size="2">Recommendation:</Text>
+                                            <Text size="2">
+                                                This model doesn't seem to fully support tool calling, which is needed for the SDK Agent to work properly.
+                                                For local LLMs, we recommend models like Llama 3 (llama3) or Mistral models with "instruct" in their name.
+                                            </Text>
+                                            <Text size="2" mt="1">
+                                                You can still use this model with our direct API implementation, but some advanced features may not work.
+                                            </Text>
+                                        </Flex>
+                                    </Card>
+                                )}
+                            </Flex>
+                        </Card>
+                    )}
+                    
+                    <Flex gap="3" mt="4" justify="end">
+                        <Dialog.Close>
+                            <Button variant="soft" color="gray">Close</Button>
+                        </Dialog.Close>
+                    </Flex>
+                </Dialog.Content>
+            </Dialog.Root>
             
             <Stack maxWidth={'480px'}>
                 <Text as="label" size="2">
@@ -135,76 +285,112 @@ const AIFeaturesBotForm = (props: Props) => {
             </Stack>
             
             <Separator className='w-full' />
-            <Heading as='h5' size='2' className='not-cal' weight='medium'>RAG (Retrieval-Augmented Generation)</Heading>
-            
-            {modelProvider !== 'OpenAI' && (
-                <Stack maxWidth={'560px'}>
-                    <Text as="label" size="2">
-                        <HStack align='center'>
-                            <Controller
-                                control={control}
-                                name='enable_local_rag'
-                                render={({ field }) => (
-                                    <Checkbox
-                                        checked={field.value ? true : false}
-                                        onCheckedChange={(v) => field.onChange(v ? 1 : 0)}
-                                    />
-                                )} />
-                            <span>Enable Local RAG</span>
-                            <Tooltip content='Enable local Retrieval-Augmented Generation'>
-                                <span className='text-gray-11 -mb-1'>
-                                    <BiInfoCircle size={16} />
-                                </span>
-                            </Tooltip>
-                        </HStack>
-                    </Text>
-                    <HelperText>
-                        Enable this to use local RAG with your selected model provider. This allows the bot to retrieve 
-                        information from documents stored in a vector database.
-                    </HelperText>
-                </Stack>
-            )}
-            
-            {modelProvider !== 'OpenAI' && enableLocalRAG && (
-                <Stack maxWidth={'480px'}>
-                    <Label htmlFor='local_rag_provider'>Local RAG Provider</Label>
-                    <Controller
-                        control={control}
-                        name='local_rag_provider'
-                        render={({ field }) => (
-                            <Select.Root
-                                value={field.value || ''}
-                                onValueChange={field.onChange}
-                            >
-                                <Select.Trigger id='local_rag_provider' />
-                                <Select.Content>
-                                    <Select.Item value="Chroma">ChromaDB</Select.Item>
-                                    <Select.Item value="FAISS">FAISS</Select.Item>
-                                    <Select.Item value="Weaviate">Weaviate</Select.Item>
-                                </Select.Content>
-                            </Select.Root>
-                        )}
-                    />
-                    <HelperText>
-                        Select the vector database provider for local RAG. ChromaDB is recommended for most use cases.
-                    </HelperText>
-                </Stack>
-            )}
-            
-            {modelProvider === 'OpenAI' && (
-                <Stack maxWidth={'480px'}>
-                    <Label htmlFor='vector_store_ids'>OpenAI Vector Store IDs</Label>
-                    <TextField.Root
-                        id='vector_store_ids'
-                        {...register('vector_store_ids')}
-                        placeholder="vs-abc123,vs-def456"
-                        aria-invalid={errors.vector_store_ids ? 'true' : 'false'}
-                    />
-                    <HelperText>
-                        Comma-separated list of OpenAI vector store IDs for RAG. Leave empty if not using OpenAI RAG.
-                    </HelperText>
-                    {errors.vector_store_ids && <ErrorText>{errors.vector_store_ids?.message}</ErrorText>}
-                </Stack>
+            <Heading as='h5' size='2' className='not-cal' weight='medium'>RAG (Retrieval-Augmented Generation) Settings</Heading>
+
+            {/* Only show RAG options if file search is enabled */}
+            {watch('enable_file_search') && (
+                <>
+                    <Stack maxWidth={'560px'}>
+                        <Text as="label" size="2">
+                            <HStack align='center'>
+                                <Controller
+                                    control={control}
+                                    name='enable_local_rag'
+                                    defaultValue={1}
+                                    render={({ field }) => (
+                                        <Checkbox
+                                            checked={field.value ? true : false}
+                                            onCheckedChange={(v) => field.onChange(v ? 1 : 0)}
+                                        />
+                                    )} />
+                                <span>Use Local Vector Database</span>
+                                <Tooltip content='Use local instead of cloud-based vector storage'>
+                                    <span className='text-gray-11 -mb-1'>
+                                        <BiInfoCircle size={16} />
+                                    </span>
+                                </Tooltip>
+                            </HStack>
+                        </Text>
+                        <HelperText>
+                            When enabled (recommended), document content will be stored and searched in a local vector database instead of OpenAI's cloud storage.
+                            Local storage provides better privacy, reduced costs, and works with all model providers.
+                        </HelperText>
+                    </Stack>
+                    
+                    {/* Local RAG Provider selection */}
+                    {enableLocalRAG && (
+                        <>
+                            <Stack maxWidth={'480px'}>
+                                <Label htmlFor='local_rag_provider'>Vector Database</Label>
+                                <Controller
+                                    control={control}
+                                    name='local_rag_provider'
+                                    render={({ field }) => (
+                                        <Select.Root
+                                            value={field.value || 'Chroma'}
+                                            onValueChange={field.onChange}
+                                        >
+                                            <Select.Trigger id='local_rag_provider' />
+                                            <Select.Content>
+                                                <Select.Item value="Chroma">ChromaDB</Select.Item>
+                                                <Select.Item value="FAISS">FAISS</Select.Item>
+                                                <Select.Item value="Weaviate">Weaviate</Select.Item>
+                                                <Select.Item value="LLMEnhanced">LLM-Enhanced</Select.Item>
+                                            </Select.Content>
+                                        </Select.Root>
+                                    )}
+                                />
+                                <HelperText>
+                                    ChromaDB is recommended for most use cases, FAISS for larger document collections,
+                                    and Weaviate for more complex semantic search requirements. LLM-Enhanced uses ChromaDB with AI-powered query enhancement.
+                                </HelperText>
+                            </Stack>
+
+                            <Stack maxWidth={'560px'}>
+                                <Text as="label" size="2">
+                                    <HStack align='center'>
+                                        <Controller
+                                            control={control}
+                                            name='use_llm_enhanced'
+                                            defaultValue={1}
+                                            render={({ field }) => (
+                                                <Checkbox
+                                                    checked={field.value ? true : false}
+                                                    onCheckedChange={(v) => field.onChange(v ? 1 : 0)}
+                                                />
+                                            )} />
+                                        <span>Use LLM for Query Enhancement</span>
+                                        <Tooltip content='More language-agnostic search using LLM'>
+                                            <span className='text-gray-11 -mb-1'>
+                                                <BiInfoCircle size={16} />
+                                            </span>
+                                        </Tooltip>
+                                    </HStack>
+                                </Text>
+                                <HelperText>
+                                    Use the configured LLM to understand and enhance search queries in any language.
+                                </HelperText>
+                            </Stack>
+                        </>
+                    )}
+                    
+                    {/* OpenAI Vector Store IDs - only show if using OpenAI provider and not using local RAG */}
+                    {modelProvider === 'OpenAI' && !enableLocalRAG && (
+                        <Stack maxWidth={'480px'}>
+                            <Label htmlFor='vector_store_ids'>OpenAI Vector Store IDs</Label>
+                            <TextField.Root
+                                id='vector_store_ids'
+                                {...register('vector_store_ids')}
+                                placeholder="vs-abc123,vs-def456"
+                                aria-invalid={errors.vector_store_ids ? 'true' : 'false'}
+                            />
+                            <HelperText>
+                                Comma-separated list of OpenAI vector store IDs (vs-*). Required for document search with OpenAI.
+                            </HelperText>
+                            {errors.vector_store_ids && <ErrorText>{errors.vector_store_ids?.message}</ErrorText>}
+                        </Stack>
+                    )}
+                </>
             )}
             
             <Separator className='w-full' />

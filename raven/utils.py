@@ -1,4 +1,5 @@
 import frappe
+from typing import List
 
 
 def track_channel_visit(channel_id, user=None, commit=False, publish_event_for_user=False):
@@ -194,3 +195,45 @@ def clear_thread_reply_count_cache(thread_id: str):
 	Clear the thread reply count cache
 	"""
 	frappe.cache().hdel("raven:thread_reply_count", thread_id)
+
+
+def get_recent_uploads() -> List[str]:
+	"""
+	Retrieve the list of recently uploaded files
+	
+	Returns:
+		List[str]: List of recently uploaded files
+	"""
+	try:
+		import time
+		recent_uploads = []
+		current_time = time.time()
+		
+		# Retrieve recently uploaded files from the global cache
+		if hasattr(frappe, 'recent_file_uploads') and frappe.recent_file_uploads:
+			# Consider files uploaded in the last 5 minutes as "recent"
+			for file_id, info in frappe.recent_file_uploads.items():
+				if current_time - info.get('upload_time', 0) < 300:  # 5 minutes in seconds
+					filename = info.get('filename', 'unknown')
+					if filename not in recent_uploads:
+						recent_uploads.append(filename)
+		
+		# Also try to retrieve from the persistent cache
+		try:
+			if hasattr(frappe.cache(), 'hget'):
+				upload_cache_key = "raven:recent_uploads"
+				cached_uploads = frappe.cache().hget(upload_cache_key, "uploads") or {}
+				
+				for file_id, info in cached_uploads.items():
+					if current_time - info.get('upload_time', 0) < 600:  # 10 minutes for the cache
+						filename = info.get('filename', 'unknown')
+						if filename not in recent_uploads:
+							recent_uploads.append(filename)
+		except Exception as cache_err:
+			frappe.log_error("RAG", f"Error retrieving recent uploads from cache: {str(cache_err)}")
+		
+		frappe.log_error("RAG", f"Recently uploaded files: {recent_uploads}")
+		return recent_uploads
+	except Exception as e:
+		frappe.log_error("RAG", f"Error retrieving recent uploads: {str(e)}")
+		return []

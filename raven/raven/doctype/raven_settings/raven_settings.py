@@ -24,6 +24,9 @@ class RavenSettings(Document):
 		company_workspace_mapping: DF.Table[RavenHRCompanyWorkspace]
 		department_channel_type: DF.Literal["Public", "Private"]
 		enable_ai_integration: DF.Check
+		enable_local_llm: DF.Check
+		local_llm_provider: DF.Literal["LM Studio", "Ollama", "LocalAI"]
+		local_llm_api_url: DF.Data | None
 		oauth_client: DF.Link | None
 		openai_api_key: DF.Password | None
 		openai_organisation_id: DF.Data | None

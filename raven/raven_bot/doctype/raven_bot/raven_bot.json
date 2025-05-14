@@ -30,6 +30,9 @@
   "vector_store_ids",
   "enable_local_rag",
   "local_rag_provider",
+  "use_local_embeddings",
+  "embeddings_model",
+  "use_llm_enhanced",
   "section_break_lwkx",
   "instruction",
   "dynamic_instructions",
@@ -37,6 +40,14 @@
   "bot_functions"
  ],
  "fields": [
+  {
+   "default": "1",
+   "depends_on": "eval: doc.enable_file_search && doc.enable_local_rag",
+   "description": "Use LLM-based query enhancement for language-agnostic search. Works with any configured LLM provider.",
+   "fieldname": "use_llm_enhanced",
+   "fieldtype": "Check",
+   "label": "Use LLM for Query Enhancement"
+  },
   {
    "fieldname": "description",
    "fieldtype": "Small Text",
@@ -102,7 +113,7 @@
    "fieldname": "model_provider",
    "fieldtype": "Select",
    "label": "Model Provider",
-   "options": "OpenAI\nLM Studio\nOllama\nLocalAI"
+   "options": "OpenAI\nLocalLLM"
   },
   {
    "default": "gpt-4o",
@@ -154,28 +165,28 @@
    "label": "Enable File Search"
   },
   {
-   "depends_on": "eval: doc.enable_file_search && doc.model_provider === 'OpenAI' && !doc.enable_local_rag",
-   "description": "Comma-separated list of OpenAI vector store IDs to search in",
-   "fieldname": "vector_store_ids",
-   "fieldtype": "Small Text",
-   "label": "Vector Store IDs"
-  },
-  {
-   "default": "0",
+   "default": "1",
    "depends_on": "eval: doc.enable_file_search",
-   "description": "Enable to use local RAG implementation instead of OpenAI's file search",
+   "description": "When enabled (recommended), document content will be stored and searched in a local vector database instead of OpenAI's cloud storage. Local storage provides better privacy, reduced costs, and works with all model providers.",
    "fieldname": "enable_local_rag",
    "fieldtype": "Check",
-   "label": "Enable Local RAG"
+   "label": "Use Local Vector Database"
   },
   {
    "default": "Chroma",
-   "depends_on": "eval: doc.enable_local_rag",
-   "description": "The vector store provider to use for local RAG",
+   "depends_on": "eval: doc.enable_file_search && doc.enable_local_rag",
+   "description": "The vector database to use for document storage and retrieval",
    "fieldname": "local_rag_provider",
    "fieldtype": "Select",
-   "label": "Local RAG Provider",
+   "label": "Vector Database",
    "options": "Chroma\nFAISS\nWeaviate"
+  },
+  {
+   "depends_on": "eval: doc.enable_file_search && doc.model_provider === 'OpenAI' && !doc.enable_local_rag",
+   "description": "Comma-separated list of OpenAI vector store IDs (vs-*). Required for document search with OpenAI.",
+   "fieldname": "vector_store_ids",
+   "fieldtype": "Small Text",
+   "label": "OpenAI Vector Store IDs"
   },
   {
    "default": "0",
@@ -214,6 +225,22 @@
    "fieldname": "debug_mode",
    "fieldtype": "Check",
    "label": "Debug Mode"
+  },
+  {
+   "default": "1",
+   "depends_on": "eval: doc.enable_file_search && doc.enable_local_rag",
+   "description": "Use local embedding models instead of OpenAI embeddings. This avoids the need for an OpenAI API key when using local vector databases.",
+   "fieldname": "use_local_embeddings",
+   "fieldtype": "Check",
+   "label": "Use Local Embeddings"
+  },
+  {
+   "default": "all-MiniLM-L6-v2",
+   "depends_on": "eval: doc.enable_file_search && doc.enable_local_rag && doc.use_local_embeddings",
+   "description": "The HuggingFace embedding model to use (requires sentence-transformers package)",
+   "fieldname": "embeddings_model",
+   "fieldtype": "Data",
+   "label": "Embeddings Model"
   }
  ],
  "image_field": "image",

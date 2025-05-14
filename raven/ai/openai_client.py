@@ -12,6 +12,9 @@ def get_open_ai_client():
 
 	if not raven_settings.enable_ai_integration:
 		frappe.throw(_("AI Integration is not enabled"))
+	
+	if not raven_settings.enable_openai_services:
+		frappe.throw(_("OpenAI services are not enabled"))
 
 	openai_api_key = raven_settings.get_password("openai_api_key")
 
@@ -20,11 +23,16 @@ def get_open_ai_client():
 			organization=raven_settings.openai_organisation_id,
 			project=raven_settings.openai_project_id,
 			api_key=openai_api_key,
+			max_retries=1  # Limit retries to prevent duplicate responses
 		)
 
 		return client
 
 	else:
-		client = OpenAI(api_key=openai_api_key, organization=raven_settings.openai_organisation_id)
+		client = OpenAI(
+			api_key=openai_api_key, 
+			organization=raven_settings.openai_organisation_id,
+			max_retries=1  # Limit retries to prevent duplicate responses
+		)
 
 		return client

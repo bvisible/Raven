@@ -14,14 +14,14 @@
   "tenor_api_key",
   "ai_section",
   "enable_ai_integration",
+  "enable_openai_services",
   "openai_organisation_id",
   "openai_api_key",
   "openai_project_id",
   "local_llm_section",
   "enable_local_llm",
-  "lm_studio_api_url",
-  "ollama_api_url",
-  "localai_api_url",
+  "local_llm_provider",
+  "local_llm_api_url",
   "column_break_occp",
   "frappe_hr_tab",
   "auto_create_department_channel",
@@ -109,56 +109,61 @@
   },
   {
    "depends_on": "eval:doc.enable_ai_integration;",
+   "default": "0",
+   "fieldname": "enable_openai_services",
+   "fieldtype": "Check",
+   "label": "Enable OpenAI Services"
+  },
+  {
+   "depends_on": "eval:doc.enable_ai_integration && doc.enable_openai_services;",
    "fieldname": "openai_organisation_id",
    "fieldtype": "Data",
    "label": "OpenAI Organisation ID",
-   "mandatory_depends_on": "eval:doc.enable_ai_integration;"
+   "mandatory_depends_on": "eval:doc.enable_ai_integration && doc.enable_openai_services;"
   },
   {
-   "depends_on": "eval:doc.enable_ai_integration;",
+   "depends_on": "eval:doc.enable_ai_integration && doc.enable_openai_services;",
    "fieldname": "openai_api_key",
    "fieldtype": "Password",
    "label": "OpenAI API Key",
-   "mandatory_depends_on": "eval:doc.enable_ai_integration;"
+   "mandatory_depends_on": "eval:doc.enable_ai_integration && doc.enable_openai_services;"
   },
   {
-   "depends_on": "eval:doc.enable_ai_integration;",
+   "depends_on": "eval:doc.enable_ai_integration && doc.enable_openai_services;",
    "description": "If not set, the integration will use the default project",
    "fieldname": "openai_project_id",
    "fieldtype": "Data",
    "label": "OpenAI Project ID"
   },
   {
+   "depends_on": "eval:doc.enable_ai_integration;",
    "fieldname": "local_llm_section",
    "fieldtype": "Section Break",
    "label": "Local LLM Configuration"
   },
   {
+   "depends_on": "eval:doc.enable_ai_integration;",
    "default": "0",
    "fieldname": "enable_local_llm",
    "fieldtype": "Check",
    "label": "Enable Local LLM Integration"
   },
   {
-   "depends_on": "eval:doc.enable_local_llm;",
-   "fieldname": "lm_studio_api_url",
-   "fieldtype": "Password",
-   "label": "LM Studio API URL",
-   "description": "URL for the local LM Studio API (e.g., http://localhost:1234/v1)"
+   "depends_on": "eval:doc.enable_ai_integration && doc.enable_local_llm;",
+   "fieldname": "local_llm_provider",
+   "fieldtype": "Select",
+   "label": "Local LLM Provider",
+   "options": "LM Studio\nOllama\nLocalAI",
+   "default": "LM Studio",
+   "description": "Choose your local LLM provider"
   },
   {
-   "depends_on": "eval:doc.enable_local_llm;",
-   "fieldname": "ollama_api_url",
-   "fieldtype": "Password",
-   "label": "Ollama API URL",
-   "description": "URL for the local Ollama API (e.g., http://localhost:11434/api)"
-  },
-  {
-   "depends_on": "eval:doc.enable_local_llm;",
-   "fieldname": "localai_api_url",
-   "fieldtype": "Password",
-   "label": "LocalAI API URL",
-   "description": "URL for the local LocalAI API (e.g., http://localhost:8080/v1)"
+   "depends_on": "eval:doc.enable_ai_integration && doc.enable_local_llm;",
+   "fieldname": "local_llm_api_url",
+   "fieldtype": "Data",
+   "label": "Local LLM API URL",
+   "description": "URL for the selected local LLM API",
+   "options": "URL"
   },
   {
    "fieldname": "column_break_occp",

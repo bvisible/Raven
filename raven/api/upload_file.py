@@ -76,25 +76,68 @@ def upload_file_with_message():
 	else:
 		frappe.form_dict.optimize = False
 
-	message_doc = frappe.new_doc("Raven Message")
-	message_doc.channel_id = frappe.form_dict.channelID
-	message_doc.message_type = "File"
-	message_doc.text = frappe.form_dict.caption
-
-	# If no caption is provided, use the filename as the caption
-	if not frappe.form_dict.caption:
-		# Get the filename
+	# Check if a thread_message_id was provided (for attaching files to existing messages)
+	thread_message_id = frappe.form_dict.get("thread_message_id")
+	
+	# Debug logging
+	frappe.log_error("File upload", f"Upload file with parameters: {frappe.form_dict}")
+	frappe.log_error("File upload", f"Thread message ID: {thread_message_id}")
+	
+	if thread_message_id and thread_message_id.strip():
+		# Attach file to existing message instead of creating a new one
+		# Get a fresh copy of the document to avoid timestamp mismatch
+		message_doc = frappe.get_doc("Raven Message", thread_message_id)
+		message_doc.message_type = "File" # Update to File type
+		
+		# Update caption if provided
+		if frappe.form_dict.caption:
+			message_doc.text = frappe.form_dict.caption
+		else:
+			# Get the filename as caption
+			try:
+				filename = frappe.request.files["file"].filename
+			except Exception:
+				filename = "File"
+			message_doc.content = filename
+			
+		# Save changes to avoid race conditions
 		try:
-			filename = frappe.request.files["file"].filename
-		except Exception:
-			filename = "File"
-		message_doc.content = filename
+			# Set a flag to indicate this is not a new upload but an attachment to an existing message
+			message_doc.flags.is_new_upload = False
+			message_doc.save(ignore_version=True)
+		except frappe.exceptions.TimestampMismatchError:
+			# Get a fresh copy and retry
+			frappe.log_error("File upload", "TimestampMismatchError occurred, retrying with fresh copy")
+			message_doc = frappe.get_doc("Raven Message", thread_message_id)
+			message_doc.message_type = "File"
+			
+			# Update caption if provided again
+			if frappe.form_dict.caption:
+				message_doc.text = frappe.form_dict.caption
+			# Set a flag to indicate this is not a new upload but an attachment to an existing message
+			message_doc.flags.is_new_upload = False
+			message_doc.save(ignore_version=True, ignore_permissions=True)
+	else:
+		# Create a new message as usual
+		message_doc = frappe.new_doc("Raven Message")
+		message_doc.channel_id = frappe.form_dict.channelID
+		message_doc.message_type = "File"
+		message_doc.text = frappe.form_dict.caption
 
-	message_doc.is_reply = frappe.form_dict.is_reply
-	if message_doc.is_reply == "1" or message_doc.is_reply == 1:
-		message_doc.linked_message = frappe.form_dict.linked_message
+		# If no caption is provided, use the filename as the caption
+		if not frappe.form_dict.caption:
+			# Get the filename
+			try:
+				filename = frappe.request.files["file"].filename
+			except Exception:
+				filename = "File"
+			message_doc.content = filename
 
-	message_doc.insert()
+		message_doc.is_reply = frappe.form_dict.is_reply
+		if message_doc.is_reply == "1" or message_doc.is_reply == 1:
+			message_doc.linked_message = frappe.form_dict.linked_message
+
+		message_doc.insert()
 
 	frappe.form_dict.docname = message_doc.name
 
@@ -117,6 +160,40 @@ def upload_file_with_message():
 	message_doc.reload()
 
 	message_doc.file = file_doc.file_url
+	
+	# Force submission to RAG for file processing (important for AI search)
+	try:
+		# This is critical for ensuring file search works correctly with all files
+		frappe.log_error("File upload RAG", f"Initiating direct RAG processing for: {file_doc.file_name}")
+		
+		# Get the file's physical path
+		import os
+		file_real_path = frappe.get_site_path(file_doc.file_url.lstrip("/")) if file_doc.file_url.startswith("/") else None
+		
+		if file_real_path and os.path.exists(file_real_path):
+			# Import and process the file immediately
+			from raven.ai.rag import process_uploaded_file_immediately
+			
+			frappe.log_error("File upload RAG", f"Processing file: {file_real_path}")
+			
+			# Process synchronously - this is important to ensure the file is available 
+			# immediately for the next AI request
+			result = process_uploaded_file_immediately(
+				file_path=file_real_path,
+				filename=file_doc.file_name,
+				file_id=file_doc.name,
+				channel_id=message_doc.channel_id
+			)
+			
+			frappe.log_error("File upload RAG", f"Direct processing result: {result}")
+			
+			# Store the file ID for reference
+			message_doc.file_processed_for_rag = 1
+			message_doc.file_id_for_rag = file_doc.name
+		else:
+			frappe.log_error("File upload RAG", f"File not found at path: {file_real_path}")
+	except Exception as e:
+		frappe.log_error("File upload RAG", f"Error in RAG processing: {str(e)}")
 
 	if file_doc.file_type in fileExt:
 
@@ -162,6 +239,23 @@ def upload_file_with_message():
 		message_doc.thumbnail_width = thumbnail_width
 		message_doc.thumbnail_height = thumbnail_height
 
-	message_doc.save()
+	try:
+		message_doc.save(ignore_version=True)
+	except frappe.exceptions.TimestampMismatchError:
+		# Get a fresh copy and retry
+		frappe.log_error("File upload", "TimestampMismatchError occurred on final save, retrying with fresh copy")
+		message_doc = frappe.get_doc("Raven Message", message_doc.name)
+		
+		# Set properties again
+		message_doc.file = file_doc.file_url
+		
+		if file_doc.file_type in fileExt:
+			message_doc.message_type = "Image"
+			message_doc.image_width = width
+			message_doc.image_height = height
+			message_doc.thumbnail_width = thumbnail_width
+			message_doc.thumbnail_height = thumbnail_height
+			
+		message_doc.save(ignore_version=True, ignore_permissions=True)
 
 	return message_doc

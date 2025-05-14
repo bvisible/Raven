@@ -1,19 +1,19 @@
+import "cal-sans"
+import { init } from 'emoji-mart'
 import { FrappeProvider } from 'frappe-react-sdk'
+import Cookies from 'js-cookie'
 import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
+import { Toaster } from 'sonner'
+import WorkspaceSwitcherGrid from './components/layout/WorkspaceSwitcherGrid'
+import { useStickyState } from './hooks/useStickyState'
+import ErrorPage from './pages/ErrorPage'
 import { MainPage } from './pages/MainPage'
+import MobileTabsPage from './pages/MobileTabsPage'
+import WorkspaceSwitcher from './pages/WorkspaceSwitcher'
+import { ThemeProvider } from './ThemeProvider'
+import AppUpdateProvider from './utils/AppUpdateProvider'
 import { ProtectedRoute } from './utils/auth/ProtectedRoute'
 import { UserProvider } from './utils/auth/UserProvider'
-import "cal-sans";
-import { ThemeProvider } from './ThemeProvider'
-import { Toaster } from 'sonner'
-import { useStickyState } from './hooks/useStickyState'
-import MobileTabsPage from './pages/MobileTabsPage'
-import Cookies from 'js-cookie'
-import ErrorPage from './pages/ErrorPage'
-import WorkspaceSwitcher from './pages/WorkspaceSwitcher'
-import WorkspaceSwitcherGrid from './components/layout/WorkspaceSwitcherGrid'
-import { init } from 'emoji-mart'
-import AppUpdateProvider from './utils/AppUpdateProvider'
 
 /** Following keys will not be cached in app cache */
 // const NO_CACHE_KEYS = [
@@ -109,7 +109,7 @@ const router = createBrowserRouter(
               <Route path=":ID" lazy={() => import('./pages/settings/AI/ViewSavedPrompt')} />
             </Route>
 
-            <Route path="openai-settings" lazy={() => import('./pages/settings/AI/OpenAISettings')} />
+            <Route path="llm-settings" lazy={() => import('./pages/settings/AI/LLMSettings')} />
 
             <Route path="webhooks">
               <Route index lazy={() => import('./pages/settings/Webhooks/WebhookList')} />

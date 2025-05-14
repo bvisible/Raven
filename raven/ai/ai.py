@@ -1,23 +1,17 @@
 import frappe
 import asyncio
 
-from raven.ai.handler import stream_response as openai_stream_response
 from raven.ai.sdk_handler import stream_response as sdk_stream_response
-from raven.ai.openai_client import get_open_ai_client
 from raven.ai.sdk_agents import AGENTS_SDK_AVAILABLE
 
 
 def handle_bot_dm(message, bot):
 	"""
-	 Function to handle direct messages to the bot.
-
-	We need to start a new thread with the message and create a new conversation in OpenAI
+	Function to handle direct messages to the bot.
+	
+	Creates a thread channel and processes the message with the SDK Agent.
 	"""
-
-	client = get_open_ai_client()
-
 	# If the message is a poll, send a message to the user that we don't support polls for AI yet
-
 	if message.message_type == "Poll":
 		bot.send_message(
 			channel_id=message.channel_id,
@@ -25,56 +19,12 @@ def handle_bot_dm(message, bot):
 		)
 		return
 
+	# Check if file search is enabled for file messages
 	if message.message_type in ["File", "Image"]:
-
 		if message.message_type == "File" and not check_if_bot_has_file_search(bot, message.channel_id):
 			return
 
-		# If the file has an "fid" query parameter, we need to remove that from the file_url
-		if "fid" in message.file:
-			file_url = message.file.split("?fid=")[0]
-		else:
-			file_url = message.file
-
-		# Upload the file to OpenAI
-		file = create_file_in_openai(file_url, message.message_type, client)
-
-		content, attachments = get_content_attachment_for_file(message.message_type, file.id, file_url)
-
-		ai_thread = client.beta.threads.create(
-			messages=[
-				{
-					"role": "user",
-					"content": content,
-					"metadata": {"user": message.owner, "message": message.name},
-					"attachments": attachments,
-				}
-			],
-			metadata={
-				"bot": bot.name,
-				"channel": message.channel_id,
-				"user": message.owner,
-				"message": message.name,
-			},
-		)
-
-	else:
-		ai_thread = client.beta.threads.create(
-			messages=[
-				{
-					"role": "user",
-					"content": message.content,
-					"metadata": {"user": message.owner, "message": message.name},
-				}
-			],
-			metadata={
-				"bot": bot.name,
-				"channel": message.channel_id,
-				"user": message.owner,
-				"message": message.name,
-			},
-		)
-
+	# Create a thread channel for the conversation
 	thread_channel = frappe.get_doc(
 		{
 			"doctype": "Raven Channel",
@@ -83,17 +33,18 @@ def handle_bot_dm(message, bot):
 			"is_thread": 1,
 			"is_ai_thread": 1,
 			"is_dm_thread": 1,
-			"openai_thread_id": ai_thread.id,
 			"thread_bot": bot.name,
 		}
 	).insert()
 
 	# Update the message to mark it as a thread
 	message.is_thread = 1
-	message.save()
-	# nosemgrep We need to commit here since the response will be streamed, and hence might take a while
+	message.save(ignore_version=True)
+	
+	# Commit changes before processing the message
 	frappe.db.commit()
 
+	# Publish thinking state
 	frappe.publish_realtime(
 		"ai_event",
 		{
@@ -106,79 +57,51 @@ def handle_bot_dm(message, bot):
 		after_commit=True,
 	)
 
-	# Check if we should use SDK Agents or the old OpenAI Assistants API
-	if AGENTS_SDK_AVAILABLE and hasattr(bot, "model_provider") and bot.model_provider != "OpenAI":
-		# Use SDK Agents with local LLM
-		asyncio.run(sdk_stream_response(
+	# Check if the SDK is available
+	if AGENTS_SDK_AVAILABLE:
+		# Use SDK Agents for all models
+		file_data = None
+		if message.message_type in ["File", "Image"]:
+			file_doc = frappe.get_doc("File", {"file_url": message.file})
+			file_data = [{"file_path": file_doc.get_full_path(), "file_name": file_doc.file_name}]
+		
+		# Get response from SDK and send message
+		response_text = asyncio.run(sdk_stream_response(
 			bot=bot, 
 			channel_id=thread_channel.name, 
 			message=message.content,
-			files=[{"file_path": frappe.get_doc("File", {"file_url": message.file}).get_full_path(), "file_name": message.file_name}] if message.message_type in ["File", "Image"] else None
+			files=file_data
 		))
+		
+		# Send the message if we got a response
+		if response_text:
+			bot.send_message(
+				channel_id=thread_channel.name,
+				text=response_text,
+				markdown=True,
+			)
 	else:
-		# Use the old OpenAI Assistants API
-		openai_stream_response(ai_thread_id=ai_thread.id, bot=bot, channel_id=thread_channel.name)
-
+		# SDK not available - inform the user
+		bot.send_message(
+			channel_id=thread_channel.name,
+			text="OpenAI Agents SDK is not installed. Please run 'pip install openai-agents' on the server.",
+		)
 
 def handle_ai_thread_message(message, channel):
 	"""
 	Function to handle messages in an AI thread
-
-	When a new message is sent, we need to send it to the OpenAI API and then stream the response
+	
+	Processes the message using the SDK Agent.
 	"""
-
-	client = get_open_ai_client()
-
+	# Get the bot for this thread
 	bot = frappe.get_doc("Raven Bot", channel.thread_bot)
 
-	if message.message_type in ["File", "Image"]:
-
-		file_url = message.file
-		if "fid" in file_url:
-			file_url = file_url.split("?fid=")[0]
-
-		if message.message_type == "File" and not check_if_bot_has_file_search(bot, channel.name):
-			return
-		# Upload the file to OpenAI
-		try:
-			file = create_file_in_openai(file_url, message.message_type, client)
-		except Exception as e:
-			frappe.log_error("Raven AI Error", frappe.get_traceback())
-			bot.send_message(
-				channel_id=channel.name,
-				text="Sorry, there was an error in processing your file. Please try again.<br/><br/>Error: "
-				+ str(e),
-			)
+	# Check file search capability for file messages
+	if message.message_type in ["File", "Image"] and message.message_type == "File":
+		if not check_if_bot_has_file_search(bot, channel.name):
 			return
 
-		content, attachments = get_content_attachment_for_file(message.message_type, file.id, file_url)
-
-		try:
-			client.beta.threads.messages.create(
-				thread_id=channel.openai_thread_id,
-				role="user",
-				content=content,
-				metadata={"user": message.owner, "message": message.name},
-				attachments=attachments,
-			)
-		except Exception as e:
-			frappe.log_error("Raven AI Error", frappe.get_traceback())
-			bot.send_message(
-				channel_id=channel.name,
-				text="Sorry, there was an error in processing your file. Please try again.<br/><br/>Error: "
-				+ str(e),
-			)
-			return
-
-	else:
-
-		client.beta.threads.messages.create(
-			thread_id=channel.openai_thread_id,
-			role="user",
-			content=message.content,
-			metadata={"user": message.owner, "message": message.name},
-		)
-
+	# Publish thinking state
 	frappe.publish_realtime(
 		"ai_event",
 		{
@@ -190,25 +113,41 @@ def handle_ai_thread_message(message, channel):
 		docname=channel.name,
 	)
 
-	# Check if we should use SDK Agents or the old OpenAI Assistants API
-	if AGENTS_SDK_AVAILABLE and hasattr(bot, "model_provider") and bot.model_provider != "OpenAI":
-		# Use SDK Agents with local LLM
-		asyncio.run(sdk_stream_response(
+	# Check if the SDK is available
+	if AGENTS_SDK_AVAILABLE:
+		# Use SDK Agents for all models
+		file_data = None
+		if message.message_type in ["File", "Image"]:
+			file_doc = frappe.get_doc("File", {"file_url": message.file})
+			file_data = [{"file_path": file_doc.get_full_path(), "file_name": file_doc.file_name}]
+		
+		# Get response from SDK and send message
+		response_text = asyncio.run(sdk_stream_response(
 			bot=bot, 
 			channel_id=channel.name, 
 			message=message.content,
-			files=[{"file_path": frappe.get_doc("File", {"file_url": message.file}).get_full_path(), "file_name": message.file_name}] if message.message_type in ["File", "Image"] else None
+			files=file_data
 		))
+		
+		# Send the message if we got a response
+		if response_text:
+			bot.send_message(
+				channel_id=channel.name,
+				text=response_text,
+				markdown=True,
+			)
 	else:
-		# Use the old OpenAI Assistants API
-		openai_stream_response(ai_thread_id=channel.openai_thread_id, bot=bot, channel_id=channel.name)
+		# SDK not available - inform the user
+		bot.send_message(
+			channel_id=channel.name,
+			text="OpenAI Agents SDK is not installed. Please run 'pip install openai-agents' on the server.",
+		)
 
 
 def check_if_bot_has_file_search(bot, channel_id):
 	"""
-	Checks of bot has file search. If not, send a message to the user. If yes, return True
+	Checks if bot has file search. If not, send a message to the user. If yes, return True
 	"""
-
 	if not bot.enable_file_search:
 		bot.send_message(
 			channel_id=channel_id,
@@ -217,51 +156,3 @@ def check_if_bot_has_file_search(bot, channel_id):
 		return False
 
 	return True
-
-
-def create_file_in_openai(file_url: str, message_type: str, client):
-	"""
-	Function to create a file in OpenAI
-
-	We need to upload the file to OpenAI and return the file ID
-	"""
-
-	file_doc = frappe.get_doc("File", {"file_url": file_url})
-	file_path = file_doc.get_full_path()
-
-	file = client.files.create(
-		file=open(file_path, "rb"), purpose="assistants" if message_type == "File" else "vision"
-	)
-
-	return file
-
-
-def get_content_attachment_for_file(message_type: str, file_id: str, file_url: str):
-
-	attachments = None
-
-	if message_type == "File":
-		content = f"Uploaded a file. URL of the file is '{file_url}'"
-
-		FILE_SEARCH_EXCLUSIONS = [".xlsx", ".csv", ".json", ".xls"]
-
-		tool_type = "file_search"
-
-		for exclusion in FILE_SEARCH_EXCLUSIONS:
-			if file_url.endswith(exclusion):
-				tool_type = "code_interpreter"
-				break
-
-		attachments = [
-			{
-				"file_id": file_id,
-				"tools": [{"type": tool_type}],
-			}
-		]
-	else:
-		content = [
-			{"type": "text", "text": f"Uploaded an image. URL of the image is '{file_url}'"},
-			{"type": "image_file", "image_file": {"file_id": file_id}},
-		]
-
-	return content, attachments

@@ -209,7 +209,7 @@ class RavenMessage(Document):
 
 		is_ai_thread = channel_doc.is_ai_thread
 
-		if is_ai_thread and channel_doc.openai_thread_id:
+		if is_ai_thread:
 			frappe.enqueue(
 				method=handle_ai_thread_message,
 				message=self,
@@ -618,10 +618,15 @@ class RavenMessage(Document):
 				track_channel_visit(channel_id=self.channel_id, user=self.owner)
 				# frappe.enqueue(method=track_channel_visit, channel_id=self.channel_id, user=self.owner)
 
-			# If this is a new messagge (only applicable for files in on_update), then handle the AI message
-			if self.message_type == "File" or self.message_type == "Image":
-				if self.file:
-					self.handle_ai_message()
+			# If this is a new message (only applicable for files in on_update), then handle the AI message
+			# But only do this if we're not attaching to an existing thread message
+			channel_doc = frappe.get_cached_doc("Raven Channel", self.channel_id)
+			is_existing_thread = channel_doc.is_thread and not self.flags.get("is_new_upload", True)
+			
+			if (self.message_type == "File" or self.message_type == "Image") and self.file and not is_existing_thread:
+				# Log debug info about the file handling
+				frappe.log_error("File Upload AI", f"Handling AI message for file: {self.name} in channel: {self.channel_id}, is_thread: {channel_doc.is_thread}")
+				self.handle_ai_message()
 
 	def on_trash(self):
 		# delete all the reactions for the message
