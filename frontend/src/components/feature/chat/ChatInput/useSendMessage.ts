@@ -1,6 +1,6 @@
+import { RavenMessage } from '@/types/RavenMessaging/RavenMessage'
 import { useFrappePostCall } from 'frappe-react-sdk'
 import { Message } from '../../../../../../types/Messaging/Message'
-import { RavenMessage } from '@/types/RavenMessaging/RavenMessage'
 
 export const useSendMessage = (channelID: string, uploadFiles: (selectedMessage?: Message | null, threadMessageId?: string | null) => Promise<RavenMessage[]>, onMessageSent: (messages: RavenMessage[]) => void, selectedMessage?: Message | null) => {
 
@@ -27,36 +27,11 @@ export const useSendMessage = (channelID: string, uploadFiles: (selectedMessage?
                 .then((res) => {
                     onMessageSent(res)
                 })
-                    .then((res) => {
-                        onMessageSent([res.message]);
-                        // Return the message ID to use it for file upload
-                        return res.message.name;
-                    })
-                    .then((messageId) => {
-                        console.log("Sending file attachments with message ID:", messageId);
-                        return uploadFiles(selectedMessage, messageId);
-                    })
-                    .then((res) => {
-                        onMessageSent(res);
-                    })
-                    .catch(error => {
-                        console.error("Error in message sending chain:", error);
-                        throw error;
-                    });
-            } else {
-                return uploadFiles(selectedMessage)
-                    .then((res) => {
-                        onMessageSent(res);
-                    })
-                    .catch(error => {
-                        console.error("Error uploading files:", error);
-                        throw error;
-                    });
-            }
-        } catch (error) {
-            console.error("Error in sendMessage:", error);
-            throw error;
-        }
+                .catch(error => {
+                    console.error("Error uploading files:", error);
+                    throw error;
+                });
+        } 
     }
 
 
