@@ -22,4 +22,5 @@ unstructured>=0.17.0
 pdf2image>=1.16.3
 pytesseract>=0.3.10
 PyPDF2>=3.0.0  # For PDF preprocessing and compatibility fixes
+pymupdf4llm>=0.0.24  # Enhanced PDF processing for RAG
 blurhash-python

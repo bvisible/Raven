@@ -28,6 +28,11 @@ async def handle_message(bot, channel_id: str, message: str, files: List[Dict] =
                 "error": True
             }
         
+        # Set current channel ID in frappe local context for RAG filtering
+        if channel_id:
+            frappe.local.current_channel_id = channel_id
+            frappe.log_error("SDK Channel Context", f"Set current channel_id: {channel_id}")
+        
         # Log debug info about bot functions
         frappe.log_error("SDK Functions Debug", f"Handle message for bot: {bot.name}")
         if hasattr(bot, "bot_functions"):
@@ -65,14 +70,20 @@ async def handle_message(bot, channel_id: str, message: str, files: List[Dict] =
         # Process files if any
         file_references = []
         if files and len(files) > 0:
+            frappe.log_error("SDK File Processing", f"Processing {len(files)} files")
+            
             # Use the unified RAG system to process files
             from .rag import process_file_upload
             for file_data in files:
+                frappe.log_error("SDK File Processing", f"Processing file: {file_data}")
+                
                 # Process file upload through RAG system
                 file_id = await process_file_upload(bot, file_data.get("file_path"), {
                     "filename": file_data.get("file_name"),
                     "channel_id": channel_id
                 })
+                
+                frappe.log_error("SDK File Processing", f"File ID from RAG: {file_id}")
                 
                 # Also process directly to handle thread context properly
                 try:
@@ -90,6 +101,9 @@ async def handle_message(bot, channel_id: str, message: str, files: List[Dict] =
                             file_id=file_id,
                             channel_id=channel_id
                         )
+                        frappe.log_error("SDK File Processing", f"Direct file processing completed")
+                    else:
+                        frappe.log_error("SDK File Processing", f"File path not found: {file_path}")
                 except Exception as e:
                     frappe.log_error("SDK Handler", f"Error in direct file processing: {str(e)}")
                 
@@ -98,15 +112,21 @@ async def handle_message(bot, channel_id: str, message: str, files: List[Dict] =
                     "file_id": file_id,
                     "file_name": file_data.get("file_name")
                 })
+                
+                frappe.log_error("SDK File Processing", f"Added file reference: {file_references[-1]}")
             
             # Add file references to the message if any with enhanced context
             if file_references:
                 file_info = ", ".join([f"{file.get('file_name')}" for file in file_references])
                 
+                frappe.log_error("SDK File Processing", f"Modifying message with file context: {file_info}")
+                
                 # Add more specific instruction about the files in the message
                 message = f"{message}\n\nIMPORTANT: I've just attached these files to examine: {file_info}.\n\n" + \
                           f"Please focus ONLY on these specific files when responding. " + \
                           f"If asked about content, totals, or data in these files, use the file_search tool."
+                
+                frappe.log_error("SDK File Processing", f"Final message with file context: {message}")
         
         # Get dynamic instructions if needed
         instructions = None
@@ -123,7 +143,11 @@ async def handle_message(bot, channel_id: str, message: str, files: List[Dict] =
         
         # Process the message with conversation history
         frappe.log_error("SDK Functions Debug", f"Processing message with conversation history: {len(conversation_history) if conversation_history else 0} messages")
+        frappe.log_error("SDK Pre-Process", f"Channel ID before process_message: {getattr(frappe.local, 'current_channel_id', 'NOT SET')}")
+        
         response = await agent_manager.process_message(message, conversation_history)
+        
+        frappe.log_error("SDK Post-Process", f"Channel ID after process_message: {getattr(frappe.local, 'current_channel_id', 'NOT SET')}")
         
         # Ensure response is not None before accessing
         if response is None:
@@ -133,8 +157,16 @@ async def handle_message(bot, channel_id: str, message: str, files: List[Dict] =
                 "full_response": {}
             }
         
+        # Clean the response text - remove <think> tags
+        response_text = response.get("message", "")
+        if response_text:
+            # Remove <think>...</think> content including nested tags
+            import re
+            response_text = re.sub(r'<think>.*?</think>', '', response_text, flags=re.DOTALL)
+            response_text = response_text.strip()
+        
         return {
-            "text": response.get("message"),
+            "text": response_text,
             "full_response": response
         }
     
@@ -319,6 +351,13 @@ async def stream_response(bot, channel_id: str, message: str, files: List[Dict] 
             response_text = "Sorry, I encountered an error processing your message."
         else:
             response_text = response.get('message', '')
+        
+        # Clean the response text - remove <think> tags
+        if response_text:
+            # Remove <think>...</think> content including nested tags
+            import re
+            response_text = re.sub(r'<think>.*?</think>', '', response_text, flags=re.DOTALL)
+            response_text = response_text.strip()
         
         # Log message preparation but DO NOT SEND
         frappe.log_error("SDK Clean", f"Preparing message to return to caller, length: {len(response_text)}")

@@ -221,6 +221,7 @@ class ChromaRAGProvider(LocalRAGProvider):
                 UnstructuredWordDocumentLoader
             )
             from langchain.text_splitter import RecursiveCharacterTextSplitter
+            from langchain.schema import Document
             
             # Get file info for metadata
             file_name = os.path.basename(file_path)
@@ -241,8 +242,11 @@ class ChromaRAGProvider(LocalRAGProvider):
                 "source": "raven_upload"
             }
             
-            # Merge with provided metadata
-            enhanced_metadata = {**file_metadata, **(metadata or {})}
+            # Merge with provided metadata, filtering out None values
+            enhanced_metadata = {}
+            for key, value in {**file_metadata, **(metadata or {})}.items():
+                if value is not None:
+                    enhanced_metadata[key] = value
             frappe.log_error("RAG Debug", f"Enhanced metadata: {enhanced_metadata}")
             
             # Initialize text splitter for chunking
@@ -257,38 +261,80 @@ class ChromaRAGProvider(LocalRAGProvider):
             if file_extension == '.pdf':
                 frappe.log_error("RAG Debug", f"Loading PDF file: {file_path}")
                 
-                # Use UnstructuredPDFLoader for better text extraction with OCR fallback
+                # Try to use PyMuPDF4LLM first for better extraction
                 try:
-                    # First try with PyPDFLoader which is faster
+                    import pymupdf4llm
+                    frappe.log_error("RAG Debug", "PyMuPDF4LLM available, using enhanced PDF extraction")
+                    
+                    # Extract text in markdown format with page chunks
+                    pages_data = pymupdf4llm.to_markdown(
+                        file_path,
+                        page_chunks=True,  # Get chunks by page
+                        write_images=False  # For now, no image extraction
+                    )
+                    
+                    # Convert to langchain document format
+                    pages = []
+                    for page_num, page_data in enumerate(pages_data):
+                        page_text = page_data.get('text', '')
+                        page_metadata = page_data.get('metadata', {})
+                        
+                        # Create a langchain document
+                        doc = Document(
+                            page_content=page_text,
+                            metadata={
+                                'page': page_num + 1,
+                                'source': 'pymupdf4llm',
+                                **page_metadata
+                            }
+                        )
+                        pages.append(doc)
+                    
+                    frappe.log_error("RAG Debug", f"Loaded {len(pages)} pages from PDF using PyMuPDF4LLM")
+                    
+                except ImportError:
+                    frappe.log_error("RAG Debug", "PyMuPDF4LLM not available, using standard PDF loaders")
+                    
+                    # Fallback to standard approach
+                    try:
+                        # First try with PyPDFLoader which is faster
+                        loader = PyPDFLoader(file_path)
+                        pages = loader.load_and_split()
+                        frappe.log_error("RAG Debug", f"Loaded {len(pages)} pages from PDF using PyPDFLoader")
+                        
+                        # Check if we got meaningful content
+                        is_content_meaningful = False
+                        for page in pages:
+                            content = page.page_content.strip()
+                            # Check if content is meaningful (not just spaces or very short)
+                            if len(content) > 100:
+                                is_content_meaningful = True
+                                break
+                        
+                        # If content is not meaningful, try UnstructuredPDFLoader
+                        if not is_content_meaningful:
+                            frappe.log_error("RAG Debug", "PDF content seems insufficient, trying UnstructuredPDFLoader")
+                            from langchain_community.document_loaders import UnstructuredPDFLoader
+                            loader = UnstructuredPDFLoader(file_path, mode="elements")
+                            raw_pages = loader.load()
+                            frappe.log_error("RAG Debug", f"Loaded {len(raw_pages)} elements from PDF using UnstructuredPDFLoader")
+                            pages = raw_pages
+                        
+                    except Exception as e:
+                        frappe.log_error("RAG Debug", f"Error with primary PDF loader: {str(e)}, trying fallback")
+                        # Fallback to UnstructuredPDFLoader
+                        from langchain_community.document_loaders import UnstructuredPDFLoader
+                        loader = UnstructuredPDFLoader(file_path, mode="elements")
+                        pages = loader.load()
+                        frappe.log_error("RAG Debug", f"Loaded {len(pages)} elements from PDF using fallback UnstructuredPDFLoader")
+                        
+                except Exception as e:
+                    frappe.log_error("RAG Debug", f"Error with PyMuPDF4LLM: {str(e)}, using standard approach")
+                    
+                    # Fallback to standard PyPDFLoader
                     loader = PyPDFLoader(file_path)
                     pages = loader.load_and_split()
                     frappe.log_error("RAG Debug", f"Loaded {len(pages)} pages from PDF using PyPDFLoader")
-                    
-                    # Check if we got meaningful content
-                    is_content_meaningful = False
-                    for page in pages:
-                        content = page.page_content.strip()
-                        # Check if content is meaningful (not just spaces or very short)
-                        if len(content) > 100:
-                            is_content_meaningful = True
-                            break
-                    
-                    # If content is not meaningful, try UnstructuredPDFLoader
-                    if not is_content_meaningful:
-                        frappe.log_error("RAG Debug", "PDF content seems insufficient, trying UnstructuredPDFLoader")
-                        from langchain_community.document_loaders import UnstructuredPDFLoader
-                        loader = UnstructuredPDFLoader(file_path, mode="elements")
-                        raw_pages = loader.load()
-                        frappe.log_error("RAG Debug", f"Loaded {len(raw_pages)} elements from PDF using UnstructuredPDFLoader")
-                        pages = raw_pages
-                    
-                except Exception as e:
-                    frappe.log_error("RAG Debug", f"Error with primary PDF loader: {str(e)}, trying fallback")
-                    # Fallback to UnstructuredPDFLoader
-                    from langchain_community.document_loaders import UnstructuredPDFLoader
-                    loader = UnstructuredPDFLoader(file_path, mode="elements")
-                    pages = loader.load()
-                    frappe.log_error("RAG Debug", f"Loaded {len(pages)} elements from PDF using fallback UnstructuredPDFLoader")
                 
                 # Process the pages into documents with metadata
                 documents = []
@@ -416,7 +462,7 @@ class ChromaRAGProvider(LocalRAGProvider):
             
         except Exception as e:
             frappe.log_error("RAG Debug", f"Error processing file: {type(e).__name__}: {str(e)}")
-            frappe.log_error("RAG Debug", f"Error details: {str(e)}", exc_info=True)
+            frappe.log_error("RAG Debug", f"Error details: {str(e)}")
             raise ValueError(f"Error processing file: {str(e)}")
     
     def add_documents(self, documents: List[Dict[str, Any]]):
@@ -436,19 +482,20 @@ class ChromaRAGProvider(LocalRAGProvider):
         # Add documents to the vector store
         self.vector_store.add_texts(texts=texts, metadatas=metadatas)
     
-    def search(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+    def search(self, query: str, k: int = 5, filename: str = None) -> List[Dict[str, Any]]:
         """
         Search the vector store
         
         Args:
             query: Query string
             k: Number of results to return
+            filename: Optional filename to filter by
             
         Returns:
             List[Dict[str, Any]]: List of search results
         """
         try:
-            frappe.log_error("RAG Debug", f"Searching for: '{query}', k={k}")
+            frappe.log_error("RAG Debug", f"Searching for: '{query}', k={k}, filename={filename}")
             
             if not self.vector_store:
                 frappe.log_error("RAG Debug", "Vector store not initialized, initializing now")
@@ -464,11 +511,69 @@ class ChromaRAGProvider(LocalRAGProvider):
             # Strategy 1: Direct vector similarity search
             frappe.log_error("RAG Debug", "Strategy 1: Direct vector similarity search")
             try:
-                direct_results = self.vector_store.similarity_search_with_relevance_scores(
-                    query, 
-                    k=k
-                )
-                frappe.log_error("RAG Debug", f"Direct search found {len(direct_results)} results")
+                # Get file filter from conversation context or recent uploads
+                file_filter = filename  # Use provided filename if available
+                channel_id = getattr(frappe.local, 'current_channel_id', None)
+                frappe.log_error("RAG Debug", f"Checking for channel_id: {channel_id}, filename: {filename}")
+                
+                if channel_id:
+                    try:
+                        from .rag import get_recent_file_uploads
+                        recent_files = get_recent_file_uploads(channel_id)
+                        frappe.log_error("RAG Debug", f"Recent files for channel {channel_id}: {[f.get('filename') for f in recent_files]}")
+                        
+                        # If there's a recent file upload, use it as filter
+                        if recent_files and len(recent_files) > 0:
+                            file_filter = recent_files[0].get('filename')
+                            frappe.log_error("RAG Debug", f"Using file filter: {file_filter}")
+                    except Exception as e:
+                        frappe.log_error("RAG Debug", f"Error getting recent files: {str(e)}")
+                
+                # Use metadata filter if file_filter is available
+                if file_filter:
+                    # Chroma supports metadata filtering
+                    direct_results = self.vector_store.similarity_search_with_relevance_scores(
+                        query, 
+                        k=k,
+                        filter={"file_name": file_filter}
+                    )
+                    frappe.log_error("RAG Debug", f"Direct search with file filter '{file_filter}' found {len(direct_results)} results")
+                    
+                    # If no results with exact filter, try with channel_id
+                    if not direct_results and hasattr(frappe.local, 'current_channel_id') and frappe.local.current_channel_id:
+                        frappe.log_error("RAG Debug", f"No results with file filter, trying channel filter")
+                        direct_results = self.vector_store.similarity_search_with_relevance_scores(
+                            query, 
+                            k=k,
+                            filter={"channel_id": frappe.local.current_channel_id}
+                        )
+                        frappe.log_error("RAG Debug", f"Channel-filtered search found {len(direct_results)} results")
+                else:
+                    # Try channel filter first if available
+                    if hasattr(frappe.local, 'current_channel_id') and frappe.local.current_channel_id:
+                        frappe.log_error("RAG Debug", f"Using channel filter: {frappe.local.current_channel_id}")
+                        direct_results = self.vector_store.similarity_search_with_relevance_scores(
+                            query, 
+                            k=k,
+                            filter={"channel_id": frappe.local.current_channel_id}
+                        )
+                        frappe.log_error("RAG Debug", f"Channel-filtered search found {len(direct_results)} results")
+                        
+                        # If no results with channel filter, search without filter
+                        if not direct_results:
+                            frappe.log_error("RAG Debug", "No results with channel filter, searching all documents")
+                            direct_results = self.vector_store.similarity_search_with_relevance_scores(
+                                query, 
+                                k=k
+                            )
+                            frappe.log_error("RAG Debug", f"Unfiltered search found {len(direct_results)} results")
+                    else:
+                        direct_results = self.vector_store.similarity_search_with_relevance_scores(
+                            query, 
+                            k=k
+                        )
+                        frappe.log_error("RAG Debug", f"Direct search without filter found {len(direct_results)} results")
+                
                 all_results.extend(direct_results)
             except Exception as e:
                 frappe.log_error("RAG Debug", f"Direct search failed: {str(e)}")
@@ -672,7 +777,7 @@ class ChromaRAGProvider(LocalRAGProvider):
             
         except Exception as e:
             frappe.log_error("RAG Debug", f"Error in search: {type(e).__name__}: {str(e)}")
-            frappe.log_error("RAG Debug", f"Error details: {str(e)}", exc_info=True)
+            frappe.log_error("RAG Debug", f"Error details: {str(e)}")
             # Return empty list on error to not break the flow
             return []
     
@@ -1183,6 +1288,7 @@ def create_local_file_search_tool(bot) -> FunctionTool:
     # Define async handler for the tool invocation
     async def on_invoke_tool(ctx, args_json: str) -> str:
         frappe.log_error("RAG Debug", f"File search tool invoked with args: {args_json}")
+        frappe.log_error("RAG Debug", f"Context channel_id: {getattr(frappe.local, 'current_channel_id', 'NOT SET')}")
         
         try:
             # Parse arguments from JSON
@@ -1191,13 +1297,14 @@ def create_local_file_search_tool(bot) -> FunctionTool:
             # Extract parameters
             original_query = args_dict.get("query", "")
             max_results = args_dict.get("max_results", 5)
+            filename = args_dict.get("filename", None)
             
             # Process the query to make it more effective for RAG
             enhanced_query = _enhance_search_query(original_query, ctx)
-            frappe.log_error("RAG Debug", f"Original query: '{original_query}', Enhanced query: '{enhanced_query}'")
+            frappe.log_error("RAG Debug", f"Original query: '{original_query}', Enhanced query: '{enhanced_query}', Filename: '{filename}'")
             
-            # Call the search function with enhanced query
-            result = local_file_search(enhanced_query, max_results)
+            # Call the search function with enhanced query and filename
+            result = local_file_search(enhanced_query, max_results, filename)
             
             # Enhance result with original query for LLM context
             if result.get("success", False):
@@ -1231,6 +1338,10 @@ def create_local_file_search_tool(bot) -> FunctionTool:
                     "type": "integer",
                     "description": "Maximum number of results to return",
                     "default": 5
+                },
+                "filename": {
+                    "type": "string",
+                    "description": "Optional: The specific filename to search in (e.g., 'Devis-1450.pdf')"
                 }
             },
             "required": ["query"]
@@ -1310,18 +1421,23 @@ def _enhance_search_query(query: str, ctx) -> str:
     return enhanced_query
 
 
-def local_file_search(query: str, max_results: int = 5) -> Dict[str, Any]:
+def local_file_search(query: str, max_results: int = 5, filename: str = None) -> Dict[str, Any]:
     """
     Search for information in files
     
     Args:
         query: The search query
         max_results: Maximum number of results to return
+        filename: Optional filename to search in
         
     Returns:
         Dict[str, Any]: Search results
     """
-    frappe.log_error("RAG Debug", f"File search called with query: '{query}', max_results: {max_results}")
+    frappe.log_error("RAG Debug", f"File search called with query: '{query}', max_results: {max_results}, filename: '{filename}'")
+    
+    # Get current channel_id from local context
+    channel_id = frappe.local.current_channel_id if hasattr(frappe.local, "current_channel_id") else None
+    frappe.log_error("RAG Debug", f"Current channel_id: {channel_id}")
     
     # Get current bot from context
     bot_name = frappe.flags.get("raven_current_bot")
@@ -1364,8 +1480,8 @@ def local_file_search(query: str, max_results: int = 5) -> Dict[str, Any]:
             init_result = provider.initialize()
             frappe.log_error("RAG Debug", f"Provider initialization result: {init_result}")
             
-            # Search
-            results = provider.search(query, k=max_results)
+            # Search with filename if provided
+            results = provider.search(query, k=max_results, filename=filename)
             frappe.log_error("RAG Debug", f"Search returned {len(results)} results")
             
             # If no results found, return clear message
@@ -1415,7 +1531,7 @@ def local_file_search(query: str, max_results: int = 5) -> Dict[str, Any]:
             
         except Exception as e:
             frappe.log_error("RAG Debug", f"Error in search process: {type(e).__name__}: {str(e)}")
-            frappe.log_error("RAG Debug", f"Error details: {str(e)}", exc_info=True)
+            frappe.log_error("RAG Debug", f"Error details: {str(e)}")
             return {
                 "success": False,
                 "error": f"Error searching documents: {str(e)}",
@@ -1424,7 +1540,7 @@ def local_file_search(query: str, max_results: int = 5) -> Dict[str, Any]:
             
     except Exception as e:
         frappe.log_error("RAG Debug", f"Error in local_file_search setup: {type(e).__name__}: {str(e)}")
-        frappe.log_error("RAG Debug", f"Error details: {str(e)}", exc_info=True)
+        frappe.log_error("RAG Debug", f"Error details: {str(e)}")
         return {
             "success": False,
             "error": f"Error in file search: {str(e)}",

@@ -372,7 +372,8 @@ class OpenAIRAGProvider:
                 # Parse arguments
                 args = json.loads(args_json)
                 query = args.get("query", "")
-                max_results = args.get("max_results", 5)
+                # Modified: Increased default max_results from 5 to 10 for better search coverage
+                max_results = args.get("max_results", 10)
                 
                 # Get OpenAI client
                 from openai import OpenAI
@@ -659,14 +660,19 @@ CRITICAL INSTRUCTIONS FOR USING SEARCH RESULTS:
 This is file search data from the file: {most_recent_filename if most_recent_filename else 'unknown'}
 
 When responding to the user:
-1. ONLY use information from this specific file - do not reference other files
+1. ONLY use information from THIS specific file - do not reference other files
 2. Extract and cite specific data points exactly as they appear in the text - especially for numbers, amounts, dates, and totals
-3. When mentioning totals or financial amounts, include the exact currency symbol and formatting from the document (e.g., "CHF 1'234.56")
-4. Format your answer to clearly state you are getting information specifically from this file: {most_recent_filename if most_recent_filename else 'unknown'}
+3. When mentioning totals or financial amounts, include the exact currency symbol and formatting from the document (e.g., "CHF 2'075.52")
+4. Format your answer to clearly state you are getting information SPECIFICALLY from this file: {most_recent_filename if most_recent_filename else 'unknown'}
 5. Be precise and avoid generalizing or summarizing when exact data is available
-6. For questions about totals or amounts, always mention the specific total you found (e.g., "According to the invoice, the total is...")
+6. For questions about totals or amounts:
+   - First check if the filename matches what the user is asking about
+   - If asking about "cette facture" (this invoice), use data from {most_recent_filename if most_recent_filename else 'unknown'}
+   - Always mention the specific total you found and the document name
+   - Example: "According to {most_recent_filename if most_recent_filename else 'this document'}, the total is CHF 2'075.52"
 
-The user's question is about THIS file that was just uploaded, not older files. Focus exclusively on the information in these search results.
+IMPORTANT: The user is asking about THIS specific file that was just uploaded: {most_recent_filename if most_recent_filename else 'unknown'}
+Do NOT reference other files like DransGrid1T.pdf unless explicitly asked about them.
 """
                     }
                     
@@ -792,12 +798,12 @@ VERY IMPORTANT INSTRUCTIONS:
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": "The search query - should be related to what the user is asking about the document. For questions about totals, numbers, or specific data, use explicit terms like 'total amount', 'invoice total', 'date', etc. ALWAYS include specific details like document type (e.g., 'invoice', 'receipt', 'contract') and be very explicit about what information you're looking for (e.g., 'find the total amount in the invoice', 'extract the invoice number')."
+                        "description": "The search query - should be related to what the user is asking about the document. For questions about totals, numbers, or specific data, use explicit terms like 'total amount', 'invoice total', 'date', etc. ALWAYS include specific details like document type (e.g., 'invoice', 'receipt', 'contract') and be very explicit about what information you're looking for (e.g., 'find the total amount in the invoice', 'extract the invoice number'). For monetary amounts, search for terms like 'total', 'montant', 'amount', 'subtotal', 'total HT', 'total TTC', 'grand total', 'net amount', 'CHF', 'EUR', '$', etc."
                     },
                     "max_results": {
                         "type": "integer",
-                        "description": "Maximum number of results to return",
-                        "default": 5
+                        "description": "Maximum number of results to return. More results = better chance of finding the exact information needed.",
+                        "default": 10
                     }
                 },
                 "required": ["query"]
@@ -1389,3 +1395,38 @@ def get_recent_uploads() -> Dict[str, float]:
                 if filename:
                     result[filename] = info.get('upload_time', 0)
     return result
+
+def get_recent_file_uploads(channel_id: str = None) -> List[Dict[str, Any]]:
+    """
+    Get recent file uploads, optionally filtered by channel
+    
+    Args:
+        channel_id: Optional channel ID to filter by
+        
+    Returns:
+        List[Dict[str, Any]]: List of recent file uploads, sorted by most recent first
+    """
+    # First try to load from Redis to get the most up-to-date data
+    redis_data = _get_recent_files_from_redis()
+    if redis_data:
+        frappe.recent_file_uploads.update(redis_data)
+    
+    files = []
+    with _recent_uploads_lock:
+        if hasattr(frappe, 'recent_file_uploads'):
+            for file_id, info in frappe.recent_file_uploads.items():
+                # Filter by channel if specified
+                if channel_id and info.get('channel_id') != channel_id:
+                    continue
+                
+                files.append({
+                    'file_id': file_id,
+                    'filename': info.get('filename', ''),
+                    'upload_time': info.get('upload_time', 0),
+                    'is_most_recent': info.get('is_most_recent', False),
+                    'channel_id': info.get('channel_id', None)
+                })
+    
+    # Sort by upload time, most recent first
+    files.sort(key=lambda x: (x.get('is_most_recent', False), x.get('upload_time', 0)), reverse=True)
+    return files

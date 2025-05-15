@@ -4,7 +4,7 @@ import { HStack, Stack } from '@/components/layout/Stack'
 import { RavenBot } from '@/types/RavenBot/RavenBot'
 import { CheckCircledIcon, CrossCircledIcon } from '@radix-ui/react-icons'
 import { Box, Button, Card, Checkbox, Dialog, Flex, Heading, Select, Separator, Text, TextField, Tooltip } from '@radix-ui/themes'
-import { useFrappeGetCall, useFrappePostCall } from 'frappe-react-sdk'
+import { useFrappePostCall } from 'frappe-react-sdk'
 import { useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import { BiInfoCircle } from 'react-icons/bi'
@@ -209,10 +209,9 @@ const AIFeaturesBotForm = (props: Props) => {
                 </Dialog.Content>
             </Dialog.Root>
             
-            <HStack gap='8'>
-                <ModelSelector />
+            <Stack maxWidth={'480px'}>
                 <ReasoningEffortSelector />
-            </HStack>
+            </Stack>
             <Separator className='w-full' />
             <Stack maxWidth={'480px'}>
                 <Text as="label" size="2">
@@ -441,58 +440,17 @@ const AIFeaturesBotForm = (props: Props) => {
     )
 }
 
-const ModelSelector = () => {
-
-    const { data: models } = useFrappeGetCall('raven.api.ai_features.get_openai_available_models', undefined, undefined, {
-        revalidateOnFocus: false,
-        revalidateIfStale: false
-    })
-    const { control, formState: { errors }, watch } = useFormContext<RavenBot>()
-
-    const is_ai_bot = watch('is_ai_bot')
-
-
-    return <Stack maxWidth={'480px'}>
-        <Box>
-            <Label htmlFor='model' isRequired>Model</Label>
-            <Controller control={control} name='model'
-                rules={{
-                    required: is_ai_bot ? true : false
-                }}
-                defaultValue='gpt-4o'
-                render={({ field }) => (
-                    <Select.Root
-                        value={field.value}
-                        name={field.name}
-                        onValueChange={(value) => field.onChange(value)}>
-                        <Select.Trigger placeholder='Select Model' className='w-full' />
-                        <Select.Content>
-                            {models?.message.map((model: string) => (
-                                <Select.Item key={model} value={model}>{model}</Select.Item>
-                            ))}
-                        </Select.Content>
-                    </Select.Root>
-                )} />
-        </Box>
-        {errors.model && <ErrorText>{errors.model?.message}</ErrorText>}
-        <HelperText>
-            The model you select will be used to run the agent.
-            <br />
-            The model should be compatible with the OpenAI Assistants API. We recomment using models in the GPT-4 family for best results.
-        </HelperText>
-    </Stack>
-}
 
 const ReasoningEffortSelector = () => {
     const { control, watch } = useFormContext<RavenBot>()
 
-    const model = watch('model')
+    const modelName = watch('model_name')
 
     const is_ai_bot = watch('is_ai_bot')
 
-    if (!model) return null
+    if (!modelName) return null
 
-    if (model.startsWith("o")) {
+    if (modelName.startsWith("o")) {
         return <Stack maxWidth={'480px'}>
             <Box>
                 <Label htmlFor='reasoning_effort' isRequired>Reasoning Effort</Label>
