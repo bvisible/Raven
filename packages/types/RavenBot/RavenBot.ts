@@ -45,4 +45,16 @@ File search enables the assistant with knowledge from files that you upload. Onc
 	dynamic_instructions?: 0 | 1
 	/**	Bot Functions : Table - Raven Bot Functions	*/
 	bot_functions?: RavenBotFunctions[]
+	/**	Model Provider : Select	*/
+	model_provider?: "openai" | "local"
+	/**	Local Model Override : Data - Override model name for local LLM	*/
+	local_model_override?: string
+	/**	Use Local RAG : Check	*/
+	use_local_rag?: 0 | 1
+	/**	RAG Settings : JSON	*/
+	rag_settings?: {
+		similarity_threshold?: number
+		max_results?: number
+		chunk_size?: number
+	}
 }

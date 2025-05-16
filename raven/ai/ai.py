@@ -1,6 +1,10 @@
+# raven/ai/ai_new.py
 import frappe
+import asyncio
 
 from raven.ai.handler import stream_response
+from raven.ai.agent_handler import process_message_with_agent
+from raven.ai.migration_helper import use_legacy_system
 from raven.ai.openai_client import (
 	code_interpreter_file_types,
 	file_search_file_types,
@@ -10,15 +14,115 @@ from raven.ai.openai_client import (
 
 def handle_bot_dm(message, bot):
 	"""
-	 Function to handle direct messages to the bot.
-
-	We need to start a new thread with the message and create a new conversation in OpenAI
+	Function to handle direct messages to the bot.
+	
+	We need to start a new thread with the message and create a new conversation
 	"""
+	
+	# Determine which system to use
+	if not use_legacy_system(bot.name):
+		# Use the new agent system
+		return handle_bot_dm_with_agent(message, bot)
+	
+	# Use the legacy system (existing code below)
+	return handle_bot_dm_legacy(message, bot)
 
+
+def handle_bot_dm_with_agent(message, bot):
+	"""
+	Handle direct messages with the new agent system
+	"""
+	
+	# If the message is a poll, send an error message
+	if message.message_type == "Poll":
+		bot.send_message(
+			channel_id=message.channel_id,
+			text="Sorry, I don't support polls yet. Please send a text message or file.",
+		)
+		return
+	
+	# Prepare the context
+	context = {
+		"user": message.owner,
+		"message_name": message.name,
+		"message_type": message.message_type
+	}
+	
+	# Handle files
+	if message.message_type in ["File", "Image"]:
+		if message.message_type == "File" and not check_if_bot_has_file_search(bot, message.channel_id):
+			return
+		
+		# Extract the file URL
+		file_url = message.file.split("?fid=")[0] if "fid" in message.file else message.file
+		
+		# If RAG is enabled, index the file
+		if bot.use_local_rag:
+			from raven.ai.file_manager import FileManager
+			file_manager = FileManager(bot)
+			
+			# Download and index the file asynchronously
+			try:
+				loop = asyncio.new_event_loop()
+				asyncio.set_event_loop(loop)
+				loop.run_until_complete(file_manager.process_file(file_url))
+				
+				# Add a message to confirm indexing
+				bot.send_message(
+					channel_id=message.channel_id,
+					text=f"File indexed successfully. You can now ask questions about it.",
+				)
+			except Exception as e:
+				frappe.log_error(f"Error indexing file: {e}")
+				bot.send_message(
+					channel_id=message.channel_id,
+					text="Error processing file. Please try again.",
+				)
+				return
+		
+		# Add the file to the message context
+		message_text = f"[File: {file_url}]\n{message.text or 'Process this file'}"
+	else:
+		message_text = message.text
+	
+	# Start a new conversation thread
+	ai_thread_id = frappe.generate_hash(length=10)
+	
+	# Process the message asynchronously
+	try:
+		loop = asyncio.new_event_loop()
+		asyncio.set_event_loop(loop)
+		loop.run_until_complete(
+			process_message_with_agent(
+				message=message_text,
+				bot=bot,
+				channel_id=message.channel_id,
+				ai_thread_id=ai_thread_id,
+				context=context
+			)
+		)
+	except Exception as e:
+		frappe.log_error(f"Error processing message with agent: {e}")
+		if bot.debug_mode:
+			bot.send_message(
+				channel_id=message.channel_id,
+				text=f"Error: {str(e)}",
+				markdown=True
+			)
+		else:
+			bot.send_message(
+				channel_id=message.channel_id,
+				text="An error occurred while processing your message. Please try again.",
+			)
+
+
+def handle_bot_dm_legacy(message, bot):
+	"""
+	Existing code to handle bots with the Assistant API (legacy)
+	"""
 	client = get_open_ai_client()
 
 	# If the message is a poll, send a message to the user that we don't support polls for AI yet
-
 	if message.message_type == "Poll":
 		bot.send_message(
 			channel_id=message.channel_id,
@@ -27,7 +131,6 @@ def handle_bot_dm(message, bot):
 		return
 
 	if message.message_type in ["File", "Image"]:
-
 		if message.message_type == "File" and not check_if_bot_has_file_search(bot, message.channel_id):
 			return
 
@@ -52,205 +155,263 @@ def handle_bot_dm(message, bot):
 				}
 			],
 			metadata={
-				"bot": bot.name,
-				"channel": message.channel_id,
-				"user": message.owner,
-				"message": message.name,
+				"channel_id": message.channel_id,
 			},
 		)
-
+	elif message.is_continuation:
+		# If the message is a continuation, we need to add the message to the existing thread
+		ai_thread = get_ai_thread(message.channel_id)
+		client.beta.threads.messages.create(
+			thread_id=ai_thread.name,
+			role="user",
+			content=message.text,
+			metadata={"user": message.owner, "message": message.name},
+		)
 	else:
+		# Create the thread
 		ai_thread = client.beta.threads.create(
 			messages=[
 				{
 					"role": "user",
-					"content": message.content,
+					"content": message.text,
 					"metadata": {"user": message.owner, "message": message.name},
 				}
 			],
 			metadata={
-				"bot": bot.name,
-				"channel": message.channel_id,
-				"user": message.owner,
-				"message": message.name,
+				"channel_id": message.channel_id,
 			},
 		)
 
-	thread_channel = frappe.get_doc(
-		{
-			"doctype": "Raven Channel",
-			"channel_name": message.name,
-			"type": "Private",
-			"is_thread": 1,
-			"is_ai_thread": 1,
-			"is_dm_thread": 1,
-			"openai_thread_id": ai_thread.id,
-			"thread_bot": bot.name,
-		}
-	).insert()
+	# Save the thread ID to the database
+	if not message.is_continuation:
+		save_ai_thread_to_db(ai_thread.id, message.channel_id)
 
-	# Update the message to mark it as a thread
-	message.is_thread = 1
-	message.save()
-	# nosemgrep We need to commit here since the response will be streamed, and hence might take a while
-	frappe.db.commit()
-
-	frappe.publish_realtime(
-		"ai_event",
-		{
-			"text": "Raven AI is thinking...",
-			"channel_id": thread_channel.name,
-			"bot": bot.name,
-		},
-		doctype="Raven Channel",
-		docname=thread_channel.name,
-		after_commit=True,
-	)
-
-	stream_response(ai_thread_id=ai_thread.id, bot=bot, channel_id=thread_channel.name)
+	# Create the run
+	run = create_run(ai_thread.id, bot, message.channel_id)
+	stream_response(run.thread_id, bot, message.channel_id)
 
 
-def handle_ai_thread_message(message, channel):
+def handle_bot_message_in_channel(bot, channel_id: str, message):
 	"""
-	Function to handle messages in an AI thread
-
-	When a new message is sent, we need to send it to the OpenAI API and then stream the response
+	Function to handle messages to the bot in a channel.
 	"""
+	
+	# Determine which system to use
+	if not use_legacy_system(bot.name):
+		# Use the new agent system
+		return handle_bot_message_in_channel_with_agent(bot, channel_id, message)
+	
+	# Use the legacy system (existing code)
+	return handle_bot_message_in_channel_legacy(bot, channel_id, message)
 
+
+def handle_bot_message_in_channel_with_agent(bot, channel_id: str, message):
+	"""
+	Handle bot messages in a channel with the new system
+	"""
+	
+	if message.message_type == "Poll":
+		bot.send_message(
+			channel_id=channel_id,
+			text="Sorry, I don't support polls yet. Please send a text message.",
+		)
+		return
+	
+	if message.message_type in ["File", "Image"]:
+		bot.send_message(
+			channel_id=channel_id,
+			text="Sorry, I don't support files or images in channels. Please send them in a direct message.",
+		)
+		return
+	
+	# Prepare the context
+	context = {
+		"user": message.owner,
+		"message_name": message.name,
+		"channel_type": "channel"
+	}
+	
+	# Get a thread identifier for this channel
+	ai_thread_id = f"channel_{channel_id}"
+	
+	# Process the message
+	try:
+		loop = asyncio.new_event_loop()
+		asyncio.set_event_loop(loop)
+		loop.run_until_complete(
+			process_message_with_agent(
+				message=message.text,
+				bot=bot,
+				channel_id=channel_id,
+				ai_thread_id=ai_thread_id,
+				context=context
+			)
+		)
+	except Exception as e:
+		frappe.log_error(f"Error processing channel message with agent: {e}")
+		if bot.debug_mode:
+			bot.send_message(
+				channel_id=channel_id,
+				text=f"Error: {str(e)}",
+				markdown=True
+			)
+		else:
+			bot.send_message(
+				channel_id=channel_id,
+				text="An error occurred. Please try again.",
+			)
+
+
+def handle_bot_message_in_channel_legacy(bot, channel_id: str, message):
+	"""
+	Existing code to handle messages in channels (legacy)
+	"""
 	client = get_open_ai_client()
 
-	bot = frappe.get_doc("Raven Bot", channel.thread_bot)
+	# Get the AI thread for this channel/bot
+	ai_thread = get_ai_thread(channel_id)
+
+	if message.message_type == "Poll":
+		bot.send_message(
+			channel_id=channel_id,
+			text="Sorry, I don't support polls yet. Please send a text message.",
+		)
+		return
 
 	if message.message_type in ["File", "Image"]:
-
-		file_url = message.file
-		if "fid" in file_url:
-			file_url = file_url.split("?fid=")[0]
-
-		if message.message_type == "File" and not check_if_bot_has_file_search(bot, channel.name):
-			return
-		# Upload the file to OpenAI
-		try:
-			file = create_file_in_openai(file_url, message.message_type, client)
-		except Exception as e:
-			frappe.log_error("Raven AI Error", frappe.get_traceback())
-			bot.send_message(
-				channel_id=channel.name,
-				text="Sorry, there was an error in processing your file. Please try again.<br/><br/>Error: "
-				+ str(e),
-			)
-			return
-
-		content, attachments = get_content_attachment_for_file(message.message_type, file.id, file_url)
-
-		try:
-			client.beta.threads.messages.create(
-				thread_id=channel.openai_thread_id,
-				role="user",
-				content=content,
-				metadata={"user": message.owner, "message": message.name},
-				attachments=attachments,
-			)
-		except Exception as e:
-			frappe.log_error("Raven AI Error", frappe.get_traceback())
-			bot.send_message(
-				channel_id=channel.name,
-				text="Sorry, there was an error in processing your file. Please try again.<br/><br/>Error: "
-				+ str(e),
-			)
-			return
-
-	else:
-
-		client.beta.threads.messages.create(
-			thread_id=channel.openai_thread_id,
-			role="user",
-			content=message.content,
-			metadata={"user": message.owner, "message": message.name},
+		bot.send_message(
+			channel_id=channel_id,
+			text="Sorry, I don't support files or images in channels. Please send them in a direct message.",
 		)
+		return
 
-	frappe.publish_realtime(
-		"ai_event",
-		{
-			"text": "Raven AI is thinking...",
-			"channel_id": channel.name,
-			"bot": bot.name,
-		},
-		doctype="Raven Channel",
-		docname=channel.name,
+	# Add the message to the thread
+	client.beta.threads.messages.create(
+		thread_id=ai_thread.name,
+		role="user",
+		content=message.text,
+		metadata={"user": message.owner, "message": message.name},
 	)
 
-	stream_response(ai_thread_id=channel.openai_thread_id, bot=bot, channel_id=channel.name)
+	# Create the run
+	run = create_run(ai_thread.name, bot, channel_id)
+	stream_response(run.thread_id, bot, channel_id)
 
 
-def check_if_bot_has_file_search(bot, channel_id):
-	"""
-	Checks of bot has file search. If not, send a message to the user. If yes, return True
-	"""
-
+# Existing utility functions to keep
+def check_if_bot_has_file_search(bot, channel_id: str):
 	if not bot.enable_file_search:
 		bot.send_message(
 			channel_id=channel_id,
-			text="Sorry, your bot does not support file search. Please enable it and try again.",
+			text="Sorry, I don't support file search. Please enable file search in the bot settings to use this feature.",
 		)
 		return False
-
 	return True
 
 
-def create_file_in_openai(file_url: str, message_type: str, client):
+def get_content_attachment_for_file(message_type, file_id, file_url):
 	"""
-	Function to create a file in OpenAI
-
-	We need to upload the file to OpenAI and return the file ID
+	Get the content and attachment for a file.
 	"""
+	if message_type == "File":
+		return [
+			{"type": "text", "text": f"I have uploaded a file for you to analyze: {file_url}"},
+			{
+				"type": "file_search",
+				"file_search": {"file_id": file_id},
+			},
+		], [{"file_id": file_id, "tools": [{"type": "file_search"}]}]
+	elif message_type == "Image":
+		return [
+			{"type": "text", "text": f"I have uploaded an image for you to analyze: {file_url}"},
+			{
+				"type": "file_search",
+				"file_search": {"file_id": file_id},
+			},
+		], [{"file_id": file_id, "tools": [{"type": "file_search"}]}]
+	else:
+		return "", []
 
-	file_doc = frappe.get_doc("File", {"file_url": file_url})
-	file_path = file_doc.get_full_path()
 
-	file = client.files.create(
-		file=open(file_path, "rb"), purpose="assistants" if message_type == "File" else "vision"
-	)
+def create_file_in_openai(file_url, message_type, client):
+	"""
+	Upload the file to OpenAI
+	"""
+	import requests
 
+	file = requests.get(file_url)
+	file_name = "file.txt"
+	if file_url:
+		parsed_url = requests.utils.urlparse(file_url)
+		file_name = parsed_url.path.split("/")[-1]
+	
+	purpose = get_purpose_for_file(message_type, file_url)
+
+	file = client.files.create(file=(file_name, file.content), purpose=purpose)
 	return file
 
 
-def get_content_attachment_for_file(message_type: str, file_id: str, file_url: str):
-
-	attachments = None
-
-	if message_type == "File":
-		content = f"Uploaded a file. URL of the file is '{file_url}'."
-
-		file_extension = file_url.split(".")[-1].lower()
-
-		if file_extension == "pdf":
-			content += (
-				" The file is a PDF. If it's not machine readable, you can extract the text via images."
-			)
-
-		attachments = []
-
-		if file_extension in code_interpreter_file_types:
-			attachments.append(
-				{
-					"file_id": file_id,
-					"tools": [{"type": "code_interpreter"}],
-				}
-			)
-
-		if file_extension in file_search_file_types:
-			attachments.append(
-				{
-					"file_id": file_id,
-					"tools": [{"type": "file_search"}],
-				}
-			)
-
+def get_purpose_for_file(message_type, file_url):
+	"""
+	Get the purpose for the file being uploaded. We'll have to check supported mime types for the file.
+	For now, assume that all images are for "vision" and the rest can be either assistants or vision
+	"""
+	if message_type == "Image":
+		return "assistants"
 	else:
-		content = [
-			{"type": "text", "text": f"Uploaded an image. URL of the image is '{file_url}'"},
-			{"type": "image_file", "image_file": {"file_id": file_id}},
-		]
+		file_extension = file_url.split(".")[-1].lower()
+		if file_extension in file_search_file_types:
+			return "assistants"
+		elif file_extension in code_interpreter_file_types:
+			return "assistants"
+		else:
+			return "assistants"
 
-	return content, attachments
+
+def get_ai_thread(channel_id: str):
+	"""
+	Get the AI thread for the channel.
+	"""
+	thread = frappe.db.get_value(
+		"Raven AI Thread", {"channel": channel_id}, ["name", "thread_data"], as_dict=True
+	)
+	if thread:
+		return thread
+
+
+def save_ai_thread_to_db(thread_id: str, channel_id: str):
+	"""
+	Save the thread ID to the database.
+	"""
+	if not frappe.db.exists("Raven AI Thread", {"name": thread_id}):
+		frappe.get_doc(
+			{
+				"doctype": "Raven AI Thread",
+				"name": thread_id,
+				"channel": channel_id,
+			}
+		).insert()
+
+
+def create_run(thread_id: str, bot, channel_id: str):
+	"""
+	Create a run for the thread.
+	"""
+	client = get_open_ai_client()
+	tools = []
+	
+	# Add tools based on bot configuration
+	if bot.enable_file_search:
+		tools.append({"type": "file_search"})
+	if bot.enable_code_interpreter:
+		tools.append({"type": "code_interpreter"})
+	
+	run = client.beta.threads.runs.create(
+		thread_id=thread_id,
+		assistant_id=bot.openai_assistant_id,
+		tools=tools,
+		metadata={
+			"channel_id": channel_id,
+		},
+	)
+	return run

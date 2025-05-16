@@ -19,6 +19,14 @@ export interface RavenSettings{
 	tenor_api_key?: string
 	/**	Enable AI Integration : Check	*/
 	enable_ai_integration?: 0 | 1
+	/**	Enable OpenAI Services : Check	*/
+	enable_openai_services?: 0 | 1
+	/**	Enable Local LLM : Check	*/
+	enable_local_llm?: 0 | 1
+	/**	Local LLM Provider : Select	*/
+	local_llm_provider?: "LM Studio" | "Ollama" | "LocalAI"
+	/**	Local LLM API URL : Data	*/
+	local_llm_api_url?: string
 	/**	OpenAI Organisation ID : Data	*/
 	openai_organisation_id?: string
 	/**	OpenAI API Key : Password	*/

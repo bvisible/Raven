@@ -17,6 +17,10 @@
   "openai_organisation_id",
   "openai_api_key",
   "openai_project_id",
+  "enable_openai_services",
+  "enable_local_llm",
+  "local_llm_provider",
+  "local_llm_api_url",
   "column_break_occp",
   "frappe_hr_tab",
   "auto_create_department_channel",
@@ -112,6 +116,33 @@
    "fieldname": "enable_ai_integration",
    "fieldtype": "Check",
    "label": "Enable AI Integration"
+  },
+  {
+   "depends_on": "eval:doc.enable_ai_integration;",
+   "default": "0",
+   "fieldname": "enable_openai_services",
+   "fieldtype": "Check",
+   "label": "Enable OpenAI Services"
+  },
+  {
+   "depends_on": "eval:doc.enable_ai_integration;",
+   "default": "0",
+   "fieldname": "enable_local_llm",
+   "fieldtype": "Check",
+   "label": "Enable Local LLM"
+  },
+  {
+   "depends_on": "eval:doc.enable_local_llm;",
+   "fieldname": "local_llm_provider",
+   "fieldtype": "Select",
+   "label": "Local LLM Provider",
+   "options": "LM Studio\nOllama\nLocalAI"
+  },
+  {
+   "depends_on": "eval:doc.enable_local_llm;",
+   "fieldname": "local_llm_api_url",
+   "fieldtype": "Data",
+   "label": "Local LLM API URL"
   },
   {
    "depends_on": "eval:doc.enable_ai_integration;",

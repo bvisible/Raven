@@ -1,38 +1,154 @@
-import { Label, ErrorText, HelperText } from '@/components/common/Form'
-import { Stack, HStack } from '@/components/layout/Stack'
+import { ErrorText, HelperText, Label } from '@/components/common/Form'
+import { HStack, Stack } from '@/components/layout/Stack'
+import useRavenSettings from '@/hooks/fetchers/useRavenSettings'
 import { RavenBot } from '@/types/RavenBot/RavenBot'
-import { Box, TextField, Checkbox, Text, Separator, Tooltip, Heading, Select } from '@radix-ui/themes'
-import { useFrappeGetCall } from 'frappe-react-sdk'
-import { useFormContext, Controller } from 'react-hook-form'
-import { BiInfoCircle } from 'react-icons/bi'
+import { Box, Button, Checkbox, Heading, Select, Separator, Text, TextField } from '@radix-ui/themes'
+import { useFrappeGetCall, useFrappePostCall } from 'frappe-react-sdk'
+import { Controller, useFormContext } from 'react-hook-form'
+import { toast } from 'react-toastify'
 
 type Props = {}
 
 const AIFeaturesBotForm = (props: Props) => {
     const { register, control, formState: { errors }, watch } = useFormContext<RavenBot>()
-
+    const { ravenSettings } = useRavenSettings()
+    
     const openAIAssistantID = watch('openai_assistant_id')
+    const modelProvider = watch('model_provider')
+    const useLocalRag = watch('use_local_rag')
+    const openAIVectorStoreID = watch('openai_vector_store_id')
+    
+    // Determining which provider to use
+    const getAvailableProviders = () => {
+        const providers = [];
+        if (ravenSettings?.enable_openai_services) {
+            providers.push({ value: 'openai', label: 'OpenAI' });
+        }
+        if (ravenSettings?.enable_local_llm) {
+            // Use the provider configured in the settings
+            const localProvider = ravenSettings.local_llm_provider || 'LM Studio';
+            providers.push({ value: 'local', label: `Local LLM (${localProvider})` });
+        }
+        return providers;
+    }
+
+    const { call: testModelCompatibility } = useFrappePostCall('raven.api.ai_features.test_model_compatibility')
 
     return (
         <Stack gap='4'>
+            {/* Selection of LLM provider */}
             <Stack maxWidth={'480px'}>
-                <Box hidden={!openAIAssistantID}>
-                    <Label htmlFor='openai_assistant_id'>OpenAI Assistant ID</Label>
-                    <TextField.Root
-                        id='openai_assistant_id'
-                        {...register('openai_assistant_id')}
-                        readOnly
-                        placeholder="asst_*******************"
-                        aria-invalid={errors.openai_assistant_id ? 'true' : 'false'}
-                    />
-                </Box>
-                {errors.openai_assistant_id && <ErrorText>{errors.openai_assistant_id?.message}</ErrorText>}
+                <Label htmlFor='model_provider'>Model Provider</Label>
+                <Controller
+                    control={control}
+                    name='model_provider'
+                    render={({ field }) => (
+                        <Select.Root
+                            value={field.value || 'openai'}
+                            onValueChange={field.onChange}
+                        >
+                            <Select.Trigger />
+                            <Select.Content>
+                                {getAvailableProviders().map(provider => (
+                                    <Select.Item key={provider.value} value={provider.value}>
+                                        {provider.label}
+                                    </Select.Item>
+                                ))}
+                            </Select.Content>
+                        </Select.Root>
+                    )}
+                />
+                <HelperText>
+                    Choose which LLM provider this bot should use
+                </HelperText>
             </Stack>
+            
+            {/* If OpenAI, show the assistant ID (will be removed after migration) */}
+            {modelProvider === 'openai' && (
+                <Stack maxWidth={'480px'}>
+                    <Box hidden={!openAIAssistantID}>
+                        <Label htmlFor='openai_assistant_id'>OpenAI Assistant ID (Legacy - Will be removed)</Label>
+                        <TextField.Root
+                            id='openai_assistant_id'
+                            {...register('openai_assistant_id')}
+                            readOnly
+                            placeholder="asst_*******************"
+                        />
+                    </Box>
+                </Stack>
+            )}
+            
+            {/* If Local LLM, show the model override */}
+            {modelProvider === 'local' && (
+                <Stack maxWidth={'480px'}>
+                    <Label htmlFor='local_model_override'>Model Override (Optional)</Label>
+                    <TextField.Root
+                        id='local_model_override'
+                        {...register('local_model_override')}
+                        placeholder="Leave empty to use default model"
+                    />
+                    <HelperText>
+                        Override the model for this bot (provider: {ravenSettings?.local_llm_provider})
+                    </HelperText>
+                </Stack>
+            )}
+            
             <HStack gap='8'>
                 <ModelSelector />
                 <ReasoningEffortSelector />
             </HStack>
+            
             <Separator className='w-full' />
+            
+            {/* Local RAG Option */}
+            <Stack maxWidth={'560px'}>
+                <Text as="label" size="2">
+                    <HStack align='center'>
+                        <Controller
+                            control={control}
+                            name='use_local_rag'
+                            render={({ field }) => (
+                                <Checkbox
+                                    checked={field.value ? true : false}
+                                    onCheckedChange={(v) => field.onChange(v ? 1 : 0)}
+                                />
+                            )} />
+                        <span>Use Local RAG</span>
+                    </HStack>
+                </Text>
+                <HelperText>
+                    Enable RAG (Retrieval-Augmented Generation) with local documents instead of OpenAI Vector Store
+                </HelperText>
+            </Stack>
+            
+            {/* Configuration RAG */}
+            {useLocalRag && (
+                <Stack maxWidth={'480px'}>
+                    <Label>RAG Settings</Label>
+                    <Box>
+                        <Label htmlFor='rag_similarity_threshold'>Similarity Threshold</Label>
+                        <TextField.Root
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            max="1"
+                            {...register('rag_settings.similarity_threshold')}
+                            defaultValue="0.7"
+                        />
+                    </Box>
+                    <Box>
+                        <Label htmlFor='rag_max_results'>Max Results</Label>
+                        <TextField.Root
+                            type="number"
+                            min="1"
+                            max="20"
+                            {...register('rag_settings.max_results')}
+                            defaultValue="5"
+                        />
+                    </Box>
+                </Stack>
+            )}
+            
             <Stack maxWidth={'480px'}>
                 <Text as="label" size="2">
                     <HStack>
@@ -54,6 +170,8 @@ const AIFeaturesBotForm = (props: Props) => {
                 </HelperText>
             </Stack>
             <Separator className='w-full' />
+            
+            {/* File Search - Conditionnel selon use_local_rag */}
             <Stack maxWidth={'560px'}>
                 <Text as="label" size="2">
                     <HStack align='center'>
@@ -67,54 +185,81 @@ const AIFeaturesBotForm = (props: Props) => {
                                 />
                             )} />
                         <span>Enable File Search</span>
-                        <Tooltip content='View OpenAI documentation about File Search'>
-                            <a href='https://platform.openai.com/docs/assistants/tools/file-search'
-                                title='View OpenAI documentation about File Search'
-                                aria-label='View OpenAI documentation about File Search'
-                                target='_blank' className='text-gray-11 -mb-1'>
-                                <BiInfoCircle size={16} /></a>
-                        </Tooltip>
-
                     </HStack>
                 </Text>
                 <HelperText>
-                    Enable this if you want the bot to be able to read PDF files and scan them.
-                    <br /><br />
-                    File search enables the assistant with knowledge from files that you upload.
-                    <br /><br />
-                    Once a file is uploaded, the assistant automatically decides when to retrieve content based on user requests.
+                    {useLocalRag 
+                        ? "Files will be indexed locally using the RAG system"
+                        : modelProvider === 'openai' 
+                            ? "Files will be uploaded to OpenAI Vector Store"
+                            : "Files will be processed locally"}
                 </HelperText>
             </Stack>
+            
+            {/* OpenAI Vector Store ID - Only if OpenAI and no local RAG */}
+            {!useLocalRag && modelProvider === 'openai' && (
+                <Stack maxWidth={'480px'}>
+                    <Box hidden={!openAIVectorStoreID}>
+                        <Label htmlFor='openai_vector_store_id'>OpenAI Vector Store ID</Label>
+                        <TextField.Root
+                            id='openai_vector_store_id'
+                            {...register('openai_vector_store_id')}
+                            readOnly
+                        />
+                    </Box>
+                </Stack>
+            )}
+            
             <Separator className='w-full' />
-            <Stack maxWidth={'560px'}>
-                <Text as="label" size="2">
-                    <HStack align='center'>
-                        <Controller
-                            control={control}
-                            name='enable_code_interpreter'
-                            render={({ field }) => (
-                                <Checkbox
-                                    checked={field.value ? true : false}
-                                    onCheckedChange={(v) => field.onChange(v ? 1 : 0)}
-                                />
-                            )} />
-                        <span>Enable Code Interpreter</span>
-                        <Tooltip content='View OpenAI documentation about Code Interpreter'>
-                            <a href='https://platform.openai.com/docs/assistants/tools/code-interpreter'
-                                title='View OpenAI documentation about Code Interpreter'
-                                aria-label='View OpenAI documentation about Code Interpreter'
-                                target='_blank' className='text-gray-11 -mb-1'>
-                                <BiInfoCircle size={16} /></a>
-                        </Tooltip>
-
-                    </HStack>
-                </Text>
-                <HelperText>
-                    Enable this if you want the bot to be able to process files like Excel sheets or data from Insights.
-                    <br />
-                    OpenAI Assistants run code in a sandboxed environment (on OpenAI servers) to do this.
-                </HelperText>
+            
+            {/* Code Interpreter - only for OpenAI */}
+            {modelProvider === 'openai' && (
+                <Stack maxWidth={'560px'}>
+                    <Text as="label" size="2">
+                        <HStack align='center'>
+                            <Controller
+                                control={control}
+                                name='enable_code_interpreter'
+                                render={({ field }) => (
+                                    <Checkbox
+                                        checked={field.value ? true : false}
+                                        onCheckedChange={(v) => field.onChange(v ? 1 : 0)}
+                                    />
+                                )} />
+                            <span>Enable Code Interpreter</span>
+                        </HStack>
+                    </Text>
+                    <HelperText>
+                        OpenAI-specific feature for processing Excel sheets and data
+                    </HelperText>
+                </Stack>
+            )}
+            
+            {/* Test of model compatibility */}
+            <Stack maxWidth={'480px'}>
+                <Button
+                    onClick={async () => {
+                        const provider = modelProvider === 'local' 
+                            ? ravenSettings?.local_llm_provider 
+                            : 'OpenAI';
+                        const model = modelProvider === 'local' 
+                            ? watch('local_model_override') || 'default'
+                            : watch('model') || 'gpt-4';
+                            
+                        const result = await testModelCompatibility({
+                            provider,
+                            model_name: model
+                        });
+                        
+                        // Display results
+                        toast(result.message);
+                    }}
+                    variant="soft"
+                >
+                    Test Model Compatibility
+                </Button>
             </Stack>
+            
             <Separator className='w-full' />
             <Heading as='h5' size='2' className='not-cal' weight='medium'>Advanced</Heading>
             <Stack maxWidth={'560px'}>
