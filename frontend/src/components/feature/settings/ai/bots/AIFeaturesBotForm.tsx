@@ -5,7 +5,7 @@ import { RavenBot } from '@/types/RavenBot/RavenBot'
 import { Box, Button, Checkbox, Heading, Select, Separator, Text, TextField } from '@radix-ui/themes'
 import { useFrappeGetCall, useFrappePostCall } from 'frappe-react-sdk'
 import { Controller, useFormContext } from 'react-hook-form'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 type Props = {}
 
