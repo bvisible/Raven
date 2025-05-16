@@ -1,4 +1,13 @@
 # raven/ai/agent_manager.py
+import sys
+import os
+
+# Add the agents SDK to Python path
+base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+agents_path = os.path.join(base_dir, 'openai-agents-python-0.0.14', 'src')
+if agents_path not in sys.path:
+    sys.path.insert(0, agents_path)
+
 from agents import Agent, Runner
 from typing import Dict, Any
 import frappe

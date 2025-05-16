@@ -2,8 +2,17 @@
 import json
 import frappe
 from typing import Dict, Any
+import sys
+import os
+
+# Add the agents SDK to Python path
+base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+agents_path = os.path.join(base_dir, 'openai-agents-python-0.0.14', 'src')
+if agents_path not in sys.path:
+    sys.path.insert(0, agents_path)
+
 from agents import StreamEvent
-from agents.core import ErrorEvent
+from agents.exceptions import AgentsException
 from .agent_manager import RavenAgentManager
 from .openai_client import get_open_ai_client
 
@@ -73,9 +82,9 @@ async def process_message_with_agent(
 def handle_stream_event(event: StreamEvent, channel_id: str, bot, context: Dict):
     """Handle agent stream events"""
     
-    if isinstance(event, ErrorEvent):
+    if event.type == "error":
         # Handle errors
-        error_text = event.error.message if hasattr(event.error, 'message') else str(event.error)
+        error_text = event.message if hasattr(event, 'message') else str(event)
         if bot.debug_mode:
             bot.send_message(
                 channel_id=channel_id,
