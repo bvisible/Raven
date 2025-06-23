@@ -8,6 +8,7 @@ import { UserFields } from '@/utils/users/UserListProvider'
 import { DateMonthAtHourMinuteAmPm } from '@/utils/dateConversions'
 import { clsx } from 'clsx'
 import { useIsMobile } from '@/hooks/useMediaQuery'
+import { Blurhash } from "react-blurhash";
 
 const ImageViewer = lazy(() => import('@/components/common/ImageViewer'))
 
@@ -59,6 +60,11 @@ export const ImageMessageBlock = memo(({ message, isScrolling = false, user }: I
         }, 200);
     }
 
+    const [isImageLoaded, setIsImageLoaded] = useState(false)
+    const onLoad = () => {
+        setIsImageLoaded(true)
+    }
+
     return (
         <Flex direction='column' gap='1'>
             <Flex className='py-1 items-center'>
@@ -96,12 +102,14 @@ export const ImageMessageBlock = memo(({ message, isScrolling = false, user }: I
                     height: height + 'px',
                     width: width + 'px',
                 }}>
-                    <Box style={{
-                        height: height + 'px',
-                        width: width + 'px',
-                    }} className='bg-gray-3 z-0 dark:bg-gray-5 rounded-md'>
+                    {message.blurhash && message.blurhash.length === 28 && !isImageLoaded ? <Blurhash hash={message.blurhash} width={width + 'px'} height={height + 'px'} /> :
+                        <Box style={{
+                            height: height + 'px',
+                            width: width + 'px',
+                        }} className='bg-gray-3 z-0 dark:bg-gray-5 rounded-md'>
 
-                    </Box>
+                        </Box>
+                    }
                 </Box>
                 {/* We are not hiding the image when scrolling because we already know the height and width of the image
                 Hence no layout shift */}
@@ -116,6 +124,7 @@ export const ImageMessageBlock = memo(({ message, isScrolling = false, user }: I
                         minHeight: height + 'px',
                         minWidth: width + 'px',
                     }}
+                    onLoad={onLoad}
                     width={width}
                     alt={`Image file sent by ${message.owner} at ${message.creation}`}
                     onContextMenu={(e) => {

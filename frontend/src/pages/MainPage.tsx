@@ -15,6 +15,7 @@ import { useActiveSocketConnection } from '@/hooks/useActiveSocketConnection'
 import { useFrappeEventListener, useSWRConfig } from 'frappe-react-sdk'
 import { useUnreadThreadsCountEventListener } from '@/hooks/useUnreadThreadsCount'
 import { UserContext } from '@/utils/auth/UserProvider'
+import AIThreadAutoOpen from '@/components/feature/ai/AIThreadAutoOpen'
 
 const AddRavenUsersPage = lazy(() => import('@/pages/AddRavenUsersPage'))
 
@@ -52,6 +53,7 @@ const MainPageContent = () => {
     const isMobile = useIsMobile()
 
     useActiveSocketConnection()
+    
 
     // Listen to channel members updated events and invalidate the channel members cache
     const { mutate } = useSWRConfig()
@@ -73,6 +75,16 @@ const MainPageContent = () => {
             }, {
                 revalidate: false
             })
+
+            // Dispatch a custom event that ThreadsList can listen to if it's mounted
+            window.dispatchEvent(new CustomEvent('thread_updated', {
+                detail: {
+                    threadId: event.channel_id,
+                    sentBy: event.sent_by,
+                    lastMessageTimestamp: event.last_message_timestamp,
+                    numberOfReplies: event.number_of_replies
+                }
+            }))
         }
 
         // Unread count only needs to be fetched for certain conditions
@@ -100,6 +112,7 @@ const MainPageContent = () => {
             </Flex>
             <CommandMenu />
             <MessageActionController />
+            <AIThreadAutoOpen />
         </ChannelListProvider>
     </UserListProvider>
 }

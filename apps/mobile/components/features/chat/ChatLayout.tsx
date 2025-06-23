@@ -6,7 +6,7 @@ import MessageActionsBottomSheet from '@components/features/chat/ChatMessage/Mes
 import { useSheetRef } from '@components/nativewindui/Sheet';
 import { useAtom } from 'jotai';
 import { messageActionsSelectedMessageAtom } from '@lib/ChatInputUtils';
-import { NativeScrollEvent, NativeSyntheticEvent, Platform, View } from 'react-native';
+import { Keyboard, NativeScrollEvent, NativeSyntheticEvent, Platform, View } from 'react-native';
 import ChatStream from '../chat-stream/ChatStream';
 import ChatInput from './ChatInput/ChatInput';
 import { JoinChannelBox } from '@components/features/chat/ChatFooter/JoinChannelBox';
@@ -14,14 +14,12 @@ import { ArchivedChannelBox } from '@components/features/chat/ChatFooter/Archive
 import useShouldJoinChannel from '@hooks/useShouldJoinChannel';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const PADDING_BOTTOM = Platform.OS === 'ios' ? 20 : 0;
-
 export const useGradualAnimation = () => {
-    const height = useSharedValue(PADDING_BOTTOM)
+    const height = useSharedValue(0)
     useKeyboardHandler({
         onMove: (event) => {
             "worklet";
-            height.value = Math.max(event.height, PADDING_BOTTOM)
+            height.value = event.height
         },
         onEnd: (event) => {
             "worklet";
@@ -79,7 +77,7 @@ const ChatLayout = ({ channelID, isThread = false, pinnedMessagesString }: Props
     const fakeView = useAnimatedStyle(() => {
         return {
             height: Math.abs(height.value),
-            marginBottom: height.value > 0 ? 0 : PADDING_BOTTOM,
+            marginBottom: 0,
         }
     }, [])
 
@@ -105,6 +103,8 @@ const ChatLayout = ({ channelID, isThread = false, pinnedMessagesString }: Props
 
     useEffect(() => {
         if (selectedMessage) {
+            // If the keyboard is open, we need to close it before opening the bottom sheet
+            Keyboard.dismiss()
             messageActionsSheetRef.current?.present()
         } else {
             messageActionsSheetRef.current?.dismiss()
@@ -112,7 +112,7 @@ const ChatLayout = ({ channelID, isThread = false, pinnedMessagesString }: Props
     }, [selectedMessage])
     return (
         <>
-            <View className='flex-1'>
+            <SafeAreaView edges={['bottom']} className='flex-1'>
                 <ChatStream
                     channelID={channelID}
                     scrollRef={scrollRef}
@@ -147,11 +147,12 @@ const ChatLayout = ({ channelID, isThread = false, pinnedMessagesString }: Props
                 </View>
 
                 <Animated.View style={fakeView} />
-            </View>
+            </SafeAreaView>
 
             <MessageActionsBottomSheet
                 messageActionsSheetRef={messageActionsSheetRef}
                 message={selectedMessage}
+                isThread={isThread}
                 handleClose={handleSheetClose}
             />
         </>
