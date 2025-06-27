@@ -22,8 +22,8 @@ app_include_js = "raven.bundle.js"
 add_to_apps_screen = [
 	{
 		"name": "raven",
-		"logo": "/assets/raven/raven-logo.png",
-		"title": "Raven",
+		"logo": "/assets/raven/icon-intern-chat.jpg",
+		"title": "synk",
 		"route": "/raven",
 		"has_permission": "raven.permissions.check_app_permission",
 	}
