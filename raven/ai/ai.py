@@ -66,7 +66,7 @@ def handle_bot_dm_with_agents(message, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
-			"text": "Raven AI is thinking...",
+			"text": "Nora is thinking...",
 			"channel_id": thread_channel.name,
 			"bot": bot.name,
 		},
@@ -173,7 +173,7 @@ def handle_bot_dm_with_assistants(message, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
-			"text": "Raven AI is thinking...",
+			"text": "Nora is thinking...",
 			"channel_id": thread_channel.name,
 			"bot": bot.name,
 		},
@@ -221,7 +221,7 @@ def handle_ai_thread_message_with_agents(message, channel, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
-			"text": "Raven AI is thinking...",
+			"text": "Nora is thinking...",
 			"channel_id": channel.name,
 			"bot": bot.name,
 		},
@@ -295,7 +295,7 @@ def handle_ai_thread_message_with_assistants(message, channel, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
-			"text": "Raven AI is thinking...",
+			"text": "Nora is thinking...",
 			"channel_id": channel.name,
 			"bot": bot.name,
 		},
