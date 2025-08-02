@@ -14,6 +14,7 @@ import { ThemeProvider } from './ThemeProvider'
 import AppUpdateProvider from './utils/AppUpdateProvider'
 import { ProtectedRoute } from './utils/auth/ProtectedRoute'
 import { UserProvider } from './utils/auth/UserProvider'
+import { useEffect } from 'react'
 
 /** Following keys will not be cached in app cache */
 // const NO_CACHE_KEYS = [
@@ -155,8 +156,63 @@ const router = createBrowserRouter(
 }
 )
 function App() {
+  // Check URL parameters for theme
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTheme = urlParams.get('theme');
+  
+  // Determine initial theme: URL param or default to 'light'
+  const getInitialTheme = (): 'light' | 'dark' | 'inherit' => {
+    if (urlTheme === 'dark') {
+      return 'dark';
+    }
+    return 'light'; // Default theme
+  };
 
-  const [appearance, setAppearance] = useStickyState<'light' | 'dark' | 'inherit'>('dark', 'appearance');
+  const [appearance, setAppearance] = useStickyState<'light' | 'dark' | 'inherit'>(getInitialTheme(), 'appearance');
+  
+  // Force theme from URL on mount
+  useEffect(() => {
+    const initialTheme = getInitialTheme();
+    setAppearance(initialTheme);
+  }, []); // Run only once on mount
+
+
+  // Listen for URL changes and update theme accordingly
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const newTheme = params.get('theme');
+      
+      if (newTheme === 'dark') {
+        setAppearance('dark');
+      } else {
+        setAppearance('light'); // Default to light
+      }
+    };
+
+    // Listen for popstate events (browser back/forward)
+    window.addEventListener('popstate', handleUrlChange);
+    
+    // Also listen for pushState/replaceState
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+    
+    history.pushState = function(...args) {
+      originalPushState.apply(history, args);
+      handleUrlChange();
+    };
+    
+    history.replaceState = function(...args) {
+      originalReplaceState.apply(history, args);
+      handleUrlChange();
+    };
+
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      history.pushState = originalPushState;
+      history.replaceState = originalReplaceState;
+    };
+  }, [setAppearance]);
 
   // We not need to pass sitename if the Frappe version is v14.
 
