@@ -205,7 +205,7 @@ def handle_ai_thread_message_with_agents(message, channel, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
-			"text": "Nora is thinking...",
+			"text": "Raven is thinking...",
 			"channel_id": channel.channel_name,  # This is the thread message ID that frontend uses
 			"bot": bot.name,
 		},
@@ -280,7 +280,7 @@ def handle_ai_thread_message_with_assistants(message, channel, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
-			"text": "Nora is thinking...",
+			"text": "Raven is thinking...",
 			"channel_id": channel.channel_name,  # This is the thread message ID that frontend uses
 			"bot": bot.name,
 		},
@@ -465,6 +465,7 @@ def process_message_with_agent(
 			{
 				"channel_id": event_channel_id,
 			},
+			room=event_channel_id,  # Send only to users in this channel
 			after_commit=False,  # Clear immediately, don't wait
 		)
 	except Exception as e:
@@ -490,6 +491,7 @@ def process_message_with_agent(
 			{
 				"channel_id": event_channel_id,
 			},
+			room=event_channel_id,  # Send only to users in this channel
 			after_commit=False,  # Clear immediately
 		)
 
