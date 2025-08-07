@@ -205,7 +205,7 @@ def handle_ai_thread_message_with_agents(message, channel, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
-			"text": "Raven is thinking...",
+			"text": "Nora is thinking...",
 			"channel_id": channel.channel_name,  # This is the thread message ID that frontend uses
 			"bot": bot.name,
 		},
@@ -280,7 +280,7 @@ def handle_ai_thread_message_with_assistants(message, channel, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
-			"text": "Raven is thinking...",
+			"text": "Nora is thinking...",
 			"channel_id": channel.channel_name,  # This is the thread message ID that frontend uses
 			"bot": bot.name,
 		},
