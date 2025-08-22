@@ -1,0 +1,172 @@
+{
+	"actions": [],
+	"allow_rename": 0,
+	"creation": "2025-08-11 11:30:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"action_type",
+		"status",
+		"channel_id",
+		"message_id",
+		"bot",
+		"column_break_1",
+		"priority",
+		"expires_at",
+		"confirmed_at",
+		"executed_at",
+		"section_break_1",
+		"action_data",
+		"preview_message",
+		"confirmation_message",
+		"section_break_2",
+		"handler_path",
+		"execution_result",
+		"error_message"
+	],
+	"fields": [
+		{
+			"fieldname": "action_type",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Action Type",
+			"reqd": 1
+		},
+		{
+			"default": "pending",
+			"fieldname": "status",
+			"fieldtype": "Select",
+			"in_list_view": 1,
+			"label": "Status",
+			"options": "pending\nconfirmed\nexecuting\ndone\nfailed\ncancelled",
+			"reqd": 1
+		},
+		{
+			"fieldname": "channel_id",
+			"fieldtype": "Data",
+			"label": "Channel ID"
+		},
+		{
+			"fieldname": "message_id",
+			"fieldtype": "Data",
+			"label": "Message ID"
+		},
+		{
+			"fieldname": "bot",
+			"fieldtype": "Link",
+			"label": "Bot",
+			"options": "Raven Bot"
+		},
+		{
+			"fieldname": "column_break_1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "Medium",
+			"fieldname": "priority",
+			"fieldtype": "Select",
+			"label": "Priority",
+			"options": "Low\nMedium\nHigh\nCritical"
+		},
+		{
+			"fieldname": "expires_at",
+			"fieldtype": "Datetime",
+			"label": "Expires At"
+		},
+		{
+			"fieldname": "confirmed_at",
+			"fieldtype": "Datetime",
+			"label": "Confirmed At",
+			"read_only": 1
+		},
+		{
+			"fieldname": "executed_at",
+			"fieldtype": "Datetime",
+			"label": "Executed At",
+			"read_only": 1
+		},
+		{
+			"fieldname": "section_break_1",
+			"fieldtype": "Section Break",
+			"label": "Action Details"
+		},
+		{
+			"fieldname": "action_data",
+			"fieldtype": "JSON",
+			"label": "Action Data"
+		},
+		{
+			"fieldname": "preview_message",
+			"fieldtype": "Text",
+			"label": "Preview Message"
+		},
+		{
+			"fieldname": "confirmation_message",
+			"fieldtype": "Text",
+			"label": "Confirmation Message"
+		},
+		{
+			"fieldname": "section_break_2",
+			"fieldtype": "Section Break",
+			"label": "Execution"
+		},
+		{
+			"fieldname": "handler_path",
+			"fieldtype": "Data",
+			"label": "Handler Path"
+		},
+		{
+			"fieldname": "execution_result",
+			"fieldtype": "JSON",
+			"label": "Execution Result",
+			"read_only": 1
+		},
+		{
+			"fieldname": "error_message",
+			"fieldtype": "Text",
+			"label": "Error Message",
+			"read_only": 1
+		}
+	],
+	"index_web_pages_for_search": 0,
+	"is_virtual": 1,
+	"issingle": 0,
+	"istable": 0,
+	"links": [],
+	"modified": "2025-08-11 11:30:00.000000",
+	"modified_by": "Administrator",
+	"module": "Raven",
+	"name": "Raven AI Pending Action",
+	"naming_rule": "Random",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 0,
+			"export": 0,
+			"print": 0,
+			"read": 1,
+			"report": 0,
+			"role": "System Manager",
+			"share": 0,
+			"write": 1
+		},
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 0,
+			"export": 0,
+			"print": 0,
+			"read": 1,
+			"report": 0,
+			"role": "Raven User",
+			"share": 0,
+			"write": 1
+		}
+	],
+	"sort_field": "creation",
+	"sort_order": "DESC",
+	"states": [],
+	"track_changes": 0
+}

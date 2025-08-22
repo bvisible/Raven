@@ -206,9 +206,6 @@ def handle_ai_thread_message_with_agents(message, channel, bot):
 
 	# Skip file/image messages without text - they'll be handled when the user sends a follow-up
 	if message.message_type in ["File", "Image"] and not message.text and not message.content:
-		frappe.log_error(
-			f"Skipping file-only message in AI thread: {message.file}", "AI Thread File Skip"
-		)
 		return
 
 	# Send thinking message for existing threads
@@ -399,27 +396,91 @@ def process_message_with_agent(
 				"message_type",
 				"file",
 				"is_bot_message",
+				"name",  # Add message ID for debugging
 			],
 			order_by="creation desc",
-			limit=10,  # Reduced from 20 to 10 for better performance
+			limit=20,  # Keep last 20 messages for better context
 		)
 
-		# Reverse to get chronological order and exclude the current message
-		messages = list(reversed(messages[:-1] if messages else []))
+		# For AI threads, also get the initial message that created the thread
+		# The channel_name is the message ID of the thread creator
+		if channel.is_ai_thread and channel.channel_name:
+			try:
+				thread_creator_msg = frappe.get_doc("Raven Message", channel.channel_name)
+				if thread_creator_msg:
+					# Add thread creator message to the list
+					# It will be sorted correctly since messages are in desc order
+					messages.append(
+						{
+							"text": thread_creator_msg.text,
+							"content": thread_creator_msg.content,
+							"owner": thread_creator_msg.owner,
+							"creation": thread_creator_msg.creation,
+							"bot": thread_creator_msg.bot if hasattr(thread_creator_msg, "bot") else None,
+							"message_type": thread_creator_msg.message_type,
+							"file": thread_creator_msg.file if hasattr(thread_creator_msg, "file") else None,
+							"is_bot_message": thread_creator_msg.is_bot_message
+							if hasattr(thread_creator_msg, "is_bot_message")
+							else 0,
+							"name": thread_creator_msg.name,
+						}
+					)
+			except Exception as e:
+				frappe.log_error(
+					"AI History Thread Creator Error", f"Could not get thread creator message: {str(e)}"
+				)
+
+		# Sort messages by creation time desc to ensure correct order after adding thread creator
+		messages = sorted(messages, key=lambda x: x["creation"], reverse=True)
+
+		# Exclude first message (current) and reverse to get chronological order
+		# messages[0] is the current message, messages[1:] are the history
+		messages = list(reversed(messages[1:] if messages else []))
+
 		for msg in messages:
 			# Use text field which contains the actual message content
-			msg_text = msg.text or msg.content or ""
+			msg_text = msg.get("text") or msg.get("content") or ""
 
-			if msg.bot or msg.is_bot_message:
+			# For bot messages with HTML thinking sections, extract the actual response
+			if msg.get("bot") or msg.get("is_bot_message"):
+				import re
+
+				# Check if message contains HTML thinking section
+				if "<details" in msg_text and "</details>" in msg_text:
+					# Extract text after </details> tag (the actual response)
+					# Remove the details section and get the actual response
+					actual_response = re.sub(
+						r"<details[^>]*>.*?</details>", "", msg_text, flags=re.DOTALL
+					).strip()
+					if actual_response:
+						msg_text = actual_response
+
+				# Also clean any remaining HTML tags (like <p> tags)
+				if "<" in msg_text and ">" in msg_text:
+					msg_text = re.sub(r"<[^>]+>", "", msg_text).strip()
+
 				conversation_history.append({"role": "assistant", "content": msg_text})
 			else:
-				if msg.message_type in ["File", "Image"]:
+				# For user messages, also clean HTML if present
+				if "<p" in msg_text and "</p>" in msg_text:
+					import re
+
+					# Extract text from HTML paragraphs
+					clean_text = re.sub(r"<[^>]+>", "", msg_text).strip()
+					if clean_text:
+						msg_text = clean_text
+
+				if msg.get("message_type") in ["File", "Image"]:
 					# DON'T add historical files - only the current message file should be analyzed
 					# Just add a reference to the file in conversation history
 
-					file_url = msg.file.split("?fid=")[0] if "fid" in msg.file else msg.file
+					file_url = (
+						msg.get("file", "").split("?fid=")[0]
+						if "fid" in msg.get("file", "")
+						else msg.get("file", "")
+					)
 					msg_content = (
-						f"[User uploaded a {'file' if msg.message_type == 'File' else 'image'}: {file_url}]"
+						f"[User uploaded a {'file' if msg.get('message_type') == 'File' else 'image'}: {file_url}]"
 					)
 					if msg_text:
 						msg_content += f"\n{msg_text}"
@@ -429,21 +490,30 @@ def process_message_with_agent(
 
 	# Use the improved sync handler
 	try:
-		# Check if we should use local LLM handler (for Local LLM with functions)
-		use_local_handler = (
-			bot.model_provider == "Local LLM"
-			and bot.bot_functions
-			and len(bot.bot_functions) > 0
-			and (not file_handler or not file_handler.conversation_files)
-		)
+		# Check if we should use LM Studio SDK handler
+		settings = frappe.get_single("Raven Settings")
+		is_lm_studio = bot.model_provider == "Local LLM" and settings.local_llm_provider == "LM Studio"
 
-		if use_local_handler:
-			# Use direct HTTP calls for Local LLM (LM Studio) for better compatibility
-			from raven.ai.local_llm_handler import local_llm_handler
+		if is_lm_studio:
+			# For LM Studio, use SDK-only handler
+			from raven.ai.lmstudio import lmstudio_sdk_handler
+			from raven.ai.response_formatter import format_ai_response
 
-			response = local_llm_handler(bot, content, channel_id, conversation_history)
+			response = lmstudio_sdk_handler(bot, content, channel_id, conversation_history)
+
+			# Format the response if successful
+			if response.get("success") and response.get("response"):
+				response["response"] = format_ai_response(response["response"])
+
+			# Debug logging is now handled inside the handler based on bot.debug_mode
+			if not response.get("success"):
+				# SDK handler failed completely
+				response = {
+					"success": False,
+					"response": response.get("response", "Unable to process request with LM Studio SDK"),
+				}
 		else:
-			# Use Agents SDK for OpenAI and complex cases
+			# Use Agents SDK for OpenAI and other providers
 			response = handle_ai_request_sync(
 				bot=bot,
 				message=content,
@@ -455,7 +525,10 @@ def process_message_with_agent(
 		if response["success"]:
 			# Only send a response if there is one
 			if response["response"] is not None:
-				bot.send_message(channel_id=channel_id, text=response["response"], markdown=True)
+				# Check if response contains details tag (thinking section)
+				# If it does, send as HTML directly without markdown conversion
+				has_thinking = "<details" in response["response"]
+				bot.send_message(channel_id=channel_id, text=response["response"], markdown=not has_thinking)
 			# If response is None (e.g., file-only upload), don't send anything
 		else:
 			# Send error message

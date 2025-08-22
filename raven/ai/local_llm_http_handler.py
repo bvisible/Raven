@@ -1,5 +1,6 @@
 """
-Local LLM handler using direct HTTP calls for better compatibility with LM Studio
+Local LLM handler using direct HTTP calls for Ollama, LocalAI and other HTTP-based providers.
+Note: For LM Studio, use the SDK handler in raven.ai.lmstudio instead.
 """
 
 import json
@@ -7,13 +8,15 @@ import json
 import frappe
 import requests
 
+from .function_executor import execute_raven_function
 
-def local_llm_handler(bot, message: str, channel_id: str, conversation_history: list = None):
+
+def local_llm_http_handler(bot, message: str, channel_id: str, conversation_history: list = None):
 	"""
-	Fast handler using direct HTTP calls for better LM Studio compatibility.
+	HTTP handler for Local LLM providers like Ollama and LocalAI.
 
-	Handles both OpenAI and LM Studio APIs with automatic prompt simplification
-	for long prompts to prevent hallucinations with quantized models.
+	Note: LM Studio should use the SDK handler in raven.ai.lmstudio.sdk_handler instead.
+	This handler is for HTTP-only providers that don't have SDK support.
 	"""
 
 	# Get settings
@@ -37,7 +40,7 @@ def local_llm_handler(bot, message: str, channel_id: str, conversation_history: 
 		# Get functions from bot
 		functions = []
 		if hasattr(bot, "bot_functions") and bot.bot_functions:
-			for func in bot.bot_functions[:10]:  # Limit to 10 functions
+			for func in bot.bot_functions:
 				try:
 					function_doc = frappe.get_doc("Raven AI Function", func.function)
 
@@ -76,10 +79,10 @@ def local_llm_handler(bot, message: str, channel_id: str, conversation_history: 
 		# Check if bot has custom instructions
 		if bot.instruction:
 			# For LM Studio with Qwen model, simplify long prompts to avoid hallucinations
-			if is_lm_studio and len(bot.instruction) > 1500:
+			if is_lm_studio:
 				# Simplify long prompts for LM Studio to prevent hallucinations with Qwen models
 				system_prompt = (
-					bot.instruction[:1000]
+					bot.instruction
 					+ """
 ## FUNCTION CALLING RULES
 When asked to perform actions or retrieve data:
@@ -221,8 +224,16 @@ You can call multiple functions in sequence. After each function call, I will pr
 				# Pattern 1: "Need function_name" followed by structured tokens
 				import re
 
+				# Only apply OSS patterns for specific models known to use this format
+				# Add model names here as we discover them
+				oss_compatible_models = ["gpt-oss-20b", "gpt-oss", "local-model"]  # Add more as needed
+				model_lower = model_name.lower() if model_name else ""
+
+				# Check if this model should use OSS patterns
+				should_use_oss_patterns = any(oss_model in model_lower for oss_model in oss_compatible_models)
+
 				# Check for "Need function_name" pattern
-				need_match = re.search(r"Need\s+(\w+)", content)
+				need_match = re.search(r"Need\s+(\w+)", content) if should_use_oss_patterns else None
 				if need_match:
 					func_name = need_match.group(1)
 
@@ -245,25 +256,45 @@ You can call multiple functions in sequence. After each function call, I will pr
 							except (json.JSONDecodeError, ValueError):
 								continue
 
-				# Pattern 2: Direct function reference like "functions.function_name"
-				func_ref_match = re.search(r"functions\.(\w+)", content)
-				if not function_calls and func_ref_match:
-					func_name = func_ref_match.group(1)
+				# Pattern 2: Direct function reference like "functions.function_name" - only for OSS models
+				if should_use_oss_patterns:
+					func_ref_match = re.search(r"functions\.(\w+)", content)
+					if not function_calls and func_ref_match:
+						func_name = func_ref_match.group(1)
 
-					# Try to find associated JSON
-					for pattern in [r"<\|message\|>({.*?})(?:<\||\s|$)", r"\{[^}]*\}"]:
-						json_match = re.search(pattern, content, re.DOTALL)
-						if json_match:
-							try:
-								json_str = json_match.group(1) if "(" in pattern else json_match.group(0)
-								args = json.loads(json_str)
-								function_calls.append({"name": func_name, "arguments": args})
-								break
-							except (json.JSONDecodeError, ValueError):
-								continue
+						# Try to find associated JSON
+						for pattern in [r"<\|message\|>({.*?})(?:<\||\s|$)", r"\{[^}]*\}"]:
+							json_match = re.search(pattern, content, re.DOTALL)
+							if json_match:
+								try:
+									json_str = json_match.group(1) if "(" in pattern else json_match.group(0)
+									args = json.loads(json_str)
+									function_calls.append({"name": func_name, "arguments": args})
+									break
+								except (json.JSONDecodeError, ValueError):
+									continue
 
 			# If we have function calls, execute them
 			if function_calls:
+				# Check if we're repeating the same function call (infinite loop detection)
+				if all_function_results:
+					last_call = all_function_results[-1] if all_function_results else None
+					current_call = {
+						"function": function_calls[0]["name"],
+						"arguments": function_calls[0].get("arguments", {}),
+					}
+					if (
+						last_call
+						and last_call["function"] == current_call["function"]
+						and last_call["arguments"] == current_call["arguments"]
+					):
+						# Force a final response to break the loop
+						from raven.ai.response_formatter import format_ai_response
+
+						final_response = f"Based on the {current_call['function']} results, here's what I found:\n\n{json.dumps(last_call['result'], default=str, indent=2)}"
+						final_response = format_ai_response(final_response)
+						break
+
 				# Add assistant message to conversation
 				messages.append(message_data)
 
@@ -271,6 +302,7 @@ You can call multiple functions in sequence. After each function call, I will pr
 				for func_call in function_calls:
 					func_name = func_call["name"]
 					args = func_call.get("arguments", {})
+					tool_call_id = func_call.get("id")
 
 					# Pass channel_id for functions that might need it
 					result = execute_raven_function(func_name, args, channel_id=channel_id)
@@ -278,14 +310,42 @@ You can call multiple functions in sequence. After each function call, I will pr
 					# Store result
 					all_function_results.append({"function": func_name, "arguments": args, "result": result})
 
-					# Add result to messages
+					# Add result to messages based on provider
 					if is_lm_studio:
-						# LM Studio doesn't support function role, use user messages
-						result_msg = {
-							"role": "user",
-							"content": f"The result of {func_name} is: {json.dumps(result, default=str)}",
-						}
-						messages.append(result_msg)
+						# For LM Studio with tool_calls, we need a special approach
+						# Many models don't properly handle the "tool" role and return raw JSON
+
+						if tool_call_id:
+							# Model supports tool_calls but may not handle tool role well
+							# Solution: Send TWO messages:
+							# 1. The tool response (for compatibility)
+							# 2. A user prompt asking for formatting
+
+							# First, add the standard tool response
+							tool_response = {
+								"role": "tool",
+								"tool_call_id": tool_call_id,
+								"content": json.dumps(result, default=str),
+							}
+							messages.append(tool_response)
+
+							# Then add a user message asking for formatting
+							# This ensures the model formats the response properly
+							formatting_prompt = {
+								"role": "user",
+								"content": f"Format the above {func_name} results in a clear, readable way in French. Present it as a numbered list with key details, not as raw JSON.",
+							}
+							messages.append(formatting_prompt)
+						else:
+							# No tool_call_id - use user role
+							# Add explicit formatting instruction
+							formatted_result = json.dumps(result, default=str, indent=2)
+							user_msg = f"""[Function Result - {func_name}]:
+{formatted_result}
+
+IMPORTANT: Please format this data as a readable response in French. Do not return raw JSON."""
+
+							messages.append({"role": "user", "content": user_msg})
 					else:
 						# OpenAI format
 						messages.append(
@@ -297,7 +357,84 @@ You can call multiple functions in sequence. After each function call, I will pr
 			else:
 				# No function calls - we have our final response
 				content = message_data.get("content", "")
-				final_response = content
+
+				# Check if the response looks like raw JSON (common issue with some models)
+				# Also check if it contains the telltale signs of our function result
+				needs_formatting = False
+
+				# Check various patterns that indicate raw JSON response
+				if content:
+					# Pattern 1: Pure JSON
+					if content.strip().startswith("{") and content.strip().endswith("}"):
+						needs_formatting = True
+					# Pattern 2: Text with embedded JSON
+					elif "Based on the" in content and "{" in content:
+						needs_formatting = True
+					# Pattern 3: Contains product data
+					elif '"products"' in content or "get_product_list" in content:
+						needs_formatting = True
+					# Pattern 4: Function result pattern
+					elif '"status": "success"' in content:
+						needs_formatting = True
+
+				if needs_formatting:
+					# Try to extract and format JSON from the response
+					import re
+
+					# Try to find JSON in the content
+					json_match = re.search(r"\{.*\}", content, re.DOTALL)
+					if json_match:
+						try:
+							json_str = json_match.group(0)
+							json_data = json.loads(json_str)
+
+							# If it's valid JSON, create a natural language response
+							if isinstance(json_data, dict):
+								# Product list response
+								if "products" in json_data:
+									products = json_data.get("products", [])
+									response_parts = ["Voici les produits que j'ai trouvés :"]
+
+									for i, product in enumerate(products[:10], 1):
+										name = product.get("name", product.get("item_code", "Unknown"))
+										price = product.get("price")
+										stock = product.get("stock", 0)
+										currency = product.get("currency", "CHF")
+										unit = product.get("unit", "Unité")
+
+										product_line = f"\n{i}. **{name}**"
+										if price is not None and price > 0:
+											product_line += f" - Prix: {currency} {price:.2f}"
+										elif price == 0:
+											product_line += f" - Prix: {currency} 0.00"
+										else:
+											product_line += " - Prix: Non défini"
+
+										if stock and stock > 0:
+											product_line += f" (Stock: {stock:.0f} {unit})"
+										else:
+											product_line += " (Stock: Épuisé)"
+
+										response_parts.append(product_line)
+
+									# Add summary
+									total = json_data.get("total_count", len(products))
+									if total > len(products):
+										response_parts.append(f"\n_{total} produits au total, {len(products)} affichés_")
+
+									final_response = "\n".join(response_parts)
+								else:
+									# Generic JSON response - try to format it nicely
+									final_response = f"Voici les informations demandées :\n\n{json.dumps(json_data, indent=2, default=str, ensure_ascii=False)}"
+							else:
+								final_response = content
+						except (json.JSONDecodeError, ValueError):
+							# If JSON parsing fails, use content as-is
+							final_response = content
+					else:
+						final_response = content
+				else:
+					final_response = content
 				break
 
 		# Format the final response
@@ -312,76 +449,5 @@ You can call multiple functions in sequence. After each function call, I will pr
 		return {"response": final_response, "success": True, "function_calls": all_function_results}
 
 	except Exception as e:
-		frappe.log_error(f"Local LLM Handler Error: {str(e)}", "Local LLM Handler")
+		frappe.log_error("Local LLM Handler", f"Error: {str(e)}")
 		return {"response": f"Error: {str(e)}", "success": False}
-
-
-def execute_raven_function(function_name: str, args: dict, channel_id: str = None):
-	"""
-	Execute a Raven function by name.
-
-	Args:
-	        function_name: Name of the function to execute
-	        args: Arguments to pass to the function
-	        channel_id: Optional channel ID for context (used by notification functions)
-	"""
-	try:
-		# Special handling for get_current_context - use base function directly
-		if function_name == "get_current_context":
-			from raven.ai.functions import get_current_context
-
-			return get_current_context()
-
-		# Get the function document
-		function_doc = frappe.get_doc("Raven AI Function", function_name)
-
-		if function_doc.type == "Custom Function":
-			# Execute custom function
-			function_path = function_doc.function_path
-			if function_path:
-				func = frappe.get_attr(function_path)
-				if func:
-					# Add channel_id to args if function accepts it and it's not already there
-					if channel_id and "channel_id" not in args:
-						# Check if function accepts channel_id parameter
-						import inspect
-
-						sig = inspect.signature(func)
-						if "channel_id" in sig.parameters:
-							args["channel_id"] = channel_id
-					result = func(**args)
-					# Ensure result is JSON serializable
-					if isinstance(result, dict):
-						try:
-							# Test serialization
-							json.dumps(result, default=str)
-						except (TypeError, ValueError):
-							# Convert non-serializable values
-							result = json.loads(json.dumps(result, default=str))
-					return result
-
-		# For other types, use existing handlers
-		from raven.ai.functions import (
-			create_document,
-			delete_document,
-			get_document,
-			get_list,
-			update_document,
-		)
-
-		if function_doc.type == "Get Document":
-			return get_document(function_doc.reference_doctype, **args)
-		elif function_doc.type == "Create Document":
-			return create_document(function_doc.reference_doctype, data=args, function=function_doc)
-		elif function_doc.type == "Update Document":
-			return update_document(function_doc.reference_doctype, **args, function=function_doc)
-		elif function_doc.type == "Delete Document":
-			return delete_document(function_doc.reference_doctype, **args)
-		elif function_doc.type == "Get List":
-			return get_list(function_doc.reference_doctype, **args)
-
-	except Exception as e:
-		frappe.log_error(f"Function execution error: {str(e)}", f"Execute {function_name}")
-		return {"error": str(e)}
-
-	return {"error": "Function type not supported"}

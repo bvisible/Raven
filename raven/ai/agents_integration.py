@@ -748,8 +748,8 @@ async def handle_ai_request_async(
 			full_input = message
 
 		try:
-			# For Local LLM, we need to use our custom implementation
-			# The SDK doesn't have a fallback for models without native function calling
+			# For Local LLM, use HTTP handler for now
+			# TODO: Fix SDK handler function calling format
 			if bot.model_provider == "Local LLM":
 				# Use our custom implementation that handles text-based tool calls
 				return await _handle_local_llm_request(manager, agent, full_input, bot)

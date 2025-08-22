@@ -382,12 +382,15 @@ def get_instructions(bot):
 
 
 def get_variables_for_instructions():
+	from frappe.utils import now_datetime, nowdate
+
 	user = frappe.get_cached_doc("User", frappe.session.user)
 
 	employee_company = None
 	company = None
 	employee_id = None
 	department = None
+	currency = None
 
 	if "erpnext" in frappe.get_installed_apps():
 		employee_id = frappe.db.exists("Employee", {"user_id": frappe.session.user})
@@ -401,14 +404,35 @@ def get_variables_for_instructions():
 			"Global Defaults", "default_company"
 		)
 
+		# Get currency from company
+		if company:
+			currency = frappe.db.get_value("Company", company, "default_currency")
+
+	# Get time zone
+	time_zone = user.time_zone or frappe.utils.get_system_timezone()
+
+	# Get channel and thread from context if available
+	channel_id = frappe.flags.get("raven_channel_id")
+	thread_id = frappe.flags.get("raven_thread_id")
+
 	return {
-		"first_name": user.first_name,
-		"full_name": user.full_name,
-		"email": user.email,
+		"user": frappe.session.user,  # Same as user_id but some prompts might use "user"
 		"user_id": frappe.session.user,
+		"first_name": user.first_name,
+		"full_name": user.full_name or user.first_name or frappe.session.user,
+		"email": user.email,
 		"company": company,
+		"currency": currency or "USD",
 		"employee_id": employee_id,
 		"department": department,
 		"employee_company": employee_company,
-		"lang": user.language.upper() if user.language else "EN",
+		"language": user.language or "en",  # Lowercase for compatibility with get_current_context
+		"lang": user.language.upper()
+		if user.language
+		else "EN",  # Keep uppercase for Nora and existing prompts
+		"time_zone": time_zone,
+		"channel_id": channel_id,
+		"thread_id": thread_id,
+		"current_date": nowdate(),
+		"current_time": now_datetime(),
 	}

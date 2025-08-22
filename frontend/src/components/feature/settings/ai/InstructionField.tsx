@@ -59,12 +59,20 @@ const variables = [
     { variable: 'first_name', description: 'The first name of the user' },
     { variable: 'full_name', description: 'The full name of the user' },
     { variable: 'email', description: 'The email of the user' },
+    { variable: 'user', description: 'The user ID (same as user_id)' },
     { variable: 'user_id', description: 'The ID of the user' },
     { variable: 'company', description: "The default company in the system" },
+    { variable: 'currency', description: "The default currency of the company" },
     { variable: 'employee_id', description: 'The ID of the employee' },
     { variable: "employee_company", description: "The company of the employee (value in Employee DocType)" },
     { variable: 'department', description: 'The department of the employee' },
-    { variable: 'lang', description: 'The current user language' },
+    { variable: 'language', description: 'The user language (lowercase, e.g., "en", "fr")' },
+    { variable: 'lang', description: 'The user language (uppercase, e.g., "EN", "FR")' },
+    { variable: 'time_zone', description: 'The user time zone' },
+    { variable: 'current_date', description: 'The current date (YYYY-MM-DD)' },
+    { variable: 'current_time', description: 'The current time (datetime object)' },
+    { variable: 'channel_id', description: 'The current Raven channel ID (if in a channel)' },
+    { variable: 'thread_id', description: 'The current Raven thread ID (if in a thread)' },
 ]
 
 const DynamicInstructionField = ({ allowUsingTemplate, instructionRequired, autoFocus }: Props) => {
