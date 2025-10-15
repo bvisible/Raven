@@ -275,7 +275,7 @@ class RavenAgentManager:
 
 			# Create provider with use_responses=False for LM Studio
 			self.provider = OpenAIProvider(
-				openai_client=client, use_responses=False  # Force chat/completions endpoint usage
+				openai_client=client, use_responses=False  # Force use of chat/completions endpoint
 			)
 		else:
 			# Standard OpenAI client
@@ -550,7 +550,10 @@ class RavenAgentManager:
 
 			for tool in self.tools:
 				if isinstance(tool, hosted_tool_types):
-					pass
+					frappe.log_error(
+						f"Skipping hosted tool {tool.name} for Local LLM - not supported with ChatCompletions API",
+						"Tool Filtering",
+					)
 				else:
 					filtered_tools.append(tool)
 
@@ -608,20 +611,7 @@ CRITICAL INSTRUCTIONS FOR TOOL USE:
 6. IMPORTANT: If a user asks about files they uploaded (PDFs, invoices, documents), you MUST use the 'analyze_conversation_file' tool. Never say you cannot analyze files - you have the tool to do it!
 7. For questions about invoice amounts, document content, or file information, ALWAYS use 'analyze_conversation_file' with an appropriate query.
 
-IMPORTANT: When calling tools, you have two options:
-1. **Preferred**: Let the SDK handle tool execution automatically through native function calling
-2. **Fallback**: If native function calling is not supported, use this exact format:
-   <tool_call>
-   {{
-     "name": "function_name",
-     "arguments": {{
-       "param1": "value1",
-       "param2": "value2"
-     }}
-   }}
-   </tool_call>
-
-For functions with no parameters, use empty arguments: {{"name": "function_name", "arguments": {{}}}}"""
+IMPORTANT: When calling tools, the SDK will handle the tool execution automatically. Simply state your intent to use the tool and the SDK will execute it. Do not use XML tags like <tool_call> or any other custom format."""
 
 			instructions = instructions + tools_instruction
 
@@ -748,11 +738,9 @@ async def handle_ai_request_async(
 			full_input = message
 
 		try:
-			# For Local LLM, use HTTP handler for now
-			# TODO: Fix SDK handler function calling format
+			# For Local LLM, always use direct API call to handle custom tool formats
 			if bot.model_provider == "Local LLM":
-				# Use our custom implementation that handles text-based tool calls
-				return await _handle_local_llm_request(manager, agent, full_input, bot)
+				raise TypeError("Force fallback for Local LLM to handle custom tool calls")
 
 			# Use Runner.run as a static method (not an instance)
 			# Set max_turns to prevent infinite loops
@@ -905,21 +893,11 @@ async def handle_ai_request_async(
 							else:
 								raw_response = "Tool execution failed - no results obtained."
 						else:
-							# No native tool calls, check if raw_response is set
-							if not raw_response:
-								pass
+							# No tool calls, check if the response contains custom tool call format
+							raw_response = choice.message.content
 
-							# Handle multiple tool calls in sequence
-							max_tool_calls = 5  # Prevent infinite loops
-							tool_call_count = 0
-							conversation_messages = messages.copy()  # Use existing messages
-
-							while (
-								raw_response
-								and "<tool_call>" in raw_response
-								and "</tool_call>" in raw_response
-								and tool_call_count < max_tool_calls
-							):
+							# Check for custom <tool_call> format in the response
+							if raw_response and "<tool_call>" in raw_response and "</tool_call>" in raw_response:
 								# Extract tool call from response
 								tool_call_match = re.search(
 									r"<tool_call>\s*({.*?})\s*</tool_call>", raw_response, re.DOTALL
@@ -934,56 +912,57 @@ async def handle_ai_request_async(
 
 										# Find and execute the tool
 										tool_result = None
-										tool_found = False
 										for tool in manager.tools:
 											if tool.name == tool_name:
-												tool_found = True
 												# Execute the tool
-												try:
-													tool_result = await tool.on_invoke_tool(None, tool_args)
-												except Exception as e:
-													tool_result = f"Error executing tool: {str(e)}"
+												tool_result = await tool.on_invoke_tool(None, tool_args)
 												break
 
-										# Always make a second API call to generate proper response
-										if not tool_found:
-											tool_result = f"Tool '{tool_name}' not found"
+										if tool_result:
+											# Remove the tool call from the response
+											response_without_tool = re.sub(
+												r"<tool_call>.*?</tool_call>", "", raw_response, flags=re.DOTALL
+											).strip()
 
-										# Add the assistant's message with tool call to conversation
-										conversation_messages.append({"role": "assistant", "content": raw_response})
+											# Parse the tool result if it's JSON
+											try:
+												result_data = json.loads(tool_result)
+												if isinstance(result_data, dict) and "result" in result_data:
+													# Format the result nicely
+													formatted_result = "Voici les produits trouvés :\n\n"
+													for item in result_data["result"]:
+														if isinstance(item, dict):
+															formatted_result += f"• {item.get('name', 'Sans nom')}\n"
 
-										# Add tool result to conversation
-										conversation_messages.append(
-											{
-												"role": "tool",
-												"content": tool_result or "Tool executed successfully",
-												"tool_call_id": f"custom_tool_call_{tool_call_count}",
-											}
-										)
+													# Add warning if present
+													if "warning" in result_data:
+														formatted_result += f"\n⚠️ {result_data['warning']}"
 
-										# Make API call to continue the conversation
-										follow_up_response = await manager.client.chat.completions.create(
-											model=bot.model,
-											messages=conversation_messages,
-											temperature=agent.model_settings.temperature,
-											top_p=agent.model_settings.top_p,
-											max_tokens=2000,
-										)
-
-										if follow_up_response and follow_up_response.choices:
-											raw_response = follow_up_response.choices[0].message.content
-											tool_call_count += 1
+													raw_response = (
+														response_without_tool + "\n\n" + formatted_result
+														if response_without_tool
+														else formatted_result
+													)
+												else:
+													# Not the expected format, use as is
+													raw_response = f"{response_without_tool}\n\n{tool_result}"
+											except Exception:
+												# Not JSON or parsing failed, use as is
+												raw_response = f"{response_without_tool}\n\n{tool_result}"
 										else:
-											raw_response = "Function executed but could not generate a response."
-											break
+											frappe.log_error(
+												f"Tool '{tool_name}' not found or execution failed", "Custom Tool Call Error"
+											)
 
 									except json.JSONDecodeError as e:
-										break
+										frappe.log_error(
+											f"Failed to parse tool call JSON: {str(e)}\nContent: {tool_call_match.group(1)}",
+											"Tool Call Parse Error",
+										)
 									except Exception as e:
-										break
-								else:
-									# No valid tool call found, exit loop
-									break
+										frappe.log_error(
+											f"Error executing custom tool call: {str(e)}", "Tool Call Execution Error"
+										)
 
 						# Format the response
 						from raven.ai.response_formatter import format_ai_response

@@ -157,22 +157,10 @@ doc_events = {
 # ---------------
 
 scheduler_events = {
-	# "all": [
-	# 	"raven.tasks.all"
-	# ],
-	# "daily": [
-	# 	"raven.tasks.daily"
-	# ],
-	"hourly": [
-		# "raven.tasks.hourly",
-		"raven.ai.pending_action_scheduler.purge_old_pending_actions"
-	],
-	# "weekly": [
-	# 	"raven.tasks.weekly"
-	# ],
-	# "monthly": [
-	# 	"raven.tasks.monthly"
-	# ],
+	"cron": {
+		# run every 5 minutes
+		"*/5 * * * *": ["raven.scheduler.close_expired_polls.close_expired_polls"]
+	}
 }
 
 # Testing

@@ -24,6 +24,9 @@ import { useSendMessage } from "../ChatInput/useSendMessage"
 import { ReplyMessageBox } from "../ChatMessage/ReplyMessageBox/ReplyMessageBox"
 import ChatStream from "./ChatStream"
 import { GetMessagesResponse } from "./useChatStream"
+import { useIsMobile } from "@/hooks/useMediaQuery"
+import { getFileType } from "@/utils/layout/FileExtIcon"
+import { getFileExtension } from "@/utils/operations"
 
 const COOL_PLACEHOLDERS = [
     "Delivering messages atop dragons 🐉 is available on a chargeable basis.",
@@ -150,7 +153,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
 
     const { fileInputRef, files, setFiles, removeFile, uploadFiles, addFile, fileUploadProgress, compressImages, setCompressImages } = useFileUpload(channelData.name)
 
-    const { sendMessage, loading } = useSendMessage(channelData.name, uploadFiles, onMessageSendCompleted, selectedMessage, files.length > 0)
+    const { sendMessage, loading } = useSendMessage(channelData.name, uploadFiles, onMessageSendCompleted, selectedMessage)
 
     const PreviousMessagePreview = ({ selectedMessage }: { selectedMessage: any }) => {
 
@@ -213,6 +216,10 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
 
     const { threadID } = useParams()
 
+    const isImageFile = useCallback((file: CustomFile) => {
+        return getFileType(getFileExtension(file.name)) === 'image'
+    }, [files])
+
     return (
         <ChatBoxBodyContainer>
             <FileDrop
@@ -255,7 +262,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                                 {files && files.length > 0 && <Flex gap='2' width='100%' align='stretch' px='2' p='2' wrap='wrap'>
                                     {files.map((f: CustomFile) => <Box className="grow-0" key={f.fileID}><FileListItem file={f} uploadProgress={fileUploadProgress} removeFile={() => removeFile(f.fileID)} /></Box>)}
                                 </Flex>}
-                                {files.length !== 0 && <CompressImageCheckbox compressImages={compressImages} setCompressImages={setCompressImages} />}
+                                {files.length !== 0 && files.some((f: CustomFile) => isImageFile(f)) && <CompressImageCheckbox compressImages={compressImages} setCompressImages={setCompressImages} />}
                             </Flex>}
                         />
                     </Stack>
