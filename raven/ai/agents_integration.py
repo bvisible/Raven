@@ -268,8 +268,14 @@ class RavenAgentManager:
 			if not self.settings.local_llm_api_url:
 				frappe.throw(_("Local LLM API URL is not configured in Raven Settings"))
 
+			# Handle OpenAI Compatible provider differently
+			if self.settings.local_llm_provider == "OpenAI Compatible":
+				api_key = self.settings.get_password("openai_compatible_api_key") or "sk-key"
+			else:
+				api_key = "not-needed"  # LM Studio, Ollama, LocalAI don't require API key
+
 			client = AsyncOpenAI(
-				api_key="not-needed",  # LM Studio doesn't require API key
+				api_key=api_key,
 				base_url=self.settings.local_llm_api_url,
 			)
 
@@ -361,7 +367,12 @@ class RavenAgentManager:
 			except Exception as e:
 				pass
 
-		if self.file_handler and self.file_handler.conversation_files:
+		# Only add conversation file tool for OpenAI, not Local LLM (content is pre-extracted for Local LLM)
+		if (
+			self.file_handler
+			and self.file_handler.conversation_files
+			and self.bot_doc.model_provider != "Local LLM"
+		):
 			conversation_file_tool = self.file_handler.create_file_analysis_tool()
 			if conversation_file_tool:
 				self.tools.append(conversation_file_tool)
@@ -608,8 +619,8 @@ CRITICAL INSTRUCTIONS FOR TOOL USE:
 3. When the user confirms with words like "ok", "yes", "apply", "do it", "applique cela", etc., USE THE APPROPRIATE TOOL to make the change.
 4. Do NOT ask the user to provide information that you can generate or retrieve yourself.
 5. Always read function descriptions carefully and follow any workflow instructions they contain.
-6. IMPORTANT: If a user asks about files they uploaded (PDFs, invoices, documents), you MUST use the 'analyze_conversation_file' tool. Never say you cannot analyze files - you have the tool to do it!
-7. For questions about invoice amounts, document content, or file information, ALWAYS use 'analyze_conversation_file' with an appropriate query.
+
+NOTE: File content from uploaded documents is automatically extracted and included in the conversation, so you can directly answer questions about files without needing special tools.
 
 IMPORTANT: When calling tools, the SDK will handle the tool execution automatically. Simply state your intent to use the tool and the SDK will execute it. Do not use XML tags like <tool_call> or any other custom format."""
 
@@ -663,24 +674,8 @@ async def handle_ai_request_async(
 				"error": "Agent creation failed",
 			}
 
-		# Build conversation context
-		# If there are files in the conversation, always suggest to use them
-		has_files_in_conversation = manager.file_handler and manager.file_handler.conversation_files
-
-		# If files are present in the conversation, enhance the message
-		if has_files_in_conversation:
-			# Get file names - but only mention the most recent one if it's the only one
-			files = list(manager.file_handler.conversation_files.values())
-			if len(files) == 1:
-				# Only one file - be specific
-				file_name = files[0]["file_name"]
-				message = f"{message}\n\n[IMPORTANT: The user has uploaded the file '{file_name}'. You MUST use the 'analyze_conversation_file' tool to read and analyze THIS specific file before answering. The user is asking about the content of this file.]"
-			else:
-				# Multiple files - let the AI figure out which one based on context
-				file_names = [f["file_name"] for f in files]
-				message = f"{message}\n\n[IMPORTANT: The user has uploaded files in this conversation. Available files: {', '.join(file_names)}. Use the 'analyze_conversation_file' tool to analyze the relevant file(s) based on the user's question.]"
-
 		# Build input with proper conversation history format
+		# Note: File content is now extracted upfront in ai.py and included in the message
 		if conversation_history:
 			# Convert conversation history to proper format for the SDK
 			input_items = []
@@ -706,35 +701,10 @@ async def handle_ai_request_async(
 					input_items.append({"role": "assistant", "content": content})  # Use "role" not "type"
 
 			# Add current message
-			current_msg = {"role": "user", "content": message}
-
-			# Add file context if present
-			if has_files_in_conversation:
-				files = list(manager.file_handler.conversation_files.values())
-				if len(files) == 1:
-					file_name = files[0]["file_name"]
-					current_msg[
-						"content"
-					] = f"{message}\n\n[IMPORTANT: The user has uploaded the file '{file_name}'. You MUST use the 'analyze_conversation_file' tool to read and analyze THIS specific file before answering.]"
-				else:
-					file_names = [f["file_name"] for f in files]
-					current_msg[
-						"content"
-					] = f"{message}\n\n[IMPORTANT: The user has uploaded files in this conversation. Available files: {', '.join(file_names)}. Use the 'analyze_conversation_file' tool to analyze the relevant file(s) based on the user's question.]"
-
-			input_items.append(current_msg)
+			input_items.append({"role": "user", "content": message})
 			full_input = input_items
 		else:
 			# No history, just the current message
-			if has_files_in_conversation:
-				files = list(manager.file_handler.conversation_files.values())
-				if len(files) == 1:
-					file_name = files[0]["file_name"]
-					message = f"{message}\n\n[IMPORTANT: The user has uploaded the file '{file_name}'. You MUST use the 'analyze_conversation_file' tool to read and analyze THIS specific file before answering.]"
-				else:
-					file_names = [f["file_name"] for f in files]
-					message = f"{message}\n\n[IMPORTANT: The user has uploaded files in this conversation. Available files: {', '.join(file_names)}. Use the 'analyze_conversation_file' tool to analyze the relevant file(s) based on the user's question.]"
-
 			full_input = message
 
 		try:
@@ -783,24 +753,23 @@ async def handle_ai_request_async(
 								tools_param.append(tool_def)
 
 					# Add instruction to encourage immediate tool use
-					tool_use_reminder = "\n\nIMPORTANT: When asked to perform an action, use your tools immediately. Do not overthink. Keep responses brief and action-oriented. When asked to improve something, propose a specific solution immediately. If asked about file content, invoices, or documents, ALWAYS use the analyze_conversation_file tool - never say you cannot analyze files."
-
-					# For Local LLMs, we need to be more explicit about tool usage
-					if bot.model_provider == "Local LLM":
-						tool_use_reminder += "\n\nREMEMBER: You MUST use the <tool_call> format when calling functions. Do not just describe what you would do - actually call the function using the exact format shown in your instructions."
-
-					enhanced_instructions = agent.instructions + tool_use_reminder
+					enhanced_instructions = (
+						agent.instructions
+						+ "\n\nIMPORTANT: When asked to perform an action, use your tools immediately. Do not overthink. Keep responses brief and action-oriented. When asked to improve something, propose a specific solution immediately. File content from uploaded documents is automatically extracted and included in the conversation - DO NOT use the analyze_conversation_file tool for files that are already in the conversation context, just use the extracted content provided."
+					)
 
 					# Build messages array with proper conversation history
-					messages = [{"role": "system", "content": enhanced_instructions}]
+					messages = [{"role": "system", "content": [{"type": "text", "text": enhanced_instructions}]}]
 
 					# Add conversation history as separate messages
 					if conversation_history:
 						for msg in conversation_history:
-							messages.append({"role": msg["role"], "content": msg["content"]})
+							messages.append(
+								{"role": msg["role"], "content": [{"type": "text", "text": msg["content"]}]}
+							)
 
 					# Add current user message
-					messages.append({"role": "user", "content": message})
+					messages.append({"role": "user", "content": [{"type": "text", "text": message}]})
 
 					# Create the API call with or without tools
 					api_params = {
@@ -850,7 +819,6 @@ async def handle_ai_request_async(
 							for tool_call in choice.message.tool_calls:
 								tool_name = tool_call.function.name
 								tool_args = tool_call.function.arguments
-
 								# Find the tool in manager.tools
 								tool_result = None
 								for tool in manager.tools:
@@ -865,16 +833,30 @@ async def handle_ai_request_async(
 							# If we have tool results, make another API call with the results
 							if tool_results:
 								# Add assistant message with tool calls
+								assistant_message = choice.message.model_dump()
+								# Fix assistant message content format
+								if isinstance(assistant_message.get("content"), str):
+									assistant_message["content"] = [{"type": "text", "text": assistant_message["content"]}]
+
 								messages = [
-									{"role": "system", "content": agent.instructions},
-									{"role": "user", "content": full_input},
-									choice.message.model_dump(),
+									{"role": "system", "content": [{"type": "text", "text": agent.instructions}]},
+									{"role": "user", "content": [{"type": "text", "text": str(full_input)}]},
+									assistant_message,
 								]
 
 								# Add tool results
 								for result in tool_results:
+									# Ensure output is a string
+									output_content = result["output"]
+									if not isinstance(output_content, str):
+										output_content = json.dumps(output_content)
+
 									messages.append(
-										{"role": "tool", "content": result["output"], "tool_call_id": result["tool_call_id"]}
+										{
+											"role": "tool",
+											"content": [{"type": "text", "text": result["output"]}],
+											"tool_call_id": result["tool_call_id"],
+										}
 									)
 
 								# Make final API call
