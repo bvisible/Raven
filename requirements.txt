@@ -3,7 +3,7 @@ linkpreview
 openai>=1.100.2
 blurhash-python
 openai-agents>=0.0.16
-markitdown
+# markitdown  # Commented out - causes TensorFlow/protobuf conflicts during migration
 pandas
 google-cloud-documentai
 lmstudio>=1.4.0
