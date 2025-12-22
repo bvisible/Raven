@@ -71,6 +71,11 @@ export default defineConfig(({ command, mode }) => {
 			sourcemap: false,
 			rollupOptions: {
 				maxParallelFileOps: 2,
+			// Ignore Frappe bench-specific imports that don't exist in standalone builds
+			external: [
+				/common_site_config\.json/,
+				/\.\.\/\.\.\/\.\.\/frappe\//,
+			],
 				onwarn(warning, warn) {
 					if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
 						return
