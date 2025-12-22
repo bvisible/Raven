@@ -811,23 +811,23 @@ button {
     margin-right: `).concat(u,"px ").concat(o,`;
     `),r==="padding"&&"padding-right: ".concat(u,"px ").concat(o,";")].filter(Boolean).join(""),`
   }
-
+  
   .`).concat(Hp,` {
     right: `).concat(u,"px ").concat(o,`;
   }
-
+  
   .`).concat(Up,` {
     margin-right: `).concat(u,"px ").concat(o,`;
   }
-
+  
   .`).concat(Hp," .").concat(Hp,` {
     right: 0 `).concat(o,`;
   }
-
+  
   .`).concat(Up," .").concat(Up,` {
     margin-right: 0 `).concat(o,`;
   }
-
+  
   body[`).concat(mc,`] {
     `).concat(EO,": ").concat(u,`px;
   }

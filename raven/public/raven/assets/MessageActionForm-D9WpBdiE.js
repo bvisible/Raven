@@ -4,7 +4,7 @@ var pe=Object.defineProperty,me=Object.defineProperties;var fe=Object.getOwnProp
 {
     "message_id": "123",
     "action_id": "abc",
-    "values": {
+    "values": {  
     # Values from the fields in the message action dialog
         "field1": "value1",
         "field2": "value2"
