@@ -1,7 +1,7 @@
 from . import __version__ as app_version
 
 app_name = "raven"
-app_title = "Raven"
+app_title = "Synk"
 app_publisher = "The Commit Company (Algocode Technologies Pvt. Ltd.)"
 app_description = "Messaging Application"
 app_email = "support@thecommit.company"

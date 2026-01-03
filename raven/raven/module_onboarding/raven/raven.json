@@ -17,19 +17,19 @@
  "owner": "Administrator",
  "steps": [
   {
-   "step": "Introduction to Raven"
+   "step": "Introduction to Synk"
   },
   {
-   "step": "Adding Users to Raven"
+   "step": "Adding Users to Synk"
   },
   {
-   "step": "Review Raven Settings"
+   "step": "Review Synk Settings"
   },
   {
    "step": "Access the Web App"
   }
  ],
  "subtitle": "Simple, work messaging tool",
- "success_message": "Raven is setup!",
- "title": "Let's setup Raven"
+ "success_message": "Synk is setup!",
+ "title": "Let's setup Synk"
 }

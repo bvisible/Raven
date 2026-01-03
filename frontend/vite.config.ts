@@ -16,9 +16,9 @@ export default defineConfig(({ command, mode }) => {
 			injectRegister: null,
 			outDir: "../raven/public/raven",
 			manifest: {
-				name: "Raven",
+				name: "Synk",
 				start_url: `/${env.VITE_BASE_NAME}`,
-				short_name: "Raven",
+				short_name: "Synk",
 				description: "Simple, work messaging tool.",
 				display: "standalone",
 				"icons": [

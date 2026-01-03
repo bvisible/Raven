@@ -55,14 +55,14 @@
    "default": "1",
    "fieldname": "auto_add_system_users",
    "fieldtype": "Check",
-   "label": "Automatically add system users to Raven",
+   "label": "Automatically add system users to Synk",
    "permlevel": 1
   },
   {
    "default": "1",
    "fieldname": "show_raven_on_desk",
    "fieldtype": "Check",
-   "label": "Show Raven on Desk",
+   "label": "Show Synk on Desk",
    "permlevel": 1
   },
   {
@@ -185,7 +185,7 @@
   {
    "fieldname": "raven_mobile_tab",
    "fieldtype": "Tab Break",
-   "label": "Raven Mobile"
+   "label": "Synk Mobile"
   },
   {
    "fieldname": "oauth_client",

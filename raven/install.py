@@ -5,17 +5,17 @@ from frappe.desk.page.setup_wizard.setup_wizard import add_all_roles_to, make_re
 
 def after_install():
 	try:
-		print("Setting up Raven...")
+		print("Setting up Synk...")
 		add_all_roles_to("Administrator")
 		create_raven_user_for_administrator()
 		create_general_channel()
 
-		click.secho("Thank you for installing Raven!", fg="green")
+		click.secho("Thank you for installing Synk!", fg="green")
 
 	except Exception as e:
 		BUG_REPORT_URL = "https://github.com/The-Commit-Company/Raven/issues/new"
 		click.secho(
-			"Installation for Raven failed due to an error."
+			"Installation for Synk failed due to an error."
 			" Please try re-installing the app or"
 			f" report the issue on {BUG_REPORT_URL} if not resolved.",
 			fg="bright_red",
@@ -40,7 +40,7 @@ def create_general_channel():
 	default_workspace = frappe.get_doc(
 		{
 			"doctype": "Raven Workspace",
-			"workspace_name": "Raven",
+			"workspace_name": "Synk",
 			"type": "Public",
 		}
 	)
