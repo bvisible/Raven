@@ -30,7 +30,6 @@ const ThreadReplyCount = ({ message }: Props) => {
         refreshInterval: 0,
         shouldRetryOnError: false
     })
-    console.log('[ThreadReplyCount] thread:', message.name, 'count:', data?.message)
     return <Text className='text-sm text-primary dark:text-secondary font-semibold'>{data?.message === 1 ? t('messages.replyCount') : t('messages.repliesCount', { count: data?.message ?? 0 })}</Text>
 }
 

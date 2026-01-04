@@ -10,7 +10,6 @@ import useSiteContext from './useSiteContext'
 import { GetMessagesResponse } from '@raven/types/common/ChatStream'
 import { useTrackChannelVisit } from './useUnreadMessageCount'
 import { useRouteToThread } from './useRouting'
-import { useSWRConfig } from 'swr'
 
 dayjs.extend(utc)
 dayjs.extend(advancedFormat)
@@ -45,7 +44,6 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
 
     const siteInformation = useSiteContext()
     const goToThread = useRouteToThread()
-    const { mutate: globalMutate } = useSWRConfig()
 
     const isDataFetched = useRef(false)
     const latestMessagesLoaded = useRef(false)
@@ -118,6 +116,7 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
                         }, 250)
                     }
                 })
+
             }
 
             if (!data.message.has_new_messages) {
@@ -130,11 +129,9 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
 
     // If there are new messages in the channel, update the messages
     useFrappeEventListener('message_created', (event) => {
-        console.log('[useChatStream] message_created event:', event.channel_id, 'current channelID:', channelID, 'match:', event.channel_id === channelID)
         if (event.channel_id === channelID) {
 
             mutate((d) => {
-                console.log('[useChatStream] mutate called, has_new_messages:', d?.message?.has_new_messages)
                 if (d && d.message.has_new_messages === false) {
                     // Update the array of messages - append the new message in it and then sort it by date
                     const existingMessages = d.message.messages ?? []
@@ -288,7 +285,6 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
 
     // If an AI thread is created, update the parent message's is_thread flag and auto-navigate
     useFrappeEventListener('ai_thread_created', (event) => {
-        console.log('[useChatStream] ai_thread_created event:', event.channel_id, 'channelID:', channelID, 'isThread:', isThread)
         if (event.channel_id === channelID && event.thread_id) {
             // Update is_thread flag on the parent message
             mutate((d) => {
@@ -315,16 +311,7 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
 
             // Auto-navigate to thread if we're in a channel (not already in a thread)
             if (!isThread && event.is_ai_thread) {
-                console.log('[useChatStream] Auto-navigating to thread:', event.thread_id)
                 goToThread(event.thread_id)
-
-                // Revalidate reply count after delays to catch bot response
-                setTimeout(() => {
-                    console.log('[useChatStream] Revalidating reply count for:', event.thread_id)
-                    globalMutate(["thread_reply_count", event.thread_id])
-                }, 3000)
-                setTimeout(() => globalMutate(["thread_reply_count", event.thread_id]), 6000)
-                setTimeout(() => globalMutate(["thread_reply_count", event.thread_id]), 10000)
             }
         }
     })

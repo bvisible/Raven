@@ -132,7 +132,6 @@ const WorkspaceProvider = ({ children }: PropsWithChildren) => {
 
     // Listen to realtime event for new message count
     useFrappeEventListener('thread_reply', (event) => {
-
         if (event.channel_id) {
             mutate(["thread_reply_count", event.channel_id], {
                 message: event.number_of_replies
