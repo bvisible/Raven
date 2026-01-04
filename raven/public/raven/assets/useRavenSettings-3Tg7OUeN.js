@@ -1,1 +1,0 @@
-import{by as a}from"./index-93kECIxS.js";const r=()=>{const{data:e,mutate:t,error:n}=a("Raven Settings","Raven Settings","raven_settings",{revalidateOnFocus:!1,dedupingInterval:288e5});return{ravenSettings:e,mutate:t,error:n}};export{r as u};
