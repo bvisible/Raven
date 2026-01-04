@@ -52,7 +52,7 @@ export const SelectedChannels = ({ selectedChannels, searchInput, setSearchInput
                             )}
                             <Text className="text-sm">
                                 {isDMChannel
-                                    ? `${user?.full_name}`
+                                    ? `${user?.full_name || user?.name || ''}`
                                     : channel.channel_name}
                             </Text>
                             <CrossIcon color={colors.icon} height={11} width={11} />

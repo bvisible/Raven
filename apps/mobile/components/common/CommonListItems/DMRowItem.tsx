@@ -25,7 +25,7 @@ const DMRowItem = ({ dmChannel, onPress }: DMRowItemProps) => {
                 textProps={{ className: 'text-sm' }}
                 isBot={user?.type === 'Bot'}
             />
-            <Text className='ml-2 text-base'>{user?.full_name}</Text>
+            <Text className='ml-2 text-base'>{user?.full_name || user?.name || ''}</Text>
         </Pressable>
     )
 }

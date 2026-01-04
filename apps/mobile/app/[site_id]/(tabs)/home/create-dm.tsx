@@ -93,7 +93,7 @@ const UserWithoutDMItem = ({ userID }: { userID: string }) => {
                     textProps={{ className: 'text-sm' }}
                     isBot={user?.type === 'Bot'}
                 />
-                <Text className='text-base'>{user?.full_name}</Text>
+                <Text className='text-base'>{user?.full_name || user?.name || ''}</Text>
                 {!user?.enabled ?
                     <View className='px-1 mt-0.5 py-0.5 rounded-sm bg-red-100'>
                         <Text className="text-[11px] text-red-700">{t('common.disabled')}</Text>

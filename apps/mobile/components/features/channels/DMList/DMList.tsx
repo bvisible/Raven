@@ -58,7 +58,7 @@ export const DMListRow = ({ dm }: { dm: DMChannelListItem }) => {
                     avatarProps={{ className: "w-8 h-8" }}
                     textProps={{ className: "text-sm font-medium" }}
                     isBot={user?.type === 'Bot'} />
-                <Text style={styles.dmChannelText}>{user?.full_name}</Text>
+                <Text style={styles.dmChannelText}>{user?.full_name || user?.name || ''}</Text>
             </Pressable>
         </Link>
     )

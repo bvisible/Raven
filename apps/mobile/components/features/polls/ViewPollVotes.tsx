@@ -122,7 +122,7 @@ const UserVote = ({ user_id }: { user_id: string }) => {
     return (
         <View className="flex flex-row items-center gap-3">
             <UserAvatar src={user?.user_image} alt={user?.full_name ?? user?.name ?? ''} avatarProps={{ className: 'h-8 w-8' }} textProps={{ className: 'text-sm' }} />
-            <Text className="font-medium text-sm text-foreground">{user?.full_name}</Text>
+            <Text className="font-medium text-sm text-foreground">{user?.full_name || user?.name || ''}</Text>
         </View>
     )
 }
