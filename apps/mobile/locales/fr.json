@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Raven",
+    "appName": "Synk",
     "cancel": "Annuler",
     "save": "Enregistrer",
     "delete": "Supprimer",
@@ -63,7 +63,7 @@
     "sites": "Sites",
     "selectExistingSite": "Sélectionner un site existant",
     "siteUrl": "URL du site",
-    "siteUrlPlaceholder": "raven.frappe.cloud",
+    "siteUrlPlaceholder": "moninstance.neoffice.me",
     "addSite": "Ajouter un site",
     "login": "Connexion",
     "logout": "Déconnexion",
@@ -76,13 +76,13 @@
     "credentialsNotFound": "Nous n'avons pas trouvé les identifiants enregistrés pour ce site. Veuillez vous reconnecter.",
     "switchSites": "Changer de site",
     "howToSetup": "Comment configurer l'application mobile",
-    "setupInstructions": "Pour utiliser l'application mobile Raven, vous devez configurer OAuth sur votre site Frappe.",
+    "setupInstructions": "Pour utiliser l'application mobile Synk, vous devez configurer OAuth sur votre site Frappe.",
     "step1": "Allez dans OAuth Client sur votre site",
     "step2": "Créez un nouveau client OAuth",
     "step3": "Définissez l'URI de redirection sur : raven://oauth-callback",
     "step4": "Copiez l'ID Client et utilisez-le ici",
     "fetchSiteInfoFailed": "Impossible de récupérer les informations du site. Veuillez vérifier l'URL et réessayer.",
-    "oauthNotConfigured": "Impossible de récupérer les informations du site / Client OAuth non configuré pour Raven Mobile",
+    "oauthNotConfigured": "Impossible de récupérer les informations du site / Client OAuth non configuré pour Synk Mobile",
     "offlineMessage": "L'application est hors ligne. Veuillez vérifier votre connexion internet.",
     "logoutFailed": "Échec de la déconnexion"
   },
@@ -509,9 +509,9 @@
     "currentSite": "Site actuel"
   },
   "setup": {
-    "howToSetupMobile": "Comment configurer mon site pour Raven mobile ?",
-    "title": "Configurer Raven mobile sur votre site",
-    "step1": "Ouvrez Raven dans votre navigateur de bureau",
+    "howToSetupMobile": "Comment configurer mon site pour Synk mobile ?",
+    "title": "Configurer Synk mobile sur votre site",
+    "step1": "Ouvrez Synk dans votre navigateur de bureau",
     "step2": "Allez dans Paramètres > Application mobile",
     "step3": "Cliquez sur Configurer le client OAuth",
     "oauthDescription": "Cela créera un client OAuth que les utilisateurs peuvent utiliser pour s'authentifier de manière sécurisée sur l'application mobile.",

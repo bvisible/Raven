@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Raven",
+    "appName": "Synk",
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
@@ -63,7 +63,7 @@
     "sites": "Sites",
     "selectExistingSite": "Select an existing site",
     "siteUrl": "Site URL",
-    "siteUrlPlaceholder": "raven.frappe.cloud",
+    "siteUrlPlaceholder": "moninstance.neoffice.me",
     "addSite": "Add Site",
     "login": "Login",
     "logout": "Log Out",
@@ -76,13 +76,13 @@
     "credentialsNotFound": "We could not find the stored credentials for this site. Please try logging in again.",
     "switchSites": "Switch Sites",
     "howToSetup": "How to setup mobile app",
-    "setupInstructions": "To use the Raven mobile app, you need to configure OAuth in your Frappe site.",
+    "setupInstructions": "To use the Synk mobile app, you need to configure OAuth in your Frappe site.",
     "step1": "Go to OAuth Client in your site",
     "step2": "Create a new OAuth Client",
     "step3": "Set the redirect URI to: raven://oauth-callback",
     "step4": "Copy the Client ID and use it here",
     "fetchSiteInfoFailed": "Failed to fetch site information. Please check the URL and try again.",
-    "oauthNotConfigured": "Failed to fetch site information / OAuth client not set for Raven Mobile",
+    "oauthNotConfigured": "Failed to fetch site information / OAuth client not set for Synk Mobile",
     "offlineMessage": "The app is offline. Please check your internet connection.",
     "logoutFailed": "Failed to log out"
   },
@@ -509,9 +509,9 @@
     "currentSite": "Current Site"
   },
   "setup": {
-    "howToSetupMobile": "How do I setup my site for Raven mobile?",
-    "title": "Set up Raven mobile on your site",
-    "step1": "Open Raven on your desktop browser",
+    "howToSetupMobile": "How do I setup my site for Synk mobile?",
+    "title": "Set up Synk mobile on your site",
+    "step1": "Open Synk on your desktop browser",
     "step2": "Go to Settings > Mobile App",
     "step3": "Click on Configure OAuth Client",
     "oauthDescription": "This will create an OAuth client that users can use to authenticate securely on the mobile app.",
