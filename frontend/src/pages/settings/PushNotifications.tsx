@@ -93,12 +93,15 @@ const PushNotifications = () => {
                         </CustomCallout>}
                         <ErrorBanner error={error} />
 
-                        <Text size='2'>To send push notifications, you have two options:
+                        <Text size='2'>To send push notifications, you have three options:
                             <br />
                             <br />
                             <ol className='list-decimal list-inside'>
                                 <li>
-                                    <Strong>Raven Cloud</Strong> - this is recommended. If you are self hosting, this is the only option.
+                                    <Strong>Firebase</Strong> - recommended for self-hosting with your own Firebase project.
+                                </li>
+                                <li>
+                                    <Strong>Raven Cloud</Strong> - uses Raven's managed push notification service.
                                 </li>
                                 <li>
                                     <Strong>Frappe Cloud</Strong> - if you are using Frappe Cloud, you can use this option.
@@ -126,6 +129,9 @@ const PushNotifications = () => {
                                         onValueChange={field.onChange}>
                                         <Select.Trigger className='w-full' />
                                         <Select.Content>
+                                            <Select.Item value='Firebase'>
+                                                {__("Firebase")}
+                                            </Select.Item>
                                             <Select.Item value='Raven'>
                                                 {__("Raven Cloud")}
                                             </Select.Item>
@@ -136,8 +142,20 @@ const PushNotifications = () => {
                                     </Select.Root>
                                 )}
                             />
-                            <HelperText>We recommend using Raven Cloud for push notifications.</HelperText>
+                            <HelperText>For self-hosted instances, we recommend using Firebase with your own Firebase project.</HelperText>
                         </Box>
+
+                        {watch('push_notification_service') === "Firebase" && ravenSettings?.vapid_public_key ?
+                            <CustomCallout
+                                rootProps={{ color: 'green', variant: 'surface' }}
+                                textChildren={__("Firebase is configured and ready to send push notifications.")} />
+                            : watch('push_notification_service') === "Firebase" && !ravenSettings?.vapid_public_key ?
+                                <CustomCallout
+                                    iconChildren={<FiAlertTriangle />}
+                                    rootProps={{ color: 'yellow', variant: 'surface' }}
+                                    textChildren={__("Firebase configuration is pending. Run 'bench migrate' to auto-configure.")} />
+                                : null
+                        }
 
                         {isRavenCloud ?
                             <Stack gap='3'>

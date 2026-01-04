@@ -88,7 +88,7 @@ class FrappePushNotification {
             return this.webConfig
         }
         try {
-            if (window.frappe?.boot.push_notification_service === "Raven") {
+            if (["Raven", "Firebase"].includes(window.frappe?.boot.push_notification_service)) {
                 this.webConfig = JSON.parse(window.frappe?.boot.firebase_client_config)
                 return this.webConfig
             }
@@ -114,7 +114,7 @@ class FrappePushNotification {
             return this.vapidPublicKey
         }
         try {
-            if (window.frappe?.boot.push_notification_service === "Raven") {
+            if (["Raven", "Firebase"].includes(window.frappe?.boot.push_notification_service)) {
                 this.vapidPublicKey = window.frappe?.boot.vapid_public_key
                 return this.vapidPublicKey
             }

@@ -44,7 +44,7 @@ class RavenSettings(Document):
 		push_notification_api_key: DF.Data | None
 		push_notification_api_secret: DF.Password | None
 		push_notification_server_url: DF.Data | None
-		push_notification_service: DF.Literal["Frappe Cloud", "Raven"]
+		push_notification_service: DF.Literal["Frappe Cloud", "Firebase", "Raven"]
 		show_if_a_user_is_on_leave: DF.Check
 		show_raven_on_desk: DF.Check
 		tenor_api_key: DF.Data | None
@@ -68,6 +68,12 @@ class RavenSettings(Document):
 				frappe.throw(_("Please enter the Push Notification API Key"))
 			if not self.push_notification_api_secret:
 				frappe.throw(_("Please enter the Push Notification API Secret"))
+
+		if self.push_notification_service == "Firebase":
+			if not self.config:
+				frappe.throw(_("Please enter the Firebase Config"))
+			if not self.vapid_public_key:
+				frappe.throw(_("Please enter the VAPID Public Key"))
 		if self.openai_organisation_id:
 			self.openai_organisation_id = self.openai_organisation_id.strip()
 

@@ -211,7 +211,7 @@
    "fieldname": "push_notification_service",
    "fieldtype": "Select",
    "label": "Push Notification Service",
-   "options": "Frappe Cloud\nRaven"
+   "options": "Frappe Cloud\nFirebase\nRaven"
   },
   {
    "depends_on": "eval: doc.push_notification_service == \"Raven\";",

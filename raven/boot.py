@@ -32,6 +32,6 @@ def boot_session(bootinfo):
 		else "Frappe Cloud"
 	)
 
-	if raven_settings.push_notification_service == "Raven":
+	if raven_settings.push_notification_service in ["Raven", "Firebase"]:
 		bootinfo.vapid_public_key = raven_settings.vapid_public_key
 		bootinfo.firebase_client_config = raven_settings.config

@@ -54,7 +54,7 @@ export interface RavenSettings{
 	/**	OAuth Client : Link - OAuth Client	*/
 	oauth_client?: string
 	/**	Push Notification Service : Select	*/
-	push_notification_service?: "Frappe Cloud" | "Raven"
+	push_notification_service?: "Frappe Cloud" | "Firebase" | "Raven"
 	/**	Push Notification Server URL : Data	*/
 	push_notification_server_url?: string
 	/**	Push Notification API Key : Data	*/
