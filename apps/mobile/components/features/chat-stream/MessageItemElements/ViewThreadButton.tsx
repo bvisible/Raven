@@ -28,7 +28,7 @@ const ThreadReplyCount = ({ message }: Props) => {
         revalidateOnFocus: false,
         shouldRetryOnError: false
     })
-    return <Text className='text-sm text-primary dark:text-secondary font-semibold'>{data?.message ?? 0} {data?.message === 1 ? t('messages.replyCount') : t('messages.repliesCount', { count: data?.message ?? 0 })}</Text>
+    return <Text className='text-sm text-primary dark:text-secondary font-semibold'>{data?.message === 1 ? t('messages.replyCount') : t('messages.repliesCount', { count: data?.message ?? 0 })}</Text>
 }
 
 export default ViewThreadButton

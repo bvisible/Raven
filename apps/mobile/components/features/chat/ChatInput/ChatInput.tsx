@@ -15,6 +15,7 @@ import TypingIndicator from "./TypingIndicator"
 import { UserMentions } from "./mentions"
 import ReplyMessagePreview from "./ReplyMessagePreview"
 import AIEventIndicator from "./AIEventIndicator"
+import AIThreadAutoOpen from "../AIThreadAutoOpen"
 import { useTyping } from "@raven/lib/hooks/useTypingIndicator"
 import * as ContextMenu from 'zeego/context-menu';
 import { useTranslation } from "react-i18next"
@@ -93,6 +94,7 @@ const ChatInput = ({ channelID, onSendMessage }: ChatInputProps) => {
     }, [onUserType])
 
     return <View className="flex flex-col gap-1 pt-1 bg-background">
+        <AIThreadAutoOpen channelID={channelID} />
         <AIEventIndicator channelID={channelID} />
         <TypingIndicator channel={channelID} />
         {siteID && <ReplyMessagePreview channelID={channelID} siteID={siteID} />}
