@@ -126,9 +126,11 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
 
     // If there are new messages in the channel, update the messages
     useFrappeEventListener('message_created', (event) => {
+        console.log('[useChatStream] message_created event:', event.channel_id, 'current channelID:', channelID, 'match:', event.channel_id === channelID)
         if (event.channel_id === channelID) {
 
             mutate((d) => {
+                console.log('[useChatStream] mutate called, has_new_messages:', d?.message?.has_new_messages)
                 if (d && d.message.has_new_messages === false) {
                     // Update the array of messages - append the new message in it and then sort it by date
                     const existingMessages = d.message.messages ?? []
