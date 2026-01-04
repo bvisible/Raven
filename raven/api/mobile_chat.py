@@ -21,6 +21,35 @@ from pypika import functions as fn
 
 from raven.api.raven_channel import create_direct_message_channel
 from raven.api.threads import get_all_threads
+from raven.utils import get_raven_user
+
+
+def ensure_raven_user():
+	"""
+	Ensure the current user has a Raven User record.
+	Creates one if it doesn't exist.
+
+	Returns:
+	    str: The Raven User ID
+	"""
+	user = frappe.session.user
+	raven_user_id = get_raven_user(user)
+
+	if raven_user_id:
+		return raven_user_id
+
+	# Create Raven User for this user
+	user_doc = frappe.get_doc("User", user)
+
+	raven_user = frappe.new_doc("Raven User")
+	raven_user.user = user
+	raven_user.full_name = user_doc.full_name or user_doc.first_name or user
+	raven_user.first_name = user_doc.first_name or user
+	raven_user.enabled = 1
+	raven_user.insert(ignore_permissions=True)
+	frappe.db.commit()
+
+	return raven_user.name
 
 
 @frappe.whitelist()
@@ -31,6 +60,9 @@ def get_nora_dm_channel():
 	Returns:
 	    dict with channel_id and bot info
 	"""
+	# Ensure current user has a Raven User record
+	ensure_raven_user()
+
 	# Get the nora bot's Raven User ID
 	nora_bot = frappe.db.get_value(
 		"Raven Bot", {"bot_name": "nora", "model_provider": "Nora"}, ["name", "raven_user"], as_dict=True
