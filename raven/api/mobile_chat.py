@@ -17,6 +17,7 @@ Date: 2026-01-04
 import frappe
 from frappe import _
 from frappe.query_builder import Order
+from pypika import functions as fn
 
 from raven.api.raven_channel import create_direct_message_channel
 from raven.api.threads import get_all_threads
@@ -250,7 +251,7 @@ def get_conversation_count():
 		.where(channel_member.user_id == frappe.session.user)
 		.where(channel.is_thread == 1)
 		.where(channel.is_ai_thread == 1)
-		.select(frappe.qb.functions.Count(channel.name))
+		.select(fn.Count(channel.name))
 		.run()
 	)
 
