@@ -1,4 +1,4 @@
-import { useFrappeEventListener } from 'frappe-react-sdk'
+import { useFrappeDocumentEventListener, useFrappeEventListener } from 'frappe-react-sdk'
 import { useRouteToThread } from '@hooks/useRouting'
 
 type Props = {
@@ -11,6 +11,9 @@ type Props = {
  */
 const AIThreadAutoOpen = ({ channelID }: Props) => {
     const goToThread = useRouteToThread()
+
+    // Subscribe to channel events to receive realtime updates
+    useFrappeDocumentEventListener('Raven Channel', channelID, () => { })
 
     // Listen for ai_thread_created event
     useFrappeEventListener('ai_thread_created', (data) => {
