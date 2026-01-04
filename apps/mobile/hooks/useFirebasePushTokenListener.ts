@@ -34,7 +34,8 @@ const useFirebasePushTokenListener = () => {
                         const response = await call.post('neoffice_theme.mobile.register_device_token', {
                             token: token,
                             platform: 'ios',
-                            device_id: Device.deviceName || 'Synk-Mobile'
+                            device_id: Device.deviceName || 'Synk-Mobile',
+                            app: 'synk'  // Link to Firebase App Configuration
                         })
                         console.log('[PushToken] Mobile Device register response:', response)
 
