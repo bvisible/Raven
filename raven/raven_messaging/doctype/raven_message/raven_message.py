@@ -204,6 +204,9 @@ class RavenMessage(Document):
 			}
 
 	def after_insert(self):
+		# Call parent to trigger doc_events hooks
+		super().after_insert()
+
 		if self.message_type != "System":
 			last_message_details = self.set_last_message_timestamp()
 			self.publish_unread_count_event(last_message_details)
