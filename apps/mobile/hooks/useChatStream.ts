@@ -282,6 +282,34 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
 
     })
 
+    // If an AI thread is created, update the parent message's is_thread flag
+    useFrappeEventListener('ai_thread_created', (event) => {
+        console.log('[useChatStream] ai_thread_created event:', event.channel_id, 'channelID:', channelID)
+        if (event.channel_id === channelID && event.thread_id) {
+            mutate((d) => {
+                if (d) {
+                    const newMessages = d.message.messages.map((message) => {
+                        if (message.name === event.thread_id) {
+                            return {
+                                ...message,
+                                is_thread: 1,
+                            }
+                        }
+                        return message
+                    })
+                    return ({
+                        message: {
+                            messages: newMessages,
+                            has_old_messages: d.message.has_old_messages,
+                            has_new_messages: d.message.has_new_messages
+                        }
+                    })
+                }
+                return d
+            }, { revalidate: false })
+        }
+    })
+
     const trackVisit = useTrackChannelVisit(channelID, isThread)
     /**
      * Track visit when unmounting if new messages were loaded.
