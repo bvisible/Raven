@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "257310726313",
-    "project_id": "raven-c2659",
-    "storage_bucket": "raven-c2659.firebasestorage.app"
+    "project_number": "654951732242",
+    "project_id": "neoffice-ee024",
+    "storage_bucket": "neoffice-ee024.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:257310726313:android:f0ee0638ffdfd773a631b8",
+        "mobilesdk_app_id": "1:654951732242:android:c67c6c9062edb46269f4cb",
         "android_client_info": {
-          "package_name": "raven.thecommit.company"
+          "package_name": "io.synk.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCf69Jla-6oxw9GXL2rcuwJpLhSbk5F_gQ"
+          "current_key": "AIzaSyDlEP5zUMpdllXB-M75-YS4ymt_wLl8dXk"
         }
       ],
       "services": {

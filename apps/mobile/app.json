@@ -2,7 +2,7 @@
   "expo": {
     "name": "Synk",
     "slug": "Synk",
-    "scheme": "raven.thecommit.company",
+    "scheme": "io.synk.app",
     "version": "1.1.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": false,
       "appleTeamId": "W6346TTZQX",
-      "bundleIdentifier": "raven.thecommit.company",
+      "bundleIdentifier": "io.synk.app",
       "config": {
         "usesNonExemptEncryption": false
       },
@@ -37,7 +37,7 @@
         "backgroundColor": "#000000"
       },
       "softwareKeyboardLayoutMode": "pan",
-      "package": "raven.thecommit.company",
+      "package": "io.synk.app",
       "googleServicesFile": "./google-services.json"
     },
     "web": {
