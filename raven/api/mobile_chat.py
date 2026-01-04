@@ -23,7 +23,7 @@ from raven.api.raven_channel import create_direct_message_channel
 from raven.api.threads import get_all_threads
 
 
-@frappe.whitelist(methods=["GET"])
+@frappe.whitelist()
 def get_nora_dm_channel():
 	"""
 	Get or create the DM channel between current user and nora bot.
@@ -45,7 +45,7 @@ def get_nora_dm_channel():
 	return {"channel_id": channel_id, "bot_name": nora_bot.name, "bot_user_id": nora_bot.raven_user}
 
 
-@frappe.whitelist(methods=["GET"])
+@frappe.whitelist()
 def get_ai_conversations(limit: int = 20, start_after: int = 0):
 	"""
 	Get all AI conversation threads for the current user.
@@ -74,7 +74,7 @@ def get_ai_conversations(limit: int = 20, start_after: int = 0):
 	return threads
 
 
-@frappe.whitelist(methods=["GET"])
+@frappe.whitelist()
 def get_thread_messages(thread_id: str, limit: int = 50, offset: int = 0):
 	"""
 	Get messages from an AI thread.
@@ -233,7 +233,7 @@ def send_message_to_nora(text: str, thread_id: str = None):
 	}
 
 
-@frappe.whitelist(methods=["GET"])
+@frappe.whitelist()
 def get_conversation_count():
 	"""
 	Get the total count of AI conversations for the current user.
