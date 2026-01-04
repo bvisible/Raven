@@ -106,7 +106,8 @@
    "fieldname": "model_provider",
    "fieldtype": "Select",
    "label": "Model Provider",
-   "options": "OpenAI\nLocal LLM"
+   "options": "OpenAI\nLocal LLM\nNora",
+   "description": "OpenAI: Use OpenAI API, Local LLM: Use local LLM (Ollama/LM Studio), Nora: Use NORA AI engine (RAG, code execution, ERP tools)"
   },
   {
    "depends_on": "eval: doc.is_ai_bot",
@@ -250,7 +251,7 @@
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-10-03 16:40:08.890724",
+ "modified": "2026-01-04 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "Raven Bot",
  "name": "Raven Bot",

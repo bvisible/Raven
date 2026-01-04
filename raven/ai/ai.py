@@ -17,15 +17,81 @@ def handle_bot_dm(message, bot):
 	"""
 	Function to handle direct messages to the bot.
 
-	Routes to Agents SDK for bots with model_provider, falls back to Assistants API for legacy bots.
+	Routes to:
+	- Nora handler for bots with model_provider="Nora"
+	- Agents SDK for bots with model_provider in ["OpenAI", "Local LLM"]
+	- Assistants API for legacy bots with openai_assistant_id
 	"""
 
+	# Check if bot uses Nora integration
+	if bot.model_provider == "Nora":
+		return handle_bot_dm_with_nora(message, bot)
 	# Check if bot uses new Agents SDK
-	if bot.model_provider in ["OpenAI", "Local LLM"] and not bot.openai_assistant_id:
+	elif bot.model_provider in ["OpenAI", "Local LLM"] and not bot.openai_assistant_id:
 		return handle_bot_dm_with_agents(message, bot)
 	else:
 		# Use old Assistants API for legacy bots
 		return handle_bot_dm_with_assistants(message, bot)
+
+
+def handle_bot_dm_with_nora(message, bot):
+	"""
+	Handle direct messages using NORA AI engine.
+
+	Routes all AI processing (prompt, RAG, code execution) to Nora.
+	Raven only handles the chat UI and message storage.
+	"""
+
+	# If the message is a poll, send a message to the user that we don't support polls for AI yet
+	if message.message_type == "Poll":
+		bot.send_message(
+			channel_id=message.channel_id,
+			text="Sorry, I don't support polls yet. Please send a text message or file.",
+		)
+		return
+
+	# Create thread channel for the conversation FIRST
+	thread_channel = frappe.get_doc(
+		{
+			"doctype": "Raven Channel",
+			"channel_name": message.name,
+			"type": "Private",
+			"is_thread": 1,
+			"is_ai_thread": 1,
+			"is_dm_thread": 1,
+			"thread_bot": bot.name,
+		}
+	).insert()
+
+	# Update the message to mark it as a thread
+	message.is_thread = 1
+	message.save()
+	# Manual commit required: AI processing happens in background job that needs the message to exist in DB
+	frappe.db.commit()  # nosemgrep
+
+	# Send event to open the thread FIRST
+	publish_ai_thread_created_event(message, message.channel_id)
+
+	# Send thinking message for new DM threads
+	frappe.publish_realtime(
+		"ai_event",
+		{
+			"text": "Nora is thinking...",
+			"channel_id": message.name,  # For new DM threads, use the message ID
+			"bot": bot.name,
+		},
+		user=message.owner,
+		after_commit=False,
+	)
+
+	# Process message with Nora
+	process_message_with_nora(
+		message=message,
+		bot=bot,
+		channel_id=thread_channel.name,
+		is_new_conversation=True,
+		thread_message_id=message.name,
+	)
 
 
 def handle_bot_dm_with_agents(message, bot):
@@ -186,17 +252,50 @@ def handle_ai_thread_message(message, channel):
 	"""
 	Function to handle messages in an AI thread.
 
-	Routes to Agents SDK for bots with model_provider, falls back to Assistants API for legacy bots.
+	Routes to:
+	- Nora handler for bots with model_provider="Nora"
+	- Agents SDK for bots with model_provider in ["OpenAI", "Local LLM"]
+	- Assistants API for legacy bots with openai_assistant_id
 	"""
 
 	bot = frappe.get_cached_doc("Raven Bot", channel.thread_bot)
 
+	# Check if bot uses Nora integration
+	if bot.model_provider == "Nora":
+		return handle_ai_thread_message_with_nora(message, channel, bot)
 	# Check if bot uses new Agents SDK
-	if bot.model_provider in ["OpenAI", "Local LLM"] and not bot.openai_assistant_id:
+	elif bot.model_provider in ["OpenAI", "Local LLM"] and not bot.openai_assistant_id:
 		return handle_ai_thread_message_with_agents(message, channel, bot)
 	else:
 		# Use old Assistants API for legacy bots
 		return handle_ai_thread_message_with_assistants(message, channel, bot)
+
+
+def handle_ai_thread_message_with_nora(message, channel, bot):
+	"""
+	Handle thread messages using NORA AI engine.
+	"""
+
+	# Skip file/image messages without text - they'll be handled when the user sends a follow-up
+	if message.message_type in ["File", "Image"] and not message.text and not message.content:
+		return
+
+	# Send thinking message for existing threads
+	frappe.publish_realtime(
+		"ai_event",
+		{
+			"text": "Nora is thinking...",
+			"channel_id": channel.channel_name,
+			"bot": bot.name,
+		},
+		user=message.owner,
+		after_commit=False,
+	)
+
+	# Process message with Nora
+	process_message_with_nora(
+		message=message, bot=bot, channel_id=channel.name, is_new_conversation=False, channel=channel
+	)
 
 
 def handle_ai_thread_message_with_agents(message, channel, bot):
@@ -754,6 +853,131 @@ def get_content_attachment_for_file(message_type: str, file_id: str, file_url: s
 		]
 
 	return content, attachments
+
+
+def process_message_with_nora(
+	message, bot, channel_id: str, is_new_conversation: bool, channel=None, thread_message_id=None
+):
+	"""
+	Process a message using NORA's AI orchestration.
+
+	This function routes all AI processing to Nora, including:
+	- Prompt generation (from NORA Settings)
+	- RAG context (from Haystack)
+	- Code execution (31 Frappe tools)
+	- OCR/Vision
+
+	Raven only handles the chat UI and message storage.
+	"""
+	import json
+
+	try:
+		# Check if Nora app is installed
+		if "nora" not in frappe.get_installed_apps():
+			bot.send_message(
+				channel_id=channel_id,
+				text="Error: NORA app is not installed. Please install the NORA app to use this bot.",
+			)
+			return
+
+		# Get the message content
+		content = message.text or message.content or ""
+
+		# Handle file/image messages
+		files = []
+		if message.message_type in ["File", "Image"]:
+			file_url = message.file
+			if "fid" in file_url:
+				file_url = file_url.split("?fid=")[0]
+
+			files.append(
+				{"file_url": file_url, "file_type": message.message_type, "message_type": message.message_type}
+			)
+
+			# If there's text with the file, include it
+			if content:
+				pass  # content already set
+			else:
+				content = f"[User uploaded a {'file' if message.message_type == 'File' else 'image'}]"
+
+		# Get conversation history from the channel
+		conversation_history = []
+		if not is_new_conversation and channel:
+			messages = frappe.get_all(
+				"Raven Message",
+				filters={"channel_id": channel.name},
+				fields=["text", "content", "owner", "bot", "is_bot_message", "creation"],
+				order_by="creation desc",
+				limit=20,
+			)
+
+			# Reverse to get chronological order and exclude current message
+			for msg in reversed(messages[1:] if messages else []):
+				msg_text = msg.get("text") or msg.get("content") or ""
+				if msg.get("bot") or msg.get("is_bot_message"):
+					conversation_history.append({"role": "assistant", "content": msg_text})
+				else:
+					conversation_history.append({"role": "user", "content": msg_text})
+
+		# Call Nora handler
+		from nora.api.raven_handler import handle_raven_message_stream
+
+		response = handle_raven_message_stream(
+			channel_id=channel_id,
+			message_id=message.name,
+			message_text=content,
+			user=message.owner,
+			thread_id=thread_message_id,
+			files=json.dumps(files) if files else None,
+			conversation_history=json.dumps(conversation_history) if conversation_history else None,
+			bot_name=bot.name,
+		)
+
+		if response.get("success"):
+			if response.get("response"):
+				# Check if response contains details tag (thinking section)
+				has_thinking = "<details" in response["response"]
+				bot.send_message(channel_id=channel_id, text=response["response"], markdown=not has_thinking)
+		else:
+			error_text = "Sorry, I encountered an error while processing your request."
+			if bot.debug_mode and response.get("error"):
+				error_text += f"\n\nError: {response['error']}"
+			bot.send_message(channel_id=channel_id, text=error_text)
+
+		# Clear the "thinking" message
+		event_channel_id = (
+			thread_message_id if thread_message_id else (channel.channel_name if channel else channel_id)
+		)
+		frappe.publish_realtime(
+			"ai_event_clear",
+			{"channel_id": event_channel_id},
+			user=message.owner,
+			after_commit=False,
+		)
+
+	except Exception as e:
+		import traceback
+
+		frappe.log_error(
+			f"Error in process_message_with_nora: {str(e)}\n\nTraceback:\n{traceback.format_exc()}",
+			"Raven Nora Integration",
+		)
+
+		error_text = "I encountered an error while processing your request."
+		if bot.debug_mode:
+			error_text += f"\n\nError: {str(e)}"
+		bot.send_message(channel_id=channel_id, text=error_text)
+
+		# Clear the "thinking" message even on error
+		event_channel_id = (
+			thread_message_id if thread_message_id else (channel.channel_name if channel else channel_id)
+		)
+		frappe.publish_realtime(
+			"ai_event_clear",
+			{"channel_id": event_channel_id},
+			user=message.owner,
+			after_commit=False,
+		)
 
 
 def publish_ai_thread_created_event(message, channel_id):
