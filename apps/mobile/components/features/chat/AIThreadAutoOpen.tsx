@@ -12,13 +12,16 @@ type Props = {
 const AIThreadAutoOpen = ({ channelID }: Props) => {
     const goToThread = useRouteToThread()
 
+    console.log('[AIThreadAutoOpen] Mounted with channelID:', channelID)
+
     // Subscribe to channel events to receive realtime updates
     useFrappeDocumentEventListener('Raven Channel', channelID, () => { })
 
     // Listen for ai_thread_created event
     useFrappeEventListener('ai_thread_created', (data) => {
+        console.log('[AIThreadAutoOpen] Event received:', JSON.stringify(data), 'channelID:', channelID)
         if (data.is_ai_thread && data.thread_id && data.channel_id && channelID === data.channel_id) {
-            // Navigate to the AI thread
+            console.log('[AIThreadAutoOpen] Navigating to thread:', data.thread_id)
             goToThread(data.thread_id)
         }
     })
