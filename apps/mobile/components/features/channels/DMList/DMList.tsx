@@ -20,29 +20,6 @@ const DMList = ({ dms }: { dms: DMChannelListItem[] }) => {
     return <DMListUI dms={dms} />
 }
 
-const DMListUI = ({ dms }: { dms: DMChannelListItem[] }) => {
-    const { t } = useTranslation();
-    const [isExpanded, setIsExpanded] = useState(true)
-    const { colors } = useColorScheme()
-
-    const toggleAccordion = () => {
-        setIsExpanded((prev) => !prev)
-    }
-
-    return (
-        <View style={styles.container}>
-            <TouchableOpacity onPress={toggleAccordion} style={styles.header} activeOpacity={0.7}>
-                <Text style={styles.headerText}>{t('channels.directMessages')}</Text>
-                {isExpanded ? <ChevronDownIcon fill={colors.icon} /> : <ChevronRightIcon fill={colors.icon} />}
-            </TouchableOpacity>
-            {isExpanded && <>
-                {dms.map((dm) => <DMListRow key={dm.name} dm={dm} />)}
-                {dms.length < 5 && <ExtraUsersItemList dms={dms} />}
-            </>}
-        </View>
-    )
-}
-
 export const DMListRow = ({ dm }: { dm: DMChannelListItem }) => {
     const user = useGetUser(dm.peer_user_id)
 
@@ -67,6 +44,37 @@ export const DMListRow = ({ dm }: { dm: DMChannelListItem }) => {
                 <Text style={styles.dmChannelText}>{user?.full_name || user?.name || ''}</Text>
             </Pressable>
         </Link>
+    )
+}
+
+const ExtraUserItem = ({ user, createDMChannel }: { user: UserFields, createDMChannel: (user_id: string) => Promise<void> }) => {
+    const [isLoading, setIsLoading] = useState(false)
+    const isActive = useIsUserActive(user.name)
+
+    const onPress = () => {
+        setIsLoading(true)
+        createDMChannel(user.name).finally(() => setIsLoading(false))
+    }
+
+    return (
+        <Pressable
+            onPress={onPress}
+            disabled={isLoading}
+            className='flex-row items-center px-3 py-1.5 rounded-lg ios:active:bg-linkColor'
+            android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: false }}
+            style={{ opacity: isLoading ? 0.5 : 1 }}
+        >
+            <UserAvatar
+                src={user.user_image ?? ""}
+                alt={user.full_name ?? ""}
+                isActive={isActive}
+                availabilityStatus={user.availability_status}
+                avatarProps={{ className: "w-8 h-8" }}
+                textProps={{ className: "text-sm font-medium" }}
+                isBot={user.type === 'Bot'}
+            />
+            <Text style={styles.dmChannelText}>{user.full_name || user.name || ''}</Text>
+        </Pressable>
     )
 }
 
@@ -103,34 +111,26 @@ const ExtraUsersItemList = ({ dms }: { dms: DMChannelListItem[] }) => {
     )
 }
 
-const ExtraUserItem = ({ user, createDMChannel }: { user: UserFields, createDMChannel: (user_id: string) => Promise<void> }) => {
-    const [isLoading, setIsLoading] = useState(false)
-    const isActive = useIsUserActive(user.name)
+const DMListUI = ({ dms }: { dms: DMChannelListItem[] }) => {
+    const { t } = useTranslation();
+    const [isExpanded, setIsExpanded] = useState(true)
+    const { colors } = useColorScheme()
 
-    const onPress = () => {
-        setIsLoading(true)
-        createDMChannel(user.name).finally(() => setIsLoading(false))
+    const toggleAccordion = () => {
+        setIsExpanded((prev) => !prev)
     }
 
     return (
-        <Pressable
-            onPress={onPress}
-            disabled={isLoading}
-            className='flex-row items-center px-3 py-1.5 rounded-lg ios:active:bg-linkColor'
-            android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: false }}
-            style={{ opacity: isLoading ? 0.5 : 1 }}
-        >
-            <UserAvatar
-                src={user.user_image ?? ""}
-                alt={user.full_name ?? ""}
-                isActive={isActive}
-                availabilityStatus={user.availability_status}
-                avatarProps={{ className: "w-8 h-8" }}
-                textProps={{ className: "text-sm font-medium" }}
-                isBot={user.type === 'Bot'}
-            />
-            <Text style={styles.dmChannelText}>{user.full_name || user.name || ''}</Text>
-        </Pressable>
+        <View style={styles.container}>
+            <TouchableOpacity onPress={toggleAccordion} style={styles.header} activeOpacity={0.7}>
+                <Text style={styles.headerText}>{t('channels.directMessages')}</Text>
+                {isExpanded ? <ChevronDownIcon fill={colors.icon} /> : <ChevronRightIcon fill={colors.icon} />}
+            </TouchableOpacity>
+            {isExpanded && <>
+                {dms.map((dm) => <DMListRow key={dm.name} dm={dm} />)}
+                {dms.length < 5 && <ExtraUsersItemList dms={dms} />}
+            </>}
+        </View>
     )
 }
 
