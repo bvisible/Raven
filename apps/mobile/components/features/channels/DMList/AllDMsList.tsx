@@ -1,6 +1,7 @@
 import { useColorScheme } from "@hooks/useColorScheme"
 import useUnreadMessageCount from "@hooks/useUnreadMessageCount"
 import { ChannelListContext, ChannelListContextType } from "@raven/lib/providers/ChannelListProvider"
+import useCurrentRavenUser from "@raven/lib/hooks/useCurrentRavenUser"
 import { useContext, useMemo, useState } from "react"
 import { View, ActivityIndicator, Pressable } from "react-native"
 import DMRow from "./DMRow"
@@ -77,6 +78,7 @@ const AllDMsList = () => {
     const { dm_channels, error, isLoading, mutate } = useContext(ChannelListContext) as ChannelListContextType
     const { enabledUsers } = useContext(UserListContext)
     const { unread_count } = useUnreadMessageCount()
+    const { myProfile } = useCurrentRavenUser()
 
     const allDMs = useMemo(() => {
         return dm_channels?.map(dm => ({
@@ -90,20 +92,23 @@ const AllDMsList = () => {
     const filteredDMs = useMemo(() => {
         return allDMs.filter(dm => {
             if (!dm.peer_user_id) return false
+            // Filter out self-DMs (DMs with yourself)
+            if (dm.peer_user_id === myProfile?.name) return false
             return dm.peer_user_id?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
         })
-    }, [allDMs, debouncedSearchQuery])
+    }, [allDMs, debouncedSearchQuery, myProfile?.name])
 
-    // Get users without existing DM channels
+    // Get users without existing DM channels (excluding self)
     const extraUsers = useMemo(() => {
         return Array.from(enabledUsers.values())
+            .filter((user) => user.name !== myProfile?.name) // Exclude self
             .filter((user) => !dm_channels.find((channel) => channel.peer_user_id === user.name))
             .filter((user) => {
                 if (!debouncedSearchQuery) return true
                 return user.full_name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
                     user.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
             })
-    }, [enabledUsers, dm_channels, debouncedSearchQuery])
+    }, [enabledUsers, dm_channels, debouncedSearchQuery, myProfile?.name])
 
     const { call } = useFrappePostCall<{ message: string }>('raven.api.raven_channel.create_direct_message_channel')
 

@@ -15,6 +15,7 @@ import { ChannelListContext, ChannelListContextType } from '@raven/lib/providers
 import { useFrappePostCall } from 'frappe-react-sdk';
 import { toast } from 'sonner-native';
 import { UserFields } from '@raven/types/common/UserFields';
+import useCurrentRavenUser from '@raven/lib/hooks/useCurrentRavenUser';
 
 const DMList = ({ dms }: { dms: DMChannelListItem[] }) => {
     return <DMListUI dms={dms} />
@@ -81,6 +82,7 @@ const ExtraUserItem = ({ user, createDMChannel }: { user: UserFields, createDMCh
 const ExtraUsersItemList = ({ dms }: { dms: DMChannelListItem[] }) => {
     const { enabledUsers } = useContext(UserListContext)
     const { mutate } = useContext(ChannelListContext) as ChannelListContextType
+    const { myProfile } = useCurrentRavenUser()
 
     const { call } = useFrappePostCall<{ message: string }>('raven.api.raven_channel.create_direct_message_channel')
 
@@ -96,11 +98,12 @@ const ExtraUsersItemList = ({ dms }: { dms: DMChannelListItem[] }) => {
     }
 
     const filteredUsers = useMemo(() => {
-        // Show only users who are not in the DM list
+        // Show only users who are not in the DM list (excluding self)
         return Array.from(enabledUsers.values())
+            .filter((user) => user.name !== myProfile?.name) // Exclude self
             .filter((user) => !dms.find((channel) => channel.peer_user_id === user.name))
             .slice(0, 5)
-    }, [enabledUsers, dms])
+    }, [enabledUsers, dms, myProfile?.name])
 
     return (
         <>
@@ -115,10 +118,16 @@ const DMListUI = ({ dms }: { dms: DMChannelListItem[] }) => {
     const { t } = useTranslation();
     const [isExpanded, setIsExpanded] = useState(true)
     const { colors } = useColorScheme()
+    const { myProfile } = useCurrentRavenUser()
 
     const toggleAccordion = () => {
         setIsExpanded((prev) => !prev)
     }
+
+    // Filter out self-DMs (DMs with yourself)
+    const filteredDMs = useMemo(() => {
+        return dms.filter(dm => dm.peer_user_id !== myProfile?.name)
+    }, [dms, myProfile?.name])
 
     return (
         <View style={styles.container}>
@@ -127,8 +136,8 @@ const DMListUI = ({ dms }: { dms: DMChannelListItem[] }) => {
                 {isExpanded ? <ChevronDownIcon fill={colors.icon} /> : <ChevronRightIcon fill={colors.icon} />}
             </TouchableOpacity>
             {isExpanded && <>
-                {dms.map((dm) => <DMListRow key={dm.name} dm={dm} />)}
-                {dms.length < 5 && <ExtraUsersItemList dms={dms} />}
+                {filteredDMs.map((dm) => <DMListRow key={dm.name} dm={dm} />)}
+                {filteredDMs.length < 5 && <ExtraUsersItemList dms={filteredDMs} />}
             </>}
         </View>
     )
