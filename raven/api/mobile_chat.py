@@ -266,10 +266,12 @@ def send_message_to_nora(text: str, thread_id: str = None):
 
 	# The bot response will be sent asynchronously via Raven's normal flow
 	# Return info about what was created
+	# Note: When sending to DM (no thread_id), the user_message.name becomes the new thread ID
 	return {
 		"success": True,
 		"user_message_id": user_message.name,
 		"channel_id": target_channel,
+		"thread_id": thread_id or user_message.name,  # If new thread, message ID = thread ID
 		"is_new_thread": thread_id is None,
 	}
 

@@ -48,8 +48,8 @@ def create_oauth_client():
 
 	oauth_client.app_name = "Raven Mobile"
 	oauth_client.scopes = "all openid"
-	oauth_client.redirect_uris = "raven.thecommit.company:"
-	oauth_client.default_redirect_uri = "raven.thecommit.company:"
+	oauth_client.redirect_uris = "io.synk.app:"
+	oauth_client.default_redirect_uri = "io.synk.app:"
 	oauth_client.grant_type = "Authorization Code"
 	oauth_client.response_type = "Code"
 	oauth_client.allowed_roles = []
