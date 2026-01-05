@@ -179,14 +179,17 @@ def get_raven_user(user_id: str) -> str:
 	"""
 	Get the Raven User ID of a user
 	"""
-	# TODO: Run this via cache
-	filters = [["user", "=", user_id], "or", ["bot", "=", user_id]]
+	# First check by user field
+	raven_user = frappe.db.get_value("Raven User", {"user": user_id}, "name")
+	if raven_user:
+		return raven_user
 
-	query = frappe.qb.get_query("Raven User", filters=filters, limit=1)
+	# Then check by bot field
+	raven_user = frappe.db.get_value("Raven User", {"bot": user_id}, "name")
+	if raven_user:
+		return raven_user
 
-	result = query.run(pluck=True)
-
-	return result[0] if result else None
+	return None
 
 
 def get_thread_reply_count(thread_id: str) -> int:
