@@ -63,7 +63,10 @@ export default function RootLayout() {
             const initialNotification = await messaging.getInitialNotification();
 
             if (initialNotification) {
+                console.log('[Notification] App started from notification:', JSON.stringify(initialNotification.data));
                 if (initialNotification.data?.channel_id && initialNotification.data?.sitename) {
+                    const targetPath = `/${initialNotification.data.sitename}/${initialNotification.data.is_thread ? 'thread' : 'chat'}/${initialNotification.data.channel_id}`;
+                    console.log('[Notification] Navigating to:', targetPath);
                     setDefaultSite(initialNotification.data.sitename as string)
                     let path = 'chat'
                     if (initialNotification.data.is_thread) {
@@ -74,6 +77,8 @@ export default function RootLayout() {
                     })
 
                     return
+                } else {
+                    console.log('[Notification] Missing channel_id or sitename in initial notification');
                 }
             }
 
@@ -89,8 +94,10 @@ export default function RootLayout() {
 
         // Handle notification open when app is in background
         const unsubscribeOnNotificationOpen = messaging.onNotificationOpenedApp(async (remoteMessage) => {
-            // console.log('Notification opened app from background state:', remoteMessage);
+            console.log('[Notification] App opened from background:', JSON.stringify(remoteMessage.data));
             if (remoteMessage.data?.channel_id && remoteMessage.data?.sitename) {
+                const targetPath = `/${remoteMessage.data.sitename}/${remoteMessage.data.is_thread === '1' ? 'thread' : 'chat'}/${remoteMessage.data.channel_id}`;
+                console.log('[Notification] Navigating to:', targetPath);
                 setDefaultSite(remoteMessage.data.sitename as string)
                 let path = 'chat'
                 if (remoteMessage.data.is_thread === '1') {
@@ -99,6 +106,8 @@ export default function RootLayout() {
                 router.navigate(`/${remoteMessage.data.sitename}/${path}/${remoteMessage.data.channel_id}`, {
                     withAnchor: true
                 })
+            } else {
+                console.log('[Notification] Missing channel_id or sitename in notification data');
             }
         });
 

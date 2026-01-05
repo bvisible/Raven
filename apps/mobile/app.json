@@ -75,16 +75,17 @@
           }
         }
       ],
-      "expo-video"
+      "expo-video",
+      "expo-localization"
     ],
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "3a173ddd-f22a-4f81-8279-40dcee6c29d5"
+        "projectId": "35f9bd40-e4d5-4243-8569-b2d810b93be2"
       }
     },
-    "owner": "the-commit-company"
+    "owner": "neoservice"
   }
 }

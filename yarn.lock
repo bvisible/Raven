@@ -1286,10 +1286,10 @@
   dependencies:
     uuid "^8.0.0"
 
-"@expo/cli@0.22.26":
-  version "0.22.26"
-  resolved "https://registry.yarnpkg.com/@expo/cli/-/cli-0.22.26.tgz#b61b5223af484cc50f83eac3eaaa9d53e941ade9"
-  integrity sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==
+"@expo/cli@0.22.27":
+  version "0.22.27"
+  resolved "https://registry.yarnpkg.com/@expo/cli/-/cli-0.22.27.tgz#22b64e1b02908390ab397693699986a5c70f72a2"
+  integrity sha512-MZ3s68+OFQZWljAiCdwL+dL+xZudpkmhq0A2Qb4+p6MNp386WJyAYineXtiLJVww/8ohIfUxOL10vnaPdDVl4w==
   dependencies:
     "@0no-co/graphql.web" "^1.0.8"
     "@babel/runtime" "^7.20.0"
@@ -1613,10 +1613,12 @@
   resolved "https://registry.yarnpkg.com/@expo/sudo-prompt/-/sudo-prompt-9.3.2.tgz#0fd2813402a42988e49145cab220e25bea74b308"
   integrity sha512-HHQigo3rQWKMDzYDLkubN5WQOYXJJE2eNqIQC2axC2iO3mHdwnIR7FgZVvHWtBwAdzBgAP0ECp8KqS8TiMKvgw==
 
-"@expo/vector-icons@^14.0.0":
-  version "14.1.0"
-  resolved "https://registry.yarnpkg.com/@expo/vector-icons/-/vector-icons-14.1.0.tgz#d3dddad8b6ea60502e0fe5485b86751827606ce4"
-  integrity sha512-7T09UE9h8QDTsUeMGymB4i+iqvtEeaO5VvUjryFB4tugDTG/bkzViWA74hm5pfjjDEhYMXWaX112mcvhccmIwQ==
+"@expo/vector-icons@~14.0.4":
+  version "14.0.4"
+  resolved "https://registry.yarnpkg.com/@expo/vector-icons/-/vector-icons-14.0.4.tgz#fa9d4351877312badf91a806598b2f0bab16039a"
+  integrity sha512-+yKshcbpDfbV4zoXOgHxCwh7lkE9VVTT5T03OUlBsqfze1PLy6Hi4jp1vSb1GVbY6eskvMIivGVc9SKzIv0oEQ==
+  dependencies:
+    prop-types "^15.8.1"
 
 "@expo/ws-tunnel@^1.0.1":
   version "1.0.6"
@@ -6322,10 +6324,10 @@ expo-auth-session@~6.0.3:
     expo-web-browser "~14.0.2"
     invariant "^2.2.4"
 
-expo-build-properties@~0.13.2:
-  version "0.13.2"
-  resolved "https://registry.yarnpkg.com/expo-build-properties/-/expo-build-properties-0.13.2.tgz#c9cef927fc8236551d940da4fd8dc1332e2d052d"
-  integrity sha512-ML2GwBgn0Bo4yPgnSGb7h3XVxCigS/KFdid3xPC2HldEioTP3UewB/2Qa4WBsam9Fb7lAuRyVHAfRoA3swpDzg==
+expo-build-properties@~0.13.3:
+  version "0.13.3"
+  resolved "https://registry.yarnpkg.com/expo-build-properties/-/expo-build-properties-0.13.3.tgz#6b96d0486148fca6e74e62c7c502c0a9990931aa"
+  integrity sha512-gw7AYP+YF50Gr912BedelRDTfR4GnUEn9p5s25g4nv0hTJGWpBZdCYR5/Oi2rmCHJXxBqhPjxzV7JRh72fntLg==
   dependencies:
     ajv "^8.11.0"
     semver "^7.6.0"
@@ -6461,10 +6463,10 @@ expo-linking@~7.0.5:
     expo-constants "~17.0.5"
     invariant "^2.2.4"
 
-expo-localization@^17.0.8:
-  version "17.0.8"
-  resolved "https://registry.yarnpkg.com/expo-localization/-/expo-localization-17.0.8.tgz#eb74ae0f9b5b49596322d68d2005662346211100"
-  integrity sha512-UrdwklZBDJ+t+ZszMMiE0SXZ2eJxcquCuQcl6EvGHM9K+e6YqKVRQ+w8qE+iIB3H75v2RJy6MHAaLK+Mqeo04g==
+expo-localization@~16.0.1:
+  version "16.0.1"
+  resolved "https://registry.yarnpkg.com/expo-localization/-/expo-localization-16.0.1.tgz#a6016288f0e4a5acef143d2a39ac3e5b4ac8963e"
+  integrity sha512-kUrXiV/Pq9r7cG+TMt+Qa49IUQ9Y/czVwen4hmiboTclTopcWdIeCzYZv6JGtufoPpjEO9vVx1QJrXYl9V2u0Q==
   dependencies:
     rtl-detect "^1.0.2"
 
@@ -6510,10 +6512,10 @@ expo-network@~7.0.5:
   resolved "https://registry.yarnpkg.com/expo-network/-/expo-network-7.0.5.tgz#14d5b001850d77b23bd0b0f37b2b5ea0e1f64a97"
   integrity sha512-5dlowKAimhIDN1/lBRnN6SSH6c07f12R3QrfLf3b3GEr6D+EijH2wE537mmwPh1p+254LAkm0Z5ZEXxbwII4sA==
 
-expo-router@~4.0.20:
-  version "4.0.21"
-  resolved "https://registry.yarnpkg.com/expo-router/-/expo-router-4.0.21.tgz#191e8e5a4401097261cf54461e621387da6cf910"
-  integrity sha512-z1U9cGZbgL+ZSHp533VMobOqdkUpFBlDXBpd9/JH+Q0wW49is0G2PrJVUYMzdwr30HSUltdO/19W8rRwjfOnFw==
+expo-router@~4.0.22:
+  version "4.0.22"
+  resolved "https://registry.yarnpkg.com/expo-router/-/expo-router-4.0.22.tgz#9b0972d9b33f79fb2d76ee519392b8b7c38b8871"
+  integrity sha512-cbl6pWUMMZl5sZaHSMmxhQi+kTC6Yzj0ATaD2j6MiLF6VQyr5IcWes3V0UxPtI08boTX0i+76/fnP5fZ3eGQYQ==
   dependencies:
     "@expo/metro-runtime" "4.0.1"
     "@expo/server" "^0.5.3"
@@ -6567,18 +6569,18 @@ expo-web-browser@~14.0.2:
   resolved "https://registry.yarnpkg.com/expo-web-browser/-/expo-web-browser-14.0.2.tgz#52d53947c42fdfb225e8c230418ffe508bcf98a7"
   integrity sha512-Hncv2yojhTpHbP6SGWARBFdl7P6wBHc1O8IKaNsH0a/IEakq887o1eRhLxZ5IwztPQyRDhpqHdgJ+BjWolOnwA==
 
-expo@~52.0.42:
-  version "52.0.46"
-  resolved "https://registry.yarnpkg.com/expo/-/expo-52.0.46.tgz#3869b87b585da67406a8216539d12a16d736f16e"
-  integrity sha512-JG89IVZLp7DWzgeiQb+0N43kWOF1DUm3esBvAS9cPFWZsM9x8nDXgbvtREcycDPA6E+yJsSC+086CigeUY6sVA==
+expo@~52.0.48:
+  version "52.0.48"
+  resolved "https://registry.yarnpkg.com/expo/-/expo-52.0.48.tgz#47f83b3b95f4a8970db4aa8e83246105d4a7c7e2"
+  integrity sha512-/HR/vuo57KGEWlvF3GWaquwEAjXuA5hrOCsaLcZ3pMSA8mQ27qKd1jva4GWzpxXYedlzs/7LLP1XpZo6hXTsog==
   dependencies:
     "@babel/runtime" "^7.20.0"
-    "@expo/cli" "0.22.26"
+    "@expo/cli" "0.22.27"
     "@expo/config" "~10.0.11"
     "@expo/config-plugins" "~9.0.17"
     "@expo/fingerprint" "0.11.11"
     "@expo/metro-config" "0.19.12"
-    "@expo/vector-icons" "^14.0.0"
+    "@expo/vector-icons" "~14.0.4"
     babel-preset-expo "~12.0.11"
     expo-asset "~11.0.5"
     expo-constants "~17.0.8"

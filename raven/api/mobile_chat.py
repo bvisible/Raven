@@ -33,10 +33,15 @@ def ensure_raven_user():
 	    str: The Raven User ID
 	"""
 	user = frappe.session.user
-	raven_user_id = get_raven_user(user)
 
-	if raven_user_id:
-		return raven_user_id
+	# Check if Raven User already exists (by user field)
+	existing = frappe.db.get_value("Raven User", {"user": user}, "name")
+	if existing:
+		return existing
+
+	# Also check by name (in case name == user email)
+	if frappe.db.exists("Raven User", user):
+		return user
 
 	# Create Raven User for this user
 	user_doc = frappe.get_doc("User", user)
