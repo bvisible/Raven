@@ -34,11 +34,13 @@ def get_all_channels(hide_archived=True):
 		parsed_channels.append(parsed_channel)
 
 	channel_list = [channel for channel in parsed_channels if not channel.get("is_direct_message")]
-	# Filter out DMs with Administrator
+	# Filter out DMs with Administrator (check both peer_user_id and channel_name)
 	dm_list = [
 		channel
 		for channel in parsed_channels
-		if channel.get("is_direct_message") and channel.get("peer_user_id") != "Administrator"
+		if channel.get("is_direct_message")
+		and channel.get("peer_user_id") != "Administrator"
+		and "Administrator" not in (channel.get("channel_name") or "")
 	]
 
 	return {"channels": channel_list, "dm_channels": dm_list}
@@ -106,9 +108,12 @@ def get_channels(hide_archived=False):
 		peer_user_id = get_peer_user_id(
 			channel.get("name"), channel.get("is_direct_message"), channel.get("is_self_message")
 		)
-		# Filter out DMs with Administrator
-		if channel.get("is_direct_message") and peer_user_id == "Administrator":
-			continue
+		# Filter out DMs with Administrator (check both peer_user_id and channel_name)
+		if channel.get("is_direct_message"):
+			if peer_user_id == "Administrator":
+				continue
+			if "Administrator" in (channel.get("channel_name") or ""):
+				continue
 		channel["peer_user_id"] = peer_user_id
 		if peer_user_id:
 			user_full_name = frappe.get_cached_value("User", peer_user_id, "full_name")
