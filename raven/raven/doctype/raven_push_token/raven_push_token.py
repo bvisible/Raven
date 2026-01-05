@@ -25,7 +25,9 @@ class RavenPushToken(Document):
 
 	def after_insert(self):
 		"""
-		If the push service is Frappe Cloud and is enabled, then send the token to the Frappe Cloud API
+		If the push service is Frappe Cloud and is enabled, then send the token to the Frappe Cloud API.
+		If the push service is Raven, then send the token to Raven Cloud.
+		If the push service is Firebase, no additional sync is needed (tokens are stored locally).
 		"""
 
 		push_service = self.get_push_service()
@@ -40,12 +42,15 @@ class RavenPushToken(Document):
 				pass
 			except Exception:
 				frappe.log_error("Failed to subscribe to Frappe Cloud push notifications")
-		else:
+		elif push_service == "Raven":
 			add_token_to_raven_cloud(self.user, self.fcm_token)
+		# For Firebase, tokens are stored locally only - no cloud sync needed
 
 	def on_trash(self):
 		"""
-		If the push service is Frappe Cloud and is enabled, then delete the token from the Frappe Cloud API
+		If the push service is Frappe Cloud and is enabled, then delete the token from the Frappe Cloud API.
+		If the push service is Raven, then delete the token from Raven Cloud.
+		If the push service is Firebase, no additional sync is needed (tokens are stored locally).
 		"""
 
 		push_service = self.get_push_service()
@@ -60,8 +65,9 @@ class RavenPushToken(Document):
 				pass
 			except Exception:
 				frappe.log_error("Failed to unsubscribe from Frappe Cloud push notifications")
-		else:
+		elif push_service == "Raven":
 			delete_token_from_raven_cloud(self.user, self.fcm_token)
+		# For Firebase, tokens are stored locally only - no cloud sync needed
 
 	def get_push_service(self) -> str:
 		"""
