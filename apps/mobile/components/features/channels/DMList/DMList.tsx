@@ -1,5 +1,5 @@
 import { DMChannelListItem } from '@raven/types/common/ChannelListItem';
-import { useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { View, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from '@components/nativewindui/Text';
 import { useColorScheme } from '@hooks/useColorScheme';
@@ -7,9 +7,14 @@ import ChevronDownIcon from '@assets/icons/ChevronDownIcon.svg';
 import ChevronRightIcon from '@assets/icons/ChevronRightIcon.svg';
 import { useGetUser } from '@raven/lib/hooks/useGetUser';
 import UserAvatar from '@components/layout/UserAvatar';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useIsUserActive } from '@hooks/useIsUserActive';
 import { useTranslation } from 'react-i18next';
+import { UserListContext } from '@raven/lib/providers/UserListProvider';
+import { ChannelListContext, ChannelListContextType } from '@raven/lib/providers/ChannelListProvider';
+import { useFrappePostCall } from 'frappe-react-sdk';
+import { toast } from 'sonner-native';
+import { UserFields } from '@raven/types/common/UserFields';
 
 const DMList = ({ dms }: { dms: DMChannelListItem[] }) => {
     return <DMListUI dms={dms} />
@@ -32,6 +37,7 @@ const DMListUI = ({ dms }: { dms: DMChannelListItem[] }) => {
             </TouchableOpacity>
             {isExpanded && <>
                 {dms.map((dm) => <DMListRow key={dm.name} dm={dm} />)}
+                {dms.length < 5 && <ExtraUsersItemList dms={dms} />}
             </>}
         </View>
     )
@@ -61,6 +67,70 @@ export const DMListRow = ({ dm }: { dm: DMChannelListItem }) => {
                 <Text style={styles.dmChannelText}>{user?.full_name || user?.name || ''}</Text>
             </Pressable>
         </Link>
+    )
+}
+
+const ExtraUsersItemList = ({ dms }: { dms: DMChannelListItem[] }) => {
+    const { enabledUsers } = useContext(UserListContext)
+    const { mutate } = useContext(ChannelListContext) as ChannelListContextType
+
+    const { call } = useFrappePostCall<{ message: string }>('raven.api.raven_channel.create_direct_message_channel')
+
+    const createDMChannel = async (user_id: string) => {
+        return call({ user_id })
+            .then((r) => {
+                router.push(`../chat/${r?.message}`)
+                mutate()
+            })
+            .catch(() => {
+                toast.error('Could not create channel')
+            })
+    }
+
+    const filteredUsers = useMemo(() => {
+        // Show only users who are not in the DM list
+        return Array.from(enabledUsers.values())
+            .filter((user) => !dms.find((channel) => channel.peer_user_id === user.name))
+            .slice(0, 5)
+    }, [enabledUsers, dms])
+
+    return (
+        <>
+            {filteredUsers.map((user) => (
+                <ExtraUserItem key={user.name} user={user} createDMChannel={createDMChannel} />
+            ))}
+        </>
+    )
+}
+
+const ExtraUserItem = ({ user, createDMChannel }: { user: UserFields, createDMChannel: (user_id: string) => Promise<void> }) => {
+    const [isLoading, setIsLoading] = useState(false)
+    const isActive = useIsUserActive(user.name)
+
+    const onPress = () => {
+        setIsLoading(true)
+        createDMChannel(user.name).finally(() => setIsLoading(false))
+    }
+
+    return (
+        <Pressable
+            onPress={onPress}
+            disabled={isLoading}
+            className='flex-row items-center px-3 py-1.5 rounded-lg ios:active:bg-linkColor'
+            android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: false }}
+            style={{ opacity: isLoading ? 0.5 : 1 }}
+        >
+            <UserAvatar
+                src={user.user_image ?? ""}
+                alt={user.full_name ?? ""}
+                isActive={isActive}
+                availabilityStatus={user.availability_status}
+                avatarProps={{ className: "w-8 h-8" }}
+                textProps={{ className: "text-sm font-medium" }}
+                isBot={user.type === 'Bot'}
+            />
+            <Text style={styles.dmChannelText}>{user.full_name || user.name || ''}</Text>
+        </Pressable>
     )
 }
 
