@@ -68,6 +68,7 @@ def get_users():
 			"availability_status",
 			"custom_status",
 		],
+		filters=[["name", "!=", "Administrator"]],
 		order_by="full_name",
 	)
 	return users

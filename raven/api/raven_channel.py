@@ -160,6 +160,10 @@ def create_direct_message_channel(user_id):
 	"""
 	# TODO: this logic might break if the user_id changes
 
+	# Block DMs with Administrator
+	if user_id == "Administrator" or frappe.session.user == "Administrator":
+		frappe.throw(_("Cannot create direct messages with Administrator."))
+
 	# Validate both users are Raven Users
 	if not get_raven_user(frappe.session.user):
 		frappe.throw(_("You need to be a Raven User to send DMs."))
