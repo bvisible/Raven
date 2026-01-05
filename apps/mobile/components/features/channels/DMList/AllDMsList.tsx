@@ -2,7 +2,7 @@ import { useColorScheme } from "@hooks/useColorScheme"
 import useUnreadMessageCount from "@hooks/useUnreadMessageCount"
 import { ChannelListContext, ChannelListContextType } from "@raven/lib/providers/ChannelListProvider"
 import { useContext, useMemo, useState } from "react"
-import { View, ActivityIndicator } from "react-native"
+import { View, ActivityIndicator, Pressable } from "react-native"
 import DMRow from "./DMRow"
 import ChatOutlineIcon from "@assets/icons/ChatOutlineIcon.svg"
 import ErrorBanner from "@components/common/ErrorBanner"
@@ -12,11 +12,19 @@ import { useDebounce } from "@raven/lib/hooks/useDebounce"
 import { Text } from "@components/nativewindui/Text"
 import { LegendList } from "@legendapp/list"
 import { useTranslation } from "react-i18next"
+import { UserListContext } from "@raven/lib/providers/UserListProvider"
+import { useFrappePostCall } from "frappe-react-sdk"
+import { router } from "expo-router"
+import { toast } from "sonner-native"
+import UserAvatar from "@components/layout/UserAvatar"
+import { useIsUserActive } from "@hooks/useIsUserActive"
+import { UserFields } from "@raven/types/common/UserFields"
 
 const AllDMsList = () => {
 
     const { t } = useTranslation()
-    const { dm_channels, error, isLoading } = useContext(ChannelListContext) as ChannelListContextType
+    const { dm_channels, error, isLoading, mutate } = useContext(ChannelListContext) as ChannelListContextType
+    const { enabledUsers } = useContext(UserListContext)
     const { unread_count } = useUnreadMessageCount()
 
     const allDMs = useMemo(() => {
@@ -34,6 +42,30 @@ const AllDMsList = () => {
             return dm.peer_user_id?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
         })
     }, [allDMs, debouncedSearchQuery])
+
+    // Get users without existing DM channels
+    const extraUsers = useMemo(() => {
+        return Array.from(enabledUsers.values())
+            .filter((user) => !dm_channels.find((channel) => channel.peer_user_id === user.name))
+            .filter((user) => {
+                if (!debouncedSearchQuery) return true
+                return user.full_name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+                    user.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+            })
+    }, [enabledUsers, dm_channels, debouncedSearchQuery])
+
+    const { call } = useFrappePostCall<{ message: string }>('raven.api.raven_channel.create_direct_message_channel')
+
+    const createDMChannel = async (user_id: string) => {
+        return call({ user_id })
+            .then((r) => {
+                router.push(`../chat/${r?.message}`)
+                mutate()
+            })
+            .catch(() => {
+                toast.error(t('directMessages.createDMFailed'))
+            })
+    }
 
     if (isLoading) {
         return <View className="flex-1 justify-center items-center h-full">
@@ -67,11 +99,55 @@ const AllDMsList = () => {
                     ItemSeparatorComponent={() => <Divider />}
                     bounces={false}
                     showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={<DMListEmptyState searchQuery={searchQuery} />}
+                    ListEmptyComponent={filteredDMs.length === 0 && extraUsers.length === 0 ? <DMListEmptyState searchQuery={searchQuery} /> : null}
                 />
+                {extraUsers.length > 0 && (
+                    <View>
+                        {filteredDMs.length > 0 && <Divider prominent />}
+                        {extraUsers.map((user) => (
+                            <View key={user.name}>
+                                <ExtraUserRow user={user} createDMChannel={createDMChannel} />
+                                <Divider />
+                            </View>
+                        ))}
+                    </View>
+                )}
                 <Divider prominent />
             </View>
         </View>
+    )
+}
+
+const ExtraUserRow = ({ user, createDMChannel }: { user: UserFields, createDMChannel: (user_id: string) => Promise<void> }) => {
+    const [isLoading, setIsLoading] = useState(false)
+    const isActive = useIsUserActive(user.name)
+
+    const onPress = () => {
+        setIsLoading(true)
+        createDMChannel(user.name).finally(() => setIsLoading(false))
+    }
+
+    return (
+        <Pressable
+            onPress={onPress}
+            disabled={isLoading}
+            className="flex-row items-center px-4 py-3 bg-background ios:active:bg-linkColor"
+            android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: false }}
+            style={{ opacity: isLoading ? 0.5 : 1 }}
+        >
+            <UserAvatar
+                src={user.user_image ?? ""}
+                alt={user.full_name ?? ""}
+                isActive={isActive}
+                availabilityStatus={user.availability_status}
+                avatarProps={{ className: "w-10 h-10" }}
+                textProps={{ className: "text-base font-medium" }}
+                isBot={user.type === 'Bot'}
+            />
+            <View className="ml-3 flex-1">
+                <Text className="text-base font-medium">{user.full_name || user.name || ''}</Text>
+            </View>
+        </Pressable>
     )
 }
 
