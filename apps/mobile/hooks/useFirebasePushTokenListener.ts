@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef } from 'react'
+import { Platform } from 'react-native'
 import * as Device from 'expo-device';
 import { AuthorizationStatus, getMessaging } from '@react-native-firebase/messaging';
 import useSiteContext from './useSiteContext';
@@ -33,7 +34,7 @@ const useFirebasePushTokenListener = () => {
                         // Register with neoffice_theme Mobile Device (unified token store)
                         const response = await call.post('neoffice_theme.mobile.register_device_token', {
                             token: token,
-                            platform: 'ios',
+                            platform: Platform.OS === 'ios' ? 'ios' : 'android',
                             device_id: Device.deviceName || 'Synk-Mobile',
                             app: 'synk'  // Link to Firebase App Configuration
                         })

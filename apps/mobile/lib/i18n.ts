@@ -13,19 +13,19 @@ const resources = {
   fr: { translation: fr },
 };
 
-// Get the device language or fallback to English
+// Get the device language or fallback to French
 const getDeviceLanguage = (): string => {
   const locale = Localization.getLocales()[0];
-  const languageCode = locale?.languageCode || "en";
+  const languageCode = locale?.languageCode || "fr";
   // Only return supported languages
-  return languageCode in resources ? languageCode : "en";
+  return languageCode in resources ? languageCode : "fr";
 };
 
 // Initialize i18n
 i18n.use(initReactI18next).init({
   resources,
   lng: getDeviceLanguage(),
-  fallbackLng: "en",
+  fallbackLng: "fr",
   interpolation: {
     escapeValue: false,
   },

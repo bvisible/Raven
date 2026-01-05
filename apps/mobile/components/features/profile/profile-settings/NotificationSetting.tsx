@@ -1,4 +1,4 @@
-import { View } from 'react-native'
+import { Platform, View } from 'react-native'
 import BellOutlineIcon from '@assets/icons/BellOutlineIcon.svg'
 import { useColorScheme } from '@hooks/useColorScheme'
 import { Text } from '@components/nativewindui/Text'
@@ -25,42 +25,63 @@ const NotificationSetting = () => {
         })
     }, [])
 
-    const onToggle = useCallback((enabled: boolean) => {
-        if (enabled) {
-            messaging.requestPermission().then((authorizationStatus) => {
-                if (authorizationStatus !== AuthorizationStatus.AUTHORIZED && authorizationStatus !== AuthorizationStatus.EPHEMERAL) {
-                    throw new Error('User has not granted permission to receive notifications.')
-                }
-            }).then(() => {
-                messaging.getToken().then((token) => {
-                    if (token) {
-                        call.post('raven.api.notification.subscribe', {
-                            fcm_token: token,
-                            environment: 'Mobile',
-                            device_information: Device.deviceName
+    const onToggle = useCallback(async (newValue: boolean) => {
+        try {
+            const token = await messaging.getToken()
+            if (!token) {
+                toast.error(t('errors.somethingWentWrong'))
+                return
+            }
 
-                        }).then(() => {
-                            setEnabled(true)
-                        }).catch((error) => {
-                            toast.error(t('errors.somethingWentWrong'))
-                        })
-                    } else {
-                        toast.error(t('errors.somethingWentWrong'))
-                    }
+            if (newValue) {
+                const authorizationStatus = await messaging.requestPermission()
+
+                if (authorizationStatus !== AuthorizationStatus.AUTHORIZED && authorizationStatus !== AuthorizationStatus.EPHEMERAL) {
+                    toast.error(t('errors.somethingWentWrong'))
+                    return
+                }
+
+                // Register with neoffice_theme Mobile Device (primary system)
+                await call.post('neoffice_theme.mobile.register_device_token', {
+                    token: token,
+                    platform: Platform.OS === 'ios' ? 'ios' : 'android',
+                    device_id: Device.deviceName || 'Synk-Mobile',
+                    app: 'synk'
                 })
-            })
-        } else {
-            messaging.getToken().then((token) => {
-                if (token) {
-                    call.post('raven.api.notification.unsubscribe', {
+
+                // Also register with Raven for backward compatibility
+                try {
+                    await call.post('raven.api.notification.subscribe', {
+                        fcm_token: token,
+                        environment: 'Mobile',
+                        device_information: Device.deviceName
+                    })
+                } catch (e) {
+                    // Raven subscribe is optional
+                }
+
+                setEnabled(true)
+            } else {
+                // Deactivate Mobile Device
+                await call.post('neoffice_theme.mobile.unregister_device_token', {
+                    token: token
+                })
+
+                // Also unsubscribe from Raven
+                try {
+                    await call.post('raven.api.notification.unsubscribe', {
                         fcm_token: token
                     })
+                } catch (e) {
+                    // Raven unsubscribe is optional
                 }
-            })
 
-            setEnabled(false)
+                setEnabled(false)
+            }
+        } catch (error) {
+            toast.error(t('errors.somethingWentWrong'))
         }
-    }, [t])
+    }, [t, call])
 
     return (
         <View>

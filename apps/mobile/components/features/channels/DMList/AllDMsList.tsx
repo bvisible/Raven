@@ -20,6 +20,57 @@ import UserAvatar from "@components/layout/UserAvatar"
 import { useIsUserActive } from "@hooks/useIsUserActive"
 import { UserFields } from "@raven/types/common/UserFields"
 
+const ExtraUserRow = ({ user, createDMChannel }: { user: UserFields, createDMChannel: (user_id: string) => Promise<void> }) => {
+    const [isLoading, setIsLoading] = useState(false)
+    const isActive = useIsUserActive(user.name)
+
+    const onPress = () => {
+        setIsLoading(true)
+        createDMChannel(user.name).finally(() => setIsLoading(false))
+    }
+
+    return (
+        <Pressable
+            onPress={onPress}
+            disabled={isLoading}
+            className="flex-row items-center px-4 py-3 bg-background ios:active:bg-linkColor"
+            android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: false }}
+            style={{ opacity: isLoading ? 0.5 : 1 }}
+        >
+            <UserAvatar
+                src={user.user_image ?? ""}
+                alt={user.full_name ?? ""}
+                isActive={isActive}
+                availabilityStatus={user.availability_status}
+                avatarProps={{ className: "w-10 h-10" }}
+                textProps={{ className: "text-base font-medium" }}
+                isBot={user.type === 'Bot'}
+            />
+            <View className="ml-3 flex-1">
+                <Text className="text-base font-medium">{user.full_name || user.name || ''}</Text>
+            </View>
+        </Pressable>
+    )
+}
+
+const DMListEmptyState = ({ searchQuery }: { searchQuery?: string }) => {
+    const { t } = useTranslation()
+    const { colors } = useColorScheme()
+    return (
+        <View className="flex flex-col gap-2 bg-background px-4 py-1">
+            <View className="flex flex-row items-center gap-2">
+                <ChatOutlineIcon fill={colors.icon} height={20} width={20} />
+                <Text className="text-foreground text-base font-medium">
+                    {searchQuery ? t('directMessages.noDMsFoundWithQuery', { query: searchQuery }) : t('directMessages.noDMsFound')}
+                </Text>
+            </View>
+            <Text className="text-sm text-foreground/60">
+                {searchQuery ? t('directMessages.tryDifferentSearch') : t('directMessages.startConversation')}
+            </Text>
+        </View>
+    )
+}
+
 const AllDMsList = () => {
 
     const { t } = useTranslation()
@@ -114,57 +165,6 @@ const AllDMsList = () => {
                 )}
                 <Divider prominent />
             </View>
-        </View>
-    )
-}
-
-const ExtraUserRow = ({ user, createDMChannel }: { user: UserFields, createDMChannel: (user_id: string) => Promise<void> }) => {
-    const [isLoading, setIsLoading] = useState(false)
-    const isActive = useIsUserActive(user.name)
-
-    const onPress = () => {
-        setIsLoading(true)
-        createDMChannel(user.name).finally(() => setIsLoading(false))
-    }
-
-    return (
-        <Pressable
-            onPress={onPress}
-            disabled={isLoading}
-            className="flex-row items-center px-4 py-3 bg-background ios:active:bg-linkColor"
-            android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: false }}
-            style={{ opacity: isLoading ? 0.5 : 1 }}
-        >
-            <UserAvatar
-                src={user.user_image ?? ""}
-                alt={user.full_name ?? ""}
-                isActive={isActive}
-                availabilityStatus={user.availability_status}
-                avatarProps={{ className: "w-10 h-10" }}
-                textProps={{ className: "text-base font-medium" }}
-                isBot={user.type === 'Bot'}
-            />
-            <View className="ml-3 flex-1">
-                <Text className="text-base font-medium">{user.full_name || user.name || ''}</Text>
-            </View>
-        </Pressable>
-    )
-}
-
-const DMListEmptyState = ({ searchQuery }: { searchQuery?: string }) => {
-    const { t } = useTranslation()
-    const { colors } = useColorScheme()
-    return (
-        <View className="flex flex-col gap-2 bg-background px-4 py-1">
-            <View className="flex flex-row items-center gap-2">
-                <ChatOutlineIcon fill={colors.icon} height={20} width={20} />
-                <Text className="text-foreground text-base font-medium">
-                    {searchQuery ? t('directMessages.noDMsFoundWithQuery', { query: searchQuery }) : t('directMessages.noDMsFound')}
-                </Text>
-            </View>
-            <Text className="text-sm text-foreground/60">
-                {searchQuery ? t('directMessages.tryDifferentSearch') : t('directMessages.startConversation')}
-            </Text>
         </View>
     )
 }
