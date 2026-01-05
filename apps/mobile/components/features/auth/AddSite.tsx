@@ -144,7 +144,7 @@ export const SiteAuthFlowSheet = ({ siteInformation, onDismiss }: { siteInformat
         usePKCE: true,
         scopes: ['all', 'openid'],
         codeChallengeMethod: CodeChallengeMethod.S256,
-        redirectUri: makeRedirectUri({ native: 'raven.thecommit.company:' }),
+        redirectUri: makeRedirectUri({ native: 'io.synk.app:' }),
     }, discoveryWithURL)
 
     const onLoginClick = () => {
@@ -159,7 +159,7 @@ export const SiteAuthFlowSheet = ({ siteInformation, onDismiss }: { siteInformat
                         extraParams: {
                             code_verifier: request?.codeVerifier ?? '',
                         },
-                        redirectUri: makeRedirectUri({ native: 'raven.thecommit.company:' }),
+                        redirectUri: makeRedirectUri({ native: 'io.synk.app:' }),
                     }, discoveryWithURL).then(data => {
                         onAccessTokenReceived(data)
                     }).catch(err => {

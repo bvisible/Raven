@@ -124,11 +124,15 @@ def get_thread_messages(thread_id: str, limit: int = 50, offset: int = 0):
 	Returns:
 	    List of messages in chronological order
 	"""
+	# Check if thread exists
+	if not frappe.db.exists("Raven Channel", thread_id):
+		return []  # Thread doesn't exist, return empty
+
 	# Verify user has access to this thread
 	if not frappe.db.exists(
 		"Raven Channel Member", {"channel_id": thread_id, "user_id": frappe.session.user}
 	):
-		frappe.throw(_("You don't have access to this thread"))
+		return []  # User doesn't have access, return empty
 
 	messages = frappe.get_all(
 		"Raven Message",
