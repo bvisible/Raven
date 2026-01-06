@@ -468,7 +468,7 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
             messagesWithDateSeparators.push({
                 ...lastMessage,
                 might_contain_link_preview: checkIfMessageContainsLinkPreview(lastMessage),
-                formattedTime: dayjs(lastMessage.creation).local().format('hh:mm A'),
+                formattedTime: dayjs(lastMessage.creation).local().format('HH:mm'),
                 is_continuation: 0,
                 isOpenInThread: isThread,
                 is_pinned: pinnedMessageIDs.includes(lastMessage.name) ? 1 : 0
@@ -479,7 +479,7 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
                 const message = messages[i]
                 const messageDate = message.creation.split(' ')[0]
                 let messageDateTime = new Date(message.creation.split('.')[0]).getTime()
-                const formattedMessageTime = dayjs(message.creation).local().format('hh:mm A')
+                const formattedMessageTime = dayjs(message.creation).local().format('HH:mm')
                 const might_contain_link_preview = checkIfMessageContainsLinkPreview(message)
 
                 if (messageDate !== currentDate) {

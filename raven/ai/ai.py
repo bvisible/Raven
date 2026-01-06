@@ -908,12 +908,16 @@ def process_message_with_nora(
 				filters={"channel_id": channel.name},
 				fields=["text", "content", "owner", "bot", "is_bot_message", "creation"],
 				order_by="creation desc",
-				limit=20,
+				limit=10,  # Reduced from 20 to prevent token overflow
 			)
 
 			# Reverse to get chronological order and exclude current message
 			for msg in reversed(messages[1:] if messages else []):
 				msg_text = msg.get("text") or msg.get("content") or ""
+				# Truncate very long messages to prevent token overflow
+				# Bot messages might echo conversation history, causing exponential growth
+				if len(msg_text) > 3000:
+					msg_text = msg_text[:2000] + "... [truncated]"
 				if msg.get("bot") or msg.get("is_bot_message"):
 					conversation_history.append({"role": "assistant", "content": msg_text})
 				else:

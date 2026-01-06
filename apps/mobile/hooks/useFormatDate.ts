@@ -9,7 +9,7 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(advancedFormat)
 
-type DateFormatOptions = 'Do MMMM YYYY, hh:mm A' | 'Do MMMM [at] hh:mm A' | 'hh:mm A' | 'hh:mm'
+type DateFormatOptions = 'Do MMMM YYYY, HH:mm' | 'Do MMMM [at] HH:mm' | 'HH:mm' | 'hh:mm'
 
 /**
  * Hook to format a date string based on the format option
@@ -17,7 +17,7 @@ type DateFormatOptions = 'Do MMMM YYYY, hh:mm A' | 'Do MMMM [at] hh:mm A' | 'hh:
  * @param format - The format option to use
  * @returns The formatted date string
  */
-const useDateFormat = (timestamp: string, format: DateFormatOptions | string = 'Do MMMM YYYY, hh:mm A') => {
+const useDateFormat = (timestamp: string, format: DateFormatOptions | string = 'Do MMMM YYYY, HH:mm') => {
 
   const siteInformation = useSiteContext()
 

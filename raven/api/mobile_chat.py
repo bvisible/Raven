@@ -60,7 +60,7 @@ def ensure_raven_user():
 @frappe.whitelist()
 def get_nora_dm_channel():
 	"""
-	Get or create the DM channel between current user and nora bot.
+	Get or create the DM channel between current user and Nora bot.
 
 	Returns:
 	    dict with channel_id and bot info
@@ -68,9 +68,9 @@ def get_nora_dm_channel():
 	# Ensure current user has a Raven User record
 	ensure_raven_user()
 
-	# Get the nora bot's Raven User ID
+	# Get the Nora bot's Raven User ID
 	nora_bot = frappe.db.get_value(
-		"Raven Bot", {"bot_name": "nora", "model_provider": "Nora"}, ["name", "raven_user"], as_dict=True
+		"Raven Bot", {"bot_name": "Nora", "model_provider": "Nora"}, ["name", "raven_user"], as_dict=True
 	)
 
 	if not nora_bot or not nora_bot.raven_user:
