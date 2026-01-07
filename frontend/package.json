@@ -12,6 +12,7 @@
     "copy-html-entry": "cp ../raven/public/raven/index.html ../raven/www/raven.html"
   },
   "dependencies": {
+    "@neoffice/frappe-sidebar-react": "git+https://github.com/bvisible/frappe-sidebar-react.git",
     "@emoji-mart/react": "^1.1.1",
     "@radix-ui/themes": "^3.2.0",
     "@tiptap/extension-code-block-lowlight": "^2.12.0",
