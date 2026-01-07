@@ -16,22 +16,55 @@ import { useFrappePostCall } from 'frappe-react-sdk';
 import { toast } from 'sonner-native';
 import { UserFields } from '@raven/types/common/UserFields';
 import useCurrentRavenUser from '@raven/lib/hooks/useCurrentRavenUser';
+import dayjs from 'dayjs';
 
 const DMList = ({ dms }: { dms: DMChannelListItem[] }) => {
     return <DMListUI dms={dms} />
 }
 
 export const DMListRow = ({ dm }: { dm: DMChannelListItem }) => {
+    const { t } = useTranslation()
     const user = useGetUser(dm.peer_user_id)
-
     const isActive = useIsUserActive(dm.peer_user_id)
+
+    // Parse last message details
+    const lastMessageContent = useMemo(() => {
+        if (dm.last_message_details) {
+            try {
+                const parsedDetails = JSON.parse(dm.last_message_details)
+                return parsedDetails.content?.trim() || ''
+            } catch (e) {
+                return ''
+            }
+        }
+        return ''
+    }, [dm.last_message_details])
+
+    // Format timestamp
+    const formattedTime = useMemo(() => {
+        if (!dm.last_message_timestamp) return ''
+        const dateObj = dayjs(dm.last_message_timestamp)
+        if (!dateObj.isValid()) return ''
+
+        const today = dayjs()
+        const yesterday = today.subtract(1, 'day')
+
+        if (dateObj.isSame(today, 'day')) {
+            return dateObj.format('HH:mm')
+        }
+        if (dateObj.isSame(yesterday, 'day')) {
+            return t('common.yesterday')
+        }
+        if (dateObj.isSame(today, 'week')) {
+            return dateObj.format('ddd')
+        }
+        return dateObj.format('D MMM')
+    }, [dm.last_message_timestamp, t])
 
     return (
         <Link href={`../chat/${dm.name}`} asChild>
             <Pressable
-                // Use tailwind classes for layout and ios:active state
-                className='flex-row items-center px-3 py-1.5 rounded-lg ios:active:bg-linkColor'
-                // Add a subtle ripple effect on Android
+                className='flex-row items-center px-3 py-2 rounded-lg ios:active:bg-linkColor'
                 android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: false }}
             >
                 <UserAvatar
@@ -39,10 +72,26 @@ export const DMListRow = ({ dm }: { dm: DMChannelListItem }) => {
                     alt={user?.full_name ?? ""}
                     isActive={isActive}
                     availabilityStatus={user?.availability_status}
-                    avatarProps={{ className: "w-8 h-8" }}
-                    textProps={{ className: "text-sm font-medium" }}
+                    avatarProps={{ className: "w-10 h-10" }}
+                    textProps={{ className: "text-base font-medium" }}
                     isBot={user?.type === 'Bot'} />
-                <Text style={styles.dmChannelText}>{user?.full_name || user?.name || ''}</Text>
+                <View className='flex-1 ml-3'>
+                    <View className='flex-row justify-between items-center'>
+                        <Text className='text-base font-medium' numberOfLines={1}>
+                            {user?.full_name || user?.name || ''}
+                        </Text>
+                        {formattedTime ? (
+                            <Text className='text-xs text-muted-foreground ml-2'>
+                                {formattedTime}
+                            </Text>
+                        ) : null}
+                    </View>
+                    {lastMessageContent ? (
+                        <Text className='text-sm text-muted-foreground' numberOfLines={1}>
+                            {lastMessageContent}
+                        </Text>
+                    ) : null}
+                </View>
             </Pressable>
         </Link>
     )
@@ -61,7 +110,7 @@ const ExtraUserItem = ({ user, createDMChannel }: { user: UserFields, createDMCh
         <Pressable
             onPress={onPress}
             disabled={isLoading}
-            className='flex-row items-center px-3 py-1.5 rounded-lg ios:active:bg-linkColor'
+            className='flex-row items-center px-3 py-2 rounded-lg ios:active:bg-linkColor'
             android_ripple={{ color: 'rgba(0,0,0,0.1)', borderless: false }}
             style={{ opacity: isLoading ? 0.5 : 1 }}
         >
@@ -70,11 +119,15 @@ const ExtraUserItem = ({ user, createDMChannel }: { user: UserFields, createDMCh
                 alt={user.full_name ?? ""}
                 isActive={isActive}
                 availabilityStatus={user.availability_status}
-                avatarProps={{ className: "w-8 h-8" }}
-                textProps={{ className: "text-sm font-medium" }}
+                avatarProps={{ className: "w-10 h-10" }}
+                textProps={{ className: "text-base font-medium" }}
                 isBot={user.type === 'Bot'}
             />
-            <Text style={styles.dmChannelText}>{user.full_name || user.name || ''}</Text>
+            <View className='flex-1 ml-3'>
+                <Text className='text-base font-medium' numberOfLines={1}>
+                    {user.full_name || user.name || ''}
+                </Text>
+            </View>
         </Pressable>
     )
 }
@@ -156,10 +209,6 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontWeight: '600',
-        fontSize: 16,
-    },
-    dmChannelText: {
-        marginLeft: 12,
         fontSize: 16,
     },
 })
