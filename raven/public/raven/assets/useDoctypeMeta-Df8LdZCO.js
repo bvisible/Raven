@@ -1,1 +1,0 @@
-import{v as r}from"./index-DhM1aug3.js";const i=c=>{var o,s;const{data:e,isLoading:t,mutate:n}=r("frappe.desk.form.load.getdoctype",{doctype:c},void 0,{dedupingInterval:864e5,revalidateOnFocus:!1,revalidateOnReconnect:!1}),d=(o=e==null?void 0:e.docs)==null?void 0:o.slice(1);return{doc:(s=e==null?void 0:e.docs)==null?void 0:s[0],childDocs:d,isLoading:t,mutate:n}};export{i as u};
