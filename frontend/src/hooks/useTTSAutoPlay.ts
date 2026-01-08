@@ -106,14 +106,16 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 
 		call({ text: plainText })
 			.then((response) => {
-				if (response?.success && response?.audio_url) {
+				// Frappe API wraps response in 'message' key
+				const data = (response as any)?.message ?? response
+				if (data?.success && data?.audio_url) {
 					// Stop any currently playing audio
 					if (globalAudio) {
 						globalAudio.pause()
 						globalAudio = null
 					}
 
-					const audio = new Audio(response.audio_url)
+					const audio = new Audio(data.audio_url)
 					globalAudio = audio
 
 					audio.onended = () => {
