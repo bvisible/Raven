@@ -97,6 +97,10 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 	// Track the initial message count to only process NEW messages (per-instance)
 	const initialMessageCountRef = useRef<number | null>(null)
 
+	// Track when we started waiting for messages (when isBot became true with empty messages)
+	// This allows us to play TTS for messages that arrive after we opened the thread
+	const waitingForMessagesSinceRef = useRef<number | null>(null)
+
 	const { call } = useFrappePostCall<TTSResponse>("nora.api.tts.generate_audio")
 
 	useEffect(() => {
@@ -145,9 +149,19 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 			if (latestBotMessage && globalLastProcessedMessage !== latestBotMessage.name && !globalIsPlaying) {
 				const messageTime = new Date(latestBotMessage.creation).getTime()
 				const now = Date.now()
-				const isRecent = (now - messageTime) < 30000
+				const ageMs = now - messageTime
 
-				console.log('[TTS AutoPlay] Initial load with bot message, isRecent:', isRecent, 'age:', now - messageTime, 'ms')
+				// Message is "recent" if either:
+				// 1. It was created in the last 30 seconds, OR
+				// 2. It was created after we started waiting for messages (thread just opened)
+				const wasWaitingForMessages = waitingForMessagesSinceRef.current !== null
+				const arrivedAfterWaiting = wasWaitingForMessages && messageTime >= waitingForMessagesSinceRef.current!
+				const isRecent = ageMs < 30000 || arrivedAfterWaiting
+
+				console.log('[TTS AutoPlay] Initial load with bot message, isRecent:', isRecent, 'age:', ageMs, 'ms, wasWaiting:', wasWaitingForMessages, 'arrivedAfter:', arrivedAfterWaiting)
+
+				// Clear waiting state
+				waitingForMessagesSinceRef.current = null
 
 				if (isRecent) {
 					// Play TTS for this recent bot message
@@ -210,6 +224,8 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 
 			// No recent bot message, just mark the latest as processed
 			globalLastProcessedMessage = latestMessage.name
+			// Clear any waiting state
+			waitingForMessagesSinceRef.current = null
 			return
 		}
 
@@ -330,7 +346,14 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 
 			console.log('[TTS AutoPlay] Messages available:', actualMessages?.length ?? 0, 'messages:', actualMessages?.map(m => ({ name: m.name, is_bot: m.is_bot_message, owner: m.owner })))
 
-			if (actualMessages && actualMessages.length > 0) {
+			// If messages are empty, start waiting for them
+			// This timestamp will be used to determine if incoming messages should trigger TTS
+			if (!actualMessages || actualMessages.length === 0) {
+				console.log('[TTS AutoPlay] No messages yet, starting to wait...')
+				waitingForMessagesSinceRef.current = Date.now()
+			} else if (actualMessages && actualMessages.length > 0) {
+				// Clear any waiting state since we already have messages
+				waitingForMessagesSinceRef.current = null
 				// Find the most recent bot message
 				const latestBotMessage = [...actualMessages].reverse().find(m => m.is_bot_message === 1 && m.text)
 				console.log('[TTS AutoPlay] Latest bot message found:', latestBotMessage ? latestBotMessage.name : 'none')
