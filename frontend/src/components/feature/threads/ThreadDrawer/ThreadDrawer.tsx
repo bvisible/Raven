@@ -22,7 +22,7 @@ const ThreadDrawer = () => {
     return (
         <div>
             <Flex direction='column' gap='0' className='w-full h-[100vh] border-l border-gray-4 sm:dark:border-gray-6'>
-                <ThreadHeader />
+                <ThreadHeader parentChannelID={data?.channel_id} />
                 {isLoading && <FullPageLoader />}
                 {error && <Box p='4'><ErrorBanner error={error} /></Box>}
                 {data && <ThreadMessages threadMessage={data} key={threadID} />}

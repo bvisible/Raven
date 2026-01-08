@@ -10,8 +10,14 @@ import useFetchChannelMembers, { Member } from "@/hooks/fetchers/useFetchChannel
 import { useContext, useMemo } from "react"
 import useIsPushNotificationEnabled from "@/hooks/fetchers/useIsPushNotificationEnabled"
 import { UserContext } from "@/utils/auth/UserProvider"
+import { TTSToggle } from "@/components/feature/chat-header/TTSToggle"
 
-export const ThreadHeader = () => {
+interface ThreadHeaderProps {
+    /** Parent channel ID to check if it's a bot DM */
+    parentChannelID?: string
+}
+
+export const ThreadHeader = ({ parentChannelID }: ThreadHeaderProps) => {
 
     const navigate = useNavigate()
 
@@ -28,12 +34,25 @@ export const ThreadHeader = () => {
         return null
     }, [user, channelMembers])
 
+    // Fetch parent channel members to check if it's a bot DM
+    const { channelMembers: parentChannelMembers } = useFetchChannelMembers(parentChannelID ?? '')
+
+    // Check if the parent channel is a bot DM
+    const isParentBotDM = useMemo(() => {
+        if (!parentChannelID || !parentChannelMembers || !currentUser) return false
+        // Find the peer (other user in the DM that is not the current user)
+        const members = Object.values(parentChannelMembers)
+        const peer = members.find(m => m.name !== currentUser)
+        return peer?.type === 'Bot'
+    }, [parentChannelID, parentChannelMembers, currentUser])
+
     return (
         <header className='dark:bg-gray-2 bg-white fixed top-0 px-3 sm:w-[calc((100vw-var(--sidebar-width)-var(--space-8))/2)] w-screen' style={{ zIndex: 999 }}>
             <Flex direction={'column'} gap='2' className='pt-3'>
                 <Flex justify={'between'} align={'center'}>
                     <Heading size='4' className='pl-1'>Thread</Heading>
                     <Flex gap='2' justify={'between'} align={'center'} className="px-4 sm:px-0">
+                        {isParentBotDM && <TTSToggle compact />}
                         {channelMember &&
                             <DropdownMenu.Root>
                                 <DropdownMenu.Trigger>

@@ -8,11 +8,8 @@ node_modules
 dist/
 mobile/dev-dist
 
-# Ignore public folder EXCEPT raven (pre-built assets)
-raven/public/*
-!raven/public/raven/
-!raven/public/js/
-!raven/public/.gitkeep
+raven/public/raven
+raven/www/raven.html
 *.env
 
 apps/mobile/ios

@@ -135,7 +135,6 @@ Workflows in `.github/workflows/`:
 |----------|---------|-------------|
 | `ci.yml` | Push/PR on `main` (raven/** paths) | Runs Python tests with MariaDB/Redis |
 | `linters.yml` | Push/PR on `main` (raven/** paths) | Pre-commit hooks + Semgrep security |
-| `build-frontend.yml` | Push on `develop`/`main` (frontend/** paths) | Auto-builds and commits frontend assets |
 | `build.yml` | Manual/releases | Docker image build |
 
-**Auto-build**: When frontend files change on `develop` or `main`, GitHub Actions automatically rebuilds assets and commits them with `[skip ci]`.
+**Note**: Frontend assets must be built on the server using `bench build --app raven`.

@@ -12,6 +12,8 @@ import ChatStream from "../../chat/ChatStream/ChatStream"
 import { JoinChannelBox } from "../../chat/chat-footer/JoinChannelBox"
 import { useUserData } from "@/hooks/useUserData"
 import useFetchChannelMembers from "@/hooks/fetchers/useFetchChannelMembers"
+import { useContext } from "react"
+import { UserContext } from "@/utils/auth/UserProvider"
 import ThreadFirstMessage from "./ThreadFirstMessage"
 import AIEvent from "../../ai/AIEvent"
 import { useTyping } from "../../chat/ChatInput/TypingIndicator/useTypingIndicator"
@@ -27,7 +29,17 @@ export const ThreadMessages = ({ threadMessage }: { threadMessage: Message }) =>
     const threadID = threadMessage.name
     const channelID = threadMessage.channel_id
 
+    const { currentUser } = useContext(UserContext)
     const { channelMembers } = useFetchChannelMembers(channelID ?? '')
+
+    // Check if the parent channel is a bot DM for TTS auto-play
+    const isParentBotDM = useMemo(() => {
+        if (!channelID || !channelMembers || !currentUser) return false
+        // Find the peer (other user in the DM that is not the current user)
+        const members = Object.values(channelMembers)
+        const peer = members.find(m => m.name !== currentUser)
+        return peer?.type === 'Bot'
+    }, [channelID, channelMembers, currentUser])
 
     const { stopTyping, onUserType } = useTyping(threadID ?? '')
 
@@ -177,6 +189,7 @@ export const ThreadMessages = ({ threadMessage }: { threadMessage: Message }) =>
                     replyToMessage={handleReplyAction}
                     showThreadButton={false}
                     onModalClose={onModalClose}
+                    isBot={isParentBotDM}
                 />
                 <AIEvent channelID={threadID ?? ''} />
 

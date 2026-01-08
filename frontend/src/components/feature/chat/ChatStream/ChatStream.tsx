@@ -81,7 +81,7 @@ const ChatStream = forwardRef(({ channelID, replyToMessage, showThreadButton = t
     const { messages, hasOlderMessages, loadOlderMessages, goToLatestMessages, hasNewMessages, error, loadNewerMessages, isLoading, highlightedMessage, scrollToMessage } = useChatStream(channelID, scrollRef, pinnedMessagesString)
 
     // Auto-play TTS for bot messages when TTS is enabled
-    useTTSAutoPlay(messages as Message[] | undefined, isBot)
+    useTTSAutoPlay(messages, isBot)
     const { setDeleteMessage, ...deleteProps } = useDeleteMessage(onModalClose)
 
     const { setEditMessage, ...editProps } = useEditMessage(onModalClose)
