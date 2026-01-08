@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react"
 import { useAtomValue } from "jotai"
 import { useFrappePostCall } from "frappe-react-sdk"
-import { TTSEnabledAtom } from "@/utils/preferences"
+import { TTSEnabledAtom, TTSVoiceAtom } from "@/utils/preferences"
 import { Message } from "../../../../types/Messaging/Message"
 
 interface TTSResponse {
@@ -93,6 +93,7 @@ function cleanTextForTTS(text: string): string {
  */
 export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot: boolean) {
 	const ttsEnabled = useAtomValue(TTSEnabledAtom)
+	const ttsVoice = useAtomValue(TTSVoiceAtom)
 
 	// Track the initial message count to only process NEW messages (per-instance)
 	const initialMessageCountRef = useRef<number | null>(null)
@@ -175,7 +176,7 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 
 					if (cleanedText.trim()) {
 						console.log('[TTS AutoPlay] Playing initial bot message:', cleanedText.substring(0, 50) + '...')
-						call({ text: cleanedText })
+						call({ text: cleanedText, voice: ttsVoice })
 							.then((response) => {
 								console.log('[TTS AutoPlay] TTS API response:', response)
 								const data = (response as any)?.message ?? response
@@ -276,7 +277,7 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 		globalIsPlaying = true
 		console.log('[TTS AutoPlay] Calling TTS API with text:', cleanedText.substring(0, 50) + '...')
 
-		call({ text: cleanedText })
+		call({ text: cleanedText, voice: ttsVoice })
 			.then((response) => {
 				console.log('[TTS AutoPlay] TTS API response (new msg):', response)
 				// Frappe API wraps response in 'message' key
@@ -320,7 +321,7 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 				console.error('[TTS AutoPlay] TTS API call failed (new msg):', err)
 				globalIsPlaying = false
 			})
-	}, [messages, isBot, ttsEnabled, call])
+	}, [messages, isBot, ttsEnabled, ttsVoice, call])
 
 	// Track previous isBot value to detect transitions
 	const previousIsBotRef = useRef<boolean>(isBot)
@@ -378,7 +379,7 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 
 						if (cleanedText.trim()) {
 							console.log('[TTS AutoPlay] Playing missed bot message:', cleanedText.substring(0, 50) + '...')
-							call({ text: cleanedText })
+							call({ text: cleanedText, voice: ttsVoice })
 								.then((response) => {
 									const data = (response as any)?.message ?? response
 									if (data?.success && data?.audio_url) {
@@ -418,7 +419,7 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 			}
 		}
 		previousIsBotRef.current = isBot
-	}, [isBot, ttsEnabled, messages, call])
+	}, [isBot, ttsEnabled, ttsVoice, messages, call])
 
 	// Cleanup on unmount
 	useEffect(() => {

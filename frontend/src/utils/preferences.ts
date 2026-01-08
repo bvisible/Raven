@@ -6,3 +6,6 @@ export const QuickEmojisAtom = atomWithStorage<string[]>("raven-quick-emojis", [
 
 // TTS (Text-to-Speech) preference for AI bot conversations
 export const TTSEnabledAtom = atomWithStorage<boolean>("raven-tts-enabled", false, undefined, { getOnInit: true })
+
+// TTS Voice preference - default to French Swiss male voice
+export const TTSVoiceAtom = atomWithStorage<string>("raven-tts-voice", "fr-CH-FabriceNeural", undefined, { getOnInit: true })

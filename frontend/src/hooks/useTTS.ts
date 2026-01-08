@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react"
-import { useAtom } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 import { useFrappePostCall } from "frappe-react-sdk"
-import { TTSEnabledAtom } from "@/utils/preferences"
+import { TTSEnabledAtom, TTSVoiceAtom } from "@/utils/preferences"
 
 interface TTSResponse {
 	success: boolean
@@ -27,6 +27,7 @@ interface UseTTSReturn {
  */
 export function useTTS(): UseTTSReturn {
 	const [ttsEnabled, setTTSEnabled] = useAtom(TTSEnabledAtom)
+	const ttsVoice = useAtomValue(TTSVoiceAtom)
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -51,7 +52,7 @@ export function useTTS(): UseTTSReturn {
 		setIsLoading(true)
 
 		try {
-			const response = await call({ text })
+			const response = await call({ text, voice: ttsVoice })
 
 			if (response?.success && response?.audio_url) {
 				const audio = new Audio(response.audio_url)
@@ -83,7 +84,7 @@ export function useTTS(): UseTTSReturn {
 			console.error("TTS API error:", error)
 			setIsLoading(false)
 		}
-	}, [call, stop])
+	}, [call, stop, ttsVoice])
 
 	return {
 		isPlaying,
