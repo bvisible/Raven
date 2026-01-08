@@ -161,8 +161,10 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 						console.log('[TTS AutoPlay] Playing initial bot message:', cleanedText.substring(0, 50) + '...')
 						call({ text: cleanedText })
 							.then((response) => {
+								console.log('[TTS AutoPlay] TTS API response:', response)
 								const data = (response as any)?.message ?? response
 								if (data?.success && data?.audio_url) {
+									console.log('[TTS AutoPlay] Got audio URL:', data.audio_url)
 									if (globalAudio) {
 										globalAudio.pause()
 										globalAudio = null
@@ -170,22 +172,29 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 									const audio = new Audio(data.audio_url)
 									globalAudio = audio
 									audio.onended = () => {
+										console.log('[TTS AutoPlay] Audio playback ended')
 										globalIsPlaying = false
 										globalAudio = null
 									}
-									audio.onerror = () => {
+									audio.onerror = (e) => {
+										console.error('[TTS AutoPlay] Audio error:', e)
 										globalIsPlaying = false
 										globalAudio = null
 									}
-									audio.play().catch(() => {
-										globalIsPlaying = false
-										globalAudio = null
-									})
+									audio.play()
+										.then(() => console.log('[TTS AutoPlay] Audio playing successfully'))
+										.catch((err) => {
+											console.error('[TTS AutoPlay] Failed to play:', err.name, err.message)
+											globalIsPlaying = false
+											globalAudio = null
+										})
 								} else {
+									console.log('[TTS AutoPlay] TTS API returned no audio:', data)
 									globalIsPlaying = false
 								}
 							})
-							.catch(() => {
+							.catch((err) => {
+								console.error('[TTS AutoPlay] TTS API call failed:', err)
 								globalIsPlaying = false
 							})
 					} else {
@@ -251,9 +260,11 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 
 		call({ text: cleanedText })
 			.then((response) => {
+				console.log('[TTS AutoPlay] TTS API response (new msg):', response)
 				// Frappe API wraps response in 'message' key
 				const data = (response as any)?.message ?? response
 				if (data?.success && data?.audio_url) {
+					console.log('[TTS AutoPlay] Got audio URL (new msg):', data.audio_url)
 					// Stop any currently playing audio
 					if (globalAudio) {
 						globalAudio.pause()
@@ -262,7 +273,6 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 
 					const audio = new Audio(data.audio_url)
 					globalAudio = audio
-					console.log('[TTS AutoPlay] Audio created, attempting to play:', data.audio_url)
 
 					audio.onended = () => {
 						console.log('[TTS AutoPlay] Audio playback ended')
@@ -270,21 +280,26 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 						globalAudio = null
 					}
 
-					audio.onerror = () => {
+					audio.onerror = (e) => {
+						console.error('[TTS AutoPlay] Audio error:', e)
 						globalIsPlaying = false
 						globalAudio = null
 					}
 
-					audio.play().catch((error) => {
-						console.error('[TTS AutoPlay] Failed to play audio:', error.name, error.message)
-						globalIsPlaying = false
-						globalAudio = null
-					})
+					audio.play()
+						.then(() => console.log('[TTS AutoPlay] Audio playing successfully'))
+						.catch((error) => {
+							console.error('[TTS AutoPlay] Failed to play audio:', error.name, error.message)
+							globalIsPlaying = false
+							globalAudio = null
+						})
 				} else {
+					console.log('[TTS AutoPlay] TTS API returned no audio (new msg):', data)
 					globalIsPlaying = false
 				}
 			})
-			.catch(() => {
+			.catch((err) => {
+				console.error('[TTS AutoPlay] TTS API call failed (new msg):', err)
 				globalIsPlaying = false
 			})
 	}, [messages, isBot, ttsEnabled, call])
