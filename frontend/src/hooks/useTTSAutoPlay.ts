@@ -100,8 +100,9 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 	const { call } = useFrappePostCall<TTSResponse>("nora.api.tts.generate_audio")
 
 	useEffect(() => {
-		// Debug logging - also show brief toast for debugging in production
-		console.log('[TTS AutoPlay] Hook triggered', { ttsEnabled, isBot, messageCount: messages?.length })
+		// Debug logging - include first message name to identify which channel/thread
+		const firstMsgName = messages?.[0]?.name ?? 'none'
+		console.log('[TTS AutoPlay] Hook triggered', { ttsEnabled, isBot, messageCount: messages?.length, firstMsg: firstMsgName })
 
 		// Show debug indicator in dev/debug mode
 		if (typeof window !== 'undefined' && (window as any).__TTS_DEBUG__) {
@@ -124,6 +125,7 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 		)
 
 		if (!actualMessages || actualMessages.length === 0) {
+			console.log('[TTS AutoPlay] No actual messages after filtering, raw count:', messages?.length ?? 0)
 			return
 		}
 
