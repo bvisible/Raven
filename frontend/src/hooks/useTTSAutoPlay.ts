@@ -32,8 +32,8 @@ export function useTTSAutoPlay(messages: Message[] | undefined, isBot: boolean) 
 			return
 		}
 
-		// Get the most recent message (messages are sorted by creation desc)
-		const latestMessage = messages[messages.length - 1]
+		// Get the most recent message (messages are sorted by creation desc, so newest is at index 0)
+		const latestMessage = messages[0]
 
 		// Skip if we've already processed this message
 		if (lastProcessedMessageRef.current === latestMessage.name) {
