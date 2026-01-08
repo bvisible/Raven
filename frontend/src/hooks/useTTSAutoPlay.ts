@@ -18,21 +18,24 @@ type MessageOrDateBlock = Message | {
 	name: string
 }
 
+// Module-level state to prevent multiple instances from playing simultaneously
+let globalIsPlaying = false
+let globalLastProcessedMessage: string | null = null
+let globalAudio: HTMLAudioElement | null = null
+
 /**
  * Hook to auto-play TTS for NEW AI bot messages only.
  * Only triggers for messages that arrive AFTER the initial load.
+ * Uses module-level state to prevent multiple component instances from playing simultaneously.
  *
  * @param messages Array of messages from the chat stream (includes date blocks)
  * @param isBot Whether the current channel is with a bot
  */
 export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot: boolean) {
 	const ttsEnabled = useAtomValue(TTSEnabledAtom)
-	const audioRef = useRef<HTMLAudioElement | null>(null)
-	const isPlayingRef = useRef(false)
 
-	// Track the initial message count to only process NEW messages
+	// Track the initial message count to only process NEW messages (per-instance)
 	const initialMessageCountRef = useRef<number | null>(null)
-	const lastProcessedMessageRef = useRef<string | null>(null)
 
 	const { call } = useFrappePostCall<TTSResponse>("nora.api.tts.generate_audio")
 
@@ -55,10 +58,9 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 		// This ensures we only play TTS for messages that arrive AFTER opening the thread
 		if (initialMessageCountRef.current === null) {
 			initialMessageCountRef.current = actualMessages.length
-			// Mark the latest message as processed so we don't play it
+			// Mark the latest message as processed globally so we don't play it
 			const latestMessage = actualMessages[actualMessages.length - 1]
-			lastProcessedMessageRef.current = latestMessage.name
-			console.log("[TTS] Initialized with", actualMessages.length, "messages. Latest:", latestMessage.name)
+			globalLastProcessedMessage = latestMessage.name
 			return
 		}
 
@@ -70,25 +72,25 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 		// Get the most recent message (messages are sorted oldest-to-newest, so newest is at the end)
 		const latestMessage = actualMessages[actualMessages.length - 1]
 
-		// Skip if we've already processed this message
-		if (lastProcessedMessageRef.current === latestMessage.name) {
+		// Skip if we've already processed this message (global check across all instances)
+		if (globalLastProcessedMessage === latestMessage.name) {
 			return
 		}
 
 		// Only process bot messages with text content
 		// is_bot_message is 1 or 0, not boolean
 		if (latestMessage.is_bot_message !== 1 || !latestMessage.text) {
-			lastProcessedMessageRef.current = latestMessage.name
+			globalLastProcessedMessage = latestMessage.name
 			return
 		}
 
-		// Skip if audio is already playing
-		if (isPlayingRef.current) {
+		// Skip if audio is already playing globally (across all instances)
+		if (globalIsPlaying) {
 			return
 		}
 
-		// Mark as processed
-		lastProcessedMessageRef.current = latestMessage.name
+		// Mark as processed globally
+		globalLastProcessedMessage = latestMessage.name
 
 		// Extract plain text from HTML content
 		const tempDiv = document.createElement("div")
@@ -100,44 +102,40 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 		}
 
 		// Generate and play TTS
-		isPlayingRef.current = true
-		console.log("[TTS] Playing new bot message:", latestMessage.name, "text:", plainText.substring(0, 50))
+		globalIsPlaying = true
 
 		call({ text: plainText })
 			.then((response) => {
 				if (response?.success && response?.audio_url) {
 					// Stop any currently playing audio
-					if (audioRef.current) {
-						audioRef.current.pause()
-						audioRef.current = null
+					if (globalAudio) {
+						globalAudio.pause()
+						globalAudio = null
 					}
 
 					const audio = new Audio(response.audio_url)
-					audioRef.current = audio
+					globalAudio = audio
 
 					audio.onended = () => {
-						isPlayingRef.current = false
-						audioRef.current = null
+						globalIsPlaying = false
+						globalAudio = null
 					}
 
 					audio.onerror = () => {
-						console.error("[TTS] Audio playback error")
-						isPlayingRef.current = false
-						audioRef.current = null
+						globalIsPlaying = false
+						globalAudio = null
 					}
 
-					audio.play().catch((error) => {
-						console.error("[TTS] Play error:", error)
-						isPlayingRef.current = false
-						audioRef.current = null
+					audio.play().catch(() => {
+						globalIsPlaying = false
+						globalAudio = null
 					})
 				} else {
-					isPlayingRef.current = false
+					globalIsPlaying = false
 				}
 			})
-			.catch((error) => {
-				console.error("[TTS] API error:", error)
-				isPlayingRef.current = false
+			.catch(() => {
+				globalIsPlaying = false
 			})
 	}, [messages, isBot, ttsEnabled, call])
 
@@ -145,17 +143,17 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 	useEffect(() => {
 		if (!messages || messages.length === 0) {
 			initialMessageCountRef.current = null
-			lastProcessedMessageRef.current = null
 		}
 	}, [messages])
 
 	// Cleanup on unmount
 	useEffect(() => {
 		return () => {
-			if (audioRef.current) {
-				audioRef.current.pause()
-				audioRef.current = null
+			if (globalAudio) {
+				globalAudio.pause()
+				globalAudio = null
 			}
+			globalIsPlaying = false
 		}
 	}, [])
 }
