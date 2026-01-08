@@ -100,8 +100,12 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 	const { call } = useFrappePostCall<TTSResponse>("nora.api.tts.generate_audio")
 
 	useEffect(() => {
+		// Debug logging
+		console.log('[TTS AutoPlay] Hook triggered', { ttsEnabled, isBot, messageCount: messages?.length })
+
 		// Only process if TTS is enabled and this is a bot channel
 		if (!ttsEnabled || !isBot) {
+			console.log('[TTS AutoPlay] Skipping - ttsEnabled:', ttsEnabled, 'isBot:', isBot)
 			return
 		}
 
@@ -121,13 +125,17 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 			// Mark the latest message as processed globally so we don't play it
 			const latestMessage = actualMessages[actualMessages.length - 1]
 			globalLastProcessedMessage = latestMessage.name
+			console.log('[TTS AutoPlay] Initial load, storing count:', actualMessages.length)
 			return
 		}
 
 		// Only process if we have more messages than initial (new message arrived)
 		if (actualMessages.length <= initialMessageCountRef.current) {
+			console.log('[TTS AutoPlay] No new messages, current:', actualMessages.length, 'initial:', initialMessageCountRef.current)
 			return
 		}
+
+		console.log('[TTS AutoPlay] New message detected! Count:', actualMessages.length, 'vs initial:', initialMessageCountRef.current)
 
 		// Get the most recent message (messages are sorted oldest-to-newest, so newest is at the end)
 		const latestMessage = actualMessages[actualMessages.length - 1]
