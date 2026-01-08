@@ -127,12 +127,71 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 			return
 		}
 
-		// On first run with messages, store the initial count and don't play anything
-		// This ensures we only play TTS for messages that arrive AFTER opening the thread
+		// On first run with messages, store the initial count
+		// BUT check if the latest message is a recent bot message (within 30 seconds)
+		// This handles the case where a new thread opens and the bot has just responded
 		if (initialMessageCountRef.current === null) {
 			initialMessageCountRef.current = actualMessages.length
-			// Mark the latest message as processed globally so we don't play it
 			const latestMessage = actualMessages[actualMessages.length - 1]
+
+			// Check if latest message is a recent bot message that should be played
+			if (latestMessage.is_bot_message === 1 && latestMessage.text && globalLastProcessedMessage !== latestMessage.name && !globalIsPlaying) {
+				const messageTime = new Date(latestMessage.creation).getTime()
+				const now = Date.now()
+				const isRecent = (now - messageTime) < 30000
+
+				console.log('[TTS AutoPlay] Initial load with bot message, isRecent:', isRecent, 'age:', now - messageTime, 'ms')
+
+				if (isRecent) {
+					// Play TTS for this recent bot message
+					globalLastProcessedMessage = latestMessage.name
+					globalIsPlaying = true
+
+					const tempDiv = document.createElement("div")
+					tempDiv.innerHTML = latestMessage.text
+					const rawText = tempDiv.textContent || tempDiv.innerText || ""
+					const cleanedText = cleanTextForTTS(rawText)
+
+					if (cleanedText.trim()) {
+						console.log('[TTS AutoPlay] Playing initial bot message:', cleanedText.substring(0, 50) + '...')
+						call({ text: cleanedText })
+							.then((response) => {
+								const data = (response as any)?.message ?? response
+								if (data?.success && data?.audio_url) {
+									if (globalAudio) {
+										globalAudio.pause()
+										globalAudio = null
+									}
+									const audio = new Audio(data.audio_url)
+									globalAudio = audio
+									audio.onended = () => {
+										globalIsPlaying = false
+										globalAudio = null
+									}
+									audio.onerror = () => {
+										globalIsPlaying = false
+										globalAudio = null
+									}
+									audio.play().catch(() => {
+										globalIsPlaying = false
+										globalAudio = null
+									})
+								} else {
+									globalIsPlaying = false
+								}
+							})
+							.catch(() => {
+								globalIsPlaying = false
+							})
+					} else {
+						globalIsPlaying = false
+						globalLastProcessedMessage = latestMessage.name
+					}
+					return
+				}
+			}
+
+			// Not a recent bot message, just mark as processed
 			globalLastProcessedMessage = latestMessage.name
 			console.log('[TTS AutoPlay] Initial load, storing count:', actualMessages.length)
 			return
@@ -225,12 +284,96 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 			})
 	}, [messages, isBot, ttsEnabled, call])
 
+	// Track previous isBot value to detect transitions
+	const previousIsBotRef = useRef<boolean>(isBot)
+
 	// Reset initial count when channel changes (messages becomes undefined or empty)
+	// OR when isBot transitions from false to true (e.g., when channelMembers loads)
 	useEffect(() => {
 		if (!messages || messages.length === 0) {
 			initialMessageCountRef.current = null
 		}
 	}, [messages])
+
+	// Handle when isBot changes from false to true
+	// This handles the case where channelMembers loads AFTER messages (e.g., new thread creation)
+	useEffect(() => {
+		if (isBot && !previousIsBotRef.current && ttsEnabled) {
+			console.log('[TTS AutoPlay] isBot transitioned to true, checking for recent bot message')
+
+			// Filter to actual messages
+			const actualMessages = messages?.filter(
+				(m): m is Message => m.message_type !== 'date' && m.message_type !== 'System'
+			)
+
+			console.log('[TTS AutoPlay] Messages available:', actualMessages?.length ?? 0, 'messages:', actualMessages?.map(m => ({ name: m.name, is_bot: m.is_bot_message, owner: m.owner })))
+
+			if (actualMessages && actualMessages.length > 0) {
+				// Find the most recent bot message
+				const latestBotMessage = [...actualMessages].reverse().find(m => m.is_bot_message === 1 && m.text)
+				console.log('[TTS AutoPlay] Latest bot message found:', latestBotMessage ? latestBotMessage.name : 'none')
+
+				if (latestBotMessage && globalLastProcessedMessage !== latestBotMessage.name && !globalIsPlaying) {
+					// Check if this message is recent (within last 30 seconds)
+					const messageTime = new Date(latestBotMessage.creation).getTime()
+					const now = Date.now()
+					const isRecent = (now - messageTime) < 30000
+
+					console.log('[TTS AutoPlay] Found bot message, isRecent:', isRecent, 'age:', now - messageTime, 'ms')
+
+					if (isRecent) {
+						// Play TTS for this message
+						globalLastProcessedMessage = latestBotMessage.name
+						globalIsPlaying = true
+
+						const tempDiv = document.createElement("div")
+						tempDiv.innerHTML = latestBotMessage.text
+						const rawText = tempDiv.textContent || tempDiv.innerText || ""
+						const cleanedText = cleanTextForTTS(rawText)
+
+						if (cleanedText.trim()) {
+							console.log('[TTS AutoPlay] Playing missed bot message:', cleanedText.substring(0, 50) + '...')
+							call({ text: cleanedText })
+								.then((response) => {
+									const data = (response as any)?.message ?? response
+									if (data?.success && data?.audio_url) {
+										if (globalAudio) {
+											globalAudio.pause()
+											globalAudio = null
+										}
+										const audio = new Audio(data.audio_url)
+										globalAudio = audio
+										audio.onended = () => {
+											globalIsPlaying = false
+											globalAudio = null
+										}
+										audio.onerror = () => {
+											globalIsPlaying = false
+											globalAudio = null
+										}
+										audio.play().catch(() => {
+											globalIsPlaying = false
+											globalAudio = null
+										})
+									} else {
+										globalIsPlaying = false
+									}
+								})
+								.catch(() => {
+									globalIsPlaying = false
+								})
+						} else {
+							globalIsPlaying = false
+						}
+					}
+				}
+
+				// Set initial count to current so future messages trigger normally
+				initialMessageCountRef.current = actualMessages.length
+			}
+		}
+		previousIsBotRef.current = isBot
+	}, [isBot, ttsEnabled, messages, call])
 
 	// Cleanup on unmount
 	useEffect(() => {
