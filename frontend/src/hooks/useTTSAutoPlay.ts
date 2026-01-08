@@ -128,7 +128,8 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 						globalAudio = null
 					}
 
-					audio.play().catch(() => {
+					audio.play().catch((error) => {
+						console.error('[TTS AutoPlay] Failed to play audio:', error.name, error.message)
 						globalIsPlaying = false
 						globalAudio = null
 					})
