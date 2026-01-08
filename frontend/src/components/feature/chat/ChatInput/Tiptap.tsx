@@ -69,6 +69,8 @@ type TiptapEditorProps = {
     channelID?: string,
     onUserType?: () => void,
     onUpArrow?: () => void,
+    /** Whether this is a bot channel - shows AI gradient border */
+    isBot?: boolean,
 }
 
 export const UserMention = Mention.extend({
@@ -109,7 +111,7 @@ export interface MemberSuggestions extends UserFields {
     is_member: boolean
 }
 
-const Tiptap = forwardRef(({ isEdit, slotBefore, fileProps, onMessageSend, onUpArrow, channelMembers, onUserType, channelID, replyMessage, clearReplyMessage, placeholder = 'Type a message...', messageSending, sessionStorageKey = 'tiptap-editor', disableSessionStorage = false, defaultText = '' }: TiptapEditorProps, ref) => {
+const Tiptap = forwardRef(({ isEdit, slotBefore, fileProps, onMessageSend, onUpArrow, channelMembers, onUserType, channelID, replyMessage, clearReplyMessage, placeholder = 'Type a message...', messageSending, sessionStorageKey = 'tiptap-editor', disableSessionStorage = false, defaultText = '', isBot = false }: TiptapEditorProps, ref) => {
 
     const { enabledUsers } = useContext(UserListContext)
 
@@ -603,16 +605,21 @@ const Tiptap = forwardRef(({ isEdit, slotBefore, fileProps, onMessageSend, onUpA
     }
 
     return (
-        <Box className='border rounded-radius2 border-gray-300 dark:border-gray-500 dark:bg-gray-3'>
+        <Box className={clsx(
+            'border rounded-radius2 border-gray-300 dark:border-gray-500 dark:bg-gray-3',
+            isBot && 'ai-gradient-border'
+        )}>
             <EditorContext.Provider value={{ editor }}>
-                {slotBefore}
-                <EditorContent editor={editor} />
-                <ToolPanel>
-                    <TextFormattingMenu />
-                    <RightToolbarButtons fileProps={fileProps} setContent={setContent} sendMessage={onMessageSend} messageSending={messageSending}
-                        isEdit={isEdit}
-                        channelID={channelID} />
-                </ToolPanel>
+                <div className={isBot ? 'bg-white dark:bg-gray-3 rounded-[calc(var(--radius-2)-2px)]' : ''}>
+                    {slotBefore}
+                    <EditorContent editor={editor} />
+                    <ToolPanel>
+                        <TextFormattingMenu />
+                        <RightToolbarButtons fileProps={fileProps} setContent={setContent} sendMessage={onMessageSend} messageSending={messageSending}
+                            isEdit={isEdit}
+                            channelID={channelID} />
+                    </ToolPanel>
+                </div>
             </EditorContext.Provider>
         </Box>
 

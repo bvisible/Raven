@@ -267,6 +267,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                             sessionStorageKey={`tiptap-${channelData.name}`}
                             onMessageSend={sendMessage}
                             messageSending={loading}
+                            isBot={isBot}
                             slotBefore={<Flex direction='column' justify='center' hidden={!selectedMessage && !files.length}>
                                 {selectedMessage && <PreviousMessagePreview selectedMessage={selectedMessage} />}
                                 {files && files.length > 0 && <Flex gap='2' width='100%' align='stretch' px='2' p='2' wrap='wrap'>

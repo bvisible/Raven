@@ -130,3 +130,77 @@
 .tiptap pre .hljs-strong {
     font-weight: 700;
 }
+
+/* AI Bot gradient border effect */
+.ai-gradient-border {
+    position: relative;
+    padding: 2px;
+    border-radius: var(--radius-2);
+    background: linear-gradient(
+        90deg,
+        #6366f1 0%,
+        #8b5cf6 8.33%,
+        #a855f7 16.66%,
+        #d946ef 25%,
+        #ec4899 33.33%,
+        #f43f5e 41.66%,
+        #f97316 50%,
+        #eab308 58.33%,
+        #22c55e 66.66%,
+        #14b8a6 75%,
+        #06b6d4 83.33%,
+        #3b82f6 91.66%,
+        #6366f1 100%
+    );
+    background-size: 200% 100%;
+    animation: ai-border-gradient 8s linear infinite;
+    border: none !important;
+}
+
+.ai-gradient-border > div {
+    background: var(--color-background);
+    border-radius: calc(var(--radius-2) - 2px);
+}
+
+/* Glow effect behind the gradient border */
+.ai-gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: calc(var(--radius-2) + 3px);
+    background: linear-gradient(
+        90deg,
+        #6366f1 0%,
+        #8b5cf6 8.33%,
+        #a855f7 16.66%,
+        #d946ef 25%,
+        #ec4899 33.33%,
+        #f43f5e 41.66%,
+        #f97316 50%,
+        #eab308 58.33%,
+        #22c55e 66.66%,
+        #14b8a6 75%,
+        #06b6d4 83.33%,
+        #3b82f6 91.66%,
+        #6366f1 100%
+    );
+    background-size: 200% 100%;
+    animation: ai-border-gradient 8s linear infinite;
+    filter: blur(12px);
+    opacity: 0.4;
+    z-index: -1;
+}
+
+@keyframes ai-border-gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: -200% 50%;
+    }
+}
+
+/* Override focus state for AI gradient border */
+.ai-gradient-border .tiptap-editor.ProseMirror:focus {
+    outline: none;
+}

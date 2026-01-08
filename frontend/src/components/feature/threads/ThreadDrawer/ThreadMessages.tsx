@@ -214,6 +214,7 @@ export const ThreadMessages = ({ threadMessage }: { threadMessage: Message }) =>
                         sessionStorageKey={`tiptap-${threadID}`}
                         onMessageSend={sendMessage}
                         messageSending={loading}
+                        isBot={isParentBotDM}
                         slotBefore={<Flex direction='column' justify='center' hidden={!selectedMessage && !files.length}>
                             {selectedMessage && <PreviousMessagePreview selectedMessage={selectedMessage} />}
                             {files && files.length > 0 && <Flex gap='2' width='100%' align='end' px='2' p='2' wrap='wrap'>
