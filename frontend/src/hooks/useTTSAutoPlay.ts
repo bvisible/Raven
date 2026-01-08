@@ -100,8 +100,17 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 	const { call } = useFrappePostCall<TTSResponse>("nora.api.tts.generate_audio")
 
 	useEffect(() => {
-		// Debug logging
+		// Debug logging - also show brief toast for debugging in production
 		console.log('[TTS AutoPlay] Hook triggered', { ttsEnabled, isBot, messageCount: messages?.length })
+
+		// Show debug indicator in dev/debug mode
+		if (typeof window !== 'undefined' && (window as any).__TTS_DEBUG__) {
+			const debugDiv = document.createElement('div')
+			debugDiv.style.cssText = 'position:fixed;top:10px;right:10px;background:#333;color:#fff;padding:8px;border-radius:4px;z-index:99999;font-size:12px;'
+			debugDiv.textContent = `TTS: enabled=${ttsEnabled}, isBot=${isBot}, msgs=${messages?.length}`
+			document.body.appendChild(debugDiv)
+			setTimeout(() => debugDiv.remove(), 2000)
+		}
 
 		// Only process if TTS is enabled and this is a bot channel
 		if (!ttsEnabled || !isBot) {
@@ -174,6 +183,7 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 
 		// Generate and play TTS
 		globalIsPlaying = true
+		console.log('[TTS AutoPlay] Calling TTS API with text:', cleanedText.substring(0, 50) + '...')
 
 		call({ text: cleanedText })
 			.then((response) => {
@@ -188,8 +198,10 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 
 					const audio = new Audio(data.audio_url)
 					globalAudio = audio
+					console.log('[TTS AutoPlay] Audio created, attempting to play:', data.audio_url)
 
 					audio.onended = () => {
+						console.log('[TTS AutoPlay] Audio playback ended')
 						globalIsPlaying = false
 						globalAudio = null
 					}
