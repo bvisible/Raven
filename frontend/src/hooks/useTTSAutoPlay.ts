@@ -24,6 +24,66 @@ let globalLastProcessedMessage: string | null = null
 let globalAudio: HTMLAudioElement | null = null
 
 /**
+ * Clean text for TTS - removes emojis, markdown, HTML tags, etc.
+ * Based on Nora's clean_text_for_tts function
+ */
+function cleanTextForTTS(text: string): string {
+	if (!text) return ''
+
+	let cleaned = text
+
+	// Remove ALL emojis (Unicode ranges)
+	// Basic Emoji: 1F600-1F64F (emoticons)
+	// Misc Symbols: 2600-26FF
+	// Dingbats: 2700-27BF
+	// Misc Symbols Extended: 1F900-1F9FF
+	// Supplemental Symbols: 1F300-1F5FF
+	// Transport & Map: 1F680-1F6FF
+	cleaned = cleaned.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '')
+
+	// Remove emoji shortcodes like :smile: :thumbsup:
+	cleaned = cleaned.replace(/:[a-z_]+:/g, '')
+
+	// Remove HTML tags
+	cleaned = cleaned.replace(/<[^>]*>/g, '')
+
+	// Remove Markdown bold/italic markers
+	cleaned = cleaned.replace(/\*\*\*/g, '')  // Bold + Italic (***text***)
+	cleaned = cleaned.replace(/\*\*/g, '')    // Bold (**text**)
+	cleaned = cleaned.replace(/\*/g, '')      // Italic (*text*)
+	cleaned = cleaned.replace(/___/g, '')     // Bold + Italic (___text___)
+	cleaned = cleaned.replace(/__/g, '')      // Bold (__text__)
+	cleaned = cleaned.replace(/_/g, ' ')      // Italic (_text_) - replace with space to avoid joined words
+
+	// Remove Markdown links but keep the text: [text](url) -> text
+	cleaned = cleaned.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+
+	// Remove Markdown headers (#, ##, etc.)
+	cleaned = cleaned.replace(/^#{1,6}\s+/gm, '')
+
+	// Remove Markdown code blocks (``` or `)
+	cleaned = cleaned.replace(/```[^`]*```/g, '')
+	cleaned = cleaned.replace(/`([^`]+)`/g, '$1')
+
+	// Remove Markdown lists (-, *, +, numbers)
+	cleaned = cleaned.replace(/^\s*[-*+]\s+/gm, '')
+	cleaned = cleaned.replace(/^\s*\d+\.\s+/gm, '')
+
+	// Decode common HTML entities
+	cleaned = cleaned.replace(/&nbsp;/g, ' ')
+	cleaned = cleaned.replace(/&amp;/g, '&')
+	cleaned = cleaned.replace(/&lt;/g, '<')
+	cleaned = cleaned.replace(/&gt;/g, '>')
+	cleaned = cleaned.replace(/&quot;/g, '"')
+	cleaned = cleaned.replace(/&#39;/g, "'")
+
+	// Remove extra whitespace
+	cleaned = cleaned.replace(/\s+/g, ' ').trim()
+
+	return cleaned
+}
+
+/**
  * Hook to auto-play TTS for NEW AI bot messages only.
  * Only triggers for messages that arrive AFTER the initial load.
  * Uses module-level state to prevent multiple component instances from playing simultaneously.
@@ -92,19 +152,22 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 		// Mark as processed globally
 		globalLastProcessedMessage = latestMessage.name
 
-		// Extract plain text from HTML content
+		// Extract plain text from HTML content and clean for TTS
 		const tempDiv = document.createElement("div")
 		tempDiv.innerHTML = latestMessage.text
-		const plainText = tempDiv.textContent || tempDiv.innerText || ""
+		const rawText = tempDiv.textContent || tempDiv.innerText || ""
 
-		if (!plainText.trim()) {
+		// Clean text: remove emojis, markdown, etc.
+		const cleanedText = cleanTextForTTS(rawText)
+
+		if (!cleanedText.trim()) {
 			return
 		}
 
 		// Generate and play TTS
 		globalIsPlaying = true
 
-		call({ text: plainText })
+		call({ text: cleanedText })
 			.then((response) => {
 				// Frappe API wraps response in 'message' key
 				const data = (response as any)?.message ?? response
