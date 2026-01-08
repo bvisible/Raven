@@ -128,15 +128,20 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 		}
 
 		// On first run with messages, store the initial count
-		// BUT check if the latest message is a recent bot message (within 30 seconds)
+		// BUT check if there's a recent bot message (within 30 seconds) that should be played
 		// This handles the case where a new thread opens and the bot has just responded
 		if (initialMessageCountRef.current === null) {
 			initialMessageCountRef.current = actualMessages.length
+
+			// Find the most recent bot message (not just the latest message, which could be user's)
+			const latestBotMessage = [...actualMessages].reverse().find(m => m.is_bot_message === 1 && m.text)
 			const latestMessage = actualMessages[actualMessages.length - 1]
 
-			// Check if latest message is a recent bot message that should be played
-			if (latestMessage.is_bot_message === 1 && latestMessage.text && globalLastProcessedMessage !== latestMessage.name && !globalIsPlaying) {
-				const messageTime = new Date(latestMessage.creation).getTime()
+			console.log('[TTS AutoPlay] Initial load, storing count:', actualMessages.length, 'latestBotMessage:', latestBotMessage?.name ?? 'none')
+
+			// Check if there's a recent bot message that should be played
+			if (latestBotMessage && globalLastProcessedMessage !== latestBotMessage.name && !globalIsPlaying) {
+				const messageTime = new Date(latestBotMessage.creation).getTime()
 				const now = Date.now()
 				const isRecent = (now - messageTime) < 30000
 
@@ -144,11 +149,11 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 
 				if (isRecent) {
 					// Play TTS for this recent bot message
-					globalLastProcessedMessage = latestMessage.name
+					globalLastProcessedMessage = latestBotMessage.name
 					globalIsPlaying = true
 
 					const tempDiv = document.createElement("div")
-					tempDiv.innerHTML = latestMessage.text
+					tempDiv.innerHTML = latestBotMessage.text
 					const rawText = tempDiv.textContent || tempDiv.innerText || ""
 					const cleanedText = cleanTextForTTS(rawText)
 
@@ -185,15 +190,15 @@ export function useTTSAutoPlay(messages: MessageOrDateBlock[] | undefined, isBot
 							})
 					} else {
 						globalIsPlaying = false
-						globalLastProcessedMessage = latestMessage.name
 					}
+					// Mark the latest message as processed to avoid processing it again
+					globalLastProcessedMessage = latestMessage.name
 					return
 				}
 			}
 
-			// Not a recent bot message, just mark as processed
+			// No recent bot message, just mark the latest as processed
 			globalLastProcessedMessage = latestMessage.name
-			console.log('[TTS AutoPlay] Initial load, storing count:', actualMessages.length)
 			return
 		}
 
