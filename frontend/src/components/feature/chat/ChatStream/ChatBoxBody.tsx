@@ -48,6 +48,15 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
     const { name: user } = useUserData()
     const { channelMembers, isLoading } = useFetchChannelMembers(channelData.name)
 
+    // Check if this is a bot DM channel
+    const isBot = useMemo(() => {
+        if (channelData.is_direct_message === 1 && 'peer_user_id' in channelData) {
+            const peer = (channelData as DMChannelListItem).peer_user_id
+            return channelMembers?.[peer]?.type === 'Bot'
+        }
+        return false
+    }, [channelData, channelMembers])
+
     const { onUserType, stopTyping } = useTyping(channelData.name)
 
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null)
@@ -236,6 +245,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                     onModalClose={onModalClose}
                     pinnedMessagesString={channelData.pinned_messages_string}
                     replyToMessage={handleReplyAction}
+                    isBot={isBot}
                 />
                 {canUserSendMessage &&
                     <Stack>

@@ -499,7 +499,10 @@ class RavenBot(Document):
 		)
 		# Bots can probably send messages without permissions? Upto the end user to create bots.
 		# Besides sending messages is not a security concern, unauthorized reading of messages is.
-		doc.insert(ignore_permissions=True)
+		# Use ignore_links=True when link_document is set because the document may have been
+		# created in a different database connection (e.g., by Nora's code executor) and
+		# may not be immediately visible due to connection isolation
+		doc.insert(ignore_permissions=True, ignore_links=bool(link_document))
 		return doc.name
 
 	def create_direct_message_channel(self, user_id: str) -> str:

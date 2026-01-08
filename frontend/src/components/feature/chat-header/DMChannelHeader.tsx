@@ -15,6 +15,7 @@ import { replaceCurrentUserFromDMChannelName } from "@/utils/operations"
 import { useIsDesktop } from "@/hooks/useMediaQuery"
 import { useAtomValue } from "jotai"
 import { lastWorkspaceAtom } from "@/utils/lastVisitedAtoms"
+import { TTSToggle } from "./TTSToggle"
 
 interface DMChannelHeaderProps {
     channelData: DMChannelListItem,
@@ -86,6 +87,7 @@ export const DMChannelHeader = ({ channelData }: DMChannelHeaderProps) => {
                 </Heading>
             </Flex>
             <Flex gap='4' align='center'>
+                {isBot && <TTSToggle compact />}
                 <ChannelHeaderMenu channelData={channelData} />
             </Flex>
         </PageHeader>

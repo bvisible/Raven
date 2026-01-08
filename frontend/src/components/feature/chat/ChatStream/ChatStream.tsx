@@ -18,6 +18,7 @@ import AttachFileToDocumentDialog, { useAttachFileToDocument } from '../ChatMess
 import { ReactionAnalyticsDialog, useMessageReactionAnalytics } from '../ChatMessage/MessageActions/MessageReactionAnalytics'
 import SystemMessageBlock from '../ChatMessage/SystemMessageBlock'
 import { useUserData } from '@/hooks/useUserData'
+import { useTTSAutoPlay } from '@/hooks/useTTSAutoPlay'
 
 /**
  * Anatomy of a message
@@ -70,12 +71,17 @@ type Props = {
     showThreadButton?: boolean,
     scrollRef: MutableRefObject<HTMLDivElement | null>,
     pinnedMessagesString?: string,
-    onModalClose?: () => void
+    onModalClose?: () => void,
+    /** Whether this is a bot channel (for TTS auto-play) */
+    isBot?: boolean
 }
 
-const ChatStream = forwardRef(({ channelID, replyToMessage, showThreadButton = true, pinnedMessagesString, scrollRef, onModalClose }: Props, ref) => {
+const ChatStream = forwardRef(({ channelID, replyToMessage, showThreadButton = true, pinnedMessagesString, scrollRef, onModalClose, isBot = false }: Props, ref) => {
 
     const { messages, hasOlderMessages, loadOlderMessages, goToLatestMessages, hasNewMessages, error, loadNewerMessages, isLoading, highlightedMessage, scrollToMessage } = useChatStream(channelID, scrollRef, pinnedMessagesString)
+
+    // Auto-play TTS for bot messages when TTS is enabled
+    useTTSAutoPlay(messages as Message[] | undefined, isBot)
     const { setDeleteMessage, ...deleteProps } = useDeleteMessage(onModalClose)
 
     const { setEditMessage, ...editProps } = useEditMessage(onModalClose)

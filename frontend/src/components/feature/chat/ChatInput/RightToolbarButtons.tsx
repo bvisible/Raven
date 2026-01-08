@@ -14,6 +14,7 @@ import AISavedPromptsButton from './AISavedPromptsButton'
 import DocumentLinkButton from './DocumentLinkButton'
 import { HStack } from '@/components/layout/Stack'
 import clsx from 'clsx'
+import { MicrophoneButton } from './MicrophoneButton'
 
 
 const EmojiPicker = lazy(() => import('@/components/common/EmojiPicker/EmojiPicker'))
@@ -56,6 +57,7 @@ export const RightToolbarButtons = ({ fileProps, channelID, isEdit, ...sendProps
                 <EmojiPickerButton />
                 <GIFPickerButton />
                 {fileProps && <FilePickerButton fileProps={fileProps} />}
+                <MicrophoneButton />
             </Flex>
             <Separator orientation='vertical' />
             <SendButton {...sendProps} />
