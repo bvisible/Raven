@@ -941,7 +941,22 @@ def process_message_with_nora(
 			if response.get("response"):
 				# Check if response contains details tag (thinking section)
 				has_thinking = "<details" in response["response"]
-				bot.send_message(channel_id=channel_id, text=response["response"], markdown=not has_thinking)
+
+				# Extract document link info if present (for doctype card display)
+				link_doctype = None
+				link_document = None
+				pending_doc = response.get("pending_document")
+				if pending_doc and isinstance(pending_doc, dict):
+					link_doctype = pending_doc.get("doctype")
+					link_document = pending_doc.get("name")
+
+				bot.send_message(
+					channel_id=channel_id,
+					text=response["response"],
+					markdown=not has_thinking,
+					link_doctype=link_doctype,
+					link_document=link_document,
+				)
 		else:
 			error_text = "Sorry, I encountered an error while processing your request."
 			if bot.debug_mode and response.get("error"):
