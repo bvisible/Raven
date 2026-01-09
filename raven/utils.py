@@ -179,15 +179,18 @@ def get_raven_user(user_id: str) -> str:
 	"""
 	Get the Raven User ID of a user
 	"""
-	# First check by user field
-	raven_user = frappe.db.get_value("Raven User", {"user": user_id}, "name")
-	if raven_user:
-		return raven_user
+	# TODO: Run this via cache
+	raven_user = frappe.qb.DocType("Raven User")
+	query = (
+		frappe.qb.from_(raven_user)
+		.select(raven_user.name)
+		.where((raven_user.user == user_id) | (raven_user.bot == user_id))
+		.limit(1)
+	)
 
-	# Then check by bot field
-	raven_user = frappe.db.get_value("Raven User", {"bot": user_id}, "name")
-	if raven_user:
-		return raven_user
+	result = query.run()
+	if result:
+		return result[0][0]
 
 	return None
 
