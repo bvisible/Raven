@@ -261,6 +261,12 @@ def on_doctype_update():
 	Add unique constraint on dm_user_1 and dm_user_2 to prevent duplicate DM channels.
 	NULL values are ignored by MySQL/MariaDB unique constraints, so this only affects DM channels.
 	"""
+	# Check if columns exist before adding constraint (they may not exist during initial migration)
+	if not frappe.db.has_column("Raven Channel", "dm_user_1"):
+		return
+	if not frappe.db.has_column("Raven Channel", "dm_user_2"):
+		return
+
 	frappe.db.add_unique(
 		"Raven Channel",
 		fields=["dm_user_1", "dm_user_2"],
