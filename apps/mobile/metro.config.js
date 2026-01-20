@@ -14,8 +14,8 @@ module.exports = (() => {
     // Extract existing transformer and resolver
     const { transformer, resolver } = config;
 
-    // 1. Watch all files within the monorepo
-    config.watchFolders = [monorepoRoot];
+    // 1. Watch all files within the monorepo (extend default watchFolders)
+    config.watchFolders = [...(config.watchFolders || []), monorepoRoot];
 
     // Add SVG transformer configuration
     config.transformer = {
