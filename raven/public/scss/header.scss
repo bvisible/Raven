@@ -9,6 +9,7 @@
 
 .raven-container[data-open-state="true"] {
     height: var(--raven-expanded-height);
+    width: var(--raven-content-width);
     overflow: hidden;
 
     .raven-header {
