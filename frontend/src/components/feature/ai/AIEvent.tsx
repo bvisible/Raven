@@ -1,9 +1,8 @@
 import { Loader } from '@/components/common/Loader'
-import { Text, Box } from '@radix-ui/themes'
+import { Text } from '@radix-ui/themes'
 import clsx from 'clsx'
 import { useFrappeEventListener } from 'frappe-react-sdk'
-import { useEffect, useState, useRef } from 'react'
-import { BiChevronDown, BiChevronRight, BiBrain } from 'react-icons/bi'
+import { useEffect, useState } from 'react'
 
 type Props = {
     channelID: string
@@ -40,38 +39,24 @@ const AIEvent = ({ channelID }: Props) => {
     const [isNewThread, setIsNewThread] = useState(initialState.isNewThread)
     const [thinkingStartTime, setThinkingStartTime] = useState(initialState.thinkingStartTime)
 
-    // Streaming state
-    const [streamedText, setStreamedText] = useState("")
-    const [isStreaming, setIsStreaming] = useState(false)
-    const streamContainerRef = useRef<HTMLDivElement>(null)
-
-    // Thinking/reasoning state
-    const [isThinking, setIsThinking] = useState(false)
-    const [thinkingContent, setThinkingContent] = useState("")
-    const [streamingThinking, setStreamingThinking] = useState("")  // Real-time thinking display
-    const [showThinkingContent, setShowThinkingContent] = useState(false)
-    const thinkingContainerRef = useRef<HTMLDivElement>(null)
 
     useFrappeEventListener("ai_event", (data) => {
         if (data.channel_id === channelID) {
             setAIEvent(data.text)
             setShowAIEvent(true)
-            setIsNewThread(false)
-            setThinkingStartTime(Date.now())
-            // Reset streaming when a new thinking event comes in
-            setStreamedText("")
-            setIsStreaming(false)
-            setIsThinking(false)
-            setThinkingContent("")
+            setIsNewThread(false) // Reset flag when we get a real event
+            setThinkingStartTime(Date.now()) // Reset timer for new thinking messages
         }
     })
 
     useFrappeEventListener("ai_event_clear", (data) => {
         if (data.channel_id === channelID) {
             const timeSinceThinking = thinkingStartTime ? Date.now() - thinkingStartTime : 0;
-            const MIN_DISPLAY_TIME = 500;
+            const MIN_DISPLAY_TIME = 2000; // Minimum 2 seconds display time
 
-            if (thinkingStartTime && timeSinceThinking < MIN_DISPLAY_TIME && !isStreaming) {
+            // For all messages (including new threads), ensure minimum display time of 2 seconds
+            if (thinkingStartTime && timeSinceThinking < MIN_DISPLAY_TIME) {
+                // Schedule the clear for later to meet minimum display time
                 const remainingTime = MIN_DISPLAY_TIME - timeSinceThinking;
                 setTimeout(() => {
                     setAIEvent("")
@@ -80,160 +65,29 @@ const AIEvent = ({ channelID }: Props) => {
                 return;
             }
 
+            // If enough time has passed, clear immediately
             setAIEvent("")
             setIsNewThread(false)
         }
     })
 
-    // Listen for thinking start
-    useFrappeEventListener("ai_thinking_start", (data) => {
-        if (data.channel_id === channelID) {
-            setIsThinking(true)
-            setThinkingContent("")
-            setStreamingThinking("")
-            setShowAIEvent(true)
-            setAIEvent("") // Clear "thinking" text, we'll show reasoning indicator
-        }
-    })
-
-    // Listen for thinking tokens (real-time reasoning display)
-    useFrappeEventListener("ai_thinking_token", (data) => {
-        if (data.channel_id === channelID) {
-            setStreamingThinking(prev => prev + data.token)
-            setShowAIEvent(true)
-        }
-    })
-
-    // Listen for thinking end (includes captured thinking content)
-    useFrappeEventListener("ai_thinking_end", (data) => {
-        if (data.channel_id === channelID) {
-            setIsThinking(false)
-            if (data.thinking_content) {
-                setThinkingContent(data.thinking_content)
-            }
-            setStreamingThinking("")  // Clear streaming thinking when done
-        }
-    })
-
-    // Listen for streaming tokens
-    useFrappeEventListener("ai_token", (data) => {
-        if (data.channel_id === channelID) {
-            setIsStreaming(true)
-            setShowAIEvent(true)
-            setAIEvent("")
-            setStreamedText(prev => prev + data.token)
-        }
-    })
-
-    // Listen for stream end
-    useFrappeEventListener("ai_stream_done", (data) => {
-        if (data.channel_id === channelID) {
-            setTimeout(() => {
-                setIsStreaming(false)
-                setStreamedText("")
-                setShowAIEvent(false)
-                setIsThinking(false)
-                setThinkingContent("")
-                setShowThinkingContent(false)
-            }, 300)
-        }
-    })
-
-    // Auto-scroll streaming container
-    useEffect(() => {
-        if (streamContainerRef.current && isStreaming) {
-            streamContainerRef.current.scrollTop = streamContainerRef.current.scrollHeight
-        }
-    }, [streamedText, isStreaming])
-
-    // Auto-scroll thinking container
-    useEffect(() => {
-        if (thinkingContainerRef.current && isThinking) {
-            thinkingContainerRef.current.scrollTop = thinkingContainerRef.current.scrollHeight
-        }
-    }, [streamingThinking, isThinking])
 
     useEffect(() => {
-        if (!aiEvent && !isStreaming && !isThinking && showAIEvent) {
+        if (!aiEvent && showAIEvent) {
             setTimeout(() => {
                 setShowAIEvent(false)
             }, 300)
         }
-    }, [aiEvent, isStreaming, isThinking])
-
-    // Show either thinking indicator, reasoning indicator, or streaming text
-    const hasContent = aiEvent || isThinking || streamingThinking || (isStreaming && streamedText)
+    }, [aiEvent])
 
     return (
         <div className={clsx(
             'w-full transition-all duration-300 ease-ease-out-quart',
-            showAIEvent && hasContent ? 'translate-y-0 opacity-100 z-50 sm:pb-0 pb-16' : 'translate-y-full opacity-0 h-0'
+            showAIEvent ? 'translate-y-0 opacity-100 z-50 sm:pb-0 pb-16' : 'translate-y-full opacity-0 h-0'
         )}>
-            <div className="py-2 px-2 bg-white dark:bg-gray-2">
-                {/* Initial thinking indicator (before streaming starts) */}
-                {aiEvent && !isStreaming && !isThinking && (
-                    <div className="flex items-center gap-2">
-                        <Loader />
-                        <Text size='2'>{aiEvent}</Text>
-                    </div>
-                )}
-
-                {/* Reasoning/thinking with real-time streaming */}
-                {(isThinking || streamingThinking) && (
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
-                            <BiBrain className="w-4 h-4 animate-pulse" />
-                            <Text size='2' weight="medium">Thinking...</Text>
-                        </div>
-                        {streamingThinking && (
-                            <div
-                                ref={thinkingContainerRef}
-                                className="max-h-32 overflow-y-auto p-2 bg-purple-50 dark:bg-purple-900/20 rounded"
-                            >
-                                <Text size='1' className="whitespace-pre-wrap font-mono text-gray-600 dark:text-gray-300">
-                                    {streamingThinking}
-                                    <span className="inline-block w-1.5 h-3 ml-0.5 bg-purple-500 animate-pulse" />
-                                </Text>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Captured thinking content (collapsible) */}
-                {!isThinking && thinkingContent && (
-                    <div className="mb-2">
-                        <button
-                            onClick={() => setShowThinkingContent(!showThinkingContent)}
-                            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                        >
-                            {showThinkingContent ? (
-                                <BiChevronDown className="w-4 h-4" />
-                            ) : (
-                                <BiChevronRight className="w-4 h-4" />
-                            )}
-                            <BiBrain className="w-3 h-3" />
-                            <span>Reasoning</span>
-                        </button>
-                        {showThinkingContent && (
-                            <Box className="mt-1 p-2 bg-purple-50 dark:bg-purple-900/20 rounded text-xs text-gray-600 dark:text-gray-300 max-h-32 overflow-y-auto">
-                                <pre className="whitespace-pre-wrap font-mono">{thinkingContent}</pre>
-                            </Box>
-                        )}
-                    </div>
-                )}
-
-                {/* Streaming text display */}
-                {isStreaming && streamedText && (
-                    <div
-                        ref={streamContainerRef}
-                        className="max-h-48 overflow-y-auto"
-                    >
-                        <Text size='2' className="whitespace-pre-wrap leading-relaxed">
-                            {streamedText}
-                            <span className="inline-block w-2 h-4 ml-0.5 bg-gray-800 dark:bg-gray-200 animate-pulse" />
-                        </Text>
-                    </div>
-                )}
+            <div className="flex items-center gap-2 py-2 px-2 bg-white dark:bg-gray-2">
+                <Loader />
+                <Text size='2'>{aiEvent}</Text>
             </div>
         </div>
     )
