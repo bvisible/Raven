@@ -48,7 +48,9 @@ const AIEvent = ({ channelID }: Props) => {
     // Thinking/reasoning state
     const [isThinking, setIsThinking] = useState(false)
     const [thinkingContent, setThinkingContent] = useState("")
+    const [streamingThinking, setStreamingThinking] = useState("")  // Real-time thinking display
     const [showThinkingContent, setShowThinkingContent] = useState(false)
+    const thinkingContainerRef = useRef<HTMLDivElement>(null)
 
     useFrappeEventListener("ai_event", (data) => {
         if (data.channel_id === channelID) {
@@ -88,8 +90,17 @@ const AIEvent = ({ channelID }: Props) => {
         if (data.channel_id === channelID) {
             setIsThinking(true)
             setThinkingContent("")
+            setStreamingThinking("")
             setShowAIEvent(true)
             setAIEvent("") // Clear "thinking" text, we'll show reasoning indicator
+        }
+    })
+
+    // Listen for thinking tokens (real-time reasoning display)
+    useFrappeEventListener("ai_thinking_token", (data) => {
+        if (data.channel_id === channelID) {
+            setStreamingThinking(prev => prev + data.token)
+            setShowAIEvent(true)
         }
     })
 
@@ -100,6 +111,7 @@ const AIEvent = ({ channelID }: Props) => {
             if (data.thinking_content) {
                 setThinkingContent(data.thinking_content)
             }
+            setStreamingThinking("")  // Clear streaming thinking when done
         }
     })
 
@@ -134,6 +146,13 @@ const AIEvent = ({ channelID }: Props) => {
         }
     }, [streamedText, isStreaming])
 
+    // Auto-scroll thinking container
+    useEffect(() => {
+        if (thinkingContainerRef.current && isThinking) {
+            thinkingContainerRef.current.scrollTop = thinkingContainerRef.current.scrollHeight
+        }
+    }, [streamingThinking, isThinking])
+
     useEffect(() => {
         if (!aiEvent && !isStreaming && !isThinking && showAIEvent) {
             setTimeout(() => {
@@ -143,7 +162,7 @@ const AIEvent = ({ channelID }: Props) => {
     }, [aiEvent, isStreaming, isThinking])
 
     // Show either thinking indicator, reasoning indicator, or streaming text
-    const hasContent = aiEvent || isThinking || (isStreaming && streamedText)
+    const hasContent = aiEvent || isThinking || streamingThinking || (isStreaming && streamedText)
 
     return (
         <div className={clsx(
@@ -159,11 +178,24 @@ const AIEvent = ({ channelID }: Props) => {
                     </div>
                 )}
 
-                {/* Reasoning/thinking indicator */}
-                {isThinking && (
-                    <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
-                        <BiBrain className="w-4 h-4 animate-pulse" />
-                        <Text size='2' weight="medium">Reasoning...</Text>
+                {/* Reasoning/thinking with real-time streaming */}
+                {(isThinking || streamingThinking) && (
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
+                            <BiBrain className="w-4 h-4 animate-pulse" />
+                            <Text size='2' weight="medium">Thinking...</Text>
+                        </div>
+                        {streamingThinking && (
+                            <div
+                                ref={thinkingContainerRef}
+                                className="max-h-32 overflow-y-auto p-2 bg-purple-50 dark:bg-purple-900/20 rounded"
+                            >
+                                <Text size='1' className="whitespace-pre-wrap font-mono text-gray-600 dark:text-gray-300">
+                                    {streamingThinking}
+                                    <span className="inline-block w-1.5 h-3 ml-0.5 bg-purple-500 animate-pulse" />
+                                </Text>
+                            </div>
+                        )}
                     </div>
                 )}
 
