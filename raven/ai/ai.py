@@ -50,18 +50,27 @@ def handle_bot_dm_with_nora(message, bot):
 		)
 		return
 
-	# Create thread channel for the conversation FIRST
-	thread_channel = frappe.get_doc(
-		{
-			"doctype": "Raven Channel",
-			"channel_name": message.name,
-			"type": "Private",
-			"is_thread": 1,
-			"is_ai_thread": 1,
-			"is_dm_thread": 1,
-			"thread_bot": bot.name,
-		}
-	).insert()
+	# Create thread channel for the conversation FIRST (or get existing one)
+	if frappe.db.exists("Raven Channel", message.name):
+		thread_channel = frappe.get_doc("Raven Channel", message.name)
+		# Ensure it has the correct AI thread settings
+		if not thread_channel.is_ai_thread:
+			thread_channel.is_ai_thread = 1
+			thread_channel.is_dm_thread = 1
+			thread_channel.thread_bot = bot.name
+			thread_channel.save()
+	else:
+		thread_channel = frappe.get_doc(
+			{
+				"doctype": "Raven Channel",
+				"channel_name": message.name,
+				"type": "Private",
+				"is_thread": 1,
+				"is_ai_thread": 1,
+				"is_dm_thread": 1,
+				"thread_bot": bot.name,
+			}
+		).insert()
 
 	# Update the message to mark it as a thread
 	message.is_thread = 1
@@ -107,19 +116,27 @@ def handle_bot_dm_with_agents(message, bot):
 		)
 		return
 
-	# Create thread channel for the conversation FIRST
-	thread_channel = frappe.get_doc(
-		{
-			"doctype": "Raven Channel",
-			"channel_name": message.name,
-			"type": "Private",
-			"is_thread": 1,
-			"is_ai_thread": 1,
-			"is_dm_thread": 1,
-			"thread_bot": bot.name,
-			# No more openai_thread_id for Agents SDK
-		}
-	).insert()
+	# Create thread channel for the conversation FIRST (or get existing one)
+	if frappe.db.exists("Raven Channel", message.name):
+		thread_channel = frappe.get_doc("Raven Channel", message.name)
+		# Ensure it has the correct AI thread settings
+		if not thread_channel.is_ai_thread:
+			thread_channel.is_ai_thread = 1
+			thread_channel.is_dm_thread = 1
+			thread_channel.thread_bot = bot.name
+			thread_channel.save()
+	else:
+		thread_channel = frappe.get_doc(
+			{
+				"doctype": "Raven Channel",
+				"channel_name": message.name,
+				"type": "Private",
+				"is_thread": 1,
+				"is_ai_thread": 1,
+				"is_dm_thread": 1,
+				"thread_bot": bot.name,
+			}
+		).insert()
 
 	# Update the message to mark it as a thread
 	message.is_thread = 1
@@ -221,18 +238,29 @@ def handle_bot_dm_with_assistants(message, bot):
 			},
 		)
 
-	thread_channel = frappe.get_doc(
-		{
-			"doctype": "Raven Channel",
-			"channel_name": message.name,
-			"type": "Private",
-			"is_thread": 1,
-			"is_ai_thread": 1,
-			"is_dm_thread": 1,
-			"openai_thread_id": ai_thread.id,
-			"thread_bot": bot.name,
-		}
-	).insert()
+	# Create thread channel or get existing one to avoid DuplicateEntryError
+	if frappe.db.exists("Raven Channel", message.name):
+		thread_channel = frappe.get_doc("Raven Channel", message.name)
+		# Ensure it has the correct AI thread settings
+		if not thread_channel.is_ai_thread or not thread_channel.openai_thread_id:
+			thread_channel.is_ai_thread = 1
+			thread_channel.is_dm_thread = 1
+			thread_channel.thread_bot = bot.name
+			thread_channel.openai_thread_id = ai_thread.id
+			thread_channel.save()
+	else:
+		thread_channel = frappe.get_doc(
+			{
+				"doctype": "Raven Channel",
+				"channel_name": message.name,
+				"type": "Private",
+				"is_thread": 1,
+				"is_ai_thread": 1,
+				"is_dm_thread": 1,
+				"openai_thread_id": ai_thread.id,
+				"thread_bot": bot.name,
+			}
+		).insert()
 
 	# Update the message to mark it as a thread
 	message.is_thread = 1
