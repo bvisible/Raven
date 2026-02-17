@@ -962,7 +962,6 @@ def process_message_with_nora(
 			thread_id=thread_message_id,
 			files=json.dumps(files) if files else None,
 			conversation_history=json.dumps(conversation_history) if conversation_history else None,
-			bot_name=bot.name,
 		)
 
 		if response.get("success"):
