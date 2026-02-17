@@ -952,9 +952,9 @@ def process_message_with_nora(
 					conversation_history.append({"role": "user", "content": msg_text})
 
 		# Call Nora handler
-		from nora.api.raven_handler import handle_raven_message_stream
+		from nora.api.raven_handler import handle_raven_message
 
-		response = handle_raven_message_stream(
+		response = handle_raven_message(
 			channel_id=channel_id,
 			message_id=message.name,
 			message_text=content,
