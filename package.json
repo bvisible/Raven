@@ -12,7 +12,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cd frontend && yarn dev",
-    "build": "cd frontend && NODE_OPTIONS=\"--max-old-space-size=2048\" yarn build",
+    "build": "if [ -d 'raven/public/raven/assets' ] && [ -z \"$FORCE_REBUILD\" ]; then echo '[skip-build] pre-built artifacts present at raven/public/raven/assets (set FORCE_REBUILD=1 to force rebuild)'; else yarn build:force; fi",
+    "build:force": "cd frontend && NODE_OPTIONS=\"--max-old-space-size=2048\" yarn build",
     "postinstall": "yarn install-web && yarn install-desk",
     "install-desk": "cd raven && yarn install",
     "install-web": "cd frontend && yarn install"
