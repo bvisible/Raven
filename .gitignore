@@ -25,4 +25,4 @@ apps/mobile/android
 apps/mobile/.expo
 
 apps/web/.env.local
-CLAUDE.md
+# CLAUDE.md  # 2026-05-07 unshipped to document commit-the-build pipeline
