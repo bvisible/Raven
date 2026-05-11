@@ -38,6 +38,13 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build
+        env:
+          # Force rebuild on CI even when pre-built artifacts are checked in.
+          # The guard in package.json ("skip-build when assets present") exists
+          # to protect 4 GB Neoffice instances from OOM during `bench build`,
+          # but in GitHub Actions we always want fresh artifacts that match
+          # the latest frontend sources.
+          FORCE_REBUILD: '1'
         run: yarn build
 
       # Raven writes vite output to public/raven/, not public/frontend/.
