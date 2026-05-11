@@ -172,4 +172,33 @@ FORCE_REBUILD=1 yarn build
 
 - ⚠️ Path atypique : artefacts dans `raven/public/raven/` (pas `public/frontend/`).
 - ⚠️ `bvisible/Raven` avait tous les workflows GH Actions `disabled_manually`. Réactiver avec `gh workflow enable build-frontend -R bvisible/Raven` si besoin.
+- ⚠️ **Le workflow CI doit passer `FORCE_REBUILD=1`** (`env: FORCE_REBUILD: '1'` dans le step Build de `.github/workflows/build-frontend.yml`). Sinon le guard `package.json` (qui protège les instances 4 GB d'OOM-kill) SKIPpe le build CI parce que `raven/public/raven/assets` est déjà présent dans le checkout. Symptôme dans les logs : `[skip-build] pre-built artifacts present` au lieu de `vite v6 building for production`. Bug rencontré 2026-05-11 lors de l'intégration Frappe Shell Native (commits `0d9040e` + `d483fb0`).
 - `raven_v3` reste dans `.gitignore` : pas de build pour cette variante aujourd'hui.
+
+## Frappe Shell Native (chrome embarqué dans /raven)
+
+Depuis 2026-05-11, `/raven` rend le **même chrome que `/app/home`** (sidebar Frappe collapsée 50px avec hover-expand + app-switcher, navbar Frappe avec logo neoffice + search + horloge + calendar + notifs + Aide + user) tout en préservant l'UX Raven existante (workspaces + channels + chat). C'est l'application du [pattern Frappe Shell Native](https://github.com/bvisible/Raven/blob/version-15/raven/api/boot.py) commun à Mint et Neoconstruction.
+
+### Comment ça marche
+
+1. `raven/hooks.py` déclare `required_apps = ["neoffice_theme"]` (sprite Lucide + `neoffice-theme.css` + DocType `App Customization`).
+2. `raven/api/boot.py` expose un **mini-boot curaté** (`get_navbar_boot()`, ~28 keys) qui inclut `docs`, `sidebar_pages`, `app_data`, et bake les UI translations dans `__messages` (sinon menu en EN forcé).
+3. `raven/www/raven.py` sert ce mini-boot au lieu du `frappe.sessions.get()` complet et expose `desk_css_url` + `neoffice_theme_css_url` via `bundled_asset()`.
+4. `frontend/index.html` (la SOURCE Vite, copiée vers `raven/www/raven.html` post-build via `yarn copy-html-entry`) charge `desk.bundle.css` + `neoffice-theme.css`, installe le shim `window['__']` (i18n minimaliste), pose `window['__FRAPPE_INTEGRATION__'] = true`, et inline 3 sprites SVG (timeless + espresso + lucide).
+5. `frontend/src/components/layout/frappe/{FrappeSidebar,FrappeNavbar,FrappeLayout,i18n}.tsx` reproduisent le DOM exact de `frappe/public/js/frappe/ui/{sidebar,navbar,apps_switcher}.html`. Toutes les strings hardcoded sont wrappées dans `t()`.
+6. `frontend/src/utils/auth/ProtectedRoute.tsx` wrappe l'`<Outlet />` authentifié dans `<FrappeLayout>` quand `__FRAPPE_INTEGRATION__` est true. Les routes `/login`, `/signup`, `/forgot-password` restent en plein écran.
+7. `frontend/src/components/layout/Sidebar/Sidebar.tsx` retire conditionnellement `<FrappeSidebar fixed={false}>` du package npm `@neoffice/frappe-sidebar-react` quand l'integration est ON (sinon doublon visuel 100px à gauche).
+
+### Pièges importants
+
+- **Bracket notation OBLIGATOIRE** dans `frontend/index.html` pour tout ce qui contient `__` : `window['__']`, `window['__FRAPPE_INTEGRATION__']`, `window['__FRAPPE_BASENAME__']`. Frappe `safe_render` Jinja rejette tout substring `.__` (anti-SSTI), commentaires JS inclus → HTTP 417 Illegal Template, page entière cassée.
+- **`docs` doit être dans `NAVBAR_BOOT_KEYS`** sinon le `safeSyncDocs()` no-op et certains scripts third-party plantent en lisant `frappe.boot.docs.<x>`.
+- **Workflow CI = `FORCE_REBUILD=1`** (cf. edge case ci-dessus).
+- **`.page-content` a `padding: 0`** (différent de Mint qui utilise `24px 36px`). Le chat Raven prend tout le viewport, l'overflow est géré par les composants Raven internes.
+- **Toute modif HTML doit aller dans `frontend/index.html`**, pas dans `raven/www/raven.html` (sinon écrasée au prochain build par `copy-html-entry`).
+
+### Documentation complète
+
+- Pattern transversal : Vault Obsidian → `Neoffice/Frappe-Shell-Native-Pattern.md` (13 pièges détaillés, playbook 9 étapes, variantes par app)
+- Session log Raven : Vault Obsidian → `wiki/log.md` entrée `[2026-05-11] raven | Frappe Shell Native intégré`
+- Apps adoptantes : Neoconstruction (2026-04-25), Mint (2026-05-11), Raven (2026-05-11)
