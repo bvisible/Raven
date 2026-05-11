@@ -172,7 +172,15 @@ export const FrappeNavbar: FC = () => {
 								</a>
 							</li>
 
-							<div style={{ width: 35 }} id="timer">
+							<div
+								id="timer"
+								style={{
+									minWidth: 42,
+									textAlign: 'center',
+									whiteSpace: 'nowrap',
+									fontVariantNumeric: 'tabular-nums',
+								}}
+							>
 								{time}
 							</div>
 
