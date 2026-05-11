@@ -77,33 +77,47 @@ def _load_ui_translations() -> dict:
 		return {}
 
 
-def _filter_app_data_enabled_only(app_data: list) -> list:
-	"""Filter `boot.app_data` to only the apps whose `App Customization` row
-	has `enabled = 1` — same filter Frappe Desk applies in /app/home.
+def _apply_neoffice_theme_filters(bootinfo) -> None:
+	"""Apply neoffice_theme's `extend_bootinfo` filters explicitly.
 
-	Without this, the embedded sidebar lists every App Customization in the
-	database (interface-mode apps like "Mode simplifié", "Fiduciary",
-	"Gestion"... that Frappe Desk hides). Mirrors what `get_app_data()` does
-	server-side in Desk context but never propagates to website pages.
+	`extend_bootinfo` hooks normally run inside `frappe.boot.get_bootinfo()`,
+	but in the website-page context the bootinfo we get back here is missing
+	the filters that Desk would normally have applied. Calling them by hand
+	ensures `/raven` shows the SAME app_data + workspaces + form_width as
+	`/app/home`:
+
+	- `filter_apps_by_interface_mode` — drops App Customizations whose
+	  `interface_mode` doesn't match the user's `view_interface` (or that
+	  are disabled entirely).
+	- `filter_apps_by_user_visibility` — drops apps the current user has no
+	  permission to see (`restricted_to`).
+	- `filter_workspaces_by_interface_mode` — same logic for workspaces.
+	- `inject_user_form_width` — exposes the user's form width preference.
+
+	Fail open: if neoffice_theme is missing or any filter throws, return the
+	bootinfo unmodified rather than break the SPA boot.
 	"""
-	if not app_data:
-		return app_data or []
 	try:
-		enabled_rows = frappe.get_all(
-			"App Customization",
-			filters={"enabled": 1},
-			fields=["app_name"],
-			ignore_permissions=True,
+		from neoffice_theme.boot_override import (
+			filter_apps_by_interface_mode,
+			filter_apps_by_user_visibility,
+			filter_workspaces_by_interface_mode,
+			inject_user_form_width,
 		)
-		enabled_names = {row["app_name"] for row in enabled_rows}
-		if not enabled_names:
-			return app_data
-		return [a for a in app_data if a.get("app_name") in enabled_names]
 	except Exception:
-		# Fail open: if the doctype query throws (e.g. fresh install before
-		# App Customization rows are seeded), keep the unfiltered list rather
-		# than show an empty sidebar.
-		return app_data
+		return
+
+	for fn in (
+		filter_apps_by_interface_mode,
+		filter_apps_by_user_visibility,
+		filter_workspaces_by_interface_mode,
+		inject_user_form_width,
+	):
+		try:
+			fn(bootinfo)
+		except Exception:
+			# Skip a single broken filter; keep going with the others.
+			continue
 
 
 def get_navbar_boot() -> dict:
@@ -119,12 +133,18 @@ def get_navbar_boot() -> dict:
 	Adds Raven-specific keys (push_relay_server_url, server_script_enabled)
 	so the Raven SPA keeps the behaviour it had with the full bootinfo.
 
-	Filters `app_data` to only enabled App Customization entries — same
-	contract as /app/home so the sidebar app-switcher shows the same apps.
+	Re-applies neoffice_theme's `extend_bootinfo` filters explicitly so
+	`app_data`, `workspaces` and form-width preferences match /app/home.
 	"""
 	from frappe.boot import get_bootinfo
 
 	full = get_bootinfo()
+
+	# Apply neoffice_theme's app/workspace filters explicitly so /raven
+	# matches /app/home (extend_bootinfo runs in get_bootinfo() but does not
+	# always reach the website-page payload — see boot_override.py).
+	_apply_neoffice_theme_filters(full)
+
 	boot = {k: full.get(k) for k in NAVBAR_BOOT_KEYS}
 	boot.setdefault("is_fc_site", False)
 	boot.setdefault("developer_mode", bool(frappe.conf.get("developer_mode")))
@@ -135,10 +155,6 @@ def get_navbar_boot() -> dict:
 		boot["server_script_enabled"] = frappe.conf.server_script_enabled
 	else:
 		boot["server_script_enabled"] = True
-
-	# Match Frappe Desk's app filter so /raven shows the exact same app
-	# cards as /app/home (no Mode simplifié, no Fiduciary, etc.).
-	boot["app_data"] = _filter_app_data_enabled_only(boot.get("app_data") or [])
 
 	# Merge boot's stock `__messages` (country names, etc.) with the full
 	# translation dict of every installed app so the embedded shell can
