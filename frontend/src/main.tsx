@@ -8,6 +8,22 @@ import './index.css'
 import FrappePushNotification from "../public/frappe-push-notification";
 
 
+// Defensive sync — frappe.model.sync(frappe.boot.docs) throws when docs is
+// missing (the curated mini-boot might omit it on a fresh install before the
+// session has loaded meta). React still needs to mount in that case.
+function safeSyncDocs() {
+  try {
+    const w = window as unknown as {
+      frappe?: { model?: { sync?: (docs: unknown) => void }; boot?: { docs?: unknown } }
+    }
+    if (w.frappe?.model?.sync && w.frappe?.boot?.docs) {
+      w.frappe.model.sync(w.frappe.boot.docs)
+    }
+  } catch (e) {
+    console.warn('[raven] frappe.model.sync failed, continuing without docs:', e)
+  }
+}
+
 const registerServiceWorker = () => {
   // @ts-ignore
   window.frappePushNotification = new FrappePushNotification("raven")
@@ -43,10 +59,14 @@ if (import.meta.env.DEV) {
     .then(response => response.json())
     .then((values) => {
       const v = JSON.parse(values.message)
-      //@ts-expect-error
+      //@ts-ignore
       if (!window.frappe) window.frappe = {};
       //@ts-ignore
       window.frappe.boot = v
+      //@ts-ignore - mirror the assignment done by raven.html in production:
+      // the embedded i18n shim reads frappe._messages (bracket notation).
+      window.frappe._messages = window.frappe.boot['__messages']
+      safeSyncDocs()
       registerServiceWorker()
       ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <React.StrictMode>
@@ -56,6 +76,7 @@ if (import.meta.env.DEV) {
     }
     )
 } else {
+  safeSyncDocs()
   registerServiceWorker()
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>

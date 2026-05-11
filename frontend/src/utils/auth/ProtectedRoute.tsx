@@ -3,6 +3,16 @@ import { Flex, Text } from '@radix-ui/themes'
 import { useContext } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { UserContext } from './UserProvider'
+import { FrappeLayout } from '@/components/layout/frappe'
+
+// Frappe integration flag — set by raven/www/raven.html before the bundle
+// loads. When true, authenticated routes are wrapped in the FrappeLayout
+// (native sidebar + navbar) reimplemented locally and fed by the curated
+// mini-boot. When false (vite standalone dev), routes render in their
+// original chrome.
+const FRAPPE_INTEGRATION =
+    typeof window !== 'undefined' &&
+    (window as unknown as { __FRAPPE_INTEGRATION__?: boolean }).__FRAPPE_INTEGRATION__ === true
 
 export const ProtectedRoute = () => {
 
@@ -19,6 +29,15 @@ export const ProtectedRoute = () => {
     else if (!currentUser || currentUser === 'Guest') {
         return <Navigate to="/login" />
     }
+
+    if (FRAPPE_INTEGRATION) {
+        return (
+            <FrappeLayout>
+                <Outlet />
+            </FrappeLayout>
+        )
+    }
+
     return (
         <Outlet />
     )

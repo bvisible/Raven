@@ -1,3 +1,15 @@
+"""Controller Jinja for the /raven website page (and all its sub-routes).
+
+Populates the context with:
+  - boot               -> window.frappe.boot for FrappeSidebar/Navbar + frappe-react-sdk
+  - csrf_token         -> for POST calls to /api/method/*
+  - desk_css_url       -> hashed asset `desk.bundle.css` (Frappe core)
+  - neoffice_theme_css_url -> `neoffice-theme.css` (theme shell)
+  - PWA metadata       -> kept from the original Raven controller (icons,
+                          splash screens, app_name, preload_links).
+
+Pattern aligned with mint/www/mint.py and the Frappe Shell Native doc.
+"""
 import json
 import re
 
@@ -6,10 +18,31 @@ import frappe.sessions
 from frappe import _
 from frappe.utils.telemetry import capture
 
+from raven.api.boot import get_navbar_boot
+
 no_cache = 1
 
 SCRIPT_TAG_PATTERN = re.compile(r"\<script[^<]*\</script\>")
 CLOSING_SCRIPT_TAG_PATTERN = re.compile(r"</script\>")
+
+
+def _get_asset_url(asset_path: str) -> str:
+	"""Resolve `<bundle>.bundle.css|js` to its hashed URL via Frappe's assets map.
+
+	Returns an empty string when no hashed URL is found, so the caller can fall
+	back to a non-hashed path.
+	"""
+	if ".bundle." not in asset_path:
+		return ""
+	try:
+		from frappe.utils.jinja_globals import bundled_asset
+
+		resolved = bundled_asset(asset_path) or ""
+		if resolved and ".bundle." in resolved and resolved != asset_path:
+			return resolved
+		return ""
+	except Exception:
+		return ""
 
 
 def get_context(context):
@@ -21,34 +54,40 @@ def get_context(context):
 		boot = frappe.website.utils.get_boot_data()
 	else:
 		try:
-			boot = frappe.sessions.get()
+			# Curated mini-boot designed for FrappeNavbar/FrappeSidebar rather
+			# than the full frappe.sessions.get() payload. Keeps surface small
+			# and stable, guarantees defensive keys (is_fc_site, developer_mode)
+			# are always set, and bakes UI translations into __messages so the
+			# embedded shell renders in the user's language.
+			boot = get_navbar_boot()
 		except Exception as e:
 			raise frappe.SessionBootFailed from e
 
-	boot["push_relay_server_url"] = frappe.conf.get("push_relay_server_url")
-
-	# add server_script_enabled in boot
-	if "server_script_enabled" in frappe.conf:
-		enabled = frappe.conf.server_script_enabled
-	else:
-		enabled = True
-	boot["server_script_enabled"] = enabled
-
 	boot_json = frappe.as_json(boot, indent=None, separators=(",", ":"))
 	boot_json = SCRIPT_TAG_PATTERN.sub("", boot_json)
-
 	boot_json = CLOSING_SCRIPT_TAG_PATTERN.sub("", boot_json)
 	boot_json = json.dumps(boot_json)
 
 	context.update(
-		{"build_version": frappe.utils.get_build_version(), "boot": boot_json, "csrf_token": csrf_token}
+		{
+			"build_version": frappe.utils.get_build_version(),
+			"boot": boot_json,
+			"csrf_token": csrf_token,
+		}
+	)
+
+	# Frappe Desk CSS bundles for the embedded shell. Loading the CSS is enough
+	# to render the navbar/sidebar markup correctly; we do NOT load
+	# desk.bundle.js (timing + dependency hell with billing/nora).
+	context["desk_css_url"] = _get_asset_url("desk.bundle.css")
+	context["neoffice_theme_css_url"] = (
+		_get_asset_url("neoffice-theme.css") or "/assets/neoffice_theme/css/neoffice-theme.css"
 	)
 
 	app_name = frappe.get_website_settings("app_name") or frappe.get_system_settings("app_name")
 
 	if app_name and app_name != "Frappe":
 		context["app_name"] = app_name + " | " + "Synk"
-
 	else:
 		context["app_name"] = "Synk"
 
@@ -87,14 +126,13 @@ def get_context_for_dev():
 
 def get_boot():
 	try:
-		boot = frappe.sessions.get()
+		# Curated mini-boot — same payload as get_context() so dev parity is kept.
+		boot = get_navbar_boot()
 	except Exception as e:
 		raise frappe.SessionBootFailed from e
 
-	boot["push_relay_server_url"] = frappe.conf.get("push_relay_server_url")
 	boot_json = frappe.as_json(boot, indent=None, separators=(",", ":"))
 	boot_json = SCRIPT_TAG_PATTERN.sub("", boot_json)
-
 	boot_json = CLOSING_SCRIPT_TAG_PATTERN.sub("", boot_json)
 	boot_json = json.dumps(boot_json)
 

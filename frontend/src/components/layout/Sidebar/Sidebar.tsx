@@ -5,10 +5,18 @@ import { HStack } from "../Stack";
 import WorkspacesSidebar from "./WorkspacesSidebar";
 import { FrappeSidebar } from "@neoffice/frappe-sidebar-react";
 
+// Frappe Shell Native: when the SPA runs embedded inside Frappe (/raven), the
+// FrappeLayout already provides the native sidebar (50px collapsed + hover
+// expand + app switcher). We must NOT render the legacy package sidebar then,
+// otherwise we get two stacked sidebars.
+const FRAPPE_INTEGRATION =
+    typeof window !== 'undefined' &&
+    (window as unknown as { __FRAPPE_INTEGRATION__?: boolean }).__FRAPPE_INTEGRATION__ === true
+
 export const Sidebar = () => {
     return (
         <HStack gap='0' className="h-screen">
-            <FrappeSidebar fixed={false} />
+            {!FRAPPE_INTEGRATION && <FrappeSidebar fixed={false} />}
             <Flex className="bg-gray-2 dark:bg-gray-1 border-r border-r-gray-3">
                 <WorkspacesSidebar />
                 <Flex justify='between' direction='row' gap='2' width='100%'>

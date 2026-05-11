@@ -10,6 +10,11 @@ source_link = "https://github.com/The-Commit-Company/Raven"
 app_logo = "/assets/raven/raven-logo.png"
 app_logo_url = "/assets/raven/raven-logo.png"
 
+# Frappe Shell Native pattern — neoffice_theme provides the Lucide sprite,
+# the neoffice-theme.css used by FrappeSidebar/FrappeNavbar, and the
+# `App Customization` doctype for app-switcher grouping.
+required_apps = ["neoffice_theme"]
+
 # Includes in <head>
 # ------------------
 
