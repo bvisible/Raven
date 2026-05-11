@@ -47,6 +47,34 @@ interface CalendarData {
 const formatTime = () =>
 	new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
 
+/**
+ * Compute the 2-letter initials from a full name the same way Frappe Desk does:
+ * first letter of the first two whitespace-separated words, uppercased.
+ * "Jeremy Bvisible" -> "JB", "Jeremy" -> "J", "" -> "?".
+ */
+const computeAbbr = (name: string): string => {
+	if (!name) return '?'
+	const words = name.trim().split(/\s+/).filter(Boolean)
+	if (words.length === 0) return '?'
+	const first = words[0]?.charAt(0) || ''
+	const second = words[1]?.charAt(0) || ''
+	return (first + second).toUpperCase() || '?'
+}
+
+/**
+ * Hash a string into a stable HSL background color for avatar fallbacks
+ * (mirrors Frappe Desk's per-user color assignment so two users with the
+ * same name get the same background tint across pages).
+ */
+const colorFromName = (name: string): string => {
+	if (!name) return '#94a3b8'
+	let h = 0
+	for (let i = 0; i < name.length; i++) {
+		h = (h * 31 + name.charCodeAt(i)) >>> 0
+	}
+	return `hsl(${h % 360}, 60%, 55%)`
+}
+
 const formatCalendar = (): CalendarData => {
 	const d = new Date()
 	return {
@@ -106,15 +134,16 @@ export const FrappeNavbar: FC = () => {
 
 	const logoUrl = boot.app_logo_url || '/assets/neoffice_theme/images/neoffice_logo.svg'
 
-	// Frappe stores per-user metadata (precomputed initials, avatar image,
-	// fullname, color) in `boot.user_info[<email>]`. The single-letter avatar
-	// from boot.user.full_name is a poor fallback — use Frappe's own `abbr`
-	// (e.g. "JB" for "Jérémy Bvisible") so the avatar matches /app/home.
+	// Frappe stores per-user metadata (fullname, image, sometimes abbr) in
+	// `boot.user_info[<email>]`. The mini-boot trims a few keys (no `abbr`,
+	// no `color`) so we compute the 2-letter initials ourselves like Frappe
+	// Desk does: take the first letter of the first two whitespace-separated
+	// words ("Jeremy Bvisible" -> "JB"), uppercased.
 	const myEmail = boot.user?.email || boot.user?.name || ''
 	const myInfo: UserInfoEntry = (boot.user_info && boot.user_info[myEmail]) || {}
 	const userName = myInfo.fullname || boot.user?.full_name || boot.user?.email || ''
 	const userImage = myInfo.image || boot.user?.user_image || ''
-	const userAbbr = myInfo.abbr || (userName ? userName.charAt(0).toUpperCase() : '?')
+	const userAbbr = myInfo.abbr || computeAbbr(userName)
 	const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.platform)
 
 	// Help dropdown badge — Frappe shows the count of *contextual* help
@@ -407,18 +436,36 @@ export const FrappeNavbar: FC = () => {
 									onClick={() => setUserMenuOpen((o) => !o)}
 									aria-label={t('User Menu')}
 								>
-									{/* Mirror Frappe Desk's avatar markup: a span.avatar
-									    .avatar-medium that holds either the user image or
-									    the precomputed 2-letter initials (boot.user_info
-									    [<email>].abbr — e.g. "JB" for "Jérémy Bvisible").
-									    desk.bundle.css already styles the round shape and
-									    background color, so we don't need inline styles. */}
-									<span className="avatar avatar-medium" title={userName}>
+									{/* Mirror Frappe Desk's avatar markup. desk.bundle.css
+									    only styles the cell with a userImage; the
+									    initials-only fallback needs explicit inline styles
+									    in our embedded shell because we don't load
+									    desk.bundle.js (which sets up frappe.avatar with
+									    a per-user background color). */}
+									<span
+										className="avatar avatar-medium"
+										title={userName}
+										style={{
+											display: 'inline-flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											width: 28,
+											height: 28,
+											borderRadius: '50%',
+											background: userImage ? 'transparent' : colorFromName(userName),
+											color: '#fff',
+											fontSize: 12,
+											fontWeight: 600,
+											lineHeight: 1,
+											overflow: 'hidden',
+										}}
+									>
 										{userImage ? (
 											<img
 												src={userImage}
 												alt={userName}
 												className="avatar-frame"
+												style={{ width: '100%', height: '100%', objectFit: 'cover' }}
 											/>
 										) : (
 											userAbbr
