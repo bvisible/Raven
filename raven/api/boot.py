@@ -77,6 +77,35 @@ def _load_ui_translations() -> dict:
 		return {}
 
 
+def _filter_app_data_enabled_only(app_data: list) -> list:
+	"""Filter `boot.app_data` to only the apps whose `App Customization` row
+	has `enabled = 1` — same filter Frappe Desk applies in /app/home.
+
+	Without this, the embedded sidebar lists every App Customization in the
+	database (interface-mode apps like "Mode simplifié", "Fiduciary",
+	"Gestion"... that Frappe Desk hides). Mirrors what `get_app_data()` does
+	server-side in Desk context but never propagates to website pages.
+	"""
+	if not app_data:
+		return app_data or []
+	try:
+		enabled_rows = frappe.get_all(
+			"App Customization",
+			filters={"enabled": 1},
+			fields=["app_name"],
+			ignore_permissions=True,
+		)
+		enabled_names = {row["app_name"] for row in enabled_rows}
+		if not enabled_names:
+			return app_data
+		return [a for a in app_data if a.get("app_name") in enabled_names]
+	except Exception:
+		# Fail open: if the doctype query throws (e.g. fresh install before
+		# App Customization rows are seeded), keep the unfiltered list rather
+		# than show an empty sidebar.
+		return app_data
+
+
 def get_navbar_boot() -> dict:
 	"""Return the curated bootinfo subset used by FrappeNavbar/FrappeSidebar.
 
@@ -89,6 +118,9 @@ def get_navbar_boot() -> dict:
 
 	Adds Raven-specific keys (push_relay_server_url, server_script_enabled)
 	so the Raven SPA keeps the behaviour it had with the full bootinfo.
+
+	Filters `app_data` to only enabled App Customization entries — same
+	contract as /app/home so the sidebar app-switcher shows the same apps.
 	"""
 	from frappe.boot import get_bootinfo
 
@@ -103,6 +135,10 @@ def get_navbar_boot() -> dict:
 		boot["server_script_enabled"] = frappe.conf.server_script_enabled
 	else:
 		boot["server_script_enabled"] = True
+
+	# Match Frappe Desk's app filter so /raven shows the exact same app
+	# cards as /app/home (no Mode simplifié, no Fiduciary, etc.).
+	boot["app_data"] = _filter_app_data_enabled_only(boot.get("app_data") or [])
 
 	# Merge boot's stock `__messages` (country names, etc.) with the full
 	# translation dict of every installed app so the embedded shell can
