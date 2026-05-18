@@ -99,25 +99,66 @@ def _apply_neoffice_theme_filters(bootinfo) -> None:
 	"""
 	try:
 		from neoffice_theme.boot_override import (
+			apply_workspace_custom_titles,
 			filter_apps_by_interface_mode,
 			filter_apps_by_user_visibility,
 			filter_workspaces_by_interface_mode,
+			fix_module_wise_workspaces,
 			inject_user_form_width,
 		)
 	except Exception:
 		return
 
+	# Order matches neoffice_theme/hooks.py::extend_bootinfo so the SPA
+	# payload is byte-identical to /app/home.
 	for fn in (
 		filter_apps_by_interface_mode,
 		filter_apps_by_user_visibility,
 		filter_workspaces_by_interface_mode,
 		inject_user_form_width,
+		apply_workspace_custom_titles,
+		fix_module_wise_workspaces,
 	):
 		try:
 			fn(bootinfo)
 		except Exception:
 			# Skip a single broken filter; keep going with the others.
 			continue
+
+	_translate_sidebar_labels(bootinfo)
+
+
+def _translate_sidebar_labels(bootinfo) -> None:
+	"""Translate sidebar_pages/app_data titles server-side via frappe._().
+
+	Defensive layer mirroring what Mint and Neoconstruction do — even
+	though Raven ships a full __messages dict that powers the client-side
+	__() helper, applying the translation here makes the payload shape
+	identical to /app/home and protects against any render path that
+	forgets to wrap a workspace label. Uses existing FR/DE/IT .po entries.
+	"""
+	from frappe import _
+
+	def _xlate(s):
+		return _(s) if isinstance(s, str) and s else s
+
+	sp = getattr(bootinfo, "sidebar_pages", None)
+	if isinstance(sp, dict):
+		pages = sp.get("pages") or []
+	elif isinstance(sp, list):
+		pages = sp
+	else:
+		pages = []
+	for p in pages:
+		if isinstance(p, dict) and p.get("title"):
+			p["title"] = _xlate(p["title"])
+
+	for app in getattr(bootinfo, "app_data", None) or []:
+		if isinstance(app, dict):
+			if app.get("app_title"):
+				app["app_title"] = _xlate(app["app_title"])
+			if app.get("title"):
+				app["title"] = _xlate(app["title"])
 
 
 def get_navbar_boot() -> dict:
