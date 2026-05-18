@@ -169,24 +169,75 @@ const router = createBrowserRouter(
 }
 )
 function App() {
-  // Check URL parameters for theme
+  // //// NEOFFICE PATCH — Follow Frappe theme instead of forcing "light"
+  // WHY: Raven is embedded inside the Neoffice Frappe shell on every
+  //      deployment. Frappe writes the active theme to two same-origin
+  //      localStorage keys (`theme_active` = "light"|"dark" already
+  //      resolved, and `appearance` = "light"|"dark"|"automatic"). The
+  //      upstream Raven boot logic defaulted to "light" and overrode
+  //      any persisted choice on mount, so a user in dark Frappe got
+  //      a glaring white Raven panel — clashing with the rest of the
+  //      app. We now read Frappe's keys first, fall back to a URL
+  //      override (?theme=dark), then to "light" as a safety net.
+  // REVIEW: drop when upstream Raven exposes an embed-mode hook for
+  //         the host app to provide an initial theme.
   const urlParams = new URLSearchParams(window.location.search);
   const urlTheme = urlParams.get('theme');
-  
-  // Determine initial theme: URL param or default to 'light'
-  const getInitialTheme = (): 'light' | 'dark' | 'inherit' => {
-    if (urlTheme === 'dark') {
-      return 'dark';
+
+  const readFrappeTheme = (): 'light' | 'dark' | null => {
+    try {
+      const ta = window.localStorage.getItem('theme_active');
+      if (ta === 'dark' || ta === 'light') return ta;
+      const ap = window.localStorage.getItem('appearance');
+      // Frappe sometimes JSON-stringifies the value, so strip quotes.
+      const apClean = (ap || '').replace(/^"|"$/g, '');
+      if (apClean === 'dark' || apClean === 'light') return apClean;
+      if (apClean === 'automatic') {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+    } catch {
+      // localStorage can throw in sandboxed contexts — fall through.
     }
-    return 'light'; // Default theme
+    return null;
+  };
+
+  const getInitialTheme = (): 'light' | 'dark' | 'inherit' => {
+    if (urlTheme === 'dark' || urlTheme === 'light') {
+      return urlTheme;
+    }
+    const frappe = readFrappeTheme();
+    if (frappe) return frappe;
+    return 'light';
   };
 
   const [appearance, setAppearance] = useStickyState<'light' | 'dark' | 'inherit'>(getInitialTheme(), 'appearance');
-  
-  // Force theme from URL on mount
+
+  // Force theme from URL / Frappe on mount + live-sync with Frappe
+  // theme changes (same-tab via 1 s poll, cross-tab via storage event).
+  // Also mirror onto <html data-theme=…> because the injected Neoffice
+  // theme stylesheet (`neoffice-theme.css`) targets that attribute, not
+  // the `body.dark` class Raven uses for its own component palette.
   useEffect(() => {
-    const initialTheme = getInitialTheme();
-    setAppearance(initialTheme);
+    const initial = getInitialTheme();
+    setAppearance(initial);
+    if (initial === 'dark' || initial === 'light') {
+      document.documentElement.setAttribute('data-theme', initial);
+    }
+
+    let last: 'light' | 'dark' | null = readFrappeTheme();
+    const sync = () => {
+      const fresh = readFrappeTheme();
+      if (!fresh || fresh === last) return;
+      last = fresh;
+      setAppearance(fresh);
+      document.documentElement.setAttribute('data-theme', fresh);
+    };
+    window.addEventListener('storage', sync);
+    const id = window.setInterval(sync, 1000);
+    return () => {
+      window.removeEventListener('storage', sync);
+      window.clearInterval(id);
+    };
   }, []); // Run only once on mount
 
 
@@ -195,7 +246,7 @@ function App() {
     const handleUrlChange = () => {
       const params = new URLSearchParams(window.location.search);
       const newTheme = params.get('theme');
-      
+
       if (newTheme === 'dark') {
         setAppearance('dark');
       } else {
