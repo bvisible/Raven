@@ -3,7 +3,7 @@ import { SidebarBody } from "./SidebarBody";
 import { Box, Flex, Separator } from "@radix-ui/themes";
 import { HStack } from "../Stack";
 import WorkspacesSidebar from "./WorkspacesSidebar";
-import { FrappeSidebar } from "@neoffice/frappe-sidebar-react";
+import { NeoCockpit } from "@neoffice/frappe-sidebar-react";
 
 // Frappe Shell Native: when the SPA runs embedded inside Frappe (/raven), the
 // FrappeLayout already provides the native sidebar (50px collapsed + hover
@@ -16,7 +16,7 @@ const FRAPPE_INTEGRATION =
 export const Sidebar = () => {
     return (
         <HStack gap='0' className="h-screen">
-            {!FRAPPE_INTEGRATION && <FrappeSidebar fixed={false} />}
+            {!FRAPPE_INTEGRATION && <NeoCockpit env="spa" layout="sidebar" />}
             <Flex className="bg-gray-2 dark:bg-gray-1 border-r border-r-gray-3">
                 <WorkspacesSidebar />
                 <Flex justify='between' direction='row' gap='2' width='100%'>
