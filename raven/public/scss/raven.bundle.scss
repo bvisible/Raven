@@ -47,6 +47,16 @@
 .raven-chat.raven-chat-docked .raven-container[data-open-state="true"] {
     height: min(var(--raven-expanded-height), calc(100vh - 120px));
 }
+/* The original widget sits at the BOTTOM of the viewport, so its message
+   input uses position:fixed bottom:0 (viewport bottom == widget bottom).
+   The docked popup is anchored at the top: pin the input to the panel
+   itself instead, or it lands outside (clipped/invisible). */
+.raven-chat.raven-chat-docked .raven-chat-view-container .raven-chat-input {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: var(--bg-color);
+}
 /* //// */
 .skeleton {
     background-color: var(--skeleton-bg);
