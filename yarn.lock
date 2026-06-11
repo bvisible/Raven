@@ -2688,9 +2688,9 @@
     htmlparser2 "^7.1.2"
     ramda "^0.27.2"
 
-"@neoffice/frappe-sidebar-react@git+https://github.com/bvisible/frappe-sidebar-react.git#e5e74af8d9478dcdb973f23425e20844c0ee49f8":
+"@neoffice/frappe-sidebar-react@git+https://github.com/bvisible/frappe-sidebar-react.git#b0fd23cfe0a77c2927100488eb2a3ae652b585f2":
   version "1.0.0"
-  resolved "git+https://github.com/bvisible/frappe-sidebar-react.git#e5e74af8d9478dcdb973f23425e20844c0ee49f8"
+  resolved "git+https://github.com/bvisible/frappe-sidebar-react.git#b0fd23cfe0a77c2927100488eb2a3ae652b585f2"
   dependencies:
     clsx "^2.0.0"
     lucide-react "^0.400.0"
