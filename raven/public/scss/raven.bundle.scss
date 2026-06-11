@@ -28,6 +28,25 @@
     border-top-left-radius: var(--border-radius-md);
     right: 15px;
 }
+
+/* //// NEOFFICE — docked mode (NeoCockpit): popup anchored next to the
+   rail's synk icon (the desk sets left/top inline on toggle). No collapsed
+   bar — when closed the widget is fully hidden. */
+.raven-chat.raven-chat-docked {
+    bottom: auto;
+    right: auto;
+    top: 100px;
+    left: 84px;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: 0 14px 44px rgba(0, 0, 0, 0.18);
+}
+.raven-chat.raven-chat-docked:has(.raven-container[data-open-state="false"]) {
+    display: none;
+}
+.raven-chat.raven-chat-docked .raven-container[data-open-state="true"] {
+    height: min(var(--raven-expanded-height), calc(100vh - 120px));
+}
 /* //// */
 .skeleton {
     background-color: var(--skeleton-bg);

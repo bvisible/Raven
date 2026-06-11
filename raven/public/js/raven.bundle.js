@@ -6,6 +6,24 @@ $(document).on('app_ready', function () {
             if (frappe.is_mobile() || frappe.boot.versions["frappe"].startsWith('16')) {
                 return;
             }
+
+            // //// NEOFFICE — NeoCockpit chrome: no floating launcher bar.
+            // The same widget mounts DOCKED (hidden until toggled) and the
+            // cockpit rail's synk icon opens it as a popup next to the menu.
+            if (document.body.classList.contains('neoffice-cockpit')) {
+                let docked_element = $(document.createElement('div'));
+                docked_element.addClass('raven-chat raven-chat-docked');
+                $('body').append(docked_element);
+
+                frappe.require("raven_chat.bundle.jsx").then(() => {
+                    frappe.raven_chat = new frappe.ui.RavenChat({
+                        wrapper: docked_element,
+                        docked: true,
+                    });
+                });
+                return;
+            }
+
             let main_section = $(document).find('.main-section');
 
             // Add bottom padding to the main section

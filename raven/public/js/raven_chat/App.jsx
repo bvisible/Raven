@@ -8,9 +8,9 @@ import ChatView from "./components/layout/Chat/ChatView";
 import useUnreadCount from "./hooks/useUnreadCount";
 import { CurrentChannelContext } from "./hooks/useCurrentChannel";
 
-export function App() {
+export function App({ docked = false }) {
 
-  const [isOpen, { on, toggle }] = useBoolean(false)
+  const [isOpen, { on, toggle, off }] = useBoolean(false)
 
   const [initOpen, setInitOpen] = React.useState(false)
 
@@ -23,6 +23,25 @@ export function App() {
   const [selectedChannel, setSelectedChannel] = React.useState('')
 
   const { totalUnread } = useUnreadCount()
+
+  // //// NEOFFICE — docked mode (NeoCockpit): the widget has no visible
+  // collapsed bar; the cockpit rail toggles it through window events and
+  // reads the unread total back to paint its badge.
+  React.useEffect(() => {
+    if (!docked) return
+    const handleToggle = () => toggle()
+    const handleClose = () => off()
+    window.addEventListener('raven-chat:toggle', handleToggle)
+    window.addEventListener('raven-chat:close', handleClose)
+    return () => {
+      window.removeEventListener('raven-chat:toggle', handleToggle)
+      window.removeEventListener('raven-chat:close', handleClose)
+    }
+  }, [docked, toggle, off])
+
+  React.useEffect(() => {
+    window.dispatchEvent(new CustomEvent('raven-chat:unread-count', { detail: totalUnread || 0 }))
+  }, [totalUnread])
 
   return (
     <StartFetchContext.Provider value={initOpen}>
