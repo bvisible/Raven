@@ -145,3 +145,71 @@ html header button {
         opacity: 1;
     }
 }
+
+/* === Neoffice Design System — remap Radix 'iris' accent to clay (#D68A59).
+   Redefining the iris scale (not the prop) clayifies every accentColor='iris'
+   subtree at once: solids, borders, text AND translucent alpha hovers, light
+   + dark. Step 9 = brand clay; alphas computed to composite over the page bg
+   (the method Radix uses). White contrast on the clay solid matches the rest
+   of the product. Generated — regenerate rather than hand-edit. */
+.radix-themes {
+  --iris-1: #fdf8f4;
+  --iris-2: #fbeee4;
+  --iris-3: #f6e1cf;
+  --iris-4: #f1d4bc;
+  --iris-5: #ebc7a9;
+  --iris-6: #e3b896;
+  --iris-7: #daa67f;
+  --iris-8: #cd9162;
+  --iris-9: #d68a59;
+  --iris-10: #c77c4a;
+  --iris-11: #9e5429;
+  --iris-12: #4f2f1b;
+  --iris-a1: rgba(209, 93, 0, 0.0431);
+  --iris-a2: rgba(217, 94, 0, 0.1059);
+  --iris-a3: rgba(207, 96, 0, 0.1882);
+  --iris-a4: rgba(202, 91, 0, 0.2627);
+  --iris-a5: rgba(196, 89, 0, 0.3373);
+  --iris-a6: rgba(187, 83, 0, 0.4118);
+  --iris-a7: rgba(181, 78, 0, 0.502);
+  --iris-a8: rgba(174, 76, 0, 0.6157);
+  --iris-a9: rgba(192, 75, 0, 0.651);
+  --iris-a10: rgba(176, 70, 0, 0.7098);
+  --iris-a11: rgba(139, 51, 0, 0.8392);
+  --iris-a12: rgba(58, 22, 0, 0.8941);
+  --iris-surface: color-mix(in oklab, #d68a59 8%, white);
+  --iris-indicator: var(--iris-9);
+  --iris-track: var(--iris-9);
+  --iris-contrast: #ffffff;
+}
+
+.dark, .dark-theme {
+  --iris-1: #1a1411;
+  --iris-2: #221a14;
+  --iris-3: #30231a;
+  --iris-4: #3a2b20;
+  --iris-5: #453427;
+  --iris-6: #523d2f;
+  --iris-7: #654b39;
+  --iris-8: #824f31;
+  --iris-9: #d68a59;
+  --iris-10: #e0976a;
+  --iris-11: #eab489;
+  --iris-12: #faefe6;
+  --iris-a1: rgba(255, 96, 17, 0.0378);
+  --iris-a2: rgba(255, 143, 59, 0.0714);
+  --iris-a3: rgba(255, 155, 86, 0.1303);
+  --iris-a4: rgba(255, 168, 104, 0.1723);
+  --iris-a5: rgba(255, 177, 118, 0.2185);
+  --iris-a6: rgba(255, 178, 127, 0.2731);
+  --iris-a7: rgba(255, 181, 130, 0.3529);
+  --iris-a8: rgba(255, 148, 84, 0.4748);
+  --iris-a9: rgba(255, 163, 104, 0.8277);
+  --iris-a10: rgba(255, 171, 119, 0.8697);
+  --iris-a11: rgba(255, 196, 149, 0.9118);
+  --iris-a12: rgba(255, 244, 235, 0.979);
+  --iris-surface: color-mix(in oklab, #d68a59 14%, #111111);
+  --iris-indicator: var(--iris-9);
+  --iris-track: var(--iris-9);
+  --iris-contrast: #ffffff;
+}
