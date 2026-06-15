@@ -10,7 +10,14 @@ $(document).on('app_ready', function () {
             // //// NEOFFICE — NeoCockpit chrome: no floating launcher bar.
             // The same widget mounts DOCKED (hidden until toggled) and the
             // cockpit rail's synk icon opens it as a popup next to the menu.
-            if (document.body.classList.contains('neoffice-cockpit')) {
+            // Decide from the SERVER boot flag (the exact criterion desk.js
+            // make_chrome uses), NOT document.body.classList: the cockpit class
+            // is added by make_cockpit() which can land AFTER the app_ready that
+            // fires this handler, so the DOM check is racy and intermittently
+            // mounts the legacy floating bar even under the cockpit (observed on
+            // demo 2026-06-15). The boot flag is available as soon as bootinfo
+            // is loaded, well before any DOM timing.
+            if (!frappe.boot.neoffice_cockpit_disable && frappe.boot.home_page !== "setup-wizard") {
                 let docked_element = $(document.createElement('div'));
                 docked_element.addClass('raven-chat raven-chat-docked');
                 $('body').append(docked_element);
