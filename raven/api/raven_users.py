@@ -115,7 +115,16 @@ def add_users_to_raven(users):
 	for user in users:
 		user_doc = frappe.get_doc("User", user)
 
-		if user_doc.role_profile_name:
+		# //// Neoffice — refuse portal accounts. Upstream appends the role and saves the
+		# //// User right away; "Raven User" is auto-created with desk_access=1, so
+		# //// frappe's User.set_system_user() silently flips a Website User into a
+		# //// System User — which consumes a paid licence seat (WI-00353). Clients ended
+		# //// up counted as staff on several instances. Report them as failed rather
+		# //// than promoting them; the dialog already renders that list.
+		if user_doc.user_type == "Website User":
+			failed_users.append(user_doc)
+
+		elif user_doc.role_profile_name:
 			failed_users.append(user_doc)
 
 		elif hasattr(user_doc, "role_profiles") and len(user_doc.role_profiles) > 0:
@@ -138,6 +147,17 @@ def invite_user(email: str, first_name: str = None, last_name: str = None):
 
 	if existing_user:
 		user_doc = frappe.get_doc("User", existing_user)
+
+		# //// Neoffice — same guard as add_users_to_raven: granting "Raven User"
+		# //// (desk_access=1) to a portal account promotes it to System User on save and
+		# //// bills a licence seat (WI-00353). Refuse loudly instead of billing silently.
+		if user_doc.user_type == "Website User":
+			frappe.throw(
+				_(
+					"{0} is a portal user. Adding them to Raven would turn them into a desk user and use up a licence seat."
+				).format(existing_user)
+			)
+
 		if user_doc.role_profile_name:
 			frappe.throw(_("User has a role profile set. Please set the role to Raven User manually."))
 

@@ -35,7 +35,11 @@ const AddUsers = () => {
         setSearchText(event.target.value)
     }
 
-    const filters: Filter[] = [['enabled', '=', 1], ['name', 'not in', ['Guest', 'Administrator']], ['full_name', 'like', `%${debouncedText}%`]]
+    //// Neoffice — hide portal accounts. Picking one here posts to add_users_to_raven,
+    //// which grants "Raven User" (desk_access=1) and promotes the account to System
+    //// User, using up a licence seat (WI-00353). AddRavenUsersPage.tsx already filters
+    //// this way; upstream left this second entry point open.
+    const filters: Filter[] = [['enabled', '=', 1], ['user_type', '!=', 'Website User'], ['name', 'not in', ['Guest', 'Administrator']], ['full_name', 'like', `%${debouncedText}%`]]
 
     const { start, count, selectedPageLength, setPageLength, nextPage, previousPage } = usePaginationWithDoctype("User", 10, filters)
     const [sortOrder, setSortOder] = useState<"asc" | "desc">("desc")
