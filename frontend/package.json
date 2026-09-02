@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@emoji-mart/react": "^1.1.1",
-    "@neoffice/frappe-sidebar-react": "git+https://github.com/bvisible/frappe-sidebar-react.git#cc506bd490181e47f94d39acc6c48a0c0f62235f",
+    "@neoffice/frappe-sidebar-react": "git+https://github.com/bvisible/frappe-sidebar-react.git#090e525980486652d56377558907d5807295079d",
     "@radix-ui/themes": "^3.2.0",
     "@tiptap/extension-code-block-lowlight": "^2.12.0",
     "@tiptap/extension-highlight": "^2.12.0",
