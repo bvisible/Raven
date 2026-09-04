@@ -304,8 +304,12 @@
     <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): minimal window['__'] i18n shim.
          //// Without desk.bundle.js, Frappe's translate() never gets installed and the embedded chrome
          //// would render in English regardless of the user's language. BRACKET NOTATION IS MANDATORY
-         //// here, in code AND in comments: Frappe's Jinja safe_render rejects any substring ".__"
-         //// (anti-SSTI) and answers HTTP 417 Illegal Template, which kills the whole page. -->
+         //// here, in code AND in comments: Frappe's Jinja safe_render (frappe/utils/jinja.py)
+         //// refuses a template containing a dot followed by two underscores, anywhere, as an
+         //// anti-SSTI guard, and answers HTTP 417 Illegal Template - the whole page dies. Which
+         //// is exactly what this comment did on 2026-09-03, by spelling that substring out:
+         //// /raven returned 417 for every visitor until 2026-09-04. Never write it literally.
+         //// The comment below it, older, already said so without naming it. -->
     frappe._messages = frappe.boot["__messages"];
 
     // Minimal i18n shim for the embedded shell. We do not load desk.bundle.js
