@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- //// Neoffice - added file (no upstream equivalent). Synk wordmark used by the iOS app icon
+     //// (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"); upstream ships the Raven mark. -->
 <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 129.79 40.32">
   <defs>
     <style>

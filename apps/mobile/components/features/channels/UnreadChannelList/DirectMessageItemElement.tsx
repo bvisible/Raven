@@ -30,6 +30,7 @@ const DirectMessageItemElement = ({ dm }: { dm: DMChannelWithUnreadCount }) => {
             <View className="flex-row items-center w-full justify-between">
                 <View className="flex-row items-center">
                     <UserAvatar src={user?.user_image} alt={user?.full_name ?? user?.name ?? ''} avatarProps={{ className: 'h-8 w-8' }} />
+                    {/* //// Neoffice - DM name fallback (fe1132079, 2026-01-04 "fix(mobile): add fallback for empty user full_name in DM displays"): empty full_name rendered a blank row. */}
                     <Text style={styles.dmChannelText}>{user?.full_name || user?.name || ''}</Text>
                 </View>
                 {dm.unread_count > 0 ? <UnreadCountBadge count={dm.unread_count} /> : null}

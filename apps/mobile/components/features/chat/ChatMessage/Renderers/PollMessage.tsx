@@ -12,6 +12,10 @@ import { PollMessage } from '@raven/types/common/Message';
 import { toast } from 'sonner-native';
 import { Button } from '@components/nativewindui/Button';
 import ErrorBanner from '@components/common/ErrorBanner';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 type PollMessageBlockProps = {
@@ -50,10 +54,12 @@ export const PollMessageBlock = ({ message, ...props }: PollMessageBlockProps) =
 };
 
 const PollMessageBox = ({ data, messageID }: { data: Poll; messageID: string }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     return (
         <View className="bg-card/80 rounded-xl p-3">
             <View className="flex-col gap-1 pb-3">
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <Text className="text-base font-medium">{data.poll.question} {data.poll.is_anonymous ? <Text className="text-primary dark:text-secondary font-medium text-xs py-1 px-2">({t('polls.anonymous')})</Text> : null}</Text>
             </View>
             {data.current_user_votes.length > 0 ? (
@@ -69,6 +75,7 @@ const PollMessageBox = ({ data, messageID }: { data: Poll; messageID: string }) 
             )}
 
             {data.poll.is_disabled ? (
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 <Text className="text-muted-foreground text-xs">{t('polls.pollClosed')}</Text>
             ) : null}
 
@@ -128,6 +135,7 @@ const PollOption = ({ data, option }: { data: Poll; option: RavenPollOption }) =
 }
 
 const PollResults = ({ data }: { data: Poll }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     return (
         <View className="w-full">
@@ -135,6 +143,7 @@ const PollResults = ({ data }: { data: Poll }) => {
                 <PollOption key={option.name} data={data} option={option} />
             ))}
             <Text className="pl-2 text-sm font-medium text-muted-foreground">
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 {`${data.poll.total_votes || 0} ${data.poll.total_votes === 1 ? t('polls.vote') : t('polls.votes')}`}
             </Text>
         </View>
@@ -143,6 +152,7 @@ const PollResults = ({ data }: { data: Poll }) => {
 
 const SingleChoicePoll = ({ data, messageID }: { data: Poll; messageID: string }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { call } = useFrappePostCall('raven.api.raven_poll.add_vote')
     const [selectedOption, setSelectedOption] = useState<string | null>(null)
@@ -152,8 +162,10 @@ const SingleChoicePoll = ({ data, messageID }: { data: Poll; messageID: string }
             'message_id': messageID,
             'option_id': option.name
         }).then(() => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.success(t('polls.voteSubmitted'))
         }).catch((error) => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('polls.voteSubmitFailed'))
         })
     }
@@ -188,6 +200,7 @@ const SingleChoicePoll = ({ data, messageID }: { data: Poll; messageID: string }
 
 const MultiChoicePoll = ({ data, messageID }: { data: Poll; messageID: string }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const [selectedOptions, setSelectedOptions] = useState<string[]>([])
     const { call } = useFrappePostCall('raven.api.raven_poll.add_vote')
@@ -205,8 +218,10 @@ const MultiChoicePoll = ({ data, messageID }: { data: Poll; messageID: string })
             'message_id': messageID,
             'option_id': selectedOptions
         }).then(() => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.success(t('polls.voteSubmitted'))
         }).catch((error) => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('polls.voteSubmitFailed'))
         })
     }
@@ -239,6 +254,7 @@ const MultiChoicePoll = ({ data, messageID }: { data: Poll; messageID: string })
 
             <View className="flex flex-col gap-3">
                 <Text className="text-sm text-muted-foreground">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     {t('polls.submitToViewResults')}
                 </Text>
                 <Button
@@ -248,6 +264,7 @@ const MultiChoicePoll = ({ data, messageID }: { data: Poll; messageID: string })
                     onPress={onVoteSubmit}
                     disabled={!!data.poll.is_disabled || selectedOptions.length === 0}>
                     <Text className='text-sm font-semibold'>
+                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                         {t('common.submit')}
                     </Text>
                 </Button>

@@ -14,10 +14,15 @@ import UserAvatar from '@components/layout/UserAvatar';
 import { Text } from '@components/nativewindui/Text';
 import ErrorBanner from '@components/common/ErrorBanner';
 import { LegendList } from '@legendapp/list';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 export default function CreateDM() {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
     const { dmChannels } = useGetDirectMessageChannels()
@@ -32,6 +37,7 @@ export default function CreateDM() {
 
     return <>
         <Stack.Screen options={{
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             title: t('directMessages.createDM'),
             headerLeft: Platform.OS === 'ios' ? () => {
                 return (
@@ -64,6 +70,7 @@ export default function CreateDM() {
 
 const UserWithoutDMItem = ({ userID }: { userID: string }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const user = useGetUser(userID)
     const { call, error } = useFrappePostCall<{ message: string }>('raven.api.raven_channel.create_direct_message_channel')
@@ -75,6 +82,7 @@ const UserWithoutDMItem = ({ userID }: { userID: string }) => {
             router.back()
             router.push(`../../chat/${res?.message}`)
         }).catch(err => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('directMessages.createDMFailed'))
         })
     }
@@ -93,9 +101,13 @@ const UserWithoutDMItem = ({ userID }: { userID: string }) => {
                     textProps={{ className: 'text-sm' }}
                     isBot={user?.type === 'Bot'}
                 />
+                {/* //// Neoffice - DM name fallback (fe1132079, 2026-01-04 "fix(mobile): add fallback for empty user full_name in DM displays"). Upstream prints user?.full_name alone,
+                    //// so a Raven User whose full_name is empty rendered as a blank row with nothing to tap by name.
+                    //// Falls back to the user id, then to an empty string. */}
                 <Text className='text-base'>{user?.full_name || user?.name || ''}</Text>
                 {!user?.enabled ?
                     <View className='px-1 mt-0.5 py-0.5 rounded-sm bg-red-100'>
+                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                         <Text className="text-[11px] text-red-700">{t('common.disabled')}</Text>
                     </View>
                     : null}
@@ -105,15 +117,19 @@ const UserWithoutDMItem = ({ userID }: { userID: string }) => {
 }
 
 const EmptyState = ({ searchQuery }: { searchQuery: string }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     if (searchQuery.length > 0) {
         return (
             <Text className='p-2 text-sm text-muted-foreground'>
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 {t('directMessages.noUsersFoundWithQuery', { query: searchQuery })}
             </Text>
         )
     }
     return (
+        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): sentence moved to t(). Also repairs the upstream
+        //// className typo 'p-2text-sm' (the two classes were glued together, so neither applied).
         <Text className='p-2 text-sm text-muted-foreground'>
             {t('directMessages.allUsersHaveDM')}
         </Text>

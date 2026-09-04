@@ -12,6 +12,10 @@ import { Sheet } from '@components/nativewindui/Sheet'
 import { ReactionObject } from './MessageReactions'
 import useFileURL from '@hooks/useFileURL'
 import { Image } from 'expo-image'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 const { width } = Dimensions.get('window');
@@ -35,6 +39,7 @@ export default ReactionAnalytics;
 
 const ReactionAnalyticsContent = ({ reactions }: { reactions: ReactionObject[] }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
 
@@ -61,6 +66,7 @@ const ReactionAnalyticsContent = ({ reactions }: { reactions: ReactionObject[] }
                 }))
             }
         });
+        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): the "All" reactions tab label goes through t().
         return [{ title: t('common.all'), is_custom: false, users: all_reacted_members }, ...reactionTabs];
     }, [reactions, all_reacted_members, t]);
 

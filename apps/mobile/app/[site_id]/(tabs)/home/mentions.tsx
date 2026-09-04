@@ -16,6 +16,10 @@ import { BaseMessageItem } from '@components/features/chat-stream/BaseMessageIte
 import { Message } from '@raven/types/common/Message';
 import ChevronLeftIcon from '@assets/icons/ChevronLeftIcon.svg';
 import { useRouteToChannel } from '@hooks/useRouting';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 interface MentionObject {
@@ -47,11 +51,13 @@ const PAGE_SIZE = 10
 
 export default function Mentions() {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
 
     return <>
         <Stack.Screen options={{
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             title: t('messages.mentions'),
             headerStyle: { backgroundColor: colors.background },
             headerLeft: Platform.OS === 'ios' ? () => {
@@ -129,11 +135,13 @@ const MentionListItem = ({ message }: { message: MentionObject }) => {
         goToChannel(message.channel_id, 'push', message.is_thread === 0 ? 'Channel' : 'Thread')
     }
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
 
     const channelName = useMemo(() => {
 
         if (message.is_thread) {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             return t('messages.thread')
         }
 
@@ -142,6 +150,7 @@ const MentionListItem = ({ message }: { message: MentionObject }) => {
         }
 
         return message.channel_name
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): t added to the deps so it recomputes on a language switch.
     }, [message, t])
 
     const { colors } = useColorScheme()
@@ -170,15 +179,18 @@ const TimeStamp = ({ creation }: { creation: string }) => {
 }
 
 const MentionsEmptyState = () => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
     return (
         <View className="flex flex-col p-4 gap-2 bg-background">
             <View className="flex flex-row items-center gap-2">
                 <AtSignIcon color={colors.icon} height={19} width={19} />
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <Text className="text-foreground text-base font-medium">{t('messages.noMentions')}</Text>
             </View>
             <Text className="text-sm text-foreground/60">
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 {t('messages.noMentionsDescription')}
             </Text>
         </View>

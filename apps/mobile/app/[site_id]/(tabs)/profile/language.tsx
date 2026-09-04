@@ -1,3 +1,7 @@
+//// Neoffice - added file (no upstream equivalent). Language picker screen
+//// (13161f9f1, 2026-01-04 "feat(mobile): Add language selection page"): upstream has no
+//// language setting, the app follows the device locale only. Reads/writes the choice through
+//// @lib/i18n (AsyncStorage key "user-language").
 import { Stack } from 'expo-router';
 import { TouchableOpacity, View } from 'react-native';
 import { Text } from '@components/nativewindui/Text';

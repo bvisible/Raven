@@ -14,6 +14,9 @@ module.exports = (() => {
     // Extract existing transformer and resolver
     const { transformer, resolver } = config;
 
+    //// Neoffice - Metro watch folders (17fbaed07, 2026-01-20 "fix: metro watchFolders and version
+    //// bump 1.1.4"): upstream REPLACES the default watchFolders with the monorepo root, which dropped
+    //// the folders Expo adds itself and broke hot reload on our layout. Extend the list instead.
     // 1. Watch all files within the monorepo (extend default watchFolders)
     config.watchFolders = [...(config.watchFolders || []), monorepoRoot];
 

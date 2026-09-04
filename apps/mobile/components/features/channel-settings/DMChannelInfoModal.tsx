@@ -14,6 +14,10 @@ import { useGetUser } from '@raven/lib/hooks/useGetUser';
 import PinOutlineIcon from '@assets/icons/PinOutlineIcon.svg';
 import UserAvatar from '@components/layout/UserAvatar';
 import { useIsUserActive } from '@hooks/useIsUserActive';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 type DMChannelInfoModalProps = {
@@ -24,6 +28,7 @@ type DMChannelInfoModalProps = {
 
 const DMChannelInfoModal = ({ channel, isModalVisible, setModalVisible }: DMChannelInfoModalProps) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     // Animation values
     const modalHeight = useSharedValue(0)
@@ -88,6 +93,7 @@ const DMChannelInfoModal = ({ channel, isModalVisible, setModalVisible }: DMChan
                         <View className='flex-row items-center justify-between px-2'>
                             <View className='flex-row items-center'>
                                 <HollowFilesIcon height={20} width={20} fill={colors.foreground} />
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 <Text style={styles.modalOption}>{t('media.imagesAndFiles')}</Text>
                             </View>
                             <ChevronRightIcon height={24} width={24} fill={colors.foreground} strokeWidth={'1px'} />
@@ -99,6 +105,7 @@ const DMChannelInfoModal = ({ channel, isModalVisible, setModalVisible }: DMChan
                         <View className='flex-row items-center justify-between px-2'>
                             <View className='flex-row items-center'>
                                 <PinOutlineIcon height={20} width={20} stroke={colors.foreground} />
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 <Text style={styles.modalOption}>{t('messages.pins')}</Text>
                             </View>
                             <View className='flex-row items-center gap-1'>

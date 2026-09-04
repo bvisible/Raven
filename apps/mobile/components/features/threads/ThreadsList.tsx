@@ -9,6 +9,10 @@ import useUnreadThreadsCount from '@hooks/useUnreadThreadsCount'
 import { LegendList } from '@legendapp/list'
 import { useColorScheme } from "@hooks/useColorScheme"
 import ThreadPreviewBox from './ThreadPreviewBox'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 type Props = {
@@ -139,25 +143,30 @@ const ThreadsList = ({ aiThreads, content, channel, endpoint = "raven.api.thread
 
 const EmptyStateForThreads = ({ isFiltered = false, searchText }: { isFiltered?: boolean, searchText?: string }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
 
     const content = useMemo(() => {
         if (searchText && !isFiltered) {
             return {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 title: t('threads.noResultsFound'),
                 description: t('threads.noResultsFoundDescription', { query: searchText })
             }
         } else if (isFiltered) {
             return {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 title: t('threads.allCaughtUp'),
                 description: t('threads.allCaughtUpDescription')
             }
         } else {
             return {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 title: t('threads.noThreads'),
                 description: t('threads.noThreadsDescription')
             }
         }
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): t added to the deps so it recomputes on a language switch.
     }, [isFiltered, searchText, t])
 
     const { colors } = useColorScheme()

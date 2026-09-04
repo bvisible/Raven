@@ -9,6 +9,10 @@ import { router } from "expo-router";
 import { useWindowDimensions, View } from "react-native";
 import { fitContainer, ResumableZoom, Source, useImageResolution } from "react-native-zoom-toolkit";
 import { Image } from "expo-image";
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from "react-i18next";
 
 
@@ -74,10 +78,12 @@ interface ImageViewerProps {
 }
 
 const ImageViewer = ({ uri, handleShowHeader }: ImageViewerProps) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const source = useFileURL(uri)
     if (!source) {
         return <View className="p-2">
+            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
             <ErrorBanner message={t('errors.somethingWentWrong')} heading={t('errors.couldNotOpenImage')} />
         </View>
     }

@@ -20,6 +20,10 @@ import useFirebasePushTokenListener from '@hooks/useFirebasePushTokenListener'
 import { Text } from '@components/nativewindui/Text'
 import RefreshIcon from '@assets/icons/RefreshIcon.svg'
 import { useColorScheme } from '@hooks/useColorScheme'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 const Providers = (props: PropsWithChildren) => {
@@ -32,6 +36,7 @@ const Providers = (props: PropsWithChildren) => {
 }
 
 const UserListProvider = ({ children }: PropsWithChildren) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { users, enabledUsers, isLoading, error, hasData, mutate } = useUserListProvider()
 
@@ -45,12 +50,14 @@ const UserListProvider = ({ children }: PropsWithChildren) => {
 
     if (!hasData && error) {
         return <View className='bg-card px-2 gap-2 h-screen' style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
             <ErrorBanner error={error} heading={t('errors.userListLoadError')} />
             <View className='flex w-full gap-2 pt-8'>
                 <TouchableOpacity onPress={() => mutate()}
                     activeOpacity={0.8}
                     hitSlop={10}
                     className="flex flex-row items-center py-3 px-4 rounded-xl justify-between bg-background">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <Text className="font-medium text-foreground">{t('common.reloadApp')}</Text>
                     <RefreshIcon height={20} width={20} fill={colors.icon} />
                 </TouchableOpacity>
@@ -72,6 +79,7 @@ const UserListProvider = ({ children }: PropsWithChildren) => {
 
 const ChannelListProvider = ({ children }: PropsWithChildren) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const channelListContextData = useChannelListProvider()
 
@@ -83,12 +91,14 @@ const ChannelListProvider = ({ children }: PropsWithChildren) => {
 
     if (!channelListContextData.hasData && channelListContextData.error) {
         return <View className='bg-card px-2 gap-2 h-screen' style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
             <ErrorBanner error={channelListContextData.error} heading={t('errors.channelListLoadError')} />
             <View className='flex w-full gap-2 pt-8'>
                 <TouchableOpacity onPress={() => channelListContextData.mutate()}
                     activeOpacity={0.8}
                     hitSlop={10}
                     className="flex flex-row items-center py-3 px-4 rounded-xl justify-between bg-background">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <Text className="font-medium text-foreground">{t('common.reloadApp')}</Text>
                     <RefreshIcon height={20} width={20} fill={colors.icon} />
                 </TouchableOpacity>

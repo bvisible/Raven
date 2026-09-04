@@ -4,10 +4,15 @@ import * as DropdownMenu from 'zeego/dropdown-menu';
 import useGetChannels from '@raven/lib/hooks/useGetChannels';
 import HashIcon from '@assets/icons/HashIcon.svg';
 import { useColorScheme } from '@hooks/useColorScheme';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 const ChannelFilter = ({ channel, setChannel }: { channel: string, setChannel: (channel: string) => void }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { channels } = useGetChannels({ showArchived: false })
     const { colors } = useColorScheme()
@@ -22,6 +27,7 @@ const ChannelFilter = ({ channel, setChannel }: { channel: string, setChannel: (
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content side='bottom' align='end'>
                     <DropdownMenu.Item key="all" onSelect={() => setChannel('all')}>
+                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                         <DropdownMenu.ItemTitle>{t('channels.anyChannel')}</DropdownMenu.ItemTitle>
                     </DropdownMenu.Item>
                     {channels.map((channelItem) => (

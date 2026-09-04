@@ -9,6 +9,10 @@ import EmojiPicker from '@components/common/EmojiPicker/EmojiPicker'
 import { toast } from 'sonner-native'
 import useReactToMessage from '@raven/lib/hooks/useReactToMessage'
 import { Emoji } from '@components/common/EmojiPicker/Picker'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 interface MessageReactionsProps {
@@ -19,6 +23,7 @@ interface MessageReactionsProps {
 
 const QuickReactions = ({ message, onClose, quickReactionEmojis }: MessageReactionsProps) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
     const emojiBottomSheetRef = useSheetRef()
@@ -31,6 +36,7 @@ const QuickReactions = ({ message, onClose, quickReactionEmojis }: MessageReacti
                 emojiBottomSheetRef.current?.close({ duration: 450 })
                 onClose();
             }).catch(() => {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.error(t('messages.reactionFailed'))
             })
         }
@@ -45,6 +51,7 @@ const QuickReactions = ({ message, onClose, quickReactionEmojis }: MessageReacti
                         emojiBottomSheetRef.current?.close({ duration: 450 })
                         onClose();
                     }).catch(() => {
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         toast.error(t('messages.reactionFailed'))
                     })
             } else {
@@ -53,6 +60,7 @@ const QuickReactions = ({ message, onClose, quickReactionEmojis }: MessageReacti
                         emojiBottomSheetRef.current?.close({ duration: 450 })
                         onClose();
                     }).catch(() => {
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         toast.error(t('messages.reactionFailed'))
                     })
             }

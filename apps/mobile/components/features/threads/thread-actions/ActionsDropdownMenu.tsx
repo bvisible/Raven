@@ -7,9 +7,14 @@ import { useFrappeDeleteDoc, useFrappePostCall, useSWRConfig } from 'frappe-reac
 import { toast } from 'sonner-native';
 import { router } from 'expo-router';
 import { useColorScheme } from '@hooks/useColorScheme';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 const ActionsDropdownMenu = ({ threadID, channelMember }: { threadID: string, channelMember: Member }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
 
@@ -18,14 +23,17 @@ const ActionsDropdownMenu = ({ threadID, channelMember }: { threadID: string, ch
     const onLeaveThread = useLeaveThread(threadID)
     const showLeaveThreadAlert = () =>
         Alert.alert(
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             t('threads.leaveThread'),
             t('threads.leaveThreadMessage'),
             [
                 {
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     text: t('common.cancel'),
                     style: 'cancel',
                 },
                 {
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     text: t('common.leave'),
                     style: 'destructive',
                     onPress: onLeaveThread
@@ -36,14 +44,17 @@ const ActionsDropdownMenu = ({ threadID, channelMember }: { threadID: string, ch
     const onDeleteThread = useDeleteThread(threadID)
     const showDeleteThreadAlert = () =>
         Alert.alert(
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             t('threads.deleteThread'),
             t('threads.deleteThreadMessage'),
             [
                 {
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     text: t('common.cancel'),
                     style: 'cancel',
                 },
                 {
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     text: t('common.delete'),
                     style: 'destructive',
                     onPress: onDeleteThread
@@ -70,6 +81,7 @@ const ActionsDropdownMenu = ({ threadID, channelMember }: { threadID: string, ch
                         },
                     }} />
                     <DropdownMenu.ItemTitle>
+                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                         {channelMember?.allow_notifications ? t('common.unmute') : t('common.mute')}
                     </DropdownMenu.ItemTitle>
                 </DropdownMenu.Item>
@@ -83,6 +95,7 @@ const ActionsDropdownMenu = ({ threadID, channelMember }: { threadID: string, ch
                             light: 'red',
                         },
                     }} />
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <DropdownMenu.ItemTitle >{t('common.leave')}</DropdownMenu.ItemTitle>
                 </DropdownMenu.Item>
                 {/* Only admins can delete threads */}
@@ -96,6 +109,7 @@ const ActionsDropdownMenu = ({ threadID, channelMember }: { threadID: string, ch
                             light: 'red',
                         },
                     }} />
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <DropdownMenu.ItemTitle>{t('common.delete')}</DropdownMenu.ItemTitle>
                 </DropdownMenu.Item>}
             </DropdownMenu.Content>
@@ -105,6 +119,7 @@ const ActionsDropdownMenu = ({ threadID, channelMember }: { threadID: string, ch
 
 const useToggleThreadNotifications = (threadID: string, channelMember: Member) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { mutate } = useSWRConfig()
     const { call, error } = useFrappePostCall('raven.api.notification.toggle_push_notification_for_channel')
@@ -130,8 +145,10 @@ const useToggleThreadNotifications = (threadID: string, channelMember: Member) =
                 })
             }
 
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.success(channelMember?.allow_notifications ? t('threads.threadUnmuted') : t('threads.threadMuted'))
         }).catch(() => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('threads.muteThreadFailed'), {
                 description: error?.httpStatusText
             })
@@ -143,6 +160,7 @@ const useToggleThreadNotifications = (threadID: string, channelMember: Member) =
 
 const useLeaveThread = (threadID: string) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { call, error } = useFrappePostCall('raven.api.raven_channel.leave_channel')
     const { mutate } = useSWRConfig()
@@ -150,11 +168,13 @@ const useLeaveThread = (threadID: string) => {
     const onLeaveThread = async () => {
         return call({ channel_id: threadID })
             .then(() => {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.success(t('threads.leftThread'))
                 router.back()
                 mutate(["channel_members", threadID])
             })
             .catch(() => {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.error(t('threads.leaveThreadFailed'), {
                     description: error?.httpStatusText
                 })
@@ -166,16 +186,19 @@ const useLeaveThread = (threadID: string) => {
 
 const useDeleteThread = (threadID: string) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { deleteDoc, error } = useFrappeDeleteDoc()
 
     const onDeleteThread = async () => {
         return deleteDoc('Raven Channel', threadID)
             .then(() => {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.success(t('threads.threadDeleted'))
                 router.back()
             })
             .catch(() => {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.error(t('threads.deleteThreadFailed'), {
                     description: error?.httpStatusText
                 })

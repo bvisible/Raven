@@ -1,3 +1,6 @@
+//// Neoffice - added file (no upstream equivalent). Language row of the profile screen
+//// (13161f9f1, 2026-01-04 "feat(mobile): Add language selection page"): shows the current
+//// language and opens ./language. Upstream has no language setting.
 import { Pressable, View } from 'react-native';
 import { Text } from '@components/nativewindui/Text';
 import { useTranslation } from 'react-i18next';

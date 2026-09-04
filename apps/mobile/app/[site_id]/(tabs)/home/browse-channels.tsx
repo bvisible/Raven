@@ -15,10 +15,15 @@ import LockIcon from '@assets/icons/LockIcon.svg';
 import FilterIcon from '@assets/icons/FilterIcon.svg';
 import { LegendList } from '@legendapp/list';
 import { ChannelListItem } from '@raven/types/common/ChannelListItem';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 export default function BrowseChannels() {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
     const { channels } = useGetChannels({ showArchived: true })
@@ -43,6 +48,7 @@ export default function BrowseChannels() {
 
     return <>
         <Stack.Screen options={{
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             title: t('channels.browseChannels'),
             headerLeft: Platform.OS === 'ios' ? () => {
                 return (
@@ -76,6 +82,7 @@ export default function BrowseChannels() {
                         <Text className="text-base">{item.channel_name}</Text>
                         {item.is_archived ?
                             <View className='px-1 mt-0.5 py-0.5 rounded-sm bg-red-100 dark:bg-red-900/40'>
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 <Text className="text-[11px] text-red-700 dark:text-red-300">{t('common.archived')}</Text>
                             </View> : null}
                     </Pressable>
@@ -84,6 +91,7 @@ export default function BrowseChannels() {
                 ListEmptyComponent={
                     <View className="p-2">
                         <Text className="text-sm text-muted-foreground">
+                            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                             {t('channels.noMatchingChannels', { query: searchQuery })}
                         </Text>
                     </View>
@@ -96,6 +104,7 @@ export default function BrowseChannels() {
 }
 
 const ChannelFilter = ({ channel, setChannel }: { channel: string, setChannel: (channel: string) => void }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
     return <DropdownMenu.Root>
@@ -114,24 +123,28 @@ const ChannelFilter = ({ channel, setChannel }: { channel: string, setChannel: (
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
             <DropdownMenu.Item key="All" onSelect={() => setChannel('All')}>
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <DropdownMenu.ItemTitle>{t('channels.anyChannel')}</DropdownMenu.ItemTitle>
             </DropdownMenu.Item>
             <DropdownMenu.Item
                 key="open"
                 textValue="Open"
                 onSelect={() => setChannel('Open')}>
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <Text>{t('channels.openChannel')}</Text>
             </DropdownMenu.Item>
             <DropdownMenu.Item
                 key="private"
                 textValue="Private"
                 onSelect={() => setChannel('Private')}>
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <Text>{t('channels.privateChannel')}</Text>
             </DropdownMenu.Item>
             <DropdownMenu.Item
                 key="public"
                 textValue="Public"
                 onSelect={() => setChannel('Public')}>
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <Text>{t('channels.publicChannel')}</Text>
             </DropdownMenu.Item>
         </DropdownMenu.Content>

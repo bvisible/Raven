@@ -14,10 +14,15 @@ import { useColorScheme } from '@hooks/useColorScheme';
 import { ActivityIndicator } from '@components/nativewindui/ActivityIndicator';
 import HeaderBackButton from '@components/common/Buttons/HeaderBackButton';
 import CommonErrorBoundary from '@components/common/CommonErrorBoundary';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 export default function CustomStatusScreen() {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { myProfile, mutate } = useCurrentRavenUser()
 
@@ -30,10 +35,12 @@ export default function CustomStatusScreen() {
         call({
             custom_status: customStatus
         }).then(() => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.success(t('profile.statusUpdated'))
             mutate()
             router.back()
         }).catch(() => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('profile.statusUpdateFailed'))
         })
     }
@@ -49,6 +56,7 @@ export default function CustomStatusScreen() {
                             <HeaderBackButton />
                         )
                     },
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     headerTitle: () => <Text className='ml-2 text-base font-semibold'>{t('profile.customStatus')}</Text>,
                     headerRight() {
                         return (
@@ -57,6 +65,7 @@ export default function CustomStatusScreen() {
                                 disabled={loading}>
                                 {loading ?
                                     <ActivityIndicator size="small" color={colors.primary} /> :
+                                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                                     <Text className="text-primary dark:text-secondary">{t('common.save')}</Text>}
                             </Button>
                         )
@@ -70,6 +79,7 @@ export default function CustomStatusScreen() {
                 contentInsetAdjustmentBehavior="automatic"
                 contentContainerStyle={{ paddingBottom: insets.bottom }}>
                 <Form className="gap-5 px-4 pt-8">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <FormSection footnote={t('profile.customStatusFootnote')}>
                         <FormItem>
                             <TextField
@@ -77,9 +87,11 @@ export default function CustomStatusScreen() {
                                 className="pl-0.5"
                                 leftView={
                                     <View className="w-36 justify-between flex-row items-center pl-2">
+                                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                         <Text className="font-medium">{t('profile.customStatus')}</Text>
                                     </View>
                                 }
+                                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                                 placeholder={t('profile.customStatusPlaceholder')}
                                 value={customStatus}
                                 onChangeText={setCustomStatus}

@@ -14,10 +14,15 @@ import ViewThreadParticipants from './ViewThreadParticipants'
 import { Divider } from '@components/layout/Divider'
 import { useRouteToThread } from '@hooks/useRouting'
 import UnreadCountBadge from '@components/common/Badge/UnreadCountBadge'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 const ThreadPreviewBox = ({ thread, unreadCount }: { thread: ThreadMessage, unreadCount?: number }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const users = useGetUserRecords()
     const { channel } = useCurrentChannelData(thread.channel_id)
@@ -75,6 +80,7 @@ const ThreadPreviewBox = ({ thread, unreadCount }: { thread: ThreadMessage, unre
                     <BaseMessageItem message={thread as unknown as Message} />
                     <View className='flex flex-row items-center gap-2 pl-16 pt-2'>
                         <ViewThreadParticipants participants={thread.participants ?? []} />
+                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                         <Text className={'text-sm font-medium text-primary dark:text-secondary'}>{thread.reply_count === 1 ? t('messages.replyCount') : t('messages.repliesCount', { count: thread.reply_count ?? 0 })}</Text>
                     </View>
                 </View>

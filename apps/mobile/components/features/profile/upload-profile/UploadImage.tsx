@@ -3,6 +3,10 @@ import { toast } from 'sonner-native'
 import ImagePickerButton from '@components/common/Buttons/ImagePickerButton'
 import { CustomFile } from '@raven/types/common/File'
 import useCurrentRavenUser from '@raven/lib/hooks/useCurrentRavenUser'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 interface UploadImageProps {
@@ -11,6 +15,7 @@ interface UploadImageProps {
 
 const UploadImage = ({ onSheetClose }: UploadImageProps) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { myProfile } = useCurrentRavenUser()
 
@@ -24,9 +29,11 @@ const UploadImage = ({ onSheetClose }: UploadImageProps) => {
                 await call({
                     user_image: file
                 })
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.success(t('profile.imageUploaded'))
                 onSheetClose()
             } catch (error) {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.error(t('profile.imageUploadFailed'))
             }
         }
@@ -50,6 +57,7 @@ const UploadImage = ({ onSheetClose }: UploadImageProps) => {
                 await uploadImage(res.file_url)
             } catch (error) {
                 console.error(error)
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.error(t('profile.imageUploadFailed'))
             }
 

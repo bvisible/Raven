@@ -7,6 +7,10 @@ import Categories from './Categories';
 import { emojis as EMOJIS, categories as EMOJI_CATEGORIES } from "./emojis.json";
 import { useDebounce } from '@raven/lib/hooks/useDebounce';
 import { BottomSheetFlashList } from '@gorhom/bottom-sheet';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 const DEFAULT_X_PADDING = 6;
@@ -57,6 +61,7 @@ interface EmojiPickerProps {
 }
 
 const EmojiPicker = ({ customEmojis, onSelect, perLine, defaultCategory = "people" }: EmojiPickerProps) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const [category, setCategory] = useState<CategoryType>(defaultCategory);
     const [searchText, setSearchText] = useState<string>('');
@@ -132,6 +137,7 @@ const EmojiPicker = ({ customEmojis, onSelect, perLine, defaultCategory = "peopl
             />
             <View className='py-3'>
                 <SearchInput
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     placeholder={t('common.search')}
                     onChangeText={setSearchText}
                     value={searchText}

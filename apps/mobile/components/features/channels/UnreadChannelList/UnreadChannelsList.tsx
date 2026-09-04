@@ -10,6 +10,10 @@ import DirectMessageItemElement from './DirectMessageItemElement'
 import ChannelItemElement from './ChannelItemElement'
 import UnreadChannelListMoreActions from './UnreadChannelListMoreActions'
 import UnreadCountBadge from '@components/common/Badge/UnreadCountBadge'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 interface UnreadChannelsListProps {
@@ -57,6 +61,7 @@ const UnreadChannelsList = ({ unreadChannels, unreadDMs }: UnreadChannelsListPro
 }
 
 const UnreadChannelListUI = ({ totalUnreadCount, unreadDMs, unreadChannels, channelIDs }: { totalUnreadCount: number, unreadDMs: DMChannelWithUnreadCount[], unreadChannels: ChannelWithUnreadCount[], channelIDs: string[] }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation();
     const [isExpanded, setIsExpanded] = useState(true)
     const { colors } = useColorScheme()
@@ -69,6 +74,7 @@ const UnreadChannelListUI = ({ totalUnreadCount, unreadDMs, unreadChannels, chan
         <View style={styles.container}>
             <TouchableOpacity onPress={toggleAccordion} style={styles.header} activeOpacity={0.7}>
                 <View className="flex-row items-center gap-2">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <Text style={styles.headerText}>{t('channels.unreadChannels')}</Text>
                     {!isExpanded ? <UnreadCountBadge count={totalUnreadCount} /> : null}
                 </View>

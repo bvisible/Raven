@@ -17,6 +17,10 @@ import clsx from 'clsx';
 import { Divider } from '@components/layout/Divider';
 import { useColorScheme } from '@hooks/useColorScheme';
 import useSiteContext from '@hooks/useSiteContext';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 export const DocTypeLinkRenderer = ({ doctype, docname }: { doctype: string, docname: string }) => {
@@ -180,6 +184,7 @@ const FieldData = ({ fields, size = 'sm', className }: { fields: [string, any][]
 
 const Actions = ({ data, doctype, docname }: { data: Record<string, any>, doctype: string, docname: string }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const siteInfo = useSiteContext()
 
@@ -194,11 +199,14 @@ const Actions = ({ data, doctype, docname }: { data: Record<string, any>, doctyp
     const copyLink = useCallback(async () => {
         try {
             await Clipboard.setStringAsync(route);
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.success(t('media.linkCopied'));
         } catch (error) {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('media.copyLinkFailed'));
             console.error('Copy error:', error);
         }
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): t added to the deps so it recomputes on a language switch.
     }, [t]);
 
     const openLink = useCallback(async () => {
@@ -208,19 +216,24 @@ const Actions = ({ data, doctype, docname }: { data: Record<string, any>, doctyp
             if (canOpen) {
                 await Linking.openURL(route);
             } else {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.error(t('media.cannotOpenUrl'));
             }
         } catch (error) {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('media.openLinkFailed'));
             console.error('Open link error:', error);
         }
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): t added to the deps so it recomputes on a language switch.
     }, [t]);
 
     const copyToClipboard = async (text: string) => {
         try {
             await Clipboard.setStringAsync(text);
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.success(t('media.copiedToClipboard'));
         } catch {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('media.copyFailed'));
         }
     };
@@ -245,6 +258,7 @@ const Actions = ({ data, doctype, docname }: { data: Record<string, any>, doctyp
             onPress={openLink}>
             <LinkExternalIcon fill={colors.icon} width={20} height={20} />
 
+            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
             <Text className='text-foreground text-sm font-medium'>{t('media.openDocument')}</Text>
         </Pressable>
         <View className='flex flex-row gap-2'>
@@ -317,6 +331,7 @@ const DocTypeCardError = ({
     docname: string,
     error: FrappeError
 }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     return (
         <View className="bg-background dark:bg-card-background/40 shadow-card border border-border dark:border-border/50 rounded-lg gap-1 p-2.5">
@@ -332,6 +347,7 @@ const DocTypeCardError = ({
                 </Text>
             </View>
             <Text className='text-sm text-error-heading'>
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 {t('errors.previewLoadError')}
             </Text>
         </View>

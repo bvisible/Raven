@@ -37,6 +37,7 @@ export const ChannelRow = React.memo(({ item, handleChannelSelect }: ChannelRowP
                     textProps={{ className: 'text-sm' }}
                     isBot={user?.type === 'Bot'}
                 />
+                {/* //// Neoffice - DM name fallback (fe1132079, 2026-01-04 "fix(mobile): add fallback for empty user full_name in DM displays"): empty full_name rendered a blank row. */}
                 <Text className='ml-2 text-base'>{user?.full_name || user?.name || ''}</Text>
             </Pressable>
         )

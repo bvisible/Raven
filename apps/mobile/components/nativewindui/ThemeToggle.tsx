@@ -7,9 +7,14 @@ import { COLORS } from '@theme/colors';
 import SunIcon from '@assets/icons/SunIcon.svg';
 import MoonIcon from '@assets/icons/MoonIcon.svg';
 import SunMoonIcon from '@assets/icons/SunMoonIcon.svg';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 export function ThemeToggle() {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation();
     const { setColorScheme, themeValue } = useColorScheme();
 
@@ -56,6 +61,7 @@ export function ThemeToggle() {
                             light: 'gray',
                         },
                     }} />
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <DropdownMenu.ItemTitle>{t('settings.lightTheme')}</DropdownMenu.ItemTitle>
                 </DropdownMenu.Item>
                 <DropdownMenu.Item key="dark" onSelect={() => setColorScheme('dark')}>
@@ -68,6 +74,7 @@ export function ThemeToggle() {
                             light: 'gray',
                         },
                     }} />
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <DropdownMenu.ItemTitle>{t('settings.darkTheme')}</DropdownMenu.ItemTitle>
                 </DropdownMenu.Item>
                 <DropdownMenu.Item key="system" onSelect={() => setColorScheme('system')}>
@@ -80,6 +87,7 @@ export function ThemeToggle() {
                             light: 'gray',
                         },
                     }} />
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <DropdownMenu.ItemTitle>{t('settings.systemTheme')}</DropdownMenu.ItemTitle>
                 </DropdownMenu.Item>
             </DropdownMenu.Content>

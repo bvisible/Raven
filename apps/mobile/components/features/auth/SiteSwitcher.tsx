@@ -11,10 +11,15 @@ import ChevronRightIcon from '@assets/icons/ChevronRightIconThin.svg'
 import { useColorScheme } from '@hooks/useColorScheme'
 import PlusIcon from '@assets/icons/PlusIcon.svg'
 import ServerIcon from '@assets/icons/ServerIcon.svg'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 const SiteSwitcher = ({ openAddSiteSheet }: { openAddSiteSheet: () => void }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const currentSite = useSiteContext()
 
@@ -40,6 +45,7 @@ const SiteSwitcher = ({ openAddSiteSheet }: { openAddSiteSheet: () => void }) =>
     return (
         <>
             <View className='flex w-full gap-2'>
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <Text className='text-muted-foreground text-sm font-medium'>{t('sites.switchToAnotherSite')}</Text>
                 {otherSites.map((siteInformation) => (
                     <Pressable key={siteInformation.sitename} onPress={() => handleSitePress(siteInformation.sitename)} className='bg-card dark:bg-card rounded-lg px-2 py-2 active:bg-card-background/50 dark:active:bg-card/80'>
@@ -67,6 +73,7 @@ const SiteSwitcher = ({ openAddSiteSheet }: { openAddSiteSheet: () => void }) =>
                                 <ServerIcon height={22} width={22} color={colors.grey} />
                             </View>
 
+                            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                             <Text className='text-base'>{t('sites.addNewSite')}</Text>
                         </View>
                         <View className='flex-row h-10 items-center'>

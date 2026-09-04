@@ -5,10 +5,15 @@ import { Button } from '@components/nativewindui/Button'
 import * as DropdownMenu from 'zeego/dropdown-menu'
 import { useFrappePostCall, useSWRConfig } from 'frappe-react-sdk'
 import { toast } from 'sonner-native'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 const UnreadChannelListMoreActions = ({ channelIDs }: { channelIDs: string[] }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
 
@@ -19,6 +24,7 @@ const UnreadChannelListMoreActions = ({ channelIDs }: { channelIDs: string[] }) 
         call({
             channel_ids: channelIDs
         }).then(() => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.success(t('channels.allMarkedAsRead'))
             mutate('unread_channel_count', (d: { message: UnreadCountData } | undefined) => {
                 if (d?.message) {
@@ -41,6 +47,7 @@ const UnreadChannelListMoreActions = ({ channelIDs }: { channelIDs: string[] }) 
                 revalidate: false
             })
         }).catch(() => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('channels.markAsReadFailed'))
         })
     }
@@ -54,6 +61,7 @@ const UnreadChannelListMoreActions = ({ channelIDs }: { channelIDs: string[] }) 
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
                 <DropdownMenu.Item key="mark-all-unread-as-read" onSelect={handleMarkAllAsRead}>
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <DropdownMenu.ItemTitle>{t('channels.markAllRead')}</DropdownMenu.ItemTitle>
                 </DropdownMenu.Item>
             </DropdownMenu.Content>

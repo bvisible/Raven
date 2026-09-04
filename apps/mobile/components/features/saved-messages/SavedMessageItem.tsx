@@ -11,10 +11,15 @@ import { useRouteToChannel } from '@hooks/useRouting';
 import * as ContextMenu from 'zeego/context-menu';
 import { useColorScheme } from '@hooks/useColorScheme';
 import useSaveMessage from '@hooks/useSaveMessage';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 const SavedMessageItem = ({ message }: { message: Message & { workspace?: string } }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { save } = useSaveMessage(message)
 
@@ -66,6 +71,7 @@ const SavedMessageItem = ({ message }: { message: Message & { workspace?: string
             </ContextMenu.Trigger>
             <ContextMenu.Content>
                 <ContextMenu.Item key="unsave" onSelect={save}>
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <ContextMenu.ItemTitle>{t('messages.unsaveMessage')}</ContextMenu.ItemTitle>
                     <ContextMenu.ItemIcon
                         ios={{

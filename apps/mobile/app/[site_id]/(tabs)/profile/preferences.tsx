@@ -14,11 +14,16 @@ import { Sheet, useSheetRef } from '@components/nativewindui/Sheet';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Emoji } from '@components/common/EmojiPicker/Picker';
 import CommonErrorBoundary from '@components/common/CommonErrorBoundary';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 const REACTION_PRESSABLE_STYLES = 'w-12 h-12 flex items-center justify-center p-2 bg-card dark:bg-card rounded-full active:bg-muted/20'
 
 export default function PreferencesScreen() {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation();
     const insets = useSafeAreaInsets()
 
@@ -61,6 +66,7 @@ export default function PreferencesScreen() {
                             <HeaderBackButton />
                         )
                     },
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     headerTitle: () => <Text className='ml-2 text-base font-semibold'>{t('profile.preferences')}</Text>,
                     headerStyle: { backgroundColor: colors.background },
                 }} />
@@ -71,6 +77,7 @@ export default function PreferencesScreen() {
                 contentInsetAdjustmentBehavior="automatic"
                 contentContainerStyle={{ paddingBottom: insets.bottom }}>
                 <Form className="gap-5 px-4 pt-8">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <FormSection footnote={t('preferences.doubleTapFootnote')}>
                         <FormItem className='py-0.5'>
                             <Pressable onPress={() => openEmojiPicker('doubleTapMessageEmoji')}
@@ -78,6 +85,7 @@ export default function PreferencesScreen() {
                                 className='bg-card dark:bg-card rounded-xl active:bg-muted/20'>
                                 <View className='flex flex-row py-2.5 px-4 justify-between'>
                                     <View className='flex-row items-center gap-2'>
+                                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                         <Text className='text-base'>{t('preferences.reactOnDoubleTap')}</Text>
                                     </View>
                                     <View>
@@ -88,9 +96,11 @@ export default function PreferencesScreen() {
                         </FormItem>
                     </FormSection>
 
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <FormSection footnote={t('preferences.quickReactionsFootnote')}>
                         <FormItem className='py-0.5'>
                             <View className='flex flex-col gap-2 px-2'>
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 <Text className='text-base font-medium'>{t('preferences.preferredEmojis')}</Text>
                                 <View className='flex flex-row gap-2 justify-around'>
                                     <Pressable

@@ -5,6 +5,10 @@ import { ChannelIcon } from '@components/features/channels/ChannelList/ChannelIc
 import { useColorScheme } from '@hooks/useColorScheme'
 import { CombinedChannel } from './ForwardMessage'
 import CrossIcon from '@assets/icons/CrossIcon.svg'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 interface SelectedChannelsProps {
@@ -17,11 +21,13 @@ interface SelectedChannelsProps {
 
 export const SelectedChannels = ({ selectedChannels, searchInput, setSearchInput, handleRemoveChannel, handleBackspace }: SelectedChannelsProps) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
 
     return (
         <View className={`flex-row items-center gap-2.5 px-3 py-3`}>
+            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
             <Text className="self-start text-base text-foreground">{t('forward.to')}</Text>
             <View className="flex-1 flex-row flex-wrap items-center gap-2 mr-5">
                 {selectedChannels.map((channel: CombinedChannel) => {
@@ -52,6 +58,7 @@ export const SelectedChannels = ({ selectedChannels, searchInput, setSearchInput
                             )}
                             <Text className="text-sm">
                                 {isDMChannel
+                                    //// Neoffice - DM name fallback (fe1132079, 2026-01-04 "fix(mobile): add fallback for empty user full_name in DM displays"): empty full_name rendered a blank chip.
                                     ? `${user?.full_name || user?.name || ''}`
                                     : channel.channel_name}
                             </Text>
@@ -62,6 +69,7 @@ export const SelectedChannels = ({ selectedChannels, searchInput, setSearchInput
                 <TextInput
                     autoFocus
                     className="flex-1"
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     placeholder={selectedChannels.length === 0 ? t('forward.addChannelOrDM') : ""}
                     value={searchInput}
                     onChangeText={setSearchInput}

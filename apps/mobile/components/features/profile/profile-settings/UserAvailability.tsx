@@ -6,12 +6,17 @@ import { toast } from 'sonner-native'
 import useCurrentRavenUser from '@raven/lib/hooks/useCurrentRavenUser'
 import CircleIcon from '@assets/icons/CircleIcon.svg'
 import { useColorScheme } from '@hooks/useColorScheme'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 export type AvailabilityStatus = 'Available' | 'Away' | 'Do not disturb' | 'Invisible' | ''
 
 const UserAvailability = () => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { myProfile, mutate } = useCurrentRavenUser()
     const { call } = useFrappePostCall('raven.api.raven_users.update_raven_user')
@@ -20,11 +25,13 @@ const UserAvailability = () => {
         call({
             'availability_status': status
         }).then(() => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.success(t('profile.availabilityUpdated'), {
                 duration: 600
             })
             mutate()
         }).catch((error) => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('profile.availabilityUpdateFailed'), {
                 description: error.message
             })
@@ -34,14 +41,19 @@ const UserAvailability = () => {
     const getStatusText = (status: AvailabilityStatus) => {
         switch (status) {
             case 'Available':
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 return t('profile.statusAvailable')
             case 'Away':
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 return t('profile.statusAway')
             case 'Do not disturb':
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 return t('profile.statusDoNotDisturb')
             case 'Invisible':
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 return t('profile.statusInvisible')
             default:
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 return t('profile.statusAvailable')
         }
     }
@@ -53,6 +65,7 @@ const UserAvailability = () => {
             <View className='flex flex-row py-2.5 px-4 rounded-xl justify-between bg-background dark:bg-card'>
                 <View className='flex-row items-center gap-2.5'>
                     <CircleIcon height={15} width={15} color={colors.icon} strokeWidth={2.5} />
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <Text className='text-base'>{t('profile.availability')}</Text>
                 </View>
                 <DropdownMenu.Root>
@@ -72,6 +85,7 @@ const UserAvailability = () => {
                                     light: 'green',
                                 },
                             }} />
+                            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                             <DropdownMenu.ItemTitle>{t('profile.statusAvailable')}</DropdownMenu.ItemTitle>
                         </DropdownMenu.Item>
                         <DropdownMenu.Item key="away" onSelect={() => setAvailabilityStatus('Away')}>
@@ -84,6 +98,7 @@ const UserAvailability = () => {
                                     light: 'orange',
                                 },
                             }} />
+                            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                             <DropdownMenu.ItemTitle>{t('profile.statusAway')}</DropdownMenu.ItemTitle>
                         </DropdownMenu.Item>
                         <DropdownMenu.Item key="do-not-disturb" onSelect={() => setAvailabilityStatus('Do not disturb')}>
@@ -96,6 +111,7 @@ const UserAvailability = () => {
                                     light: '#D22B2B',
                                 },
                             }} />
+                            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                             <DropdownMenu.ItemTitle>{t('profile.statusDoNotDisturb')}</DropdownMenu.ItemTitle>
                         </DropdownMenu.Item>
                         <DropdownMenu.Item key="invisible" onSelect={() => setAvailabilityStatus('Invisible')}>
@@ -108,6 +124,7 @@ const UserAvailability = () => {
                                     light: '#BEBEBE',
                                 },
                             }} />
+                            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                             <DropdownMenu.ItemTitle>{t('profile.statusInvisible')}</DropdownMenu.ItemTitle>
                         </DropdownMenu.Item>
                         <DropdownMenu.Item key="reset" onSelect={() => setAvailabilityStatus('')}>
@@ -120,6 +137,7 @@ const UserAvailability = () => {
                                     light: 'gray',
                                 },
                             }} />
+                            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                             <DropdownMenu.ItemTitle>{t('profile.statusReset')}</DropdownMenu.ItemTitle>
                         </DropdownMenu.Item>
                     </DropdownMenu.Content>

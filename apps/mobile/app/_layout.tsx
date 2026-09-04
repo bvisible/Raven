@@ -23,6 +23,10 @@ import advancedFormat from 'dayjs/plugin/advancedFormat'
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useAtom } from 'jotai';
 import { useColorScheme } from 'nativewind';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import '@lib/i18n';
 import { loadSavedLanguage } from '@lib/i18n';
 
@@ -55,6 +59,8 @@ export default function RootLayout() {
     useEffect(() => {
 
         const onMount = async () => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): restore the saved language before the first screen
+            //// renders, otherwise the app flashes the device locale then switches.
             // Load saved language preference
             await loadSavedLanguage();
 
@@ -63,8 +69,13 @@ export default function RootLayout() {
             const initialNotification = await messaging.getInitialNotification();
 
             if (initialNotification) {
+                //// Neoffice - push-notification deep links (b30ad1930, 2026-01-05 "fix(mobile): Android push notifications and notification toggle").
+                //// TO REVIEW: these console.log calls were left in from the debugging pass; they run on every
+                //// cold start from a notification and print the whole notification payload.
                 console.log('[Notification] App started from notification:', JSON.stringify(initialNotification.data));
                 if (initialNotification.data?.channel_id && initialNotification.data?.sitename) {
+                    //// Neoffice - push-notification deep links (b30ad1930, 2026-01-05 "fix(mobile): Android push notifications and notification toggle"): builds the in-app route from the
+                    //// notification payload (sitename + channel_id + is_thread). Upstream only opened the app.
                     const targetPath = `/${initialNotification.data.sitename}/${initialNotification.data.is_thread ? 'thread' : 'chat'}/${initialNotification.data.channel_id}`;
                     console.log('[Notification] Navigating to:', targetPath);
                     setDefaultSite(initialNotification.data.sitename as string)
@@ -77,6 +88,8 @@ export default function RootLayout() {
                     })
 
                     return
+                //// Neoffice - push-notification deep links (b30ad1930, 2026-01-05 "fix(mobile): Android push notifications and notification toggle"): log the payloads that carry no route.
+                //// TO REVIEW: debugging leftover (see above).
                 } else {
                     console.log('[Notification] Missing channel_id or sitename in initial notification');
                 }
@@ -94,8 +107,12 @@ export default function RootLayout() {
 
         // Handle notification open when app is in background
         const unsubscribeOnNotificationOpen = messaging.onNotificationOpenedApp(async (remoteMessage) => {
+            //// Neoffice - push-notification deep links (b30ad1930, 2026-01-05 "fix(mobile): Android push notifications and notification toggle"): upstream leaves this line commented
+            //// out. TO REVIEW: re-enabled as an always-on log, not gated by __DEV__.
             console.log('[Notification] App opened from background:', JSON.stringify(remoteMessage.data));
             if (remoteMessage.data?.channel_id && remoteMessage.data?.sitename) {
+                //// Neoffice - push-notification deep links (b30ad1930, 2026-01-05 "fix(mobile): Android push notifications and notification toggle"): same route construction for the
+                //// background case; here is_thread arrives as the string '1', not a number.
                 const targetPath = `/${remoteMessage.data.sitename}/${remoteMessage.data.is_thread === '1' ? 'thread' : 'chat'}/${remoteMessage.data.channel_id}`;
                 console.log('[Notification] Navigating to:', targetPath);
                 setDefaultSite(remoteMessage.data.sitename as string)
@@ -106,6 +123,7 @@ export default function RootLayout() {
                 router.navigate(`/${remoteMessage.data.sitename}/${path}/${remoteMessage.data.channel_id}`, {
                     withAnchor: true
                 })
+            //// Neoffice - push-notification deep links (b30ad1930, 2026-01-05 "fix(mobile): Android push notifications and notification toggle"). TO REVIEW: debugging leftover.
             } else {
                 console.log('[Notification] Missing channel_id or sitename in notification data');
             }

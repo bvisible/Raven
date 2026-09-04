@@ -8,10 +8,15 @@ import RemoveImage from '@components/features/profile/upload-profile/RemoveImage
 import ViewImage from '@components/features/profile/upload-profile/ViewImage';
 import UploadImage from '@components/features/profile/upload-profile/UploadImage';
 import UserAvatar from '@components/layout/UserAvatar';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 const ProfilePicture = () => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { myProfile, mutate } = useCurrentRavenUser()
     const source = useFileURL(myProfile?.user_image ?? "")
@@ -43,6 +48,7 @@ const ProfilePicture = () => {
             <Sheet ref={bottomSheetRef}>
                 <BottomSheetView className='pb-16'>
                     <View className="flex-col gap-3">
+                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                         <Text className="text-xl font-cal-sans px-5">{t('profile.updateProfilePicture')}</Text>
                         <View className="flex-col justify-start items-start px-3 w-full">
                             <UploadImage onSheetClose={onSheetClose} />

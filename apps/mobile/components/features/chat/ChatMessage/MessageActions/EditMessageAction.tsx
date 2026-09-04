@@ -5,6 +5,10 @@ import EditMessageSheet from './EditMessageSheet'
 import { Sheet, useSheetRef } from '@components/nativewindui/Sheet'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import ActionButton from '@components/common/Buttons/ActionButton'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 interface EditMessageActionProps {
@@ -13,6 +17,7 @@ interface EditMessageActionProps {
 }
 
 const EditMessageAction = ({ message, onClose }: EditMessageActionProps) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
     const editSheetRef = useSheetRef()
@@ -46,6 +51,7 @@ const EditMessageAction = ({ message, onClose }: EditMessageActionProps) => {
             <ActionButton
                 onPress={handlePress}
                 icon={<EditIcon width={18} height={18} stroke={colors.icon} fillOpacity={0} />}
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 text={t('common.edit')}
             />
 

@@ -8,6 +8,10 @@ import { useGetUser } from '@raven/lib/hooks/useGetUser';
 import UserAvatar from '@components/layout/UserAvatar';
 import { Divider } from '@components/layout/Divider';
 import ErrorBanner from '@components/common/ErrorBanner';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 type VoteData = {
@@ -24,6 +28,7 @@ interface ViewPollVotesProps {
 
 const ViewPollVotes = ({ poll }: ViewPollVotesProps) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const bottomSheetRef = useSheetRef()
 
@@ -34,6 +39,7 @@ const ViewPollVotes = ({ poll }: ViewPollVotesProps) => {
                 onPress={() => bottomSheetRef.current?.present()}
                 activeOpacity={0.6}>
                 <Text className="text-center text-sm text-primary dark:text-secondary font-medium">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     {t('polls.viewVotes')}
                 </Text>
             </TouchableOpacity>
@@ -72,12 +78,15 @@ const ViewPollVotesModalContent = ({ poll }: ViewPollVotesModalContentProps) => 
 }
 
 const VotesBlock = ({ votesData, poll }: { votesData: PollVotesResponse; poll: Poll }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     return (
         <View>
             <View className="flex-row justify-between items-baseline mb-4">
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <Text className="text-xl font-cal-sans">{t('polls.pollVotes')}</Text>
                 <Text className="text-sm text-muted-foreground">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     {poll.poll.total_votes} {poll.poll.total_votes === 1 ? t('polls.vote') : t('polls.votes')}
                 </Text>
             </View>
@@ -99,6 +108,7 @@ const VotesBlock = ({ votesData, poll }: { votesData: PollVotesResponse; poll: P
                                 </Text>
                             </View>
                             <Text className="text-sm text-muted-foreground">
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 {option.count} {option.count === 1 ? t('polls.vote') : t('polls.votes')}
                             </Text>
                         </View>
@@ -122,6 +132,7 @@ const UserVote = ({ user_id }: { user_id: string }) => {
     return (
         <View className="flex flex-row items-center gap-3">
             <UserAvatar src={user?.user_image} alt={user?.full_name ?? user?.name ?? ''} avatarProps={{ className: 'h-8 w-8' }} textProps={{ className: 'text-sm' }} />
+            {/* //// Neoffice - DM name fallback (fe1132079, 2026-01-04 "fix(mobile): add fallback for empty user full_name in DM displays"): empty full_name rendered a blank voter row. */}
             <Text className="font-medium text-sm text-foreground">{user?.full_name || user?.name || ''}</Text>
         </View>
     )

@@ -14,6 +14,10 @@ import timezone from 'dayjs/plugin/timezone'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
 import relativeTime from 'dayjs/plugin/relativeTime';
 import UnreadCountBadge from "@components/common/Badge/UnreadCountBadge"
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 dayjs.extend(utc)
@@ -23,6 +27,7 @@ dayjs.extend(relativeTime)
 
 const DMRow = ({ dm }: { dm: DMChannelWithUnreadCount }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { myProfile } = useCurrentRavenUser()
     const user = useGetUser(dm.peer_user_id)
@@ -76,6 +81,7 @@ const DMRow = ({ dm }: { dm: DMChannelWithUnreadCount }) => {
                         <View className='flex flex-row justify-between items-center'>
                             <Text
                                 className={'text-base font-medium text-foreground'}>
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 {user?.full_name ?? dm.peer_user_id} {myProfile?.name === dm.peer_user_id && `(${t('common.you')})`}
                             </Text>
                             {dm.last_message_timestamp ? (
@@ -89,6 +95,7 @@ const DMRow = ({ dm }: { dm: DMChannelWithUnreadCount }) => {
                             <View
                                 style={{ maxHeight: 30, maxWidth: dm.unread_count > 0 ? '90%' : '100%', }}
                                 className='flex flex-row items-center gap-1'>
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 {isSentByUser ? <Text className='text-sm text-muted-foreground' style={{ fontWeight: isUnread ? '500' : '400' }}>{t('common.you')}:</Text> : null}
                                 <Text className='text-sm text-muted-foreground line-clamp-1'
                                     style={{ fontWeight: isUnread ? '500' : '400' }}>{lastMessageContent}</Text>
@@ -109,6 +116,7 @@ interface LastMessageTimestampProps {
 }
 
 const LastMessageTimestamp = ({ timestamp }: LastMessageTimestampProps) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const displayTimestamp = useMemo(() => {
 
@@ -128,6 +136,7 @@ const LastMessageTimestamp = ({ timestamp }: LastMessageTimestampProps) => {
         if (dateObj.isSame(today, 'day')) {
             // If the difference is less than 1 minute, show "Just now"
             if (Math.abs(dateObj.diff(today, 'minute')) < 1) {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 return t('common.justNow')
             }
             if (Math.abs(dateObj.diff(today, 'hour')) < 1) {
@@ -137,6 +146,7 @@ const LastMessageTimestamp = ({ timestamp }: LastMessageTimestampProps) => {
         }
 
         if (dateObj.isSame(yesterday, 'day')) {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             return t('common.yesterday')
         }
 
@@ -149,6 +159,7 @@ const LastMessageTimestamp = ({ timestamp }: LastMessageTimestampProps) => {
         }
 
         return dateObj.format('D MMM YYYY')
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): t added to the deps so it recomputes on a language switch.
     }, [timestamp, t])
 
     return (

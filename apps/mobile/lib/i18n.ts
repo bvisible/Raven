@@ -1,3 +1,7 @@
+//// Neoffice - added file (no upstream equivalent). react-i18next setup for the mobile app
+//// (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n) support"): upstream is
+//// English-only. Falls back to French rather than English because the customer base is Suisse
+//// romande, and persists the choice in AsyncStorage under "user-language".
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import * as Localization from "expo-localization";

@@ -1,5 +1,9 @@
 import { View, Text } from 'react-native';
 import { FrappeError } from 'frappe-react-sdk'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import i18n from '@lib/i18n'
 
 interface BaseProps {
@@ -37,6 +41,7 @@ const getErrorMessages = (error?: FrappeError | null): ParsedErrorMessage[] => {
             if (exception) {
                 eMessages = [{
                     message: exception,
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     title: i18n.t('common.error')
                 }]
             }
@@ -45,6 +50,7 @@ const getErrorMessages = (error?: FrappeError | null): ParsedErrorMessage[] => {
         if (eMessages.length === 0) {
             eMessages = [{
                 message: error?.message,
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 title: i18n.t('common.error'),
                 indicator: "red"
             }]

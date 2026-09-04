@@ -1,1 +1,5 @@
+#//// Neoffice - ios/ and android/ removed from this list (fec6f6958, 2026-01-20 "chore: simplify
+#//// gitignore for managed expo workflow"): upstream ignores both native folders because it runs
+#//// `expo prebuild` locally. We build through EAS on the managed workflow, where the folders are
+#//// generated in CI and never exist here; the root .gitignore keeps them out anyway.
 .expo/

@@ -9,6 +9,7 @@ import { formatDate } from '@raven/lib/utils/dateConversions'
 import useSiteContext from './useSiteContext'
 import { GetMessagesResponse } from '@raven/types/common/ChatStream'
 import { useTrackChannelVisit } from './useUnreadMessageCount'
+//// Neoffice - AI thread auto-open (9c0248069 + c8f70b230 + ee79d624c, 2026-01-04): routing helper for the jump below.
 import { useRouteToThread } from './useRouting'
 
 dayjs.extend(utc)
@@ -43,6 +44,7 @@ export type MessageDateBlock = Message | DateBlock | HeaderBlock
 const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRef>, isThread: boolean = false, pinnedMessagesString?: string) => {
 
     const siteInformation = useSiteContext()
+    //// Neoffice - AI thread auto-open (9c0248069 + c8f70b230 + ee79d624c, 2026-01-04).
     const goToThread = useRouteToThread()
 
     const isDataFetched = useRef(false)
@@ -283,6 +285,11 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
 
     })
 
+    //// Neoffice - AI thread auto-open (9c0248069 + c8f70b230 + ee79d624c, 2026-01-04 "fix(mobile): Add ai_thread_created listener to
+    //// update is_thread flag"). Nora answers in a thread created server-side, and upstream has no event
+    //// for that: the parent message kept is_thread=0 (no "view thread" button) and the user had to
+    //// find the answer by hand. Listens for our ai_thread_created realtime event, flips the flag in the
+    //// cache and jumps into the thread when we are not already in one.
     // If an AI thread is created, update the parent message's is_thread flag and auto-navigate
     useFrappeEventListener('ai_thread_created', (event) => {
         if (event.channel_id === channelID && event.thread_id) {
@@ -468,6 +475,7 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
             messagesWithDateSeparators.push({
                 ...lastMessage,
                 might_contain_link_preview: checkIfMessageContainsLinkPreview(lastMessage),
+                //// Neoffice - 24-hour clock (a4eb3b921, 2026-01-06 "fix: Use 24-hour time format instead of 12-hour AM/PM"). Swiss customers read 14:05, not 02:05 PM.
                 formattedTime: dayjs(lastMessage.creation).local().format('HH:mm'),
                 is_continuation: 0,
                 isOpenInThread: isThread,
@@ -479,6 +487,7 @@ const useChatStream = (channelID: string, listRef?: React.RefObject<LegendListRe
                 const message = messages[i]
                 const messageDate = message.creation.split(' ')[0]
                 let messageDateTime = new Date(message.creation.split('.')[0]).getTime()
+                //// Neoffice - 24-hour clock (a4eb3b921, 2026-01-06 "fix: Use 24-hour time format instead of 12-hour AM/PM"), second call site.
                 const formattedMessageTime = dayjs(message.creation).local().format('HH:mm')
                 const might_contain_link_preview = checkIfMessageContainsLinkPreview(message)
 

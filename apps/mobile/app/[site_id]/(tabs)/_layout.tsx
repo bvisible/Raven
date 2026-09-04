@@ -13,6 +13,10 @@ import { useColorScheme } from '@hooks/useColorScheme'
 import { Platform } from 'react-native';
 import useUnreadThreadsCount from '@hooks/useUnreadThreadsCount';
 import useUnreadMessageCount from '@hooks/useUnreadMessageCount';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 const tabBarBadgeStyle = {
@@ -26,6 +30,7 @@ const tabBarBadgeStyle = {
 }
 
 export default function TabLayout() {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation();
     const { colors, colorScheme } = useColorScheme()
     const dark = colorScheme == "dark"
@@ -101,6 +106,7 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="home"
                     options={{
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         title: t('channels.channels'),
                         headerShown: false,
                         headerStyle,
@@ -112,6 +118,7 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="direct-messages"
                     options={{
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         title: t('channels.directMessages'),
                         headerShown: false,
                         headerStyle,
@@ -123,6 +130,7 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="threads"
                     options={{
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         title: t('threads.threads'),
                         headerShown: false,
                         headerStyle,
@@ -134,6 +142,7 @@ export default function TabLayout() {
                 <Tabs.Screen
                     name="profile"
                     options={{
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         title: t('profile.profile'),
                         headerShown: false,
                         headerStyle,

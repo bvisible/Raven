@@ -15,6 +15,10 @@ import SiteSwitcher from '../auth/SiteSwitcher'
 import { getSiteNameFromUrl } from '@raven/lib/utils/operations'
 import ServerIcon from '@assets/icons/ServerIcon.svg'
 import AddSite from '../auth/AddSite'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 const WorkspaceSwitcher = ({ workspace, setWorkspace }: { workspace: string, setWorkspace: (workspace: string) => Promise<void> }) => {
@@ -34,6 +38,7 @@ const WorkspaceSwitcher = ({ workspace, setWorkspace }: { workspace: string, set
 }
 
 const WorkSpaceSwitcherMenu = ({ selectedWorkspace, workspaces, setWorkspace }: { selectedWorkspace: WorkspaceFields, workspaces: WorkspaceFields[], setWorkspace: (workspace: string) => Promise<void> }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const bottomSheetRef = useSheetRef()
 
@@ -69,6 +74,10 @@ const WorkSpaceSwitcherMenu = ({ selectedWorkspace, workspaces, setWorkspace }: 
                     />
                     <View>
                         <View className='flex-row items-center gap-1'>
+                            {/* //// Neoffice - rebrand (601bdb9e4, 2026-01-04 "feat(mobile): Display 'Synk' instead of 'Raven'
+                                //// workspace name"). The default workspace is created server-side as "Raven" on instances set up
+                                //// before raven/install.py was rebranded, so the name is mapped at display time rather than
+                                //// renamed in the database. TO REVIEW: drop this once no instance carries a "Raven" workspace. */}
                             <Text className="text-white font-bold">{selectedWorkspace?.workspace_name === 'Raven' ? 'Synk' : selectedWorkspace?.workspace_name}</Text>
                             <ChevronDownIcon height={20} width={20} fill={COLORS.white} />
                         </View>
@@ -92,6 +101,7 @@ const WorkSpaceSwitcherMenu = ({ selectedWorkspace, workspaces, setWorkspace }: 
             <Sheet enableDynamicSizing ref={addSiteSheetRef}>
                 <BottomSheetView className='flex-1 pb-16'>
                     <View className='flex-1 gap-2 px-4'>
+                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                         <Text className='text-lg font-semibold'>{t('sites.addNewSite')}</Text>
                         <AddSite useBottomSheet={true} />
                     </View>
@@ -110,6 +120,7 @@ interface SelectWorkspaceSheetProps {
 
 const SelectWorkspaceSheet = ({ selectedWorkspace, workspaces, setWorkspace }: SelectWorkspaceSheetProps) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
 
     const { myWorkspaces, otherWorkspaces } = useMemo(() => {
@@ -160,6 +171,7 @@ const SelectWorkspaceSheet = ({ selectedWorkspace, workspaces, setWorkspace }: S
             </View>
             {otherWorkspaces.length > 0 &&
                 <View className='flex flex-col gap-2'>
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <Text className='text-sm font-medium text-muted-foreground'>{t('workspaces.otherWorkspaces')}</Text>
                     <View className='flex flex-col gap-2 border border-border p-2 rounded-xl'>
                         {otherWorkspaces.map((workspace, index) => (
@@ -190,11 +202,13 @@ const WorkspaceRow = ({ workspace, isLast, setWorkspace, isOtherWorkspace = fals
         <Pressable className='flex flex-col gap-2' onPress={onClick}>
             <View className='flex-row items-center gap-2'>
                 <UserAvatar
+                    //// Neoffice - rebrand (601bdb9e4, 2026-01-04): same display-time mapping, avatar alt text.
                     alt={workspace.workspace_name === 'Raven' ? 'Synk' : workspace.workspace_name}
                     src={getLogo(workspace)}
                     avatarProps={{ className: 'h-10 w-10 rounded-lg dark:border-border dark:border' }}
                 />
                 <View className='flex-1'>
+                    {/* //// Neoffice - rebrand (601bdb9e4, 2026-01-04): same display-time mapping, list row. */}
                     <Text className='text-sm font-semibold'>{workspace.workspace_name === 'Raven' ? 'Synk' : workspace.workspace_name}</Text>
                     <Text className='text-sm text-gray-500'>{workspace.type}</Text>
                 </View>

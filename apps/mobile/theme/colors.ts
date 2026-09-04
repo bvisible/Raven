@@ -10,8 +10,12 @@ const IOS_SYSTEM_COLORS = {
         grey3: 'rgb(199, 199, 204)',
         grey2: 'rgb(175, 176, 180)',
         grey: 'rgb(142, 142, 147)',
+        //// Neoffice - light-theme canvas set to #F5F4F9 (iOS palette) instead of pure white, to match the
+        //// Neoffice desk background. TO REVIEW: origin unknown - the change rides along in 8070d3024
+        //// (2026-01-07), whose subject is about frappe-sidebar-react collapse, not the mobile palette.
         background: 'rgb(245, 244, 249)',
         foreground: 'rgb(0, 0, 0)',
+        //// Neoffice - same light-theme canvas as above (iOS palette, root). TO REVIEW: see L13.
         root: 'rgb(245, 244, 249)',
         card: 'rgb(248, 248, 248)',
         icon: '#1C2024',
@@ -51,8 +55,10 @@ const ANDROID_COLORS = {
         grey3: 'rgb(199, 199, 204)',
         grey2: 'rgb(175, 176, 180)',
         grey: 'rgb(142, 142, 147)',
+        //// Neoffice - same light-theme canvas, Android palette. TO REVIEW: see L13.
         background: 'rgb(245, 244, 249)',
         foreground: 'rgb(0, 0, 0)',
+        //// Neoffice - same light-theme canvas, Android palette (root). TO REVIEW: see L13.
         root: 'rgb(245, 244, 249)',
         card: 'rgb(248, 248, 248)',
         icon: '#1C2024',

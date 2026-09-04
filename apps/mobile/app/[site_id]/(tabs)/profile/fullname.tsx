@@ -14,10 +14,15 @@ import { ActivityIndicator } from '@components/nativewindui/ActivityIndicator';
 import { toast } from 'sonner-native';
 import HeaderBackButton from '@components/common/Buttons/HeaderBackButton';
 import CommonErrorBoundary from '@components/common/CommonErrorBoundary';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 export default function FullNameScreen() {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { myProfile, mutate } = useCurrentRavenUser()
 
@@ -30,10 +35,12 @@ export default function FullNameScreen() {
         return updateDoc("Raven User", myProfile?.name ?? '', {
             full_name: fullName,
         }).then(() => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.success(t('profile.nameUpdated'))
             mutate()
             router.back();
         }).catch(() => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('profile.nameUpdateFailed'))
         })
     }
@@ -49,6 +56,7 @@ export default function FullNameScreen() {
                             <HeaderBackButton />
                         )
                     },
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     headerTitle: () => <Text className='ml-2 text-base font-semibold'>{t('profile.userName')}</Text>,
                     headerRight() {
                         return (
@@ -57,6 +65,7 @@ export default function FullNameScreen() {
                                 disabled={loading || !fullName.length}>
                                 {loading ?
                                     <ActivityIndicator size="small" color={colors.primary} /> :
+                                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                                     <Text className="text-primary dark:text-secondary">{t('common.save')}</Text>}
                             </Button>
                         )
@@ -70,6 +79,7 @@ export default function FullNameScreen() {
                 contentInsetAdjustmentBehavior="automatic"
                 contentContainerStyle={{ paddingBottom: insets.bottom }}>
                 <Form className="gap-5 px-4 pt-8">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <FormSection footnote={t('profile.fullNameFootnote')}>
                         <FormItem>
                             <TextField
@@ -77,9 +87,11 @@ export default function FullNameScreen() {
                                 className="pl-0.5"
                                 leftView={
                                     <View className="w-36 justify-between flex-row items-center pl-2">
+                                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                         <Text className="font-medium">{t('profile.fullName')}</Text>
                                     </View>
                                 }
+                                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                                 placeholder={t('profile.fullName')}
                                 value={fullName}
                                 onChangeText={setFullName}

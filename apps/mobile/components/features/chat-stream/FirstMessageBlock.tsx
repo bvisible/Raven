@@ -13,6 +13,10 @@ import { useColorScheme } from "@hooks/useColorScheme"
 import { useFrappeGetDoc } from "frappe-react-sdk"
 import { BaseMessageItem } from "./BaseMessageItem"
 import { formatDate } from "@raven/lib/utils/dateConversions"
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 const ChannelHistoryFirstMessage = ({ channelID, isThread }: { channelID: string, isThread: boolean }) => {
@@ -27,6 +31,7 @@ const ChannelHistoryFirstMessage = ({ channelID, isThread }: { channelID: string
 }
 
 const ChannelHeader = ({ channelID }: { channelID: string }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { channel } = useCurrentChannelData(channelID)
 
@@ -41,12 +46,14 @@ const ChannelHeader = ({ channelID }: { channelID: string }) => {
     }
 
     return <View className="pt-8 p-3">
+        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
         <Text>{t('channels.channelBeginning')}</Text>
     </View>
 }
 
 
 const ThreadHeader = ({ threadID }: { threadID: string }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { data } = useFrappeGetDoc("Raven Message", threadID)
 
@@ -61,6 +68,7 @@ const ThreadHeader = ({ threadID }: { threadID: string }) => {
 
     return <View className="bg-card-background/30 py-2 rounded-lg">
         <View className='flex-1 flex-row items-center gap-2 pr-3 ml-3 py-2 border-b border-border/50'>
+            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
             <Text className='text-base font-semibold text-foreground'>{t('threads.startOfThread')}</Text>
         </View>
         <View className="pb-2">
@@ -71,6 +79,7 @@ const ThreadHeader = ({ threadID }: { threadID: string }) => {
 
 
 const FirstMessageBlockForDM = ({ channelData }: { channelData: DMChannelListItem }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { myProfile: currentUserInfo } = useCurrentRavenUser()
     const peer = channelData.peer_user_id
@@ -103,18 +112,22 @@ const FirstMessageBlockForDM = ({ channelData }: { channelData: DMChannelListIte
                             <Text className="font-semibold">{userName}</Text>
                             <Text>
                                 {isBot ? <View className="bg-linkColor rounded-md px-2 py-0.5 opacity-70 dark:opacity-80">
+                                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                     <Text className="text-xs font-medium">{t('common.bot')}</Text>
                                 </View> : <Text className='text-sm text-muted-foreground'>{peer}</Text>}
                             </Text>
                         </View>
                     </View>
                     {channelData?.is_self_message == 1 ? (
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         <Text className='text-[15px]'>{t('messages.dmIntroSelf')}</Text>
                     ) : (
                         <View className="flex flex-row gap-2 items-center">
                             {peer || fullName ? (
+                                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                                 <Text className='text-[15px]'>{t('messages.dmIntro')} <Text className='text-[15px] font-semibold'>{fullName ?? peer}</Text>.</Text>
                             ) : (
+                                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                                 <Text className='text-[15px]'>{t('messages.dmUserNotFound')} ({replaceCurrentUserFromDMChannelName(channelData.channel_name, currentUserInfo?.name ?? "")}).</Text>
                             )}
                         </View>
@@ -126,6 +139,7 @@ const FirstMessageBlockForDM = ({ channelData }: { channelData: DMChannelListIte
 }
 
 const FirstMessageBlockForChannel = ({ channelData }: { channelData: ChannelListItem }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
     return (
@@ -135,6 +149,7 @@ const FirstMessageBlockForChannel = ({ channelData }: { channelData: ChannelList
                     <ChannelIcon size={20} type={channelData?.type} fill={colors.foreground} />
                     <Text className="text-lg font-semibold">{channelData?.channel_name}</Text>
                 </View>
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <Text className="text-[15px]">{t('channels.channelIntro')} <Text className="text-base font-semibold">{channelData?.channel_name}</Text> {t('channels.channelIntroEnd')}</Text>
                 {channelData?.channel_description && <Text className="text-sm text-muted-foreground">{t('channels.channelDescriptionLabel')} {channelData?.channel_description}</Text>}
             </View>

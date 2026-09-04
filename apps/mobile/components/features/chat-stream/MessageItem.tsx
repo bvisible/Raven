@@ -25,6 +25,10 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import ViewThreadButton from './MessageItemElements/ViewThreadButton';
 import { useColorScheme } from '@hooks/useColorScheme';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 type Props = {
     message: FileMessage | PollMessage | TextMessage | ImageMessage
@@ -32,6 +36,7 @@ type Props = {
 
 const MessageItem = memo(({ message }: Props) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors, isDarkColorScheme } = useColorScheme()
 
@@ -125,12 +130,14 @@ const MessageItem = memo(({ message }: Props) => {
                                 <View className='flex-row items-center gap-1'>
                                     <ShareForward fill={'#6b7280'} width={12} height={12} />
                                     <Text className='text-sm text-muted-foreground'>
+                                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                         {t('messages.forwarded')}
                                     </Text>
                                 </View>}
                             {message.is_pinned === 1 &&
                                 <View className='flex-row items-center gap-1'>
                                     <PinIcon width={12} height={12} fill={isDarkColorScheme ? '#5753C6' : '#787BE3'} />
+                                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                     <Text className='text-sm text-primary dark:text-secondary'>{t('messages.pinned')}</Text>
                                 </View>}
 
@@ -150,6 +157,7 @@ const MessageItem = memo(({ message }: Props) => {
                                 <DocTypeLinkRenderer doctype={message.link_doctype} docname={message.link_document} />
                             </View>}
 
+                            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                             {message.is_edited === 1 && <Text className='text-xs text-muted-foreground'>({t('messages.messageEdited')})</Text>}
                             {message.hide_link_preview === 0 && message.text && <MessageLinkRenderer message={message} />}
                             <MessageReactions message={message} longPressGesture={longPressGesture} />

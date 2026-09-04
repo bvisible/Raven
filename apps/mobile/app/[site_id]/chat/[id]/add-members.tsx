@@ -20,10 +20,15 @@ import MemberList from '@components/features/channel-settings/Members/MemberList
 import { toast } from 'sonner-native';
 import SearchInput from '@components/common/SearchInput/SearchInput';
 import CommonErrorBoundary from '@components/common/CommonErrorBoundary';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 export default function AddNewChannelMembers() {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
 
@@ -90,9 +95,11 @@ export default function AddNewChannelMembers() {
                 .then(() => {
                     mutate(["channel_members", channelId])
                     router.back()
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     toast.success(selectedMembers.length > 1 ? t('members.membersAdded', { count: selectedMembers.length }) : t('members.memberAdded'))
                 })
                 .catch((error) => {
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     toast.error(selectedMembers.length > 1 ? t('members.addMembersFailed') : t('members.addMemberFailed'))
                 })
                 .finally(() => {
@@ -114,6 +121,7 @@ export default function AddNewChannelMembers() {
                         </Link>
                     )
                 },
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 headerTitle: () => <Text className='ml-2 text-base font-semibold'>{t('members.addMembers')}</Text>,
                 headerRight() {
                     return (
@@ -122,6 +130,7 @@ export default function AddNewChannelMembers() {
                             disabled={creatingDoc || !selectedMembers.length}>
                             {creatingDoc ?
                                 <ActivityIndicator size="small" color={colors.primary} /> :
+                                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                                 <Text className="text-primary dark:text-secondary">{t('common.add')}</Text>}
                         </Button>
                     )
@@ -149,6 +158,7 @@ export default function AddNewChannelMembers() {
             {!filteredMembers.length && debouncedText.length ? (
                 <View className="absolute inset-0 items-center justify-center h-80">
                     <Text className="text-[15px] text-center text-muted-foreground">
+                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                         {t('search.noResultsFor', { query: debouncedText })}
                     </Text>
                 </View>

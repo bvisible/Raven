@@ -14,10 +14,15 @@ import { useCurrentChannelData } from '@hooks/useCurrentChannelData';
 import { toast } from 'sonner-native';
 import { ActivityIndicator } from '@components/nativewindui/ActivityIndicator';
 import { COLORS } from '@theme/colors';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 const ChannelMemberRow = ({ member }: { member: Member }) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { id: channelId } = useLocalSearchParams()
     const { myProfile: currentUserInfo } = useCurrentRavenUser()
@@ -37,6 +42,7 @@ const ChannelMemberRow = ({ member }: { member: Member }) => {
 
     const updateAdminStatus = async (admin: 1 | 0) => {
         if (isBot) {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('members.botsCannotBeAdmins'))
             return
         }
@@ -46,11 +52,14 @@ const ChannelMemberRow = ({ member }: { member: Member }) => {
             updateMembers()
             reset()
             if (admin === 1) {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.success(t('members.madeAdmin', { name: member.full_name }))
             } else {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.warning(t('members.removedAdmin', { name: member.full_name }))
             }
         }).catch((e) => {
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             toast.error(t('members.updateMemberFailed'))
             reset()
         })
@@ -77,6 +86,7 @@ const ChannelMemberRow = ({ member }: { member: Member }) => {
 
         const deleteMember = async () => {
             return deleteDoc('Raven Channel Member', memberInfo?.message.name).then(() => {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.success(t('members.removedFromChannel', { name: member.full_name }))
                 mutate(["channel_members", channelId])
             })
@@ -84,13 +94,16 @@ const ChannelMemberRow = ({ member }: { member: Member }) => {
 
         const showAlert = () =>
             Alert.alert(
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 t('members.removeMemberConfirm'),
                 t('members.removeMemberMessage', { name: member.full_name, channelName: channel?.channelData.channel_name }),
                 [
                     {
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         text: t('common.cancel'),
                     },
                     {
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         text: t('common.remove'),
                         style: 'destructive',
                         onPress: deleteMember
@@ -111,6 +124,7 @@ const ChannelMemberRow = ({ member }: { member: Member }) => {
 
     const showActions = () => {
 
+        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
         let options = [t('members.makeAdmin'), t('members.removeAdmin'), t('common.cancel')]
         const isAdmin = channelMembers[member.name].is_admin
 
@@ -153,6 +167,7 @@ const ChannelMemberRow = ({ member }: { member: Member }) => {
                                     {member.full_name?.length > 40
                                         ? `${member.full_name.slice(0, 40)}...`
                                         : member.full_name}
+                                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                     {member.name === currentUserInfo?.name ? ` (${t('common.you')})` : ""}
                                 </Text>
                                 {channelMembers[member.name].is_admin ? <CrownIcon fill="#FFC53D" width={16} height={16} /> : null}

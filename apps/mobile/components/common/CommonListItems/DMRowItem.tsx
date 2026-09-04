@@ -25,6 +25,8 @@ const DMRowItem = ({ dmChannel, onPress }: DMRowItemProps) => {
                 textProps={{ className: 'text-sm' }}
                 isBot={user?.type === 'Bot'}
             />
+            {/* //// Neoffice - DM name fallback (fe1132079, 2026-01-04 "fix(mobile): add fallback for empty user full_name in DM displays"): upstream prints user?.full_name alone,
+                //// which renders an empty row when the Raven User has no full_name. */}
             <Text className='ml-2 text-base'>{user?.full_name || user?.name || ''}</Text>
         </Pressable>
     )

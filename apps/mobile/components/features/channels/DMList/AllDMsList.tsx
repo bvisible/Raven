@@ -1,8 +1,11 @@
 import { useColorScheme } from "@hooks/useColorScheme"
 import useUnreadMessageCount from "@hooks/useUnreadMessageCount"
 import { ChannelListContext, ChannelListContextType } from "@raven/lib/providers/ChannelListProvider"
+//// Neoffice - "all users" DM tab (b8b8dd25c + 40efaffad, 2026-01-05 "feat(mobile): Show all users in Direct
+//// Messages tab"): needs the current user to exclude self from the extra-users list.
 import useCurrentRavenUser from "@raven/lib/hooks/useCurrentRavenUser"
 import { useContext, useMemo, useState } from "react"
+//// Neoffice - "all users" DM tab (b8b8dd25c + 40efaffad, 2026-01-05): Pressable for the extra-user rows.
 import { View, ActivityIndicator, Pressable } from "react-native"
 import DMRow from "./DMRow"
 import ChatOutlineIcon from "@assets/icons/ChatOutlineIcon.svg"
@@ -12,6 +15,12 @@ import SearchInput from "@components/common/SearchInput/SearchInput"
 import { useDebounce } from "@raven/lib/hooks/useDebounce"
 import { Text } from "@components/nativewindui/Text"
 import { LegendList } from "@legendapp/list"
+//// Neoffice - "all users" DM tab (b8b8dd25c + 40efaffad, 2026-01-05 "feat(mobile): Show all users in Direct Messages
+//// tab"). Upstream lists only channels that already exist, so a new colleague is invisible until
+//// someone writes to them first. ExtraUserRow renders the users with no DM yet and creates the
+//// channel on tap (raven.api.raven_channel.create_direct_message_channel). DMListEmptyState also
+//// moves above its call site here (6ccf2be7c, 2026-01-05 "Reorder components to fix hoisting
+//// issue") and gets its strings translated.
 import { useTranslation } from "react-i18next"
 import { UserListContext } from "@raven/lib/providers/UserListProvider"
 import { useFrappePostCall } from "frappe-react-sdk"
@@ -74,10 +83,13 @@ const DMListEmptyState = ({ searchQuery }: { searchQuery?: string }) => {
 
 const AllDMsList = () => {
 
+    //// Neoffice - "all users" DM tab (b8b8dd25c + 40efaffad, 2026-01-05): mutate to refresh the list after a channel is
+    //// created, and the user list to compute who has no DM yet.
     const { t } = useTranslation()
     const { dm_channels, error, isLoading, mutate } = useContext(ChannelListContext) as ChannelListContextType
     const { enabledUsers } = useContext(UserListContext)
     const { unread_count } = useUnreadMessageCount()
+    //// Neoffice - self-DM filter (1400e92c5, 2026-01-05 "fix: Filter out self-DMs from DM lists"): needs the current Raven User to compare against.
     const { myProfile } = useCurrentRavenUser()
 
     const allDMs = useMemo(() => {
@@ -92,10 +104,14 @@ const AllDMsList = () => {
     const filteredDMs = useMemo(() => {
         return allDMs.filter(dm => {
             if (!dm.peer_user_id) return false
+            //// Neoffice - self-DM filter (1400e92c5, 2026-01-05 "fix: Filter out self-DMs from DM lists"). Upstream lists the note-to-self channel among the
+            //// DMs; on Neoffice instances that row was read as a duplicate of the user's own name.
             // Filter out self-DMs (DMs with yourself)
             if (dm.peer_user_id === myProfile?.name) return false
             return dm.peer_user_id?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
         })
+    //// Neoffice - "all users" DM tab (b8b8dd25c + 40efaffad, 2026-01-05): the users with no DM channel yet, filtered by
+    //// the same search box, plus the call that creates the channel and routes to it.
     }, [allDMs, debouncedSearchQuery, myProfile?.name])
 
     // Get users without existing DM channels (excluding self)
@@ -141,6 +157,7 @@ const AllDMsList = () => {
                 <SearchInput
                     onChangeText={setSearchQuery}
                     value={searchQuery}
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): search placeholder through t().
                     placeholder={t('common.search') + '...'}
                 />
             </View>
@@ -155,8 +172,11 @@ const AllDMsList = () => {
                     ItemSeparatorComponent={() => <Divider />}
                     bounces={false}
                     showsVerticalScrollIndicator={false}
+                    //// Neoffice - "all users" DM tab (b8b8dd25c + 40efaffad, 2026-01-05): the empty state must not show while the
+                    //// extra-users section still has rows to offer.
                     ListEmptyComponent={filteredDMs.length === 0 && extraUsers.length === 0 ? <DMListEmptyState searchQuery={searchQuery} /> : null}
                 />
+                {/* //// Neoffice - "all users" DM tab (b8b8dd25c + 40efaffad, 2026-01-05): the extra-users section, below the real DMs. */}
                 {extraUsers.length > 0 && (
                     <View>
                         {filteredDMs.length > 0 && <Divider prominent />}
@@ -174,4 +194,6 @@ const AllDMsList = () => {
     )
 }
 
+//// Neoffice - DMListEmptyState moved to the top of this file (6ccf2be7c, 2026-01-05 "fix(mobile):
+//// Reorder components to fix hoisting issue"); this is the tail of that move, not a deletion.
 export default AllDMsList

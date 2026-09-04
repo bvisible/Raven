@@ -8,12 +8,17 @@ import { useSetAtom } from 'jotai';
 import { selectedWorkspaceFamily } from './useGetCurrentWorkspace';
 import useSiteContext from './useSiteContext';
 import { getMessaging } from '@react-native-firebase/messaging';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 const messaging = getMessaging()
 
 
 export const useLogout = () => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const siteInformation = useSiteContext()
     const { tokenParams, call } = useContext(FrappeContext) as FrappeConfig
@@ -45,6 +50,7 @@ export const useLogout = () => {
             })
             .catch((error) => {
                 console.error(error)
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 toast.error(t('auth.logoutFailed'))
             })
             .then(() => {

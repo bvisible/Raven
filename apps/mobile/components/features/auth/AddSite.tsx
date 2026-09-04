@@ -14,6 +14,10 @@ import { FormLabel } from '@components/layout/Form'
 import { useColorScheme } from '@hooks/useColorScheme'
 import { ActivityIndicator } from '@components/nativewindui/ActivityIndicator'
 import HowToSetupMobile from './HowToSetupMobile'
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next'
 
 WebBrowser.maybeCompleteAuthSession();
@@ -23,6 +27,7 @@ type Props = {
 }
 
 const AddSite = ({ useBottomSheet = false }: Props) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
 
@@ -63,10 +68,12 @@ const AddSite = ({ useBottomSheet = false }: Props) => {
                     })
                     bottomSheetRef.current?.present()
                 } else {
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     Alert.alert(t('common.error'), t('auth.oauthNotConfigured'))
                 }
             })
             .catch(err => {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 Alert.alert(t('common.error'), t('auth.fetchSiteInfoFailed'))
                 console.error(err)
             })
@@ -83,6 +90,7 @@ const AddSite = ({ useBottomSheet = false }: Props) => {
         <View className='flex-1 gap-3'>
             <View className="flex-col gap-2">
                 <View className="flex-row items-center gap-0">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <FormLabel className='text-base'>{t('auth.siteUrl')}</FormLabel>
                 </View>
                 {useBottomSheet ?
@@ -91,6 +99,7 @@ const AddSite = ({ useBottomSheet = false }: Props) => {
                         numberOfLines={1}
                         inputMode='url'
                         autoCapitalize='none'
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         placeholder={t('auth.siteUrlPlaceholder')}
                         placeholderTextColor={colors.grey2}
                         autoCorrect={false}
@@ -104,6 +113,7 @@ const AddSite = ({ useBottomSheet = false }: Props) => {
                         numberOfLines={1}
                         inputMode='url'
                         autoCapitalize='none'
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         placeholder={t('auth.siteUrlPlaceholder')}
                         placeholderTextColor={colors.grey2}
                         autoCorrect={false}
@@ -114,6 +124,7 @@ const AddSite = ({ useBottomSheet = false }: Props) => {
                 }
             </View>
             <Button onPress={handleAddSite} disabled={isLoading}>
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <Text>{t('auth.addSite')}</Text>
             </Button>
             <Sheet snapPoints={[400]} ref={bottomSheetRef} onDismiss={clearSiteInformation}>
@@ -128,6 +139,7 @@ const AddSite = ({ useBottomSheet = false }: Props) => {
 }
 
 export const SiteAuthFlowSheet = ({ siteInformation, onDismiss }: { siteInformation: SiteInformation, onDismiss: () => void }) => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
 
     const discoveryWithURL = {
@@ -144,6 +156,10 @@ export const SiteAuthFlowSheet = ({ siteInformation, onDismiss }: { siteInformat
         usePKCE: true,
         scopes: ['all', 'openid'],
         codeChallengeMethod: CodeChallengeMethod.S256,
+        //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): the OAuth redirect scheme must match the bundle id
+        //// the app is actually published under (io.synk.app). Upstream's raven.thecommit.company: scheme
+        //// belongs to their own App Store build and would never come back to ours. Paired with
+        //// raven/api/raven_mobile.py, which registers the same scheme on the OAuth Client.
         redirectUri: makeRedirectUri({ native: 'io.synk.app:' }),
     }, discoveryWithURL)
 
@@ -159,13 +175,16 @@ export const SiteAuthFlowSheet = ({ siteInformation, onDismiss }: { siteInformat
                         extraParams: {
                             code_verifier: request?.codeVerifier ?? '',
                         },
+                        //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): same redirect scheme as above, second call site.
                         redirectUri: makeRedirectUri({ native: 'io.synk.app:' }),
                     }, discoveryWithURL).then(data => {
                         onAccessTokenReceived(data)
                     }).catch(err => {
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         Alert.alert(t('auth.authenticationError'), err.message)
                     })
                 } else if (res.type === "error") {
+                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                     Alert.alert(t('auth.authenticationError'), res.error?.message ?? t('errors.somethingWentWrong'))
                 }
             })
@@ -200,6 +219,7 @@ export const SiteAuthFlowSheet = ({ siteInformation, onDismiss }: { siteInformat
         <Button onPress={onLoginClick} style={{
             minHeight: 40
         }} disabled={!request || loading}>
+            {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
             {loading ? <ActivityIndicator color={"#FFFFFF"} /> : <Text>{t('auth.login')}</Text>}
         </Button>
     </View>

@@ -7,6 +7,10 @@ import { useColorScheme } from '@hooks/useColorScheme';
 import TrashIcon from "@assets/icons/TrashIcon.svg"
 import PlusIcon from "@assets/icons/PlusIcon.svg"
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 type PollFormData = {
@@ -17,6 +21,7 @@ type PollFormData = {
 }
 
 const CreatePollForm = () => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme();
     const { control, formState: { errors }, setValue } = useFormContext<PollFormData>()
@@ -50,18 +55,22 @@ const CreatePollForm = () => {
 
             <View className='p-5 gap-5'>
                 <Text className="text-base">
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     {t('polls.pollDescription')}
                 </Text>
 
                 <View className='flex-col gap-2'>
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <FormLabel isRequired>{t('polls.question')}</FormLabel>
                     <Controller
                         name="question"
                         control={control}
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         rules={{ required: t('polls.questionRequired') }}
                         render={({ field }) => (
                             <TextInput
                                 className="w-full border border-border rounded-lg px-3 py-3 text-[16px] leading-5 text-foreground"
+                                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                                 placeholder={t('polls.questionPlaceholder')}
                                 placeholderTextColor={colors.grey}
                                 placeholderClassName="leading-5"
@@ -78,6 +87,7 @@ const CreatePollForm = () => {
                 </View>
 
                 <View className='flex-col gap-2'>
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <FormLabel isRequired>{t('polls.options')}</FormLabel>
                     {fields.map((field, index) => (
                         <View key={field.id} className="flex-col gap-1">
@@ -85,10 +95,12 @@ const CreatePollForm = () => {
                                 <Controller
                                     name={`options.${index}.option`}
                                     control={control}
+                                    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                                     rules={{ required: t('polls.optionRequired', { number: index + 1 }) }}
                                     render={({ field }) => (
                                         <TextInput
                                             className="flex-1 border border-border rounded-lg px-3 py-3 text-[16px] leading-5 text-foreground"
+                                            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                                             placeholder={t('polls.optionPlaceholder', { number: index + 1 })}
                                             placeholderTextColor={colors.grey}
                                             placeholderClassName="leading-5"
@@ -115,16 +127,19 @@ const CreatePollForm = () => {
                             <View className='flex flex-row items-center'>
                                 <PlusIcon width={18} height={18} fill={`${fields.length >= 10 ? colors.grey : colors.primary}`} />
                                 <Text className={`text-sm pl-0.5 ${fields.length >= 10 ? 'text-muted-foreground/80' : 'font-semibold text-primary dark:text-secondary'}`}>
+                                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                     {t('polls.addOption')}
                                 </Text>
                             </View>
                         </TouchableOpacity>
 
+                        {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                         <Text className="text-muted-foreground/80 text-sm">{t('polls.maxOptionsReached')}</Text>
                     </View>
                 </View>
 
                 <View className='flex-col gap-2'>
+                    {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                     <FormLabel>{t('common.settings')}</FormLabel>
                     <Controller
                         name="is_multi_choice"
@@ -133,6 +148,7 @@ const CreatePollForm = () => {
                         render={({ field: { value, name } }) => (
                             <Pressable onPress={() => onCheckedChange(!value, name)} className="flex-row items-center gap-2">
                                 <Checkbox checked={value} />
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 <Text className='text-base'>{t('polls.multipleChoice')}</Text>
                             </Pressable>
                         )}
@@ -144,6 +160,7 @@ const CreatePollForm = () => {
                         render={({ field: { value, name } }) => (
                             <Pressable onPress={() => onCheckedChange(!value, name)} className="flex-row items-center gap-2">
                                 <Checkbox checked={value} />
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 <Text className='text-base'>{t('polls.anonymous')}</Text>
                             </Pressable>
                         )}

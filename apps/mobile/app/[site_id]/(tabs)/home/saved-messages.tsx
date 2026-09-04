@@ -11,15 +11,21 @@ import SavedMessageItem from '@components/features/saved-messages/SavedMessageIt
 import ChevronLeftIcon from '@assets/icons/ChevronLeftIcon.svg';
 import { LegendList } from '@legendapp/list';
 import ErrorBanner from '@components/common/ErrorBanner';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 export default function SavedMessages() {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
 
     return <>
         <Stack.Screen options={{
+            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
             title: t('messages.savedMessages'),
             headerStyle: { backgroundColor: colors.background },
             headerLeft: Platform.OS === 'ios' ? () => {
@@ -70,18 +76,22 @@ const SavedMessagesContent = () => {
 }
 
 const SavedMessagesEmptyState = () => {
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { colors } = useColorScheme()
     return (
         <View className="flex flex-col p-4 gap-2 bg-background">
             <View className="flex flex-row items-center gap-2">
                 <BookMarkIcon fill={colors.icon} height={20} width={20} />
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 <Text className="text-foreground text-base font-medium">{t('messages.noSavedMessagesTitle')}</Text>
             </View>
             <Text className="text-sm text-foreground/60">
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 {t('messages.noSavedMessagesDescription')}
             </Text>
             <Text className="text-sm text-foreground/60">
+                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 {t('messages.noSavedMessagesHint')}
             </Text>
         </View>

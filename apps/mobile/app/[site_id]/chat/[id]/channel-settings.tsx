@@ -18,10 +18,15 @@ import useCurrentRavenUser from "@raven/lib/hooks/useCurrentRavenUser";
 import { useFetchChannelMembers } from "@raven/lib/hooks/useFetchChannelMembers";
 import { ChangeChannelType } from "@components/features/channel-settings/ChangeChannelType";
 import CommonErrorBoundary from "@components/common/CommonErrorBoundary";
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from "react-i18next";
 
 const ChannelSettings = () => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
     const { id } = useLocalSearchParams()
     const { colors, isDarkColorScheme } = useColorScheme()
@@ -35,6 +40,7 @@ const ChannelSettings = () => {
             <Stack.Screen options={{
                 headerStyle: { backgroundColor: isDarkColorScheme ? colors.background : colors.card },
                 headerLeft: Platform.OS === 'ios' ? () => <HeaderBackButton /> : undefined,
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                 headerTitle: () => <Text className='ml-2 text-base font-semibold'>{t('channels.channelInfo')}</Text>,
             }} />
             <View className="flex-1 bg-card dark:bg-background">
@@ -46,11 +52,13 @@ const ChannelSettings = () => {
                     {isAllowed ?
                         <View className='flex flex-col gap-4 px-3'>
                             <View className='flex flex-col gap-0.5'>
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 <Text className='pl-2 pb-1 text-xs text-muted-foreground/80'>{t('common.settings')}</Text>
                                 <PushNotifications channelID={id as string} />
                                 <ChangeChannelType channelData={channelData} />
                             </View>
                             <View className='flex flex-col gap-0.5'>
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 <Text className='pl-2 pb-1 text-xs text-muted-foreground/80'>{t('channels.dangerZone')}</Text>
                                 <ArchiveChannel channel={channelData} />
                                 <LeaveChannel channel={channelData} />
@@ -60,10 +68,12 @@ const ChannelSettings = () => {
                         :
                         <View className='flex flex-col gap-4 px-3'>
                             <View className='flex flex-col gap-0.5'>
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 <Text className='pl-2 pb-1 text-xs text-muted-foreground/80'>{t('common.settings')}</Text>
                                 <PushNotifications channelID={id as string} />
                             </View>
                             {channelData?.type !== 'Open' && <View className='flex flex-col gap-0.5'>
+                                {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                                 <Text className='pl-2 pb-1 text-xs text-muted-foreground/80'>{t('channels.dangerZone')}</Text>
                                 <LeaveChannel channel={channelData} />
                             </View>}

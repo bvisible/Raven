@@ -13,6 +13,10 @@ import { useEffect } from 'react';
 import { ChannelListItem } from '@raven/types/common/ChannelListItem';
 import PinOutlineIcon from '@assets/icons/PinOutlineIcon.svg';
 import ActionButton from '@components/common/Buttons/ActionButton';
+//// Neoffice - mobile i18n (e9ee1845e, 2026-01-04 "feat(mobile): Add internationalization (i18n)
+//// support"). Upstream hardcodes every screen string in English; our customers are French-speaking
+//// (Suisse romande), so the app ships FR+EN through react-i18next - setup in apps/mobile/lib/i18n.ts,
+//// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import { useTranslation } from 'react-i18next';
 
 type ChannelInfoModalProps = {
@@ -23,6 +27,7 @@ type ChannelInfoModalProps = {
 
 const ChannelInfoModal = ({ channel, isModalVisible, setModalVisible }: ChannelInfoModalProps) => {
 
+    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
     const { t } = useTranslation()
 
     // Animation values
@@ -99,22 +104,26 @@ const ChannelInfoModal = ({ channel, isModalVisible, setModalVisible }: ChannelI
                     <ActionButton
                         onPress={handleGoToViewMembers}
                         icon={<MembersIcon height={20} width={20} color={colors.foreground} />}
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         text={t('common.members')}
                         showChevron />
                     <ActionButton
                         onPress={handleGoToSettings}
                         icon={<SettingsIcon height={20} width={20} color={colors.foreground} />}
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         text={t('channels.settingsAndDetails')}
                         showChevron />
                     <ActionButton
                         onPress={handleGoToPins}
                         icon={<PinOutlineIcon height={20} width={20} color={colors.foreground} />}
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         text={t('messages.pinnedMessages')}
                         count={pinnedMessages}
                         showChevron />
                     <ActionButton
                         onPress={handleGoToSharedMedia}
                         icon={<HollowFilesIcon height={20} width={20} fill={colors.foreground} />}
+                        //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
                         text={t('media.imagesAndFiles')}
                         showChevron />
                 </Animated.View>
