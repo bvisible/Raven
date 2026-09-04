@@ -504,15 +504,18 @@ class RavenBot(Document):
 		)
 		# Bots can probably send messages without permissions? Upto the end user to create bots.
 		# Besides sending messages is not a security concern, unauthorized reading of messages is.
-		#//// Neoffice - TO REVIEW: link validation is disabled whenever link_document is set
-		#//// (fd5440747, 2026-02-17). The reason given is that NORA's code executor creates the linked
-		#//// document on another database connection, so it is not visible yet from this one. That turns
-		#//// off the check precisely when it would matter - a typo'd link is stored silently. The right
-		#//// fix is to commit (or share the connection) before sending the message.
-		# Use ignore_links=True when link_document is set because the document may have been
-		# created in a different database connection (e.g., by Nora's code executor) and
-		# may not be immediately visible due to connection isolation
-		doc.insert(ignore_permissions=True, ignore_links=bool(link_document))
+		#//// Neoffice - back to upstream's plain insert (2026-09-04). 98fb5650 (2026-01-08, "add
+		#//// TTS/STT support") passed ignore_links=bool(link_document), i.e. it turned link validation
+		#//// OFF exactly when there was a link to validate, and ON when there was nothing to check.
+		#//// Its stated reason - the linked document may have been created on another database
+		#//// connection by Nora's code executor and not be visible yet - does not hold: the caller that
+		#//// motivated it (nora/api/v2/hermes_callback.py) reads the NORA Action Card with get_all on
+		#//// THIS connection immediately before sending, and the desk card renders by fetching the
+		#//// document client-side anyway, so a link this connection cannot see renders as a broken card
+		#//// whether we validate it or not. The flag also silenced validation of every other Link field
+		#//// of Raven Message (channel_id, bot, file, notification) on the same insert.
+		# Bots can send messages without permissions, but a link they store must exist.
+		doc.insert(ignore_permissions=True)
 		return doc.name
 
 	def create_direct_message_channel(self, user_id: str) -> str:
