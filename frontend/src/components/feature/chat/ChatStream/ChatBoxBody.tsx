@@ -1,9 +1,9 @@
 //// Neoffice - import order only (an IDE "organize imports" pass ran on this file).
-//// TO REVIEW - REAL DEFECT: that pass ALSO left a duplicate `import { useIsMobile } from
-//// "@/hooks/useMediaQuery"` (this block and L~27 below). Two bindings of the same name in
-//// one ES module: @babel/parser refuses the file outright ("Identifier 'useIsMobile' has
-//// already been declared"). Remove one of the two - not fixed here, this pass adds comments
-//// only.
+//// That pass had ALSO left a duplicate `import { useIsMobile } from "@/hooks/useMediaQuery"`,
+//// here and again below the ./useChatStream import. Two bindings of the same name in one ES
+//// module: @babel/parser refuses the file outright ("Identifier 'useIsMobile' has already
+//// been declared"). The second one was removed on 2026-09-04; this one, first in import
+//// order, is the one that stays.
 import { Label } from "@/components/common/Form"
 import { HStack, Stack } from "@/components/layout/Stack"
 import useFetchChannelMembers, { Member } from "@/hooks/fetchers/useFetchChannelMembers"
@@ -36,7 +36,8 @@ import { useSendMessage } from "../ChatInput/useSendMessage"
 import { ReplyMessageBox } from "../ChatMessage/ReplyMessageBox/ReplyMessageBox"
 import ChatStream from "./ChatStream"
 import { GetMessagesResponse } from "./useChatStream"
-import { useIsMobile } from "@/hooks/useMediaQuery"
+//// Neoffice - the duplicate `import { useIsMobile } from "@/hooks/useMediaQuery"` was here
+//// (removed 2026-09-04); the binding comes from the import at the top of the file.
 import { getFileType } from "@/utils/layout/FileExtIcon"
 import { getFileExtension } from "@/utils/operations"
 
