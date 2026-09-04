@@ -39,6 +39,11 @@ from .functions import (
 	update_document,
 )
 
+#//// Neoffice - the Raven AI Functions of a bot are run through function_executor, which replaced
+#//// the deleted raven/ai/sdk_tools.py (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"). See
+#//// _create_function_tools() below.
+from .function_executor import execute_raven_function
+
 
 #//// Neoffice - local-LLM tool calling (6c5dfb539 + bbe50bc26, 2025-07-31/2025-08-05 "Fix: OpenAI Agents SDK Compatibility with Local LLMs").
 #//// The OpenAI Agents SDK assumes native function calling. Models served by LM Studio / Ollama
@@ -259,10 +264,14 @@ If you need to call another tool, use the <tool_call> format immediately. Do not
 class RavenAgentManager:
 	"""Manages Raven agents with local LLM/OpenAI support"""
 
-	def __init__(self, bot_doc, file_handler=None):
+	#//// Neoffice - channel_id added (2026-09-04): a Custom Function that declares a channel_id
+	#//// parameter receives it from function_executor, which is how a NORA function knows which
+	#//// conversation it is answering. Defaults to None, so existing callers are unaffected.
+	def __init__(self, bot_doc, file_handler=None, channel_id=None):
 		self.bot_doc = bot_doc
 		self.settings = frappe.get_single("Raven Settings")
 		self.file_handler = file_handler
+		self.channel_id = channel_id  #//// Neoffice - see the note above (2026-09-04).
 		self._setup_client()
 		self._setup_tools()
 
@@ -319,35 +328,36 @@ class RavenAgentManager:
 				return False
 			return True
 		except Exception as e:
-			#//// Neoffice - TO REVIEW - SILENT FAILURE: upstream logs the failed API connection test to
-			#//// Error Log; this swallows it (87fa1010c, 2025-08-04 "Fix AI Function Loading and Response
-			#//// Formatting"). A wrong local_llm_api_url now looks like a bot that simply does not answer,
-			#//// with nothing in the log. The same substitution was made five more times in this file
-			#//// (L331, L352, L368, L521, L537) and once in the outer handler (L996). Restore the logging.
-			pass
+			#//// Neoffice - logging restored (2026-09-04). 87fa1010c (2025-08-04 "Fix AI Function Loading
+			#//// and Response Formatting") had replaced upstream's frappe.log_error with `pass` here and at
+			#//// six other sites of this file, so a wrong local_llm_api_url looked like a bot that simply
+			#//// never answers, with nothing in Error Log to say why.
+			frappe.log_error(
+				"Raven AI: API connection test failed",
+				f"Bot: {self.bot_doc.name}\n{frappe.get_traceback()}",
+			)
 			return False
 
 	def _setup_tools(self):
 		"""Create SDK Tools from existing functions"""
 		self.tools = []
 
+		#//// Neoffice - fixed 2026-09-04. This block used to import create_raven_tools from
+		#//// raven/ai/sdk_tools.py, a module 7cdc45189 (2025-08-22 "Feat add SDK LM Studio") had deleted.
+		#//// The ImportError landed in an `except ... pass`, so self.tools stayed empty and every agent
+		#//// ran with NO Raven AI Function at all - only the CRUD tools appended below reached it - with
+		#//// nothing in Error Log. The functions are now built here from the bot configuration and run
+		#//// through function_executor, which is what replaced sdk_tools.
 		try:
-			from raven.ai.sdk_tools import create_raven_tools
-
-			raven_tools = create_raven_tools(self.bot_doc)
+			raven_tools = self._create_function_tools()
 			if raven_tools:
 				self.tools.extend(raven_tools)
-		except Exception as e:
-			#//// Neoffice - TO REVIEW - SILENT FAILURE, AND IT IS ALREADY FIRING: upstream logs the failure
-			#//// here; this swallows it (87fa1010c, 2025-08-04). Worse, the `from raven.ai.sdk_tools import
-			#//// create_raven_tools` a few lines above imports a module that 7cdc45189 (2025-08-22 "Feat add
-			#//// SDK LM Studio") DELETED - raven/ai/sdk_tools.py no longer exists. The ImportError lands in
-			#//// this `except ... pass`, so self.tools stays empty and the agent runs with NO Raven AI Function
-			#//// at all, and nothing in Error Log says so. Only the CRUD tools appended just below still reach
-			#//// it - those are ours too, upstream does not expose create/read/update on ERP doctypes to the
-			#//// agent. Fix the import (function_executor / raven.ai.lmstudio replaced sdk_tools) and restore
-			#//// the logging.
-			pass
+		#//// Neoffice - and a failure to build them is logged now (2026-09-04), see above.
+		except Exception:
+			frappe.log_error(
+				"Raven AI: bot functions could not be loaded",
+				f"Bot: {self.bot_doc.name}\n{frappe.get_traceback()}",
+			)
 
 		# Add CRUD tools
 		crud_tools = self._create_crud_tools()
@@ -368,8 +378,12 @@ class RavenAgentManager:
 				if file_search_tool:
 					self.tools.append(file_search_tool)
 			except Exception as e:
-				#//// Neoffice - TO REVIEW - SILENT FAILURE: file-search tool creation error swallowed (87fa1010c).
-				pass
+				#//// Neoffice - logging restored (2026-09-04, swallowed by 87fa1010c): a bot with file search
+				#//// enabled lost the tool without a word.
+				frappe.log_error(
+					"Raven AI: file search tool setup failed",
+					f"Bot: {self.bot_doc.name}\n{frappe.get_traceback()}",
+				)
 
 		# Add Code Interpreter tool if enabled (only for OpenAI, not supported with Local LLM)
 		if (
@@ -385,8 +399,12 @@ class RavenAgentManager:
 
 				self.tools.append(code_interpreter_tool)
 			except Exception as e:
-				#//// Neoffice - TO REVIEW - SILENT FAILURE: code-interpreter setup error swallowed (87fa1010c).
-				pass
+				#//// Neoffice - logging restored (2026-09-04, swallowed by 87fa1010c): the code interpreter
+				#//// silently disappeared from a bot that had it enabled.
+				frappe.log_error(
+					"Raven AI: code interpreter tool setup failed",
+					f"Bot: {self.bot_doc.name}\n{frappe.get_traceback()}",
+				)
 
 		# Only add conversation file tool for OpenAI, not Local LLM (content is pre-extracted for Local LLM)
 		if (
@@ -397,6 +415,78 @@ class RavenAgentManager:
 			conversation_file_tool = self.file_handler.create_file_analysis_tool()
 			if conversation_file_tool:
 				self.tools.append(conversation_file_tool)
+
+	#//// Neoffice - added method (2026-09-04), replaces the create_raven_tools() of the deleted
+	#//// raven/ai/sdk_tools.py. One SDK FunctionTool per Raven AI Function linked to the bot; the
+	#//// call itself goes through raven/ai/function_executor.py, the module that replaced sdk_tools
+	#//// (7cdc45189) and that the local-LLM path already uses.
+	def _create_function_tools(self) -> list[Tool]:
+		"""Build one SDK tool per Raven AI Function configured on the bot."""
+		from agents import FunctionTool
+
+		tools = []
+
+		for func_link in self.bot_doc.bot_functions or []:
+			try:
+				function_doc = frappe.get_doc("Raven AI Function", func_link.function)
+			except Exception:
+				frappe.log_error(
+					"Raven AI: function could not be loaded",
+					f"Bot: {self.bot_doc.name}\nFunction: {func_link.function}\n{frappe.get_traceback()}",
+				)
+				continue
+
+			params = {}
+			if function_doc.params:
+				try:
+					params = json.loads(function_doc.params)
+				except (json.JSONDecodeError, TypeError):
+					frappe.log_error(
+						"Raven AI: function parameters are not valid JSON",
+						f"Function: {function_doc.name}\nParams: {function_doc.params}",
+					)
+					continue
+
+			if not isinstance(params, dict) or not params:
+				params = {"type": "object", "properties": {}}
+
+			# strict_json_schema below is False, and the strict variant rejects the schemas stored on
+			# Raven AI Function, so additionalProperties is dropped rather than trusted.
+			params.pop("additionalProperties", None)
+
+			tools.append(
+				FunctionTool(
+					name=function_doc.function_name,
+					description=function_doc.description or function_doc.function_name,
+					params_json_schema=params,
+					on_invoke_tool=self._build_function_invoker(function_doc.name),
+					strict_json_schema=False,
+				)
+			)
+
+		return tools
+
+	#//// Neoffice - added method (2026-09-04), see _create_function_tools() above.
+	def _build_function_invoker(self, function_id: str):
+		"""Return the async callback the SDK calls when the model uses `function_id`."""
+		channel_id = self.channel_id
+
+		async def invoke_tool(context, arguments: str) -> str:
+			args = {}
+			if arguments:
+				try:
+					args = json.loads(arguments)
+				except (json.JSONDecodeError, TypeError):
+					frappe.log_error(
+						"Raven AI: model sent invalid tool arguments",
+						f"Function: {function_id}\nArguments: {arguments}",
+					)
+					return json.dumps({"error": "Invalid arguments"})
+
+			result = execute_raven_function(function_id, args, channel_id=channel_id)
+			return json.dumps(result, default=str)
+
+		return invoke_tool
 
 	def _create_crud_tools(self) -> list[Tool]:
 		"""Wrap CRUD functions as OpenAI Agents Tools"""
@@ -415,7 +505,14 @@ class RavenAgentManager:
 			return get_document(doctype, document_id)
 
 		# Tool for create_document
-		@function_tool
+		#//// Neoffice - strict_mode=False on the three tools below (2026-09-04). openai-agents builds a
+		#//// STRICT JSON schema by default, and a strict schema forbids additionalProperties, which is
+		#//// exactly what a `dict` parameter compiles to. With openai-agents 0.6.x the decorator raised
+		#//// UserError at import of the tool, so _create_crud_tools() - and therefore _setup_tools() and
+		#//// the whole RavenAgentManager constructor - blew up before any tool was registered. Found
+		#//// while proving the sdk_tools fix on osiris; the other four tools take only strings and stay
+		#//// strict.
+		@function_tool(strict_mode=False)
 		def create_document_tool(doctype: str, data: dict) -> dict:
 			"""Create a new document in the database
 
@@ -428,7 +525,8 @@ class RavenAgentManager:
 			return create_document(doctype, data, function)
 
 		# Tool for update_document
-		@function_tool
+		#//// Neoffice - strict_mode=False, see create_document_tool above (2026-09-04).
+		@function_tool(strict_mode=False)
 		def update_document_tool(doctype: str, document_id: str, data: dict) -> dict:
 			"""Update a document in the database
 
@@ -452,7 +550,8 @@ class RavenAgentManager:
 			return delete_document(doctype, document_id)
 
 		# Tool for get_list
-		@function_tool
+		#//// Neoffice - strict_mode=False, see create_document_tool above (2026-09-04).
+		@function_tool(strict_mode=False)
 		def search_documents(
 			doctype: str, filters: dict | None = None, fields: list[str] | None = None, limit: int = 20
 		) -> list[dict]:
@@ -539,8 +638,12 @@ class RavenAgentManager:
 								vector_store_ids = vs_ids
 
 				except Exception as e:
-					#//// Neoffice - TO REVIEW - SILENT FAILURE: assistant retrieval error swallowed (87fa1010c).
-					pass
+					#//// Neoffice - logging restored (2026-09-04, swallowed by 87fa1010c): without the vector
+					#//// store ids the bot answers as if it had no documents at all.
+					frappe.log_error(
+						"Raven AI: OpenAI assistant could not be read",
+						f"Bot: {self.bot_doc.name}\n{frappe.get_traceback()}",
+					)
 
 			# If still no vector store, log and return None
 			if not vector_store_ids:
@@ -555,9 +658,15 @@ class RavenAgentManager:
 			return file_search_tool
 
 		except ImportError:
+			# The installed agents SDK has no FileSearchTool: an expected condition, not an error.
 			return None
-		#//// Neoffice - TO REVIEW - SILENT FAILURE: FileSearchTool creation error swallowed (87fa1010c).
+		#//// Neoffice - logging restored (2026-09-04, swallowed by 87fa1010c). Unlike the ImportError
+		#//// just above, reaching this branch means the vector store lookup itself broke.
 		except Exception as e:
+			frappe.log_error(
+				"Raven AI: file search tool creation failed",
+				f"Bot: {self.bot_doc.name}\n{frappe.get_traceback()}",
+			)
 			return None
 
 	def _get_bot_function(self, doctype: str):
@@ -685,7 +794,9 @@ async def handle_ai_request_async(
 	"""Handle AI request asynchronously"""
 	try:
 
-		manager = RavenAgentManager(bot, file_handler=file_handler)
+		#//// Neoffice - channel_id passed through (2026-09-04) so a Custom Function that declares a
+		#//// channel_id parameter knows which conversation it is answering. See RavenAgentManager.
+		manager = RavenAgentManager(bot, file_handler=file_handler, channel_id=channel_id)
 
 		# No need to test API connection anymore - the SDK will handle errors
 		agent = manager.create_agent()
@@ -994,19 +1105,37 @@ async def handle_ai_request_async(
 						# No response or no choices
 						raw_response = None
 
-					#//// Neoffice - TO REVIEW: manufactures a fake Result object so the caller always has something to
-					#//// read (87fa1010c, 2025-08-04). The user sees "Failed to get response from API" in the chat
-					#//// instead of an Error Log entry.
-					# If we still don't have a result, create one with error message
+					#//// Neoffice - fixed 2026-09-04. 87fa1010c (2025-08-04) manufactured a fake Result object
+					#//// whose final_output was the sentence "Failed to get response from API", so the failure
+					#//// was delivered to the user as if the assistant had written it, and nothing reached
+					#//// Error Log. It is now logged and returned as an explicit failure; raven/ai/ai.py turns
+					#//// success=False into the user-facing error message.
 					if "result" not in locals():
-						result = type("Result", (), {"final_output": "Failed to get response from API"})()
+						frappe.log_error(
+							"Raven AI: no usable response from the provider",
+							f"Bot: {bot.name}\nModel: {bot.model}\nProvider: {bot.model_provider}",
+						)
+						return {
+							"response": _("Sorry, I could not get a response from the AI provider."),
+							"success": False,
+							"error": "No response from API",
+						}
 
-				#//// Neoffice - TO REVIEW - SILENT FAILURE: the API fallback error is turned into a chat message
-				#//// and the exception is no longer re-raised (87fa1010c, 2025-08-04).
+				#//// Neoffice - fixed 2026-09-04. 87fa1010c (2025-08-04) turned this exception into a fake
+				#//// Result whose final_output was "Error: <exception>", i.e. the traceback text was posted
+				#//// in the chat as the assistant's answer and never logged. Logged and returned as a
+				#//// failure now; the detail still reaches the user when bot.debug_mode is on, through
+				#//// raven/ai/ai.py.
 				except Exception as api_e:
-					# Create error result instead of raising
-					result = type("Result", (), {"final_output": f"Error: {str(api_e)}"})()
-					# Don't raise, continue with error result
+					frappe.log_error(
+						"Raven AI: direct API fallback failed",
+						f"Bot: {bot.name}\nModel: {bot.model}\n{frappe.get_traceback()}",
+					)
+					return {
+						"response": _("Sorry, I could not get a response from the AI provider."),
+						"success": False,
+						"error": str(api_e),
+					}
 			else:
 				raise
 
@@ -1035,9 +1164,14 @@ async def handle_ai_request_async(
 			"provider": bot.model_provider if hasattr(bot, "model_provider") else "OpenAI",
 		}
 
-	#//// Neoffice - TO REVIEW - SILENT FAILURE: the top-level "AI Agent Error" log with its traceback
-	#//// is gone (87fa1010c, 2025-08-04). This is the last place an agent failure could be seen.
+	#//// Neoffice - the top-level "AI Agent Error" log restored (2026-09-04); 87fa1010c (2025-08-04)
+	#//// had dropped it, and this is the last place an agent failure can be seen at all. The returned
+	#//// dict is unchanged, so the user still gets the message raven/ai/ai.py builds from it.
 	except Exception as e:
+		frappe.log_error(
+			"Raven AI: agent request failed",
+			f"Bot: {bot.name}\nChannel: {channel_id}\n{frappe.get_traceback()}",
+		)
 		return {
 			"response": "I encountered an error while processing your request.",
 			"success": False,
