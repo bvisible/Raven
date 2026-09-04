@@ -1,6 +1,11 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
  "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- //// Neoffice - this file is UNCHANGED from upstream. The marker is here only because vite copies
+     //// it verbatim into raven/public/raven/, a build output this fork COMMITS (commit-the-build,
+     //// e47b794fe, 2026-05-07; upstream gitignores that tree), which makes the copy show up as
+     //// Neoffice divergence. Keep the comment: it is what carries the explanation into the copy at
+     //// every rebuild. See NEOFFICE_FORK_MARKERS.md. -->
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
  width="500.000000pt" height="500.000000pt" viewBox="0 0 500.000000 500.000000"
  preserveAspectRatio="xMidYMid meet">
