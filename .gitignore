@@ -5,6 +5,11 @@
 tags
 node_modules
 
+#//// Neoffice - .idea/ dropped from the repository (2026-09-04). The folder had been committed
+#//// by mistake (d70a6fb2e, 2024-02-23) and .idea/misc.xml advertised a real production host and
+#//// login (root@demo.neoffice.me:22). It is per-developer editor state; upstream ships none.
+.idea/
+
 dist/
 mobile/dev-dist
 #//// Neoffice - commit-the-build (e47b794fe, 2026-05-07 "build(frontend): commit built frontend so instances pull, no rebuild on prod").

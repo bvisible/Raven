@@ -84,7 +84,6 @@ is marked in `raven/public/js/raven_chat/**` and `raven/public/scss/raven.bundle
 | `frontend/package.json` | Adds `@neoffice/frappe-sidebar-react` (the NeoCockpit chrome), pinned to a commit SHA and re-pinned on every cockpit release. |
 | `package.json` (root) | `build` gated on the presence of `raven/public/raven/assets` (commit-the-build; `FORCE_REBUILD=1` forces it), `build:force` added, and `resolutions.react-native-css-interop = 0.1.22` because 0.1.23+ requires `react-native-worklets`, incompatible with the RN 0.76 of `apps/mobile`. |
 | `app.json` (root) | Empty Expo stub (`{"expo": {}}`), so the Expo CLI walking up from `apps/mobile` finds a workspace root. **TO REVIEW: origin unknown** — it rides along in `0b0db7095`, whose subject is about `react-native-worklets`. |
-| `.idea/Raven.iml` | JetBrains module descriptor, committed by mistake (`d70a6fb2e`, 2024-02-23). **TO REVIEW:** the whole `.idea/` folder is developer machine state; candidate for deletion. |
 | `ios/raven.xcodeproj/project.xcworkspace/contents.xcworkspacedata` | Xcode workspace stub committed with the iOS rebrand. **TO REVIEW: origin unknown** — no commit message mentions it. |
 | `ios/raven.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist` | Xcode workspace check stub, same commit. **TO REVIEW: origin unknown.** |
 
@@ -115,6 +114,7 @@ All of them are the Neoffice/Synk artwork replacing upstream's Raven artwork
 |---|---|
 | `raven/ai/sdk_tools.py` (**deleted**, 764 lines) | Replaced by `raven/ai/function_executor.py` + `raven/ai/lmstudio/` (`7cdc45189`, 2025-08-22): the SDK tool wrappers only worked with native function calling, which local models do not have. |
 | `raven/www/__pycache__/__init__.py` (**deleted**) | A `.pyc` build artefact that had been committed. |
+| `.idea/` (**deleted**, 5 files) | JetBrains project settings, committed by mistake (`d70a6fb2e`, 2024-02-23). Per-developer editor state, and `.idea/misc.xml` advertised a real production host and login (`root@demo.neoffice.me:22`). Removed on 2026-09-04; `.idea/` is in `.gitignore` now. |
 | `raven/raven/doctype/raven_ai_pending_action/__init__.py` (**renamed**, R100) | Empty package marker for the new doctype (`7cdc45189`). |
 
 ### Known defects found while marking (not fixed — this pass adds comments only)
