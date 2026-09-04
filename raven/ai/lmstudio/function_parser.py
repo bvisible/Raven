@@ -1,3 +1,5 @@
+#//// Neoffice - added file (no upstream equivalent). Parser for the several shapes a local
+#//// model emits a tool call in - <tool_call> tags, bare JSON, fenced blocks (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 """
 Enhanced function call parser for LM Studio responses
 Handles multiple formats and variations

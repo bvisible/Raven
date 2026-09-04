@@ -26,6 +26,8 @@
     bottom: 0;
     border-top-right-radius: var(--border-radius-md);
     border-top-left-radius: var(--border-radius-md);
+    /* //// Neoffice - the floating widget sits at the right edge, not 60px from the left (833ccefb4,
+       //// 2024-10-07): the left of a Neoffice desk is taken by the workspace rail. */
     right: 15px;
 }
 

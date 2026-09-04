@@ -504,6 +504,11 @@ class RavenBot(Document):
 		)
 		# Bots can probably send messages without permissions? Upto the end user to create bots.
 		# Besides sending messages is not a security concern, unauthorized reading of messages is.
+		#//// Neoffice - TO REVIEW: link validation is disabled whenever link_document is set
+		#//// (fd5440747, 2026-02-17). The reason given is that NORA's code executor creates the linked
+		#//// document on another database connection, so it is not visible yet from this one. That turns
+		#//// off the check precisely when it would matter - a typo'd link is stored silently. The right
+		#//// fix is to commit (or share the connection) before sending the message.
 		# Use ignore_links=True when link_document is set because the document may have been
 		# created in a different database connection (e.g., by Nora's code executor) and
 		# may not be immediately visible due to connection isolation

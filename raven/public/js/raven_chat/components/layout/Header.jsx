@@ -1,6 +1,8 @@
 import * as React from "react";
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import useGetChannel from "../../hooks/useGetChannel";
 import useGetUser from "../../hooks/useGetUser";
+//// Neoffice - import order only, no behaviour change.
 import Avatar from "../common/Avatar";
 import ChannelIcon from "../common/ChannelIcon";
 /**
@@ -32,6 +34,7 @@ const Header = ({
                 alignItems: 'center',
                 gap: '0.2rem',
             }}>
+            {/* //// Neoffice - rebrand (49ee6e172, 2025-04-05 "change name to synk" / f5dd1d497, 2025-06-27 "change logo and name"): the desk widget wordmark. */}
 
                 <span role='button' className="raven-logo cal-sans" onClick={toggle}>synk</span>
 
@@ -43,6 +46,7 @@ const Header = ({
                     justifyContent: 'center',
                     // height: "24px",
                     // marginTop: '0.2rem',
+                //// Neoffice - rebrand (49ee6e172, 2025-04-05 "change name to synk" / f5dd1d497, 2025-06-27 "change logo and name"): tooltip. TO REVIEW: lower-case "synk".
                 }} title='Open synk'>
                     <svg
                         width="18"

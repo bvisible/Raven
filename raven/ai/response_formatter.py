@@ -1,5 +1,6 @@
 import re
 
+#//// Neoffice - frappe import, for the Raven Settings read below (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 import frappe
 
 """
@@ -7,17 +8,22 @@ Response formatter for AI messages to handle special formatting like <think> tag
 """
 
 
+#//// Neoffice - the annotation is dropped because LM Studio hands back a PredictionResult, not a
+#//// string (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 def format_ai_response(response_text) -> str:
 	"""
 	Format AI response to handle special tags and formatting
 
 	Args:
+	    #//// Neoffice - docstring follows the signature above (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 	    response_text: Raw response from the AI (str or PredictionResult)
 
 	Returns:
 	    Formatted HTML response
 	"""
 
+	#//// Neoffice - unwrap the LM Studio PredictionResult and strip the channel markers some local
+	#//// models leak into their answer (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 	# Extract content from PredictionResult if needed
 	if hasattr(response_text, "content"):
 		response_text = response_text.content
@@ -60,17 +66,26 @@ def format_ai_response(response_text) -> str:
 	# Build formatted response
 	formatted_parts = []
 
+	#//// Neoffice - the model's reasoning is hidden unless Raven Settings.enable_ai_debug_mode is on
+	#//// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"). Upstream always renders the <think> block; local models think out
+	#//// loud at length and the user saw pages of it before the answer.
 	# Check debug mode setting
 	show_thinking = frappe.db.get_value("Raven Settings", None, "enable_ai_debug_mode") or False
 
 	if think_matches and show_thinking:
 		# Debug mode ON - show thinking in collapsible section
+		#//// Neoffice - replaced by the debug-gated block above (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 		thinking_content = "\n\n".join(think_matches).strip()
 
+		#//// Neoffice - replaced by the debug-gated block above (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 		details_section = (
 			f'<details data-summary="Nora\'s Thinking Process">\n' f"{thinking_content}\n" f"</details>"
 		)
 
+		#//// Neoffice - the answer is converted to HTML here rather than by the caller, so a <details>
+		#//// block and its markdown body can coexist (7cdc45189, 2025-08-22 "Feat add SDK LM Studio" and 092d027d8, 2025-08-07).
+		#//// TO REVIEW: the fallback message "Comment puis-je vous aider ?" is a hardcoded French string
+		#//// in code - it should go through frappe._().
 		if main_response:
 			main_response_html = frappe.utils.md_to_html(main_response)
 			return f"{details_section}{main_response_html}"

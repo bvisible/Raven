@@ -1,3 +1,6 @@
+#//// Neoffice - added file (no upstream equivalent). LM Studio integration package
+#//// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): upstream supports OpenAI only, and the Agents SDK cannot drive a
+#//// model without native function calling.
 """
 LM Studio SDK Integration for Raven AI
 """

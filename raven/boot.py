@@ -32,6 +32,8 @@ def boot_session(bootinfo):
 		else "Frappe Cloud"
 	)
 
+	#//// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"): the VAPID key and Firebase config must
+	#//// reach the browser for our own Firebase project too, not only for Raven Cloud.
 	if raven_settings.push_notification_service in ["Raven", "Firebase"]:
 		bootinfo.vapid_public_key = raven_settings.vapid_public_key
 		bootinfo.firebase_client_config = raven_settings.config

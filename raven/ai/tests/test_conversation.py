@@ -1,3 +1,5 @@
+#//// Neoffice - added file (no upstream equivalent). Covers conversation-history building
+#//// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 """
 Conversation history tests
 """

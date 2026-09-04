@@ -46,6 +46,7 @@ def stream_response(ai_thread_id: str, bot, channel_id: str):
 					if tool.type == "file_search":
 						self.publish_event("Searching file contents...")
 			else:
+				#//// Neoffice - the assistant is Nora, not "Raven AI" (e726802e5, 2025-07-31 "Change name bot").
 				self.publish_event("Nora is thinking...")
 
 		@override
@@ -348,6 +349,7 @@ def stream_response(ai_thread_id: str, bot, channel_id: str):
 				tool_outputs=tool_outputs,
 				event_handler=EventHandler(),
 			) as stream:
+				#//// Neoffice - the assistant is Nora, not "Raven AI" (e726802e5, 2025-07-31), second call site.
 				self.publish_event("Nora is thinking...")
 				for text in stream.text_deltas:
 					print(text, end="", flush=True)
@@ -393,6 +395,7 @@ def get_instructions(bot):
 
 
 def get_variables_for_instructions():
+	#//// Neoffice - date/time helpers for the prompt variables added below (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 	from frappe.utils import now_datetime, nowdate
 
 	user = frappe.get_cached_doc("User", frappe.session.user)
@@ -401,6 +404,7 @@ def get_variables_for_instructions():
 	company = None
 	employee_id = None
 	department = None
+	#//// Neoffice - extra prompt variables (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 	currency = None
 
 	if "erpnext" in frappe.get_installed_apps():
@@ -415,6 +419,10 @@ def get_variables_for_instructions():
 			"Global Defaults", "default_company"
 		)
 
+		#//// Neoffice - extra prompt variables (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"). A local model has none of the
+		#//// implicit context an OpenAI assistant carries, so the company currency, the time zone, the
+		#//// date and the current channel/thread are spelled out in the system prompt. The documented
+		#//// list in frontend/src/components/feature/settings/ai/InstructionField.tsx mirrors this.
 		# Get currency from company
 		if company:
 			currency = frappe.db.get_value("Company", company, "default_currency")
@@ -427,16 +435,26 @@ def get_variables_for_instructions():
 	thread_id = frappe.flags.get("raven_thread_id")
 
 	return {
+		#//// Neoffice - "user" alias next to "user_id" (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): prompts written by hand
+		#//// use both spellings.
 		"user": frappe.session.user,  # Same as user_id but some prompts might use "user"
 		"user_id": frappe.session.user,
 		"first_name": user.first_name,
+		#//// Neoffice - full_name can be empty on a freshly created User; fall back rather than injecting
+		#//// an empty name into the prompt (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 		"full_name": user.full_name or user.first_name or frappe.session.user,
+		#//// Neoffice - moved up next to the "user" alias (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"). Same value.
 		"email": user.email,
 		"company": company,
+		#//// Neoffice - currency variable (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"), defaulted so the prompt never renders
+		#//// an empty placeholder.
 		"currency": currency or "USD",
 		"employee_id": employee_id,
 		"department": department,
 		"employee_company": employee_company,
+		#//// Neoffice - both cases of the language are provided (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): upstream only
+		#//// gives the uppercase "lang", while our context injection and NORA read lowercase "language".
+		#//// Time zone, date, time and channel/thread ids follow, for the same reason as L418.
 		"language": user.language or "en",  # Lowercase for compatibility with get_current_context
 		"lang": user.language.upper()
 		if user.language

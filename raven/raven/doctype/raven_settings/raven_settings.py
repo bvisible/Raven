@@ -44,6 +44,8 @@ class RavenSettings(Document):
 		push_notification_api_key: DF.Data | None
 		push_notification_api_secret: DF.Password | None
 		push_notification_server_url: DF.Data | None
+		#//// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"): mirrors the Select option added to
+		#//// raven_settings.json. This block is Frappe's generated type stub, so it must follow the JSON.
 		push_notification_service: DF.Literal["Frappe Cloud", "Firebase", "Raven"]
 		show_if_a_user_is_on_leave: DF.Check
 		show_raven_on_desk: DF.Check
@@ -68,6 +70,8 @@ class RavenSettings(Document):
 				frappe.throw(_("Please enter the Push Notification API Key"))
 			if not self.push_notification_api_secret:
 				frappe.throw(_("Please enter the Push Notification API Secret"))
+				#//// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"): a Firebase setup is unusable without the
+				#//// client config and the VAPID key, so refuse to save half of it.
 
 		if self.push_notification_service == "Firebase":
 			if not self.config:

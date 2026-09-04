@@ -1,3 +1,5 @@
+#//// Neoffice - added file (no upstream equivalent). LM Studio handler with SDK/HTTP
+#//// auto-detection and text-based function calling (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 """
 Enhanced LM Studio SDK Handler with robust function calling
 Handles multiple formats and provides fallback mechanisms

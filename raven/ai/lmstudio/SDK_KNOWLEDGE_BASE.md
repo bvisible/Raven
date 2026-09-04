@@ -1,3 +1,5 @@
+<!-- //// Neoffice - added file (no upstream equivalent). Notes on the LM Studio SDK/HTTP hybrid
+     //// handler (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"). TO REVIEW: written in French; docs in this repo should be English. -->
 # Base de Connaissances LM Studio + Raven
 
 ## 🚀 Architecture Hybride SDK/HTTP - NOUVELLE IMPLEMENTATION

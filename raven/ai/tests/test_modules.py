@@ -1,3 +1,5 @@
+#//// Neoffice - added file (no upstream equivalent). Import/structure guard for raven/ai
+#//// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 """
 Module import and structure tests
 """

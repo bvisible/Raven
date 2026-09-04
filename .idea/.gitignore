@@ -1,3 +1,6 @@
+#//// Neoffice - added file (no upstream equivalent). JetBrains project settings committed by
+#//// mistake (d70a6fb2e, 2024-02-23 "update"). TO REVIEW: the whole .idea/ folder is developer
+#//// machine state and does not belong in the repository - candidate for deletion.
 # Default ignored files
 /shelf/
 /workspace.xml

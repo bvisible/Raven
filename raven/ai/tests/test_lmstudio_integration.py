@@ -1,3 +1,5 @@
+#//// Neoffice - added file (no upstream equivalent). LM Studio end-to-end test (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
+#//// TO REVIEW: docstrings and comments are in French.
 #!/usr/bin/env python3
 """
 Test d'intégration complet avec LM Studio

@@ -1,3 +1,6 @@
+#//// Neoffice - added file (no upstream equivalent). Runs a Raven AI Function from a name +
+#//// arguments dict (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"), used by the text-based tool-calling path: with no
+#//// native function calling there is no SDK to dispatch the call for us.
 """Function executor for Raven AI functions"""
 
 import inspect

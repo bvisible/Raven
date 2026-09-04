@@ -1,6 +1,7 @@
 from . import __version__ as app_version
 
 app_name = "raven"
+#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): the app is published as Synk.
 app_title = "Synk"
 app_publisher = "The Commit Company (Algocode Technologies Pvt. Ltd.)"
 app_description = "Messaging Application"
@@ -33,6 +34,8 @@ app_include_js = "raven.bundle.js"
 add_to_apps_screen = [
 	{
 		"name": "raven",
+		#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk" + 49ee6e172, 2025-04-05 "change name to synk" / f5dd1d497, 2025-06-27 "change logo and name"): apps-screen tile logo and title.
+		#//// TO REVIEW: lower-case "synk" here while app_title above is "Synk".
 		"logo": "/assets/raven/icon-intern-chat.jpg",
 		"title": "synk",
 		"route": "/raven",

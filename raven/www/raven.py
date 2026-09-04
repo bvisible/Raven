@@ -1,3 +1,5 @@
+#//// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): module docstring for the
+#//// rewritten controller.
 """Controller Jinja for the /raven website page (and all its sub-routes).
 
 Populates the context with:
@@ -18,6 +20,7 @@ import frappe.sessions
 from frappe import _
 from frappe.utils.telemetry import capture
 
+#//// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): the curated mini-boot.
 from raven.api.boot import get_navbar_boot
 
 no_cache = 1
@@ -26,6 +29,9 @@ SCRIPT_TAG_PATTERN = re.compile(r"\<script[^<]*\</script\>")
 CLOSING_SCRIPT_TAG_PATTERN = re.compile(r"</script\>")
 
 
+#//// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): resolves desk.bundle.css and
+#//// neoffice-theme.css to their hashed URLs, so the embedded chrome is styled without loading
+#//// desk.bundle.js (whose boot sequence fights the SPA's).
 def _get_asset_url(asset_path: str) -> str:
 	"""Resolve `<bundle>.bundle.css|js` to its hashed URL via Frappe's assets map.
 
@@ -54,6 +60,10 @@ def get_context(context):
 		boot = frappe.website.utils.get_boot_data()
 	else:
 		try:
+			#//// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): frappe.sessions.get() ships the whole
+			#//// desk bootinfo - large, and full of keys the SPA never reads. get_navbar_boot() returns the
+			#//// ~28 keys the embedded sidebar/navbar actually need, guarantees the defensive ones exist and
+			#//// bakes the UI translations into __messages (without them the chrome renders in English).
 			# Curated mini-boot designed for FrappeNavbar/FrappeSidebar rather
 			# than the full frappe.sessions.get() payload. Keeps surface small
 			# and stable, guarantees defensive keys (is_fc_site, developer_mode)
@@ -62,6 +72,8 @@ def get_context(context):
 			boot = get_navbar_boot()
 		except Exception as e:
 			raise frappe.SessionBootFailed from e
+			#//// Neoffice - push_relay_server_url and server_script_enabled now come from get_navbar_boot()
+			#//// (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"), so the copies here are gone.
 
 	boot_json = frappe.as_json(boot, indent=None, separators=(",", ":"))
 	boot_json = SCRIPT_TAG_PATTERN.sub("", boot_json)
@@ -69,6 +81,8 @@ def get_context(context):
 	boot_json = json.dumps(boot_json)
 
 	context.update(
+		#//// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): the two CSS URLs are added to the
+		#//// template context here.
 		{
 			"build_version": frappe.utils.get_build_version(),
 			"boot": boot_json,
@@ -87,8 +101,10 @@ def get_context(context):
 	app_name = frappe.get_website_settings("app_name") or frappe.get_system_settings("app_name")
 
 	if app_name and app_name != "Frappe":
+		#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): page title.
 		context["app_name"] = app_name + " | " + "Synk"
 	else:
+		#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): page title fallback.
 		context["app_name"] = "Synk"
 
 	favicon = frappe.get_website_settings("favicon")
@@ -126,10 +142,13 @@ def get_context_for_dev():
 
 def get_boot():
 	try:
+		#//// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): the dev-server context must return the
+		#//// same mini-boot as production, or the chrome behaves differently in dev.
 		# Curated mini-boot — same payload as get_context() so dev parity is kept.
 		boot = get_navbar_boot()
 	except Exception as e:
 		raise frappe.SessionBootFailed from e
+		#//// Neoffice - same removal as L65, dev path (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven").
 
 	boot_json = frappe.as_json(boot, indent=None, separators=(",", ":"))
 	boot_json = SCRIPT_TAG_PATTERN.sub("", boot_json)

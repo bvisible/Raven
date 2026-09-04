@@ -1,3 +1,5 @@
+<!-- //// Neoffice - added file (no upstream equivalent). Design notes for our AI module
+     //// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): LM Studio integration, local function calling, pending actions. -->
 # Raven AI System Documentation
 
 ## 📚 Table of Contents

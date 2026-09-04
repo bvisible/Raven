@@ -25,6 +25,7 @@ class RavenPushToken(Document):
 
 	def after_insert(self):
 		"""
+		#//// Neoffice - docstring updated for the Firebase branch below (c8d3e64c6, 2026-01-05 "fix: Only sync tokens to Raven Cloud when push service is explicitly Raven").
 		If the push service is Frappe Cloud and is enabled, then send the token to the Frappe Cloud API.
 		If the push service is Raven, then send the token to Raven Cloud.
 		If the push service is Firebase, no additional sync is needed (tokens are stored locally).
@@ -42,12 +43,17 @@ class RavenPushToken(Document):
 				pass
 			except Exception:
 				frappe.log_error("Failed to subscribe to Frappe Cloud push notifications")
+		#//// Neoffice - c8d3e64c6, 2026-01-05 "fix: Only sync tokens to Raven Cloud when push service is explicitly Raven". Upstream's `else` sends every non-Frappe-Cloud token to Raven
+		#//// Cloud, so a Firebase instance pushed its tokens to a third party it does not use. Only the
+		#//// explicit "Raven" value syncs now. TO REVIEW: any future upstream push service will silently
+		#//// fall through this elif and never be registered anywhere.
 		elif push_service == "Raven":
 			add_token_to_raven_cloud(self.user, self.fcm_token)
 		# For Firebase, tokens are stored locally only - no cloud sync needed
 
 	def on_trash(self):
 		"""
+		#//// Neoffice - docstring updated for the Firebase branch below (c8d3e64c6, 2026-01-05 "fix: Only sync tokens to Raven Cloud when push service is explicitly Raven").
 		If the push service is Frappe Cloud and is enabled, then delete the token from the Frappe Cloud API.
 		If the push service is Raven, then delete the token from Raven Cloud.
 		If the push service is Firebase, no additional sync is needed (tokens are stored locally).
@@ -65,6 +71,7 @@ class RavenPushToken(Document):
 				pass
 			except Exception:
 				frappe.log_error("Failed to unsubscribe from Frappe Cloud push notifications")
+		#//// Neoffice - c8d3e64c6, 2026-01-05 "fix: Only sync tokens to Raven Cloud when push service is explicitly Raven", unsubscribe side. Same caveat as L45.
 		elif push_service == "Raven":
 			delete_token_from_raven_cloud(self.user, self.fcm_token)
 		# For Firebase, tokens are stored locally only - no cloud sync needed

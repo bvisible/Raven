@@ -1,3 +1,7 @@
+<!-- //// Neoffice - added file (no upstream equivalent). Working notes for this fork
+     //// (bc9617b4e + 7d62dc723, 2026-05-07/2026-05-11): the commit-the-build pipeline and the Frappe
+     //// Shell Native integration, both of which are ours. TO REVIEW: parts of it are written in
+     //// French; code and docs in this repo are supposed to be English. -->
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.

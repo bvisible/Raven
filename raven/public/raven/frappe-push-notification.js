@@ -1,3 +1,6 @@
+//// Neoffice - this file is copied verbatim by vite into raven/public/raven/, which is committed
+//// (commit-the-build, e47b794fe, 2026-05-07; upstream gitignores that tree). EDIT
+//// frontend/public/frappe-push-notification.js, never the copy - the next build reverts it.
 import { initializeApp } from "firebase/app"
 import {
     getMessaging,

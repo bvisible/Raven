@@ -40,6 +40,11 @@ from .functions import (
 )
 
 
+#//// Neoffice - local-LLM tool calling (6c5dfb539 + bbe50bc26, 2025-07-31/2025-08-05 "Fix: OpenAI Agents SDK Compatibility with Local LLMs").
+#//// The OpenAI Agents SDK assumes native function calling. Models served by LM Studio / Ollama
+#//// often do not have it, so this handler asks the model to emit <tool_call>{...}</tool_call> in
+#//// plain text, parses it, runs the function and feeds the result back. Upstream has no such
+#//// path: with a local model it simply produced an answer that mentioned a tool and did nothing.
 async def _handle_local_llm_request(manager, agent, full_input, bot):
 	"""
 	Custom handler for Local LLMs that don't support native function calling.
@@ -314,6 +319,11 @@ class RavenAgentManager:
 				return False
 			return True
 		except Exception as e:
+			#//// Neoffice - TO REVIEW - SILENT FAILURE: upstream logs the failed API connection test to
+			#//// Error Log; this swallows it (87fa1010c, 2025-08-04 "Fix AI Function Loading and Response
+			#//// Formatting"). A wrong local_llm_api_url now looks like a bot that simply does not answer,
+			#//// with nothing in the log. The same substitution was made five more times in this file
+			#//// (L331, L352, L368, L521, L537) and once in the outer handler (L996). Restore the logging.
 			pass
 			return False
 
@@ -328,6 +338,15 @@ class RavenAgentManager:
 			if raven_tools:
 				self.tools.extend(raven_tools)
 		except Exception as e:
+			#//// Neoffice - TO REVIEW - SILENT FAILURE, AND IT IS ALREADY FIRING: upstream logs the failure
+			#//// here; this swallows it (87fa1010c, 2025-08-04). Worse, the `from raven.ai.sdk_tools import
+			#//// create_raven_tools` a few lines above imports a module that 7cdc45189 (2025-08-22 "Feat add
+			#//// SDK LM Studio") DELETED - raven/ai/sdk_tools.py no longer exists. The ImportError lands in
+			#//// this `except ... pass`, so self.tools stays empty and the agent runs with NO Raven AI Function
+			#//// at all, and nothing in Error Log says so. Only the CRUD tools appended just below still reach
+			#//// it - those are ours too, upstream does not expose create/read/update on ERP doctypes to the
+			#//// agent. Fix the import (function_executor / raven.ai.lmstudio replaced sdk_tools) and restore
+			#//// the logging.
 			pass
 
 		# Add CRUD tools
@@ -349,6 +368,7 @@ class RavenAgentManager:
 				if file_search_tool:
 					self.tools.append(file_search_tool)
 			except Exception as e:
+				#//// Neoffice - TO REVIEW - SILENT FAILURE: file-search tool creation error swallowed (87fa1010c).
 				pass
 
 		# Add Code Interpreter tool if enabled (only for OpenAI, not supported with Local LLM)
@@ -365,6 +385,7 @@ class RavenAgentManager:
 
 				self.tools.append(code_interpreter_tool)
 			except Exception as e:
+				#//// Neoffice - TO REVIEW - SILENT FAILURE: code-interpreter setup error swallowed (87fa1010c).
 				pass
 
 		# Only add conversation file tool for OpenAI, not Local LLM (content is pre-extracted for Local LLM)
@@ -518,6 +539,7 @@ class RavenAgentManager:
 								vector_store_ids = vs_ids
 
 				except Exception as e:
+					#//// Neoffice - TO REVIEW - SILENT FAILURE: assistant retrieval error swallowed (87fa1010c).
 					pass
 
 			# If still no vector store, log and return None
@@ -534,6 +556,7 @@ class RavenAgentManager:
 
 		except ImportError:
 			return None
+		#//// Neoffice - TO REVIEW - SILENT FAILURE: FileSearchTool creation error swallowed (87fa1010c).
 		except Exception as e:
 			return None
 
@@ -777,10 +800,15 @@ async def handle_ai_request_async(
 						"messages": messages,
 						"temperature": agent.model_settings.temperature,
 						"top_p": agent.model_settings.top_p,
+						#//// Neoffice - max_tokens 800 -> 4096 (6c5dfb539 + bbe50bc26, 2025-07-31/2025-08-05 "Fix: OpenAI Agents SDK Compatibility with Local LLMs"): 800 truncated a local model
+						#//// mid-<tool_call>, so the JSON never parsed and the tool never ran.
 						"max_tokens": 4096,  # Sufficient for reasoning and tool calls
 					}
 
 					# Add tools if available
+					#//// Neoffice - local models are called WITHOUT the OpenAI tools parameter (6c5dfb539 + bbe50bc26, 2025-07-31/2025-08-05 "Fix: OpenAI Agents SDK Compatibility with Local LLMs"):
+					#//// most of them reject the schema outright. The tools are described in the prompt instead and
+					#//// parsed back out of the text (see _handle_local_llm_request above).
 					# For Local LLM, we might not want to include tools in the API params
 					# as they might not support the OpenAI tool format
 					if tools_param and bot.model_provider != "Local LLM":
@@ -791,6 +819,9 @@ async def handle_ai_request_async(
 
 					if response and response.choices:
 						choice = response.choices[0]
+						#//// Neoffice - local-LLM response shapes (6c5dfb539 + bbe50bc26, 2025-07-31/2025-08-05 "Fix: OpenAI Agents SDK Compatibility with Local LLMs"): llama.cpp-style servers put
+						#//// the answer in choice.text, LM Studio in choice.message.content, and some return an empty
+						#//// string rather than null. Upstream reads choice.message.content only and crashed on the rest.
 						# Handle different response formats for Local LLMs
 						if hasattr(choice, "message") and choice.message and hasattr(choice.message, "content"):
 							raw_response = choice.message.content
@@ -808,6 +839,7 @@ async def handle_ai_request_async(
 							raw_response = None
 
 						# Check if the response contains tool calls
+						#//// Neoffice - defensive attribute walk for the same reason as above (6c5dfb539 + bbe50bc26, 2025-07-31/2025-08-05 "Fix: OpenAI Agents SDK Compatibility with Local LLMs").
 						if (
 							hasattr(choice, "message")
 							and choice.message
@@ -957,13 +989,20 @@ async def handle_ai_request_async(
 
 						result = type("Result", (), {"final_output": formatted_response})()
 					else:
+						#//// Neoffice - TO REVIEW: upstream raises "No response from API"; here the absence of a response
+						#//// becomes raw_response = None and the flow continues (87fa1010c, 2025-08-04).
 						# No response or no choices
 						raw_response = None
 
+					#//// Neoffice - TO REVIEW: manufactures a fake Result object so the caller always has something to
+					#//// read (87fa1010c, 2025-08-04). The user sees "Failed to get response from API" in the chat
+					#//// instead of an Error Log entry.
 					# If we still don't have a result, create one with error message
 					if "result" not in locals():
 						result = type("Result", (), {"final_output": "Failed to get response from API"})()
 
+				#//// Neoffice - TO REVIEW - SILENT FAILURE: the API fallback error is turned into a chat message
+				#//// and the exception is no longer re-raised (87fa1010c, 2025-08-04).
 				except Exception as api_e:
 					# Create error result instead of raising
 					result = type("Result", (), {"final_output": f"Error: {str(api_e)}"})()
@@ -980,6 +1019,9 @@ async def handle_ai_request_async(
 		if "<think>" in final_response or "\\boxed{" in final_response:
 			final_response = format_ai_response(final_response)
 
+		#//// Neoffice - dead branch kept as a marker (6c5dfb539 + bbe50bc26, 2025-07-31/2025-08-05 "Fix: OpenAI Agents SDK Compatibility with Local LLMs"): a local model can still
+		#//// emit an unexecuted <tool_call> here. TO REVIEW: the body is `pass` - it detects the case and
+		#//// does nothing with it.
 		# IMPORTANT: Check if the response contains unexecuted tool calls
 		# This can happen if the SDK doesn't support native function calling
 		if "<tool_call>" in final_response and "</tool_call>" in final_response:
@@ -993,6 +1035,8 @@ async def handle_ai_request_async(
 			"provider": bot.model_provider if hasattr(bot, "model_provider") else "OpenAI",
 		}
 
+	#//// Neoffice - TO REVIEW - SILENT FAILURE: the top-level "AI Agent Error" log with its traceback
+	#//// is gone (87fa1010c, 2025-08-04). This is the last place an agent failure could be seen.
 	except Exception as e:
 		return {
 			"response": "I encountered an error while processing your request.",

@@ -1,3 +1,7 @@
+<!-- //// Neoffice - added file (no upstream equivalent). JetBrains project settings
+     //// (d70a6fb2e + 40f18e1c2, 2024-02). TO REVIEW - LEAK: the SshConsoleOptionsProvider block below
+     //// names a real production host and login (root@demo.neoffice.me:22). Nothing secret is stored,
+     //// but the repo should not advertise it. Candidate for deletion with the rest of .idea/. -->
 <project version="4">
   <component name="ProjectRootManager" version="2" languageLevel="JDK_20" default="true" project-jdk-name="openjdk-20" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />

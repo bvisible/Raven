@@ -9,6 +9,8 @@
 
 .raven-container[data-open-state="true"] {
     height: var(--raven-expanded-height);
+    /* //// Neoffice - bc54ba229, 2026-01-26 "fix: Move width from .raven-chat to .raven-container[data-open-state=true]". Upstream sets the width on .raven-chat, so the collapsed
+       //// widget also reserved the full panel width and blocked clicks on the page behind it. */
     width: var(--raven-content-width);
     overflow: hidden;
 

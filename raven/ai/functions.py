@@ -1,5 +1,6 @@
 import frappe
 from frappe import _, client
+#//// Neoffice - date helpers for the tool implementations (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 from frappe.utils import now_datetime, nowdate
 
 
@@ -196,6 +197,8 @@ def get_list(doctype: str, filters: dict = None, fields: list = None, limit: int
 		filters = {}
 
 	if fields is None:
+		#//// Neoffice - renamed local variable so it no longer shadows the `fields` parameter
+		#//// (05bccee36, 2025-08-07 "add get_report_result"). Behaviour unchanged.
 		filtered_fields = ["*"]
 	else:
 		meta = frappe.get_meta(doctype)
@@ -215,6 +218,9 @@ def get_value(doctype: str, filters: dict = None, fieldname: str | list = "name"
 	"""
 	Returns a value from a document
 
+	                #//// Neoffice - docstring re-indented by the formatter that ran with 7cdc45189, 2025-08-22 "Feat add SDK LM Studio".
+	                #//// No behaviour change. TO REVIEW: the fork's black/tab settings disagree with upstream's on
+	                #//// these continuation lines; the same noise appears at L241 and L246.
 	                :param doctype: DocType to be queried
 	                :param fieldname: Field to be returned (default `name`) - can be a list of fields(str) or a single field(str)
 	                :param filters: dict or string for identifying the record
@@ -238,11 +244,13 @@ def set_value(doctype: str, document_id: str, fieldname: str | dict, value: str 
 	"""
 	Set a value in a document
 
+	                #//// Neoffice - docstring re-indentation only, see L218. No behaviour change.
 	                :param doctype: DocType to be queried
 	                :param document_id: Document ID to be updated
 	                :param fieldname: Field to be updated - fieldname string or JSON / dict with key value pair
 	                :param value: value if fieldname is JSON
 
+	                #//// Neoffice - docstring re-indentation only, see L218. No behaviour change.
 	                Example:
 	                                client.set_value("Customer", "CUST-00001", {"customer_name": "John Doe", "customer_email": "john.doe@example.com"}) OR
 	                                client.set_value("Customer", "CUST-00001", "customer_name", "John Doe")

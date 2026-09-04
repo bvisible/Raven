@@ -17,16 +17,21 @@ def handle_bot_dm(message, bot):
 	"""
 	Function to handle direct messages to the bot.
 
+	#//// Neoffice - Nora as a model provider (6375b651f, 2026-01-04 "feat: Add Nora as model provider option").
 	Routes to:
 	- Nora handler for bots with model_provider="Nora"
 	- Agents SDK for bots with model_provider in ["OpenAI", "Local LLM"]
 	- Assistants API for legacy bots with openai_assistant_id
 	"""
 
+	#//// Neoffice - Nora as a model provider (6375b651f, 2026-01-04 "feat: Add Nora as model provider option"). Upstream knows OpenAI and
+	#//// "Local LLM"; a Neoffice bot can instead delegate the whole turn to NORA, which owns the
+	#//// prompt, the RAG and the ERP tools. Raven then only stores and renders the messages.
 	# Check if bot uses Nora integration
 	if bot.model_provider == "Nora":
 		return handle_bot_dm_with_nora(message, bot)
 	# Check if bot uses new Agents SDK
+	#//// Neoffice - if -> elif, because the Nora branch above now comes first (6375b651f, 2026-01-04 "feat: Add Nora as model provider option").
 	elif bot.model_provider in ["OpenAI", "Local LLM"] and not bot.openai_assistant_id:
 		return handle_bot_dm_with_agents(message, bot)
 	else:
@@ -34,6 +39,8 @@ def handle_bot_dm(message, bot):
 		return handle_bot_dm_with_assistants(message, bot)
 
 
+#//// Neoffice - Nora DM handler (6375b651f, 2026-01-04 "feat: Add Nora as model provider option"): hands the message to NORA and lets it
+#//// answer in the thread. No upstream equivalent.
 def handle_bot_dm_with_nora(message, bot):
 	"""
 	Handle direct messages using NORA AI engine.
@@ -116,6 +123,10 @@ def handle_bot_dm_with_agents(message, bot):
 		)
 		return
 
+	#//// Neoffice - fd5440747, 2026-02-17 "fix: prevent DuplicateEntryError when thread channel already exists". Upstream always inserts a new Raven Channel named after
+	#//// the message; when the same message is processed twice (a retry, a double realtime event) the
+	#//// insert raised DuplicateEntryError and the whole answer was lost. Reuse the existing channel
+	#//// and repair its AI-thread flags instead.
 	# Create thread channel for the conversation FIRST (or get existing one)
 	if frappe.db.exists("Raven Channel", message.name):
 		thread_channel = frappe.get_doc("Raven Channel", message.name)
@@ -145,6 +156,9 @@ def handle_bot_dm_with_agents(message, bot):
 	# Manual commit required: AI processing happens in background job that needs the message to exist in DB
 	frappe.db.commit()  # nosemgrep
 
+	#//// Neoffice - the thread-created event is published BEFORE the thinking message (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
+	#//// The client opens the thread on that event; publishing the thinking message first sent it to a
+	#//// screen nobody was looking at yet, so the user stared at an empty thread.
 	# Send event to open the thread FIRST
 	publish_ai_thread_created_event(message, message.channel_id)
 
@@ -152,17 +166,26 @@ def handle_bot_dm_with_agents(message, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
+			#//// Neoffice - the assistant is called Nora here, not "Raven AI" (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging"); and the
+			#//// event is addressed with the parent message id, which is what the client subscribes to for a
+			#//// brand-new DM thread.
 			"text": "Nora is thinking...",
 			"channel_id": message.name,  # For new DM threads, use the message ID
 			"bot": bot.name,
 		},
+		#//// Neoffice - the event is sent to the USER rather than broadcast on the Raven Channel document
+		#//// (5a7db4919, 2025-08-07 "fix: Add room parameter to publish_realtime to avoid broadcasting to all users"), and without after_commit so it arrives while the answer is still
+		#//// being computed - that is the whole point of a "thinking" indicator.
 		user=message.owner,
 		after_commit=False,
 	)
+	#//// Neoffice - moved above, before the thinking message (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 
 	# Process message with Agents SDK
 	# Pass both thread channel ID and message ID for proper event handling
 	process_message_with_agent(
+		#//// Neoffice - thread_message_id is threaded through so the "stop thinking" event can be
+		#//// addressed to the same id the client subscribed to (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 		message=message,
 		bot=bot,
 		channel_id=thread_channel.name,
@@ -238,6 +261,7 @@ def handle_bot_dm_with_assistants(message, bot):
 			},
 		)
 
+	#//// Neoffice - fd5440747, 2026-02-17 "fix: prevent DuplicateEntryError when thread channel already exists", same reuse as in the DM path above.
 	# Create thread channel or get existing one to avoid DuplicateEntryError
 	if frappe.db.exists("Raven Channel", message.name):
 		thread_channel = frappe.get_doc("Raven Channel", message.name)
@@ -268,6 +292,7 @@ def handle_bot_dm_with_assistants(message, bot):
 	# nosemgrep We need to commit here since the response will be streamed, and hence might take a while
 	frappe.db.commit()
 
+	#//// Neoffice - the thinking message moves after the thread-created event here too (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 	# Send event to open the thread
 	publish_ai_thread_created_event(message, message.channel_id)
 
@@ -280,6 +305,7 @@ def handle_ai_thread_message(message, channel):
 	"""
 	Function to handle messages in an AI thread.
 
+	#//// Neoffice - Nora as a model provider (6375b651f, 2026-01-04 "feat: Add Nora as model provider option"), thread path.
 	Routes to:
 	- Nora handler for bots with model_provider="Nora"
 	- Agents SDK for bots with model_provider in ["OpenAI", "Local LLM"]
@@ -288,10 +314,12 @@ def handle_ai_thread_message(message, channel):
 
 	bot = frappe.get_cached_doc("Raven Bot", channel.thread_bot)
 
+	#//// Neoffice - Nora as a model provider (6375b651f, 2026-01-04 "feat: Add Nora as model provider option"), thread path.
 	# Check if bot uses Nora integration
 	if bot.model_provider == "Nora":
 		return handle_ai_thread_message_with_nora(message, channel, bot)
 	# Check if bot uses new Agents SDK
+	#//// Neoffice - if -> elif, because the Nora branch above now comes first (6375b651f, 2026-01-04 "feat: Add Nora as model provider option").
 	elif bot.model_provider in ["OpenAI", "Local LLM"] and not bot.openai_assistant_id:
 		return handle_ai_thread_message_with_agents(message, channel, bot)
 	else:
@@ -299,6 +327,7 @@ def handle_ai_thread_message(message, channel):
 		return handle_ai_thread_message_with_assistants(message, channel, bot)
 
 
+#//// Neoffice - Nora thread handler (6375b651f, 2026-01-04 "feat: Add Nora as model provider option"). No upstream equivalent.
 def handle_ai_thread_message_with_nora(message, channel, bot):
 	"""
 	Handle thread messages using NORA AI engine.
@@ -332,6 +361,8 @@ def handle_ai_thread_message_with_agents(message, channel, bot):
 	"""
 
 	# Skip file/image messages without text - they'll be handled when the user sends a follow-up
+	#//// Neoffice - TO REVIEW - SILENT FAILURE: upstream logs the skipped file-only message; that log
+	#//// is gone (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 	if message.message_type in ["File", "Image"] and not message.text and not message.content:
 		return
 
@@ -340,10 +371,13 @@ def handle_ai_thread_message_with_agents(message, channel, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
+			#//// Neoffice - "Nora is thinking...", addressed with channel_name (the parent message id the
+			#//// client listens on), not the channel document name (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 			"text": "Nora is thinking...",
 			"channel_id": channel.channel_name,  # This is the thread message ID that frontend uses
 			"bot": bot.name,
 		},
+		#//// Neoffice - user-addressed, immediate event (5a7db4919, 2025-08-07 "fix: Add room parameter to publish_realtime to avoid broadcasting to all users"), as in the DM path.
 		user=message.owner,
 		after_commit=False,
 	)
@@ -415,10 +449,12 @@ def handle_ai_thread_message_with_assistants(message, channel, bot):
 	frappe.publish_realtime(
 		"ai_event",
 		{
+			#//// Neoffice - same thinking message and addressing, third call site (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 			"text": "Nora is thinking...",
 			"channel_id": channel.channel_name,  # This is the thread message ID that frontend uses
 			"bot": bot.name,
 		},
+		#//// Neoffice - user-addressed, immediate event (5a7db4919, 2025-08-07 "fix: Add room parameter to publish_realtime to avoid broadcasting to all users"), third call site.
 		user=message.owner,
 		after_commit=False,
 	)
@@ -474,6 +510,7 @@ def extract_file_content_for_agent(file_url: str, file_extension: str, bot, file
 
 
 def process_message_with_agent(
+	#//// Neoffice - thread_message_id added (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging"): see L166.
 	message, bot, channel_id: str, is_new_conversation: bool, channel=None, thread_message_id=None
 ):
 	"""
@@ -590,12 +627,19 @@ def process_message_with_agent(
 				"message_type",
 				"file",
 				"is_bot_message",
+				#//// Neoffice - the message name is fetched too, to build the history below (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 				"name",  # Add message ID for debugging
 			],
+			#//// Neoffice - ordered DESC so the LAST 20 messages are kept (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging"). Upstream
+			#//// orders ASC with limit 20, i.e. it keeps the OLDEST twenty and a long thread loses its own
+			#//// recent context - which is exactly what made the model repeat itself and invent facts.
 			order_by="creation desc",
 			limit=20,  # Keep last 20 messages for better context
 		)
 
+		#//// Neoffice - the message that OPENED the thread is pulled in explicitly (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging"):
+		#//// it lives in the parent channel, so the thread query never returns it, and the model answered
+		#//// without ever seeing the question it was asked.
 		# For AI threads, also get the initial message that created the thread
 		# The channel_name is the message ID of the thread creator
 		if channel.is_ai_thread and channel.channel_name:
@@ -633,6 +677,9 @@ def process_message_with_agent(
 
 		for msg in messages:
 			# Use text field which contains the actual message content
+			#//// Neoffice - dict access (get) instead of attribute access, because the history is now built
+			#//// from frappe.get_all rows rather than documents (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging"); and a bot answer is
+			#//// stripped of its <details> thinking block before being fed back as context.
 			msg_text = msg.get("text") or msg.get("content") or ""
 
 			# For bot messages with HTML thinking sections, extract the actual response
@@ -652,9 +699,12 @@ def process_message_with_agent(
 				# Also clean any remaining HTML tags (like <p> tags)
 				if "<" in msg_text and ">" in msg_text:
 					msg_text = re.sub(r"<[^>]+>", "", msg_text).strip()
+					#//// Neoffice - replaced by the msg.get() form above (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 
 				conversation_history.append({"role": "assistant", "content": msg_text})
 			else:
+				#//// Neoffice - user messages arrive as TipTap HTML; the tags are stripped before the text reaches
+				#//// the model (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging"), which otherwise quoted them back.
 				# For user messages, also clean HTML if present
 				if "<p" in msg_text and "</p>" in msg_text:
 					import re
@@ -668,12 +718,14 @@ def process_message_with_agent(
 					# DON'T add historical files - only the current message file should be analyzed
 					# Just add a reference to the file in conversation history
 
+					#//// Neoffice - dict access on the row (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 					file_url = (
 						msg.get("file", "").split("?fid=")[0]
 						if "fid" in msg.get("file", "")
 						else msg.get("file", "")
 					)
 					msg_content = (
+						#//// Neoffice - dict access on the row (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 						f"[User uploaded a {'file' if msg.get('message_type') == 'File' else 'image'}: {file_url}]"
 					)
 					if msg_text:
@@ -684,6 +736,9 @@ def process_message_with_agent(
 
 	# Use the improved sync handler
 	try:
+		#//// Neoffice - LM Studio has its own handler (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): the Agents SDK cannot drive
+		#//// it (no native function calling), so Raven Settings.local_llm_provider routes the turn to
+		#//// raven.ai.lmstudio instead. Everything else still goes through the SDK.
 		# Check if we should use LM Studio SDK handler
 		settings = frappe.get_single("Raven Settings")
 		is_lm_studio = bot.model_provider == "Local LLM" and settings.local_llm_provider == "LM Studio"
@@ -719,6 +774,9 @@ def process_message_with_agent(
 		if response["success"]:
 			# Only send a response if there is one
 			if response["response"] is not None:
+				#//// Neoffice - an answer that already carries a <details> thinking block is sent as HTML; running
+				#//// it through the markdown converter escaped the tags and the block showed as raw text
+				#//// (092d027d8, 2025-08-07 "markdown message").
 				# Check if response contains details tag (thinking section)
 				# If it does, send as HTML directly without markdown conversion
 				has_thinking = "<details" in response["response"]
@@ -732,6 +790,10 @@ def process_message_with_agent(
 
 			bot.send_message(channel_id=channel_id, text=error_text)
 
+		#//// Neoffice - the "stop thinking" event must be addressed to the SAME id the client subscribed
+		#//// to (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging"): the parent message id for an existing thread, thread_message_id
+		#//// for a brand-new one. Upstream uses channel_id, which for a DM thread is not what the client
+		#//// listens on - so the indicator never stopped.
 		# Clear the "thinking" message immediately after sending the response
 		# For existing threads, use channel.channel_name (the parent message ID)
 		# For new conversations, use thread_message_id
@@ -750,8 +812,10 @@ def process_message_with_agent(
 		frappe.publish_realtime(
 			"ai_event_clear",
 			{
+				#//// Neoffice - addressed id, see L735 (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 				"channel_id": event_channel_id,
 			},
+			#//// Neoffice - user-addressed and immediate, like the thinking message (5a7db4919, 2025-08-07 "fix: Add room parameter to publish_realtime to avoid broadcasting to all users").
 			user=message.owner,
 			after_commit=False,  # Same as thinking message
 		)
@@ -771,14 +835,18 @@ def process_message_with_agent(
 		bot.send_message(channel_id=channel_id, text=error_text)
 
 		# Clear the "thinking" message even on error
+		#//// Neoffice - same addressing on the error path (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 		event_channel_id = (
 			thread_message_id if thread_message_id else (channel.channel_name if channel else channel_id)
 		)
 		frappe.publish_realtime(
 			"ai_event_clear",
 			{
+				#//// Neoffice - addressed id, error path (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging").
 				"channel_id": event_channel_id,
 			},
+			#//// Neoffice - scoped to the channel room instead of broadcasting the failure to every connected
+			#//// user (5a7db4919, 2025-08-07 "fix: Add room parameter to publish_realtime to avoid broadcasting to all users").
 			room=event_channel_id,  # Send only to users in this channel
 			after_commit=False,  # Clear immediately
 		)
@@ -883,6 +951,9 @@ def get_content_attachment_for_file(message_type: str, file_id: str, file_url: s
 	return content, attachments
 
 
+#//// Neoffice - Nora turn processing (6375b651f, 2026-01-04 "feat: Add Nora as model provider option" + 1cbe89844/6709a4438, 2026-02-17).
+#//// Builds the conversation, calls NORA's handler and writes the answer back as the bot. No
+#//// upstream equivalent - upstream has only the OpenAI and Local LLM paths.
 def process_message_with_nora(
 	message, bot, channel_id: str, is_new_conversation: bool, channel=None, thread_message_id=None
 ):

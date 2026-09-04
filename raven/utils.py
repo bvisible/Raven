@@ -188,10 +188,15 @@ def get_raven_user(user_id: str) -> str:
 		.limit(1)
 	)
 
+	#//// Neoffice - 022fde019, 2026-01-05 "fix: Fix get_raven_user() OR filter syntax". Same result as
+	#//// upstream's run(pluck=True) - the first column of the first row. TO REVIEW: origin unknown,
+	#//// the commit subject talks about the OR filter, which is unchanged; the pluck rewrite looks
+	#//// like collateral and could be reverted to upstream at the next merge.
 	result = query.run()
 	if result:
 		return result[0][0]
 
+	#//// Neoffice - tail of the rewrite above (022fde019, 2026-01-05). Same None return.
 	return None
 
 

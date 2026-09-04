@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- //// Neoffice - added file (no upstream equivalent). JetBrains VCS mapping
+     //// (d70a6fb2e, 2024-02-23). TO REVIEW: see .idea/.gitignore. -->
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />

@@ -8,8 +8,12 @@ import ChatView from "./components/layout/Chat/ChatView";
 import useUnreadCount from "./hooks/useUnreadCount";
 import { CurrentChannelContext } from "./hooks/useCurrentChannel";
 
+//// Neoffice - docked mode (4b543c6b9 + e58d43ae8, 2026-06-11 "feat(cockpit): docked chat widget"): under the NeoCockpit chrome the widget is
+//// anchored next to the rail icon instead of floating at the bottom of the page.
 export function App({ docked = false }) {
 
+  //// Neoffice - docked mode (4b543c6b9 + e58d43ae8, 2026-06-11 "feat(cockpit): docked chat widget"): `off` is needed because a docked widget must
+  //// close completely (there is no collapsed bar to fall back to).
   const [isOpen, { on, toggle, off }] = useBoolean(false)
 
   const [initOpen, setInitOpen] = React.useState(false)

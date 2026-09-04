@@ -12,8 +12,14 @@ dependencies = [
  "openai>=1.100.2",
  "blurhash-python",
  "openai-agents>=0.0.16",
+ #//// Neoffice - markitdown pinned (d8ddbafec + 04eb1abec, 2025-11-10 "Pin markitdown to 0.0.2 to
+ #//// avoid TensorFlow dependency"). markitdown 0.1.0 pulls in magika, which pulls TensorFlow and
+ #//// its protobuf; that conflicts with the protobuf of google-cloud-documentai just above and the
+ #//// install breaks. TO REVIEW: unpin once markitdown makes magika optional.
  "markitdown==0.0.2",  # Pinned to 0.0.2 to avoid magika/TensorFlow dependency (introduced in 0.1.0)
  "pandas",
+ #//// Neoffice - lmstudio SDK (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): raven/ai/lmstudio/ talks to a local
+ #//// LM Studio server. Upstream only supports OpenAI.
  "google-cloud-documentai",
  "lmstudio>=1.4.0"
 ]
