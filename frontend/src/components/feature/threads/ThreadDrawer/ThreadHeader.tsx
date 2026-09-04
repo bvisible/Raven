@@ -10,8 +10,10 @@ import useFetchChannelMembers, { Member } from "@/hooks/fetchers/useFetchChannel
 import { useContext, useMemo } from "react"
 import useIsPushNotificationEnabled from "@/hooks/fetchers/useIsPushNotificationEnabled"
 import { UserContext } from "@/utils/auth/UserProvider"
+//// Neoffice - TTS toggle (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations").
 import { TTSToggle } from "@/components/feature/chat-header/TTSToggle"
 
+//// Neoffice - TTS toggle (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): upstream's header takes no props.
 interface ThreadHeaderProps {
     /** Parent channel ID to check if it's a bot DM */
     parentChannelID?: string
@@ -34,6 +36,8 @@ export const ThreadHeader = ({ parentChannelID }: ThreadHeaderProps) => {
         return null
     }, [user, channelMembers])
 
+    //// Neoffice - TTS toggle (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): a thread carries no bot flag of its own, so
+    //// the parent DM's peer is what decides whether the toggle is offered.
     // Fetch parent channel members to check if it's a bot DM
     const { channelMembers: parentChannelMembers } = useFetchChannelMembers(parentChannelID ?? '')
 
@@ -52,6 +56,7 @@ export const ThreadHeader = ({ parentChannelID }: ThreadHeaderProps) => {
                 <Flex justify={'between'} align={'center'}>
                     <Heading size='4' className='pl-1'>Thread</Heading>
                     <Flex gap='2' justify={'between'} align={'center'} className="px-4 sm:px-0">
+                        {/* //// Neoffice - TTS toggle (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"), shown only on Nora threads. */}
                         {isParentBotDM && <TTSToggle compact />}
                         {channelMember &&
                             <DropdownMenu.Root>

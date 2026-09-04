@@ -18,6 +18,7 @@ import AttachFileToDocumentDialog, { useAttachFileToDocument } from '../ChatMess
 import { ReactionAnalyticsDialog, useMessageReactionAnalytics } from '../ChatMessage/MessageActions/MessageReactionAnalytics'
 import SystemMessageBlock from '../ChatMessage/SystemMessageBlock'
 import { useUserData } from '@/hooks/useUserData'
+//// Neoffice - TTS auto-play (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations").
 import { useTTSAutoPlay } from '@/hooks/useTTSAutoPlay'
 
 /**
@@ -71,14 +72,18 @@ type Props = {
     showThreadButton?: boolean,
     scrollRef: MutableRefObject<HTMLDivElement | null>,
     pinnedMessagesString?: string,
+    //// Neoffice - TTS auto-play (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): only bot channels speak.
     onModalClose?: () => void,
     /** Whether this is a bot channel (for TTS auto-play) */
     isBot?: boolean
 }
 
+//// Neoffice - TTS auto-play (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): isBot pulled out of the props.
 const ChatStream = forwardRef(({ channelID, replyToMessage, showThreadButton = true, pinnedMessagesString, scrollRef, onModalClose, isBot = false }: Props, ref) => {
 
     const { messages, hasOlderMessages, loadOlderMessages, goToLatestMessages, hasNewMessages, error, loadNewerMessages, isLoading, highlightedMessage, scrollToMessage } = useChatStream(channelID, scrollRef, pinnedMessagesString)
+    //// Neoffice - TTS auto-play (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): reads each new bot answer out loud when
+    //// the user has turned TTS on (per-browser preference, see utils/preferences.ts).
 
     // Auto-play TTS for bot messages when TTS is enabled
     useTTSAutoPlay(messages, isBot)

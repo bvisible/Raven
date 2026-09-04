@@ -1,9 +1,13 @@
 import { PageHeader } from "@/components/layout/Heading/PageHeader"
+//// Neoffice - import order only (an IDE "organize imports" pass ran on this file).
+//// No import added or removed, no behaviour change.
 import { __ } from '@/utils/translations'
 import { Box, Flex, Heading, Tabs } from "@radix-ui/themes"
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import clsx from "clsx"
 import { BiChevronLeft } from "react-icons/bi"
 import { Link, Outlet, useParams } from "react-router-dom"
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import AIThreads from "./ThreadManager/AIThreads"
 import OtherThreads from "./ThreadManager/OtherThreads"
 import ParticipatingThreads from "./ThreadManager/ParticipatingThreads"
@@ -43,6 +47,8 @@ const Threads = () => {
                     <Link to={`/${workspaceID}`} className="block bg-transparent hover:bg-transparent active:bg-transparent sm:hidden">
                         <BiChevronLeft size='24' className="block text-gray-12" />
                     </Link>
+                    {/* //// Neoffice - i18n (a84e3ea68 + 9e0fda334, 2024-10-08 "add trad" / "update trad"): English literal wrapped in __() so the
+                        //// French catalogue can carry it. Upstream hardcodes it. */}
                     <Heading size='5'>{__("Threads")}</Heading>
                 </Flex>
             </PageHeader>

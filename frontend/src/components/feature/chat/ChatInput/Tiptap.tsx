@@ -69,6 +69,7 @@ type TiptapEditorProps = {
     channelID?: string,
     onUserType?: () => void,
     onUpArrow?: () => void,
+    //// Neoffice - AI gradient border (34a7de1e2, 2026-01-08 "feat: add AI gradient border effect on input for bot channels").
     /** Whether this is a bot channel - shows AI gradient border */
     isBot?: boolean,
 }
@@ -111,6 +112,7 @@ export interface MemberSuggestions extends UserFields {
     is_member: boolean
 }
 
+//// Neoffice - AI gradient border (34a7de1e2, 2026-01-08 "feat: add AI gradient border effect on input for bot channels"): isBot pulled out of the props.
 const Tiptap = forwardRef(({ isEdit, slotBefore, fileProps, onMessageSend, onUpArrow, channelMembers, onUserType, channelID, replyMessage, clearReplyMessage, placeholder = 'Type a message...', messageSending, sessionStorageKey = 'tiptap-editor', disableSessionStorage = false, defaultText = '', isBot = false }: TiptapEditorProps, ref) => {
 
     const { enabledUsers } = useContext(UserListContext)
@@ -605,11 +607,16 @@ const Tiptap = forwardRef(({ isEdit, slotBefore, fileProps, onMessageSend, onUpA
     }
 
     return (
+        //// Neoffice - AI gradient border (34a7de1e2, 2026-01-08 "feat: add AI gradient border effect on input for bot channels"): a DM with a bot gets an animated
+        //// gradient frame around the composer, so it is obvious you are writing to Nora and not to a
+        //// colleague. Style in tiptap.styles.css.
         <Box className={clsx(
             'border rounded-radius2 border-gray-300 dark:border-gray-500 dark:bg-gray-3',
             isBot && 'ai-gradient-border'
         )}>
             <EditorContext.Provider value={{ editor }}>
+                {/* //// Neoffice - AI gradient border (34a7de1e2, 2026-01-08 "feat: add AI gradient border effect on input for bot channels"): the gradient is painted on the outer
+                    //// Box's padding, so the editor needs an opaque inner wrapper or the gradient shows through it. */}
                 <div className={isBot ? 'bg-white dark:bg-gray-3 rounded-[calc(var(--radius-2)-2px)]' : ''}>
                     {slotBefore}
                     <EditorContent editor={editor} />

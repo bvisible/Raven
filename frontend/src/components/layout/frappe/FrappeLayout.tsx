@@ -1,3 +1,6 @@
+//// Neoffice - added file (no upstream equivalent). Frappe-embedded shell for /raven
+//// (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven", then 549919c71, 2026-06-10 "feat(cockpit): consume shared NeoCockpit").
+//// Replaces the copy-pasted FrappeSidebar.tsx + FrappeNavbar.tsx that the first version shipped.
 /**
  * FrappeLayout — Frappe-embedded shell (/raven/*).
  *

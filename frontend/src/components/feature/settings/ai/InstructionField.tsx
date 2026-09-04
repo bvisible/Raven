@@ -59,13 +59,19 @@ const variables = [
     { variable: 'first_name', description: 'The first name of the user' },
     { variable: 'full_name', description: 'The full name of the user' },
     { variable: 'email', description: 'The email of the user' },
+    //// Neoffice - extra prompt variables (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): the
+    //// documented list must match what raven/ai/ actually injects into the system prompt.
     { variable: 'user', description: 'The user ID (same as user_id)' },
     { variable: 'user_id', description: 'The ID of the user' },
     { variable: 'company', description: "The default company in the system" },
+    //// Neoffice - extra prompt variable (7cdc45189, 2025-08-22): company currency.
     { variable: 'currency', description: "The default currency of the company" },
     { variable: 'employee_id', description: 'The ID of the employee' },
     { variable: "employee_company", description: "The company of the employee (value in Employee DocType)" },
     { variable: 'department', description: 'The department of the employee' },
+    //// Neoffice - extra prompt variables (7cdc45189, 2025-08-22): upstream documents 'lang' alone.
+    //// Our context injection also provides language/lang in both cases, the time zone, the date and
+    //// time, and the current channel/thread ids - a local model needs them spelled out.
     { variable: 'language', description: 'The user language (lowercase, e.g., "en", "fr")' },
     { variable: 'lang', description: 'The user language (uppercase, e.g., "EN", "FR")' },
     { variable: 'time_zone', description: 'The user time zone' },

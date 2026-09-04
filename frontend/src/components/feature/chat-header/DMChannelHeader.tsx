@@ -85,6 +85,8 @@ export const DMChannelHeader = ({ channelData }: DMChannelHeaderProps) => {
                     </div>
                 </Heading>
             </Flex>
+            {/* //// Neoffice - the Flex wrapper is dropped now that the header holds a single child
+                //// (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"); the TTS toggle lives in the thread header instead. */}
             <ChannelHeaderMenu channelData={channelData} />
         </PageHeader>
     )

@@ -93,11 +93,15 @@ const PushNotifications = () => {
                         </CustomCallout>}
                         <ErrorBanner error={error} />
 
+                        {/* //// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"): a third option is offered. */}
                         <Text size='2'>To send push notifications, you have three options:
                             <br />
                             <br />
                             <ol className='list-decimal list-inside'>
                                 <li>
+                                    {/* //// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"). Upstream only offers Frappe Cloud and
+                                        //// Raven Cloud, and tells self-hosters that Raven Cloud is their only option. We self-host and
+                                        //// send through our own Firebase project, so Firebase leads the list and Raven Cloud is demoted. */}
                                     <Strong>Firebase</Strong> - recommended for self-hosting with your own Firebase project.
                                 </li>
                                 <li>
@@ -129,6 +133,7 @@ const PushNotifications = () => {
                                         onValueChange={field.onChange}>
                                         <Select.Trigger className='w-full' />
                                         <Select.Content>
+                                            {/* //// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"): the option itself. */}
                                             <Select.Item value='Firebase'>
                                                 {__("Firebase")}
                                             </Select.Item>
@@ -142,9 +147,12 @@ const PushNotifications = () => {
                                     </Select.Root>
                                 )}
                             />
+                            {/* //// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"): recommendation follows the option above. */}
                             <HelperText>For self-hosted instances, we recommend using Firebase with your own Firebase project.</HelperText>
                         </Box>
 
+                        {/* //// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"): tells the admin whether the VAPID key is
+                            //// actually in place - it is written by a migration, so a fresh instance shows "pending". */}
                         {watch('push_notification_service') === "Firebase" && ravenSettings?.vapid_public_key ?
                             <CustomCallout
                                 rootProps={{ color: 'green', variant: 'surface' }}

@@ -7,6 +7,8 @@ type Props = FlexProps & {
     text?: string
 }
 
+//// Neoffice - the default loader text was the untranslatable pun "Ravens are finding their way
+//// to you..." (a84e3ea68 + 9e0fda334, 2024-10-08 "add trad" / "update trad"); replaced by a translated "Loading".
 export const FullPageLoader = ({ text = __("Loading"), ...props }: Props) => {
     return (
         <Flex align='center' width='100%' justify='center' {...props} className={clsx('h-screen', props.className)}>

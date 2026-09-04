@@ -1,3 +1,5 @@
+//// Neoffice - added file (no upstream equivalent). Typed wrapper around the window['__']
+//// shim declared in index.html (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven").
 /**
  * Helper for the `window.__` shim defined in the index.html template.
  *

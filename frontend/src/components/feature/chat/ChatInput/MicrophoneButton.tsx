@@ -1,3 +1,6 @@
+//// Neoffice - added file (no upstream equivalent). Speech-to-text button for the chat
+//// input (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"), on the browser Web Speech API. Upstream has no
+//// voice input.
 import { useSTT } from "@/hooks/useSTT"
 import { __ } from "@/utils/translations"
 import { IconButton, Tooltip } from "@radix-ui/themes"

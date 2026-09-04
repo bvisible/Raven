@@ -1,13 +1,19 @@
 import { useTheme } from '@/ThemeProvider'
 import { commandMenuOpenAtom } from '@/components/feature/CommandMenu/CommandMenu'
+//// Neoffice - import order only (an IDE "organize imports" pass ran on this file).
+//// No import added or removed, no behaviour change.
 import { useIsDesktop } from '@/hooks/useMediaQuery'
 import { getKeyboardMetaKeyString } from '@/utils/layout/keyboardKey'
 import { __ } from '@/utils/translations'
 import { Button, Flex, IconButton, Kbd, Text, Tooltip } from '@radix-ui/themes'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { useSetAtom } from 'jotai'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { BiMoon, BiSun } from 'react-icons/bi'
 import { TbSearch } from 'react-icons/tb'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { HStack } from '../Stack'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import MentionsButton from './MentionsButton'
 
 export const SidebarHeader = () => {
@@ -38,6 +44,7 @@ export const SidebarHeader = () => {
                 align='center'
                 pt='1'
                 height='48px'>
+                {/* //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk" / 49ee6e172, 2025-04-05): sidebar wordmark. */}
                 <Text as='span' size='6' className='cal-sans pl-1'>synk</Text>
                 <Flex align='center' gap='4' className='pr-1 sm:pr-0'>
                     <MentionsButton />

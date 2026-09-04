@@ -22,6 +22,8 @@ const ThreadDrawer = () => {
     return (
         <div>
             <Flex direction='column' gap='0' className='w-full h-[100vh] border-l border-gray-4 sm:dark:border-gray-6'>
+                {/* //// Neoffice - TTS toggle in the thread header (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): the header needs the
+                    //// PARENT channel to know whether this thread belongs to a bot DM. */}
                 <ThreadHeader parentChannelID={data?.channel_id} />
                 {isLoading && <FullPageLoader />}
                 {error && <Box p='4'><ErrorBanner error={error} /></Box>}

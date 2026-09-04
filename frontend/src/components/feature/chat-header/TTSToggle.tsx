@@ -1,3 +1,6 @@
+//// Neoffice - added file (no upstream equivalent). Text-to-speech toggle for Nora
+//// conversations (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): reads the answer out loud through the
+//// instance's TTS endpoint. Upstream Raven has no voice output.
 import { useTTS } from "@/hooks/useTTS"
 import { __ } from "@/utils/translations"
 import { Flex, Switch, Text, Tooltip, IconButton } from "@radix-ui/themes"

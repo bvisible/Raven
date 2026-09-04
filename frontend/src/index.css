@@ -144,6 +144,11 @@ html header button {
     to {
         opacity: 1;
     }
+/* //// Neoffice - Design System accent (6780e3858, 2026-06-14 "style(raven): recolor Radix iris
+   //// accent to Design System clay"). Redefining the whole Radix 'iris' scale rather than changing
+   //// the accentColor prop recolours every accented subtree at once - solids, borders, text and the
+   //// translucent alpha hovers, light and dark. Generated values: regenerate, do not hand-edit.
+   //// Block runs to the end of file. */
 }
 
 /* === Neoffice Design System — remap Radix 'iris' accent to clay (#D68A59).

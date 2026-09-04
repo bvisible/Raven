@@ -1,3 +1,9 @@
+//// Neoffice - import order only (an IDE "organize imports" pass ran on this file).
+//// TO REVIEW - REAL DEFECT: that pass ALSO left a duplicate `import { useIsMobile } from
+//// "@/hooks/useMediaQuery"` (this block and L~27 below). Two bindings of the same name in
+//// one ES module: @babel/parser refuses the file outright ("Identifier 'useIsMobile' has
+//// already been declared"). Remove one of the two - not fixed here, this pass adds comments
+//// only.
 import { Label } from "@/components/common/Form"
 import { HStack, Stack } from "@/components/layout/Stack"
 import useFetchChannelMembers, { Member } from "@/hooks/fetchers/useFetchChannelMembers"
@@ -9,17 +15,23 @@ import { Box, Checkbox, Flex, IconButton } from "@radix-ui/themes"
 import clsx from "clsx"
 import { useSWRConfig } from "frappe-react-sdk"
 import { useCallback, useMemo, useRef, useState } from "react"
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { BiX } from "react-icons/bi"
 import { useParams } from "react-router-dom"
 import { Message } from "../../../../../../types/Messaging/Message"
 import { CustomFile, FileDrop } from "../../file-upload/FileDrop"
 import { FileListItem } from "../../file-upload/FileListItem"
 import { ArchivedChannelBox } from "../chat-footer/ArchivedChannelBox"
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { JoinChannelBox } from "../chat-footer/JoinChannelBox"
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import useFileUpload from "../ChatInput/FileInput/useFileUpload"
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import Tiptap from "../ChatInput/Tiptap"
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import TypingIndicator from "../ChatInput/TypingIndicator/TypingIndicator"
 import { useTyping } from "../ChatInput/TypingIndicator/useTypingIndicator"
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { useSendMessage } from "../ChatInput/useSendMessage"
 import { ReplyMessageBox } from "../ChatMessage/ReplyMessageBox/ReplyMessageBox"
 import ChatStream from "./ChatStream"
@@ -48,6 +60,8 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
     const { name: user } = useUserData()
     const { channelMembers, isLoading } = useFetchChannelMembers(channelData.name)
 
+    //// Neoffice - bot detection for the AI gradient border and TTS (34a7de1e2, 2026-01-08 "feat: add AI gradient border effect on input for bot channels" + 98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations").
+    //// The peer of a DM is a Raven User of type 'Bot' - that is what marks a Nora conversation.
     // Check if this is a bot DM channel
     const isBot = useMemo(() => {
         if (channelData.is_direct_message === 1 && 'peer_user_id' in channelData) {
@@ -245,6 +259,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                     onModalClose={onModalClose}
                     pinnedMessagesString={channelData.pinned_messages_string}
                     replyToMessage={handleReplyAction}
+                    //// Neoffice - isBot passed to ChatStream (TTS auto-play) and Tiptap (gradient border).
                     isBot={isBot}
                 />
                 {canUserSendMessage &&
@@ -267,6 +282,7 @@ export const ChatBoxBody = ({ channelData }: ChatBoxBodyProps) => {
                             sessionStorageKey={`tiptap-${channelData.name}`}
                             onMessageSend={sendMessage}
                             messageSending={loading}
+                            //// Neoffice - isBot passed down, second call site (mobile layout).
                             isBot={isBot}
                             slotBefore={<Flex direction='column' justify='center' hidden={!selectedMessage && !files.length}>
                                 {selectedMessage && <PreviousMessagePreview selectedMessage={selectedMessage} />}

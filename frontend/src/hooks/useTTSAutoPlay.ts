@@ -1,3 +1,9 @@
+//// Neoffice - added file (no upstream equivalent). Auto-plays each new Nora answer
+//// (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"). A module-level lock keeps two mounted streams (the
+//// channel and its thread drawer) from speaking the same message twice - React can hold both
+//// alive at once, and each hook instance would otherwise start its own audio
+//// (80b034a4b, 2026-01-08 "use global state to prevent multiple instances from playing
+//// simultaneously").
 import { useEffect, useRef } from "react"
 import { useAtomValue } from "jotai"
 import { useFrappePostCall } from "frappe-react-sdk"

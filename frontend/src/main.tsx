@@ -8,6 +8,9 @@ import './index.css'
 import FrappePushNotification from "../public/frappe-push-notification";
 
 
+//// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): frappe.model.sync throws when
+//// boot.docs is missing, and our curated mini-boot can legitimately omit it. Upstream calls it
+//// unguarded, so React never mounted and /raven showed a blank page.
 // Defensive sync — frappe.model.sync(frappe.boot.docs) throws when docs is
 // missing (the curated mini-boot might omit it on a fresh install before the
 // session has loaded meta). React still needs to mount in that case.
@@ -63,6 +66,8 @@ if (import.meta.env.DEV) {
       if (!window.frappe) window.frappe = {};
       //@ts-ignore
       window.frappe.boot = v
+      //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): the dev server must mirror what
+      //// raven.html does in production, or the embedded chrome renders untranslated in dev only.
       //@ts-ignore - mirror the assignment done by raven.html in production:
       // the embedded i18n shim reads frappe._messages (bracket notation).
       window.frappe._messages = window.frappe.boot['__messages']
@@ -76,6 +81,7 @@ if (import.meta.env.DEV) {
     }
     )
 } else {
+  //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): guarded sync on the production path.
   safeSyncDocs()
   registerServiceWorker()
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

@@ -12,6 +12,7 @@ import ChatStream from "../../chat/ChatStream/ChatStream"
 import { JoinChannelBox } from "../../chat/chat-footer/JoinChannelBox"
 import { useUserData } from "@/hooks/useUserData"
 import useFetchChannelMembers from "@/hooks/fetchers/useFetchChannelMembers"
+//// Neoffice - TTS auto-play in threads (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations").
 import { useContext } from "react"
 import { UserContext } from "@/utils/auth/UserProvider"
 import ThreadFirstMessage from "./ThreadFirstMessage"
@@ -29,9 +30,12 @@ export const ThreadMessages = ({ threadMessage }: { threadMessage: Message }) =>
     const threadID = threadMessage.name
     const channelID = threadMessage.channel_id
 
+    //// Neoffice - TTS auto-play in threads (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): needed to find the peer.
     const { currentUser } = useContext(UserContext)
     const { channelMembers } = useFetchChannelMembers(channelID ?? '')
 
+    //// Neoffice - TTS auto-play in threads (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): same bot-DM test as the
+    //// thread header, so a Nora thread speaks like the DM it came from.
     // Check if the parent channel is a bot DM for TTS auto-play
     const isParentBotDM = useMemo(() => {
         if (!channelID || !channelMembers || !currentUser) return false
@@ -189,6 +193,7 @@ export const ThreadMessages = ({ threadMessage }: { threadMessage: Message }) =>
                     replyToMessage={handleReplyAction}
                     showThreadButton={false}
                     onModalClose={onModalClose}
+                    //// Neoffice - isBot passed to ChatStream (TTS auto-play) and Tiptap (gradient border).
                     isBot={isParentBotDM}
                 />
                 <AIEvent channelID={threadID ?? ''} />
@@ -214,6 +219,7 @@ export const ThreadMessages = ({ threadMessage }: { threadMessage: Message }) =>
                         sessionStorageKey={`tiptap-${threadID}`}
                         onMessageSend={sendMessage}
                         messageSending={loading}
+                        //// Neoffice - isBot passed down, second call site.
                         isBot={isParentBotDM}
                         slotBefore={<Flex direction='column' justify='center' hidden={!selectedMessage && !files.length}>
                             {selectedMessage && <PreviousMessagePreview selectedMessage={selectedMessage} />}

@@ -1,3 +1,5 @@
+//// Neoffice - import order only (an IDE "organize imports" pass ran on this file).
+//// No import added or removed, no behaviour change.
 import { Loader } from '@/components/common/Loader'
 import { PageLengthSelector } from '@/components/feature/pagination/PageLengthSelector'
 import { PageSelector } from '@/components/feature/pagination/PageSelector'
@@ -7,6 +9,7 @@ import { ErrorBanner } from '@/components/layout/AlertBanner/ErrorBanner'
 import { TableLoader } from '@/components/layout/Loaders/TableLoader'
 import { useDebounce } from '@/hooks/useDebounce'
 import { usePaginationWithDoctype } from '@/hooks/usePagination'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { User } from '@/types/Core/User'
 import { UserContext } from '@/utils/auth/UserProvider'
 import { isSystemManager } from '@/utils/roles'
@@ -14,9 +17,12 @@ import { Box, Button, Card, Container, Flex, Heading, Link, Strong, Text, TextFi
 import { clsx } from 'clsx'
 import { Filter, useFrappeGetDocList, useFrappePostCall } from 'frappe-react-sdk'
 import { ChangeEvent, useContext, useState } from 'react'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { BiLeftArrowAlt, BiSearch } from 'react-icons/bi'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { FaInfo } from 'react-icons/fa'
 import { toast } from 'sonner'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 
 const AddRavenUsersPage = () => {
 
@@ -45,6 +51,8 @@ const RavenUsersAlert = () => {
                 </Box>
                 <Flex direction='column' align='center' gap='2'>
                     <Heading as='h2' className='not-cal' size='4'>
+                        {/* //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk" / 49ee6e172, 2025-04-05).
+                            //// TO REVIEW: lower-case "synk" here while the rest of the product writes "Synk". */}
                         You do not have access to <Text className='cal-sans'>synk</Text>.
                     </Heading>
                     <Text as='p' size='2' align='center' className='leading-6'>
@@ -106,6 +114,7 @@ const AddRavenUsersCard = () => {
     return <Box className={clsx(BOX_STYLE, 'bg-accent-a2')}>
         <Card className={clsx(CARD_STYLE, 'max-w-xl min-w-[720px]')}>
             <Flex gap='2' direction='column'>
+                {/* //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk" / 49ee6e172, 2025-04-05). TO REVIEW: lower-case "synk" (see L48). */}
                 <Heading as='h1'>Add users to synk</Heading>
                 <Text as='p' size='2' className='leading-6'>
                     Users you add will be given the <Strong>"Raven User"</Strong> role.

@@ -26,6 +26,7 @@ const ViewThread = () => {
     return (
         <div>
             <Flex direction='column' gap='0' className='w-full h-screen'>
+                {/* //// Neoffice - TTS toggle (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): parent channel handed to the header. */}
                 <ThreadHeader parentChannelID={data?.channel_id} />
                 {isLoading && <FullPageLoader />}
                 {error && <Box p='4'><ErrorBanner error={error} /></Box>}

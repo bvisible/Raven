@@ -54,6 +54,8 @@ export interface RavenSettings{
 	/**	OAuth Client : Link - OAuth Client	*/
 	oauth_client?: string
 	/**	Push Notification Service : Select	*/
+	//// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"): mirrors the Select added to the
+	//// Raven Settings doctype (raven/raven/doctype/raven_settings/raven_settings.json).
 	push_notification_service?: "Frappe Cloud" | "Firebase" | "Raven"
 	/**	Push Notification Server URL : Data	*/
 	push_notification_server_url?: string

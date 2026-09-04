@@ -1,3 +1,6 @@
+//// Neoffice - added file (no upstream equivalent). Text-to-speech hook
+//// (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"): posts the text to the instance's TTS endpoint and plays
+//// the returned audio. Voice defaults to fr-CH (see utils/preferences.ts).
 import { useCallback, useRef, useState } from "react"
 import { useAtom, useAtomValue } from "jotai"
 import { useFrappePostCall } from "frappe-react-sdk"

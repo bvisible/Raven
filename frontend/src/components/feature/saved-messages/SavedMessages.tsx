@@ -45,6 +45,8 @@ const SavedMessages = () => {
                     <Link to='/channel' className="block bg-transparent hover:bg-transparent active:bg-transparent sm:hidden">
                         <BiChevronLeft size='24' className="block text-gray-12" />
                     </Link>
+                    {/* //// Neoffice - i18n (a84e3ea68 + 9e0fda334, 2024-10-08 "add trad" / "update trad"): English literal wrapped in __() so the
+                        //// French catalogue can carry it. Upstream hardcodes it. */}
                     <Heading size='5'>{__("Saved Messages")}</Heading>
                 </Flex>
             </PageHeader>

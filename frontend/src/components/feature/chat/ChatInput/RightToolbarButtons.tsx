@@ -14,6 +14,7 @@ import AISavedPromptsButton from './AISavedPromptsButton'
 import DocumentLinkButton from './DocumentLinkButton'
 import { HStack } from '@/components/layout/Stack'
 import clsx from 'clsx'
+//// Neoffice - speech-to-text button (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations").
 import { MicrophoneButton } from './MicrophoneButton'
 
 
@@ -57,6 +58,7 @@ export const RightToolbarButtons = ({ fileProps, channelID, isEdit, ...sendProps
                 <EmojiPickerButton />
                 <GIFPickerButton />
                 {fileProps && <FilePickerButton fileProps={fileProps} />}
+                {/* //// Neoffice - speech-to-text button (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"). */}
                 <MicrophoneButton />
             </Flex>
             <Separator orientation='vertical' />

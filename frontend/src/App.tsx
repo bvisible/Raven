@@ -1,17 +1,26 @@
+//// Neoffice - import order only (an IDE "organize imports" pass ran on this file).
+//// No import added or removed, no behaviour change.
 import "cal-sans"
 import { init } from 'emoji-mart'
 import { FrappeProvider } from 'frappe-react-sdk'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import Cookies from 'js-cookie'
 import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { Toaster } from 'sonner'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import WorkspaceSwitcherGrid from './components/layout/WorkspaceSwitcherGrid'
 import { useStickyState } from './hooks/useStickyState'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import ErrorPage from './pages/ErrorPage'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { MainPage } from './pages/MainPage'
 import MobileTabsPage from './pages/MobileTabsPage'
 import WorkspaceSwitcher from './pages/WorkspaceSwitcher'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { ThemeProvider } from './ThemeProvider'
 import AppUpdateProvider from './utils/AppUpdateProvider'
+//// Neoffice - import order only (an IDE "organize imports" pass), no behaviour change.
 import { ProtectedRoute } from './utils/auth/ProtectedRoute'
 import { UserProvider } from './utils/auth/UserProvider'
 import { useEffect } from 'react'
@@ -271,6 +280,8 @@ function App() {
       handleUrlChange();
     };
 
+    //// Neoffice - tail of the URL-theme listener installed above (9a7dacd97, 2025-08-02 "Check URL
+    //// parameters for theme"): restores the patched history.pushState/replaceState on unmount.
     return () => {
       window.removeEventListener('popstate', handleUrlChange);
       history.pushState = originalPushState;

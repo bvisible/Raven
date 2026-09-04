@@ -100,6 +100,10 @@ const MainPageContent = () => {
 
     return <UserListProvider>
         <ChannelListProvider>
+            {/* //// Neoffice - sidebar un-fixed (0d428d89e, 2026-01-07 "fix: remove fixed positioning from sidebar
+                //// container in MainPage"). Upstream pins the sidebar with position:fixed and offsets the content
+                //// by --sidebar-width; embedded under the NeoCockpit chrome that offset is wrong and the chat
+                //// slid under the rail. Plain flex row inside a full-height container instead. */}
             <Flex className='h-screen'>
                 {!isMobile && <Sidebar />}
                 <Box className='flex-1 dark:bg-gray-2 overflow-auto'>

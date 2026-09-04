@@ -8,6 +8,9 @@ const AIThreadAutoOpen = () => {
     // Listen for ai_thread_created event
     useFrappeEventListener('ai_thread_created', (data) => {
         if (data.is_ai_thread && data.thread_id && data.channel_id && channelID === data.channel_id && workspaceID) {
+            //// Neoffice - Nora thinking indicator (4fad9cd58, 2025-08-07 "Fix LLM hallucinations and improve AI thread messaging"): hand the thread id to the
+            //// screen we are about to navigate to, so AIEvent can show "Nora is thinking..." immediately
+            //// instead of an empty thread. See AIEvent.tsx.
             // Store the thread info in sessionStorage before navigating
             const threadInfo = {
                 threadID: data.thread_id,

@@ -1,3 +1,6 @@
+//// Neoffice - added file (no upstream equivalent). Speech-to-text hook on the browser
+//// Web Speech API (98fb5650e, 2026-01-08 "feat(ai): add TTS/STT support for AI bot conversations"), feeding the microphone button of the
+//// chat input. Upstream has no voice input.
 import { useCallback, useRef, useState, useEffect } from "react"
 
 // Web Speech API types
