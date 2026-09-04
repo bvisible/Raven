@@ -3,6 +3,9 @@ import re
 #//// Neoffice - frappe import, for the Raven Settings read below (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 import frappe
 
+#//// Neoffice - frappe._ imported for the fallback sentences below (2026-09-04).
+from frappe import _
+
 """
 Response formatter for AI messages to handle special formatting like <think> tags and LaTeX
 """
@@ -84,14 +87,17 @@ def format_ai_response(response_text) -> str:
 
 		#//// Neoffice - the answer is converted to HTML here rather than by the caller, so a <details>
 		#//// block and its markdown body can coexist (7cdc45189, 2025-08-22 "Feat add SDK LM Studio" and 092d027d8, 2025-08-07).
-		#//// TO REVIEW: the fallback message "Comment puis-je vous aider ?" is a hardcoded French string
-		#//// in code - it should go through frappe._().
+		#//// The three fallback sentences below were hardcoded French; they go through frappe._()
+		#//// since 2026-09-04 (source files are English, user-facing text comes from the
+		#//// catalogue). raven/locale/ holds only main.pot today, so the French wording has to be
+		#//// re-added by the translation pass - see the commit message.
 		if main_response:
 			main_response_html = frappe.utils.md_to_html(main_response)
 			return f"{details_section}{main_response_html}"
 		else:
 			# Only thinking, add default message
-			default_msg = "Comment puis-je vous aider ?"
+			#//// Neoffice - translated through _() (2026-09-04), was hardcoded French.
+			default_msg = _("How can I help you?")
 			default_html = frappe.utils.md_to_html(default_msg)
 			return f"{details_section}{default_html}"
 	elif think_matches and not show_thinking:
@@ -100,14 +106,16 @@ def format_ai_response(response_text) -> str:
 			return main_response
 		else:
 			# No main response found - return a proper greeting
-			return "Bonjour ! Comment puis-je vous aider aujourd'hui ?"
+			#//// Neoffice - translated through _() (2026-09-04), was hardcoded French.
+			return _("Hello! How can I help you today?")
 
 	# No thinking section found at all
 	if main_response:
 		return main_response
 	else:
 		# Empty response - should not happen but handle gracefully
-		return "Bonjour ! Comment puis-je vous aider ?"
+		#//// Neoffice - translated through _() (2026-09-04), was hardcoded French.
+		return _("Hello! How can I help you?")
 
 
 def extract_thinking(response_text: str) -> tuple[str, str]:
