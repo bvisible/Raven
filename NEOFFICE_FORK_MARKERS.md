@@ -117,39 +117,62 @@ All of them are the Neoffice/Synk artwork replacing upstream's Raven artwork
 | `.idea/` (**deleted**, 5 files) | JetBrains project settings, committed by mistake (`d70a6fb2e`, 2024-02-23). Per-developer editor state, and `.idea/misc.xml` advertised a real production host and login (`root@demo.neoffice.me:22`). Removed on 2026-09-04; `.idea/` is in `.gitignore` now. |
 | `raven/raven/doctype/raven_ai_pending_action/__init__.py` (**renamed**, R100) | Empty package marker for the new doctype (`7cdc45189`). |
 
-### Known defects found while marking (not fixed — this pass adds comments only)
+### Defects found while marking — fixed on 2026-09-04
 
-1. 🔴 **`frontend/src/components/feature/chat/ChatStream/ChatBoxBody.tsx`** imports `useIsMobile`
-   **twice** (L4 and L~27), left by the "organize imports" pass. Two bindings of the same name in
-   one ES module: `@babel/parser` refuses the file outright.
-2. 🔴 **`raven/raven/onboarding_step/introduction_to_raven/introduction_to_raven.json`**: the
-   rebrand set `"action": "Go to synk"`. `action` is a **Select** on `Onboarding Step`
-   (`Go to Page` / `Create Entry` / `Show Form Tour` / …); `Go to synk` is not one of its options.
-3. 🔴 Same file and **`access_the_web_app.json`**: the rebrand ate a newline escape —
-   `"\n\n\nRaven is"` became `"\n\n\\synk is"`, i.e. a literal backslash instead of a line break.
-   `93a79031c` (2025-04-06 "fix: correct invalid escape characters in JSON files") only fixed part
-   of it.
-4. 🔴 **`access_the_web_app.json`** tells the user the app is at **`/synk`**. The route is still
-   `/raven` — only the name changed.
-5. 🔴 **`raven/ai/agents_integration.py`**: seven `frappe.log_error(...)` calls were replaced by
-   `pass` (`87fa1010c`, 2025-08-04), and the top-level `raise` by a fabricated result object.
-   Every AI failure — bad API URL, broken function, file-search or code-interpreter error — is now
-   invisible in `Error Log`. Marked `TO REVIEW - SILENT FAILURE` at each site.
-6. 🔴 **And one of them is already firing.** `raven/ai/agents_integration.py:335` still does
-   `from raven.ai.sdk_tools import create_raven_tools`, but `raven/ai/sdk_tools.py` was **deleted**
-   by `7cdc45189` (2025-08-22). The `ImportError` lands in the `except … pass` of defect 5, so
-   `_setup_tools()` silently ends with **no Raven AI Function loaded at all** — only the CRUD tools
-   appended below reach the agent — and nothing is written to `Error Log`. Two defects that hide
-   each other.
-7. 🔴 **`raven/raven_bot/doctype/raven_bot/raven_bot.py`** disables link validation
-   (`ignore_links=bool(link_document)`) exactly when a link is present, i.e. when it matters.
-8. ⚠️ **`apps/mobile/components/features/channels/DMList/DMList.tsx`**: `toast.error('Could not
-   create channel')` is still a hardcoded English string — it escaped the i18n pass.
-9. ⚠️ **`apps/mobile/app/_layout.tsx`** and **`hooks/useFirebasePushTokenListener.ts`** keep a
-   dozen `console.log` calls from a debugging session, not gated by `__DEV__`; one prints the
-   first 30 characters of the FCM token.
-10. ⚠️ **`.idea/misc.xml`** records a real production host and login (`root@demo.neoffice.me:22`).
-   No secret is stored, but the repository should not advertise it.
-11. ⚠️ **`.gitignore`** and **`CLAUDE.md`** carry French comments/prose; several
-    `raven/ai/tests/*.py` docstrings and `raven/ai/lmstudio/SDK_KNOWLEDGE_BASE.md` are in French.
-    Code and docs in this repository are supposed to be English.
+The marking pass of 2026-09-03 added comments only and listed eleven defects. They were fixed
+the next day; each line below says what was wrong and what was done.
+
+1. ✅ **`frontend/src/components/feature/chat/ChatStream/ChatBoxBody.tsx`** imported `useIsMobile`
+   **twice**, left by the "organize imports" pass. Two bindings of the same name in one ES module:
+   `@babel/parser` refused the file outright ("Identifier 'useIsMobile' has already been declared",
+   reproduced with the repository's own parser). The second import was removed.
+2. ✅ **`introduction_to_raven.json`**: the rebrand had set `"action": "Go to synk"`. `action` is a
+   **Select** on `Onboarding Step` and that is not one of its options. Frappe skips select
+   validation while importing (`frappe.flags.in_import`), so the value was stored as is and only
+   failed at use: `onboarding_widget.js` looks the action up in a map, so clicking the step threw
+   a TypeError. Back to `Go to Page`.
+3. ✅ Same file and **`access_the_web_app.json`**: the rebrand had eaten a newline escape —
+   `"\n\n\nRaven is"` became `"\n\n\\synk is"`, a literal backslash instead of a line break.
+   Repaired, and `modified` bumped on both files: `import_file` skips a file older than the record
+   already in the database, so the correction would otherwise never have reached an existing site.
+4. ✅ **`access_the_web_app.json`** told the user the app was at **`/synk`**. The route is `/raven`
+   (`raven/www/raven.py`, `website_route_rules`); the text says `/raven` now.
+5. ✅ **`raven/ai/agents_integration.py`**: seven `frappe.log_error(...)` calls had been replaced by
+   `pass` (`87fa1010c`, 2025-08-04) and the top-level `raise` by a fabricated result object. All
+   seven are restored, and the two fabricated `Result` objects are replaced by an explicit
+   `success: False` return — `raven/ai/ai.py` already turns that into the user-facing error, so a
+   failure now reaches both `Error Log` and the user instead of neither.
+6. ✅ **And one of them was already firing.** `_setup_tools()` imported `create_raven_tools` from
+   `raven/ai/sdk_tools.py`, deleted by `7cdc45189`. The `ImportError` landed in the `except … pass`
+   of defect 5, so every agent ran with **no Raven AI Function at all**. The tools are rebuilt from
+   the bot configuration (`RavenAgentManager._create_function_tools`) and executed through
+   `raven/ai/function_executor.py`, the module that replaced `sdk_tools`. Two more defects surfaced
+   while proving it on osiris and were fixed in the same commit: `_create_crud_tools()` raised
+   `UserError` with openai-agents 0.6.x (a strict JSON schema forbids the `additionalProperties`
+   that a `dict` parameter compiles to), which killed the whole constructor before any tool was
+   registered; and `execute_raven_function()` covered six of the eighteen function types, its
+   "Update Document" branch calling a signature that cannot match. Measured before/after on osiris:
+   0 tools registered (constructor raised) → 9 tools, 2 of them Raven AI Functions, both invoked
+   successfully against a real document.
+7. ✅ **`raven/raven_bot/doctype/raven_bot/raven_bot.py`** disabled link validation
+   (`ignore_links=bool(link_document)`) exactly when a link was present. Back to upstream's plain
+   `insert(ignore_permissions=True)`; verified on osiris that a message linking to a real ToDo
+   inserts and one linking to a missing document is refused with `LinkValidationError`.
+8. ✅ **`apps/mobile/…/DMList.tsx`**: `toast.error('Could not create channel')` goes through `t()`,
+   reusing the existing `channels.channelCreationFailed` key rather than adding a second wording.
+9. ✅ **`apps/mobile/app/_layout.tsx`** and **`hooks/useFirebasePushTokenListener.ts`**: the dozen
+   `console.log` calls are behind `__DEV__`, and the line that printed the first 30 characters of
+   the FCM token is gone — a push token is a credential and is not logged at all.
+10. ✅ **`.idea/`** is out of the repository and in `.gitignore`. `.idea/misc.xml` had recorded a
+   real production host and login (`root@demo.neoffice.me:22`).
+11. 🟡 **French in source.** `.gitignore` was already English — that part of the report did not
+    hold. The docstrings and comments of `raven/ai/tests/test_context_injection.py` and
+    `test_lmstudio_integration.py` are English now, and the three hardcoded French sentences of
+    `raven/ai/response_formatter.py` go through `frappe._()`. Left as they are, on purpose:
+    `CLAUDE.md` prose and `raven/ai/lmstudio/SDK_KNOWLEDGE_BASE.md` (documentation), and the
+    `print()` diagnostics and model questions of `test_lmstudio_integration.py` — that script
+    cannot run as it stands (it calls `EnhancedLMStudioHandler(bot=bot)` and
+    `lmstudio_sdk_handler(message=…, bot=…)`, neither matching the current signature) and wants a
+    rewrite rather than a translation. **Open:** `raven/locale/` holds only `main.pot`, no `fr.po`,
+    so the three `_()` fallbacks render in English for a French user until raven goes through the
+    translation pass.
