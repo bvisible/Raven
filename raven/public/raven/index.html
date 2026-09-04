@@ -23,6 +23,7 @@
   <meta name="apple-itunes-app" content="app-id=6741682327, app-argument={{sitename}}">
 
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!-- //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk" / 49ee6e172, 2025-04-05): iOS home-screen title. -->
   <meta name="apple-mobile-web-app-title" content="{{ app_name }} | Synk" />
   <meta name="apple-touch-fullscreen" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -134,6 +135,12 @@
     href="/assets/raven/raven/splash_screens/8.3__iPad_Mini_portrait.png">
 
   <!-- {{ preload_links }} -->
+  <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven").
+       //// This template is the SOURCE of raven/www/raven.html (copied post-build by yarn
+       //// copy-html-entry) - edit here, never there. It loads desk.bundle.css + neoffice-theme.css so
+       //// the embedded Frappe sidebar/navbar have their styles, WITHOUT loading desk.bundle.js (its
+       //// boot sequence fights ours). The .collapse override below undoes Tailwind's
+       //// `visibility: collapse`, which hides Bootstrap 4's .navbar-collapse that Frappe still uses. -->
 
   <!-- Frappe Shell Native: desk CSS + neoffice_theme CSS for embedded sidebar/navbar.
        We do NOT load desk.bundle.js (timing + dependency hell with billing/nora). -->
@@ -280,12 +287,15 @@
 <link rel="manifest" href="/assets/raven/raven/manifest.webmanifest"></head>
 
 <body>
+  <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): host node for the three
+       //// inlined Frappe icon sprites, so <use href="#es-line-..."> resolves without desk.bundle.js. -->
   <!-- Frappe Shell Native: container for inlined Frappe icon sprites
        (timeless + espresso + lucide) so <use href="#es-line-..."> and
        <use href="#icon-..."> resolve to actual <symbol> definitions. -->
   <div id="all-symbols" style="display: none; position: absolute; width: 0; height: 0;"></div>
 
   <div id="root" vaul-drawer-wrapper="true"></div>
+  <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): the boot script is expanded below. -->
   <script>
     window.csrf_token = '{{ csrf_token }}';
     if (!window.frappe) window.frappe = {};
@@ -293,6 +303,11 @@
     window.app_name = "{{ app_name }}";
 
     frappe.boot = JSON.parse({{ boot }});
+    <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): minimal window['__'] i18n shim.
+         //// Without desk.bundle.js, Frappe's translate() never gets installed and the embedded chrome
+         //// would render in English regardless of the user's language. BRACKET NOTATION IS MANDATORY
+         //// here, in code AND in comments: Frappe's Jinja safe_render rejects any substring ".__"
+         //// (anti-SSTI) and answers HTTP 417 Illegal Template, which kills the whole page. -->
     frappe._messages = frappe.boot["__messages"];
 
     // Minimal i18n shim for the embedded shell. We do not load desk.bundle.js
@@ -351,4 +366,5 @@
   </script>
 </body>
 
+<!-- //// Neoffice - newline at end of file. No content change. -->
 </html>

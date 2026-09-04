@@ -91,6 +91,9 @@ class FrappePushNotification {
             return this.webConfig
         }
         try {
+            //// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"). Upstream only ever registers the
+            //// service worker for its own "Raven" (Raven Cloud) service; we self-host and send through our
+            //// own Firebase project, so the Firebase value must take the same path.
             if (["Raven", "Firebase"].includes(window.frappe?.boot.push_notification_service)) {
                 this.webConfig = JSON.parse(window.frappe?.boot.firebase_client_config)
                 return this.webConfig
@@ -117,6 +120,7 @@ class FrappePushNotification {
             return this.vapidPublicKey
         }
         try {
+            //// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"): same test, unsubscribe side.
             if (["Raven", "Firebase"].includes(window.frappe?.boot.push_notification_service)) {
                 this.vapidPublicKey = window.frappe?.boot.vapid_public_key
                 return this.vapidPublicKey
