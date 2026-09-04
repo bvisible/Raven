@@ -123,8 +123,9 @@ export const DMListRow = ({ dm }: { dm: DMChannelListItem }) => {
 //// Neoffice - "extra users" sidebar section (b8b8dd25c + 40efaffad, 2026-01-05 "feat(mobile): Show extra users without
 //// DM in sidebar") + self-DM filter (1400e92c5, 2026-01-05 "fix: Filter out self-DMs from DM lists"). Upstream's sidebar can only show
 //// channels that already exist, so a colleague you never wrote to is unreachable from it: this
-//// lists up to 5 of them and creates the channel on tap. TO REVIEW: the toast.error string here
-//// is still hardcoded English - it escaped the i18n pass.
+//// lists up to 5 of them and creates the channel on tap. The toast below had escaped the i18n
+//// pass and was hardcoded English; it goes through t() since 2026-09-04, reusing the existing
+//// channels.channelCreationFailed key rather than adding a second wording for the same event.
 const ExtraUserItem = ({ user, createDMChannel }: { user: UserFields, createDMChannel: (user_id: string) => Promise<void> }) => {
     const [isLoading, setIsLoading] = useState(false)
     const isActive = useIsUserActive(user.name)
@@ -161,6 +162,8 @@ const ExtraUserItem = ({ user, createDMChannel }: { user: UserFields, createDMCh
 }
 
 const ExtraUsersItemList = ({ dms }: { dms: DMChannelListItem[] }) => {
+    //// Neoffice - t() for the toast below (2026-09-04).
+    const { t } = useTranslation()
     const { enabledUsers } = useContext(UserListContext)
     const { mutate } = useContext(ChannelListContext) as ChannelListContextType
     const { myProfile } = useCurrentRavenUser()
@@ -174,7 +177,8 @@ const ExtraUsersItemList = ({ dms }: { dms: DMChannelListItem[] }) => {
                 mutate()
             })
             .catch(() => {
-                toast.error('Could not create channel')
+                //// Neoffice - translated (2026-09-04), was a hardcoded English string.
+                toast.error(t('channels.channelCreationFailed'))
             })
     }
 
