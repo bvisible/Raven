@@ -1,6 +1,6 @@
-#//// Neoffice - added file (no upstream equivalent). Runs a Raven AI Function from a name +
-#//// arguments dict (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"), used by the text-based tool-calling path: with no
-#//// native function calling there is no SDK to dispatch the call for us.
+# //// Neoffice - added file (no upstream equivalent). Runs a Raven AI Function from a name +
+# //// arguments dict (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"), used by the text-based tool-calling path: with no
+# //// native function calling there is no SDK to dispatch the call for us.
 """Function executor for Raven AI functions"""
 
 import inspect
@@ -54,13 +54,13 @@ def execute_raven_function(function_name: str, args: dict, channel_id: str = Non
 							result = json.loads(json.dumps(result, default=str))
 					return result
 
-		#//// Neoffice - full dispatch (2026-09-04). Only six of the eighteen Raven AI Function types
-		#//// were handled here, and "Update Document" was called as update_document(doctype, **args),
-		#//// which cannot match update_document(doctype, document_id, data, function) - it raised
-		#//// TypeError on every call. The table below mirrors the dispatch of raven/ai/handler.py,
-		#//// the assistants path, so a function behaves the same whichever provider runs it. It
-		#//// matters more now that agents_integration.py builds a tool for EVERY configured function
-		#//// again. Each entry is a thunk: only the selected one is evaluated.
+		# //// Neoffice - full dispatch (2026-09-04). Only six of the eighteen Raven AI Function types
+		# //// were handled here, and "Update Document" was called as update_document(doctype, **args),
+		# //// which cannot match update_document(doctype, document_id, data, function) - it raised
+		# //// TypeError on every call. The table below mirrors the dispatch of raven/ai/handler.py,
+		# //// the assistants path, so a function behaves the same whichever provider runs it. It
+		# //// matters more now that agents_integration.py builds a tool for EVERY configured function
+		# //// again. Each entry is a thunk: only the selected one is evaluated.
 		from raven.ai import functions as raven_fn
 
 		doctype = function_doc.reference_doctype

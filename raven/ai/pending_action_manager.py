@@ -1,6 +1,6 @@
-#//// Neoffice - added file (no upstream equivalent). Confirmation workflow for actions a bot
-#//// wants to take (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): a local model is far more likely to propose a wrong
-#//// write, so a create/update/delete is parked in Redis and only runs once the user confirms.
+# //// Neoffice - added file (no upstream equivalent). Confirmation workflow for actions a bot
+# //// wants to take (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): a local model is far more likely to propose a wrong
+# //// write, so a create/update/delete is parked in Redis and only runs once the user confirms.
 """
 Pending Action Manager for Raven AI
 Centralized management of confirmation workflows and pending actions

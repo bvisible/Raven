@@ -1,5 +1,5 @@
-#//// Neoffice - added file (no upstream equivalent). Covers the LM Studio ActResult shapes
-#//// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
+# //// Neoffice - added file (no upstream equivalent). Covers the LM Studio ActResult shapes
+# //// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 """
 Test ActResult handling in LM Studio SDK
 """

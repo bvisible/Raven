@@ -1,6 +1,6 @@
-#//// Neoffice - added file (no upstream equivalent). HTTP handler for Ollama / LocalAI and
-#//// other OpenAI-compatible local servers (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"). LM Studio uses the SDK
-#//// handler in raven/ai/lmstudio/ instead.
+# //// Neoffice - added file (no upstream equivalent). HTTP handler for Ollama / LocalAI and
+# //// other OpenAI-compatible local servers (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"). LM Studio uses the SDK
+# //// handler in raven/ai/lmstudio/ instead.
 """
 Local LLM handler using direct HTTP calls for Ollama, LocalAI and other HTTP-based providers.
 Note: For LM Studio, use the SDK handler in raven.ai.lmstudio instead.

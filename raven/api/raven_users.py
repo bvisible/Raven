@@ -68,8 +68,8 @@ def get_users():
 			"availability_status",
 			"custom_status",
 		],
-		#//// Neoffice - Administrator is hidden from Raven (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely"): it must not even appear
-		#//// in the user picker, or someone starts a DM with it again.
+		# //// Neoffice - Administrator is hidden from Raven (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely"): it must not even appear
+		# //// in the user picker, or someone starts a DM with it again.
 		filters=[["name", "!=", "Administrator"]],
 		order_by="full_name",
 	)

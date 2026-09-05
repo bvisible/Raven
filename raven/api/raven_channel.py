@@ -34,10 +34,10 @@ def get_all_channels(hide_archived=True):
 		parsed_channels.append(parsed_channel)
 
 	channel_list = [channel for channel in parsed_channels if not channel.get("is_direct_message")]
-	#//// Neoffice - Administrator is hidden from Raven (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely").
-	#//// On a Neoffice instance Administrator is a shared maintenance account, not a colleague: it was
-	#//// showing up in everyone's DM list and people were writing to it. Both the peer id and the
-	#//// channel name are tested, because a DM channel keeps the name it was created with.
+	# //// Neoffice - Administrator is hidden from Raven (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely").
+	# //// On a Neoffice instance Administrator is a shared maintenance account, not a colleague: it was
+	# //// showing up in everyone's DM list and people were writing to it. Both the peer id and the
+	# //// channel name are tested, because a DM channel keeps the name it was created with.
 	# Filter out DMs with Administrator (check both peer_user_id and channel_name)
 	dm_list = [
 		channel
@@ -107,14 +107,14 @@ def get_channel_list(hide_archived=False):
 @frappe.whitelist()
 def get_channels(hide_archived=False):
 	channels = get_channel_list(hide_archived)
-	#//// Neoffice - Administrator is hidden from Raven (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely"): the loop now builds a
-	#//// filtered list instead of mutating and returning the original.
+	# //// Neoffice - Administrator is hidden from Raven (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely"): the loop now builds a
+	# //// filtered list instead of mutating and returning the original.
 	result = []
 	for channel in channels:
 		peer_user_id = get_peer_user_id(
 			channel.get("name"), channel.get("is_direct_message"), channel.get("is_self_message")
 		)
-		#//// Neoffice - Administrator is hidden from Raven (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely"), second endpoint.
+		# //// Neoffice - Administrator is hidden from Raven (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely"), second endpoint.
 		# Filter out DMs with Administrator (check both peer_user_id and channel_name)
 		if channel.get("is_direct_message"):
 			if peer_user_id == "Administrator":
@@ -125,7 +125,7 @@ def get_channels(hide_archived=False):
 		if peer_user_id:
 			user_full_name = frappe.get_cached_value("User", peer_user_id, "full_name")
 			channel["full_name"] = user_full_name
-		#//// Neoffice - returns the filtered list (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely").
+		# //// Neoffice - returns the filtered list (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely").
 		result.append(channel)
 	return result
 
@@ -174,8 +174,8 @@ def create_direct_message_channel(user_id):
 	"""
 	# TODO: this logic might break if the user_id changes
 
-	#//// Neoffice - Administrator is hidden from Raven (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely"): refuse at the source
-	#//// too, otherwise a DM created before the filter (or from the API) reappears for its owner.
+	# //// Neoffice - Administrator is hidden from Raven (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely"): refuse at the source
+	# //// too, otherwise a DM created before the filter (or from the API) reappears for its owner.
 	# Block DMs with Administrator
 	if user_id == "Administrator" or frappe.session.user == "Administrator":
 		frappe.throw(_("Cannot create direct messages with Administrator."))

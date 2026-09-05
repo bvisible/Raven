@@ -5,21 +5,21 @@ from frappe.desk.page.setup_wizard.setup_wizard import add_all_roles_to, make_re
 
 def after_install():
 	try:
-		#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): install output.
+		# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): install output.
 		print("Setting up Synk...")
 		add_all_roles_to("Administrator")
 		create_raven_user_for_administrator()
 		create_general_channel()
 
-		#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): install output.
+		# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): install output.
 		click.secho("Thank you for installing Synk!", fg="green")
 
 	except Exception as e:
 		BUG_REPORT_URL = "https://github.com/The-Commit-Company/Raven/issues/new"
 		click.secho(
-			#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): install output. TO REVIEW: the BUG_REPORT_URL just
-			#//// above still points at The-Commit-Company/Raven, so a Neoffice install failure is reported
-			#//// upstream.
+			# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): install output. TO REVIEW: the BUG_REPORT_URL just
+			# //// above still points at The-Commit-Company/Raven, so a Neoffice install failure is reported
+			# //// upstream.
 			"Installation for Synk failed due to an error."
 			" Please try re-installing the app or"
 			f" report the issue on {BUG_REPORT_URL} if not resolved.",
@@ -45,9 +45,9 @@ def create_general_channel():
 	default_workspace = frappe.get_doc(
 		{
 			"doctype": "Raven Workspace",
-			#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): the default workspace is created as "Synk".
-			#//// Instances set up before this still carry a "Raven" workspace, which is why the mobile app
-			#//// maps the name at display time (apps/mobile/.../WorkspaceSwitcher.tsx).
+			# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): the default workspace is created as "Synk".
+			# //// Instances set up before this still carry a "Raven" workspace, which is why the mobile app
+			# //// maps the name at display time (apps/mobile/.../WorkspaceSwitcher.tsx).
 			"workspace_name": "Synk",
 			"type": "Public",
 		}

@@ -1,5 +1,5 @@
-#//// Neoffice - added file (no upstream equivalent). Purges expired pending actions from Redis
-#//// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
+# //// Neoffice - added file (no upstream equivalent). Purges expired pending actions from Redis
+# //// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 from datetime import datetime, timedelta
 
 import frappe

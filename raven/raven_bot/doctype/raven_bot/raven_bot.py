@@ -504,16 +504,16 @@ class RavenBot(Document):
 		)
 		# Bots can probably send messages without permissions? Upto the end user to create bots.
 		# Besides sending messages is not a security concern, unauthorized reading of messages is.
-		#//// Neoffice - back to upstream's plain insert (2026-09-04). 98fb5650 (2026-01-08, "add
-		#//// TTS/STT support") passed ignore_links=bool(link_document), i.e. it turned link validation
-		#//// OFF exactly when there was a link to validate, and ON when there was nothing to check.
-		#//// Its stated reason - the linked document may have been created on another database
-		#//// connection by Nora's code executor and not be visible yet - does not hold: the caller that
-		#//// motivated it (nora/api/v2/hermes_callback.py) reads the NORA Action Card with get_all on
-		#//// THIS connection immediately before sending, and the desk card renders by fetching the
-		#//// document client-side anyway, so a link this connection cannot see renders as a broken card
-		#//// whether we validate it or not. The flag also silenced validation of every other Link field
-		#//// of Raven Message (channel_id, bot, file, notification) on the same insert.
+		# //// Neoffice - back to upstream's plain insert (2026-09-04). 98fb5650 (2026-01-08, "add
+		# //// TTS/STT support") passed ignore_links=bool(link_document), i.e. it turned link validation
+		# //// OFF exactly when there was a link to validate, and ON when there was nothing to check.
+		# //// Its stated reason - the linked document may have been created on another database
+		# //// connection by Nora's code executor and not be visible yet - does not hold: the caller that
+		# //// motivated it (nora/api/v2/hermes_callback.py) reads the NORA Action Card with get_all on
+		# //// THIS connection immediately before sending, and the desk card renders by fetching the
+		# //// document client-side anyway, so a link this connection cannot see renders as a broken card
+		# //// whether we validate it or not. The flag also silenced validation of every other Link field
+		# //// of Raven Message (channel_id, bot, file, notification) on the same insert.
 		# Bots can send messages without permissions, but a link they store must exist.
 		doc.insert(ignore_permissions=True)
 		return doc.name

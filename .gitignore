@@ -5,17 +5,17 @@
 tags
 node_modules
 
-#//// Neoffice - .idea/ dropped from the repository (2026-09-04). The folder had been committed
-#//// by mistake (d70a6fb2e, 2024-02-23) and .idea/misc.xml advertised a real production host and
-#//// login (root@demo.neoffice.me:22). It is per-developer editor state; upstream ships none.
+# //// Neoffice - .idea/ dropped from the repository (2026-09-04). The folder had been committed
+# //// by mistake (d70a6fb2e, 2024-02-23) and .idea/misc.xml advertised a real production host and
+# //// login (root@demo.neoffice.me:22). It is per-developer editor state; upstream ships none.
 .idea/
 
 dist/
 mobile/dev-dist
-#//// Neoffice - commit-the-build (e47b794fe, 2026-05-07 "build(frontend): commit built frontend so instances pull, no rebuild on prod").
-#//// Upstream ignores the vite output and rebuilds on every instance; `yarn build` OOM-kills a
-#//// 4 GB Neoffice instance, so GitHub Actions builds it and the artefacts are committed. The
-#//// three paths are commented out rather than deleted so the diff against upstream stays legible.
+# //// Neoffice - commit-the-build (e47b794fe, 2026-05-07 "build(frontend): commit built frontend so instances pull, no rebuild on prod").
+# //// Upstream ignores the vite output and rebuilds on every instance; `yarn build` OOM-kills a
+# //// 4 GB Neoffice instance, so GitHub Actions builds it and the artefacts are committed. The
+# //// three paths are commented out rather than deleted so the diff against upstream stays legible.
 
 # 2026-05-07 (NORA #28) — frontend build outputs are committed on this branch.
 # See docs/COMMIT-BUILD-PATTERN.md in neoffice-devops.
@@ -24,9 +24,9 @@ mobile/dev-dist
 # raven/public/raven
 # raven/public/raven_v3
 raven/public/node_modules
-#//// Neoffice - commit-the-build (e47b794fe, 2026-05-07 "build(frontend): commit built frontend so instances pull, no rebuild on prod"): raven/www/raven.html is committed too,
-#//// for the same reason as the assets above. raven_v3 is kept commented out with it - that
-#//// variant is not built today.
+# //// Neoffice - commit-the-build (e47b794fe, 2026-05-07 "build(frontend): commit built frontend so instances pull, no rebuild on prod"): raven/www/raven.html is committed too,
+# //// for the same reason as the assets above. raven_v3 is kept commented out with it - that
+# //// variant is not built today.
 # raven/www/raven.html
 # raven/www/raven_v3.html
 *.env
@@ -36,10 +36,10 @@ apps/mobile/ios
 apps/mobile/android
 apps/mobile/.expo
 
-#//// Neoffice - the two lines below. apps/web/.env.local is upstream's, unchanged - it only shows
-#//// in the diff because upstream leaves the file without a trailing newline. The CLAUDE.md rule
-#//// under it is ours (bc9617b4e, 2026-05-07 "docs(claude): unship CLAUDE.md and document
-#//// commit-the-build pipeline"): CLAUDE.md is SHIPPED, not ignored, because it documents the
-#//// build pipeline and the Frappe Shell Native integration that the next person needs.
+# //// Neoffice - the two lines below. apps/web/.env.local is upstream's, unchanged - it only shows
+# //// in the diff because upstream leaves the file without a trailing newline. The CLAUDE.md rule
+# //// under it is ours (bc9617b4e, 2026-05-07 "docs(claude): unship CLAUDE.md and document
+# //// commit-the-build pipeline"): CLAUDE.md is SHIPPED, not ignored, because it documents the
+# //// build pipeline and the Frappe Shell Native integration that the next person needs.
 apps/web/.env.local
 # CLAUDE.md  # 2026-05-07 unshipped to document commit-the-build pipeline

@@ -1,4 +1,4 @@
-#//// Neoffice - added file (no upstream equivalent). OpenAI path tests (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
+# //// Neoffice - added file (no upstream equivalent). OpenAI path tests (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 """
 OpenAI integration tests
 """

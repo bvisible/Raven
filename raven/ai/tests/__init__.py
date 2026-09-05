@@ -5,9 +5,9 @@ Modular testing framework for Raven AI system
 
 from .test_actresult import ActResultTests
 from .test_conversation import ConversationTests
-#//// Neoffice — test_functions.py was never committed (only described in ai.md), and
-#//// frappe's test runner imports every test module of the app: this package-level
-#//// import killed `bench run-tests --app raven` before any test ran (CI, 2026-09-03).
+# //// Neoffice — test_functions.py was never committed (only described in ai.md), and
+# //// frappe's test runner imports every test module of the app: this package-level
+# //// import killed `bench run-tests --app raven` before any test ran (CI, 2026-09-03).
 try:
     from .test_functions import FunctionTests
 except ImportError:  # module absent from the repository

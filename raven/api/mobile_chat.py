@@ -1,7 +1,7 @@
-#//// Neoffice - added file (no upstream equivalent). REST surface used by the Synk mobile app
-#//// and the watch client to talk to the Nora bot (b0f19a5e0, 2026-01-04 "feat(api): Add
-#//// mobile_chat.py for Flutter/Watch Nora integration"): get-or-create the DM channel, send a
-#//// message, read the thread. Upstream expects the mobile app to drive the generic channel APIs.
+# //// Neoffice - added file (no upstream equivalent). REST surface used by the Synk mobile app
+# //// and the watch client to talk to the Nora bot (b0f19a5e0, 2026-01-04 "feat(api): Add
+# //// mobile_chat.py for Flutter/Watch Nora integration"): get-or-create the DM channel, send a
+# //// message, read the thread. Upstream expects the mobile app to drive the generic channel APIs.
 """
 Mobile Chat API for Raven-Nora Integration
 

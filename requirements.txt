@@ -1,6 +1,6 @@
-#//// Neoffice - added file (no upstream equivalent). Upstream declares its dependencies in
-#//// pyproject.toml only; bench's app installer still reads requirements.txt on the fleet, so the
-#//// same list is mirrored here (markitdown pin + lmstudio included).
+# //// Neoffice - added file (no upstream equivalent). Upstream declares its dependencies in
+# //// pyproject.toml only; bench's app installer still reads requirements.txt on the fleet, so the
+# //// same list is mirrored here (markitdown pin + lmstudio included).
 # frappe -- https://github.com/frappe/frappe is installed via 'bench init'
 linkpreview
 openai>=1.100.2

@@ -1,10 +1,10 @@
-#//// Neoffice - added file (no upstream equivalent). LM Studio end-to-end test (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
-#//// Docstrings and comments translated from French on 2026-09-04: source files are English.
-#//// The print() diagnostics below are still French, and so are the questions asked to the
-#//// model - those are the fixture (a French-speaking user asking for context the prompt was
-#//// supposed to carry). Note that this script cannot run as it stands: it calls
-#//// EnhancedLMStudioHandler(bot=bot) and lmstudio_sdk_handler(message=..., bot=...), neither
-#//// of which matches the current signatures. It wants a rewrite, not a translation.
+# //// Neoffice - added file (no upstream equivalent). LM Studio end-to-end test (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
+# //// Docstrings and comments translated from French on 2026-09-04: source files are English.
+# //// The print() diagnostics below are still French, and so are the questions asked to the
+# //// model - those are the fixture (a French-speaking user asking for context the prompt was
+# //// supposed to carry). Note that this script cannot run as it stands: it calls
+# //// EnhancedLMStudioHandler(bot=bot) and lmstudio_sdk_handler(message=..., bot=...), neither
+# //// of which matches the current signatures. It wants a rewrite, not a translation.
 #!/usr/bin/env python3
 """
 End-to-end diagnostic against a live LM Studio server.
@@ -21,7 +21,7 @@ import frappe
 
 
 def test_nora_with_lmstudio():
-	#//// Neoffice - English docstring (2026-09-04), see the file header.
+	# //// Neoffice - English docstring (2026-09-04), see the file header.
 	"""Walk the whole path: settings, bot, context variables, prompt, model, tools."""
 
 	print("=" * 60)
@@ -74,7 +74,7 @@ def test_nora_with_lmstudio():
 	print("  Variables disponibles:")
 	important_vars = ["full_name", "company", "currency", "lang", "current_date"]
 	for var in important_vars:
-		value = context_vars.get(var, "NOT SET")  #//// Neoffice - English (2026-09-04).
+		value = context_vars.get(var, "NOT SET")  # //// Neoffice - English (2026-09-04).
 		print(f"    - {var}: {value}")
 
 	# 4. Check that the prompt renders
@@ -148,7 +148,7 @@ def test_nora_with_lmstudio():
 		handler = EnhancedLMStudioHandler(bot=bot)
 
 		print(f"  Fonctions chargées: {len(handler.tools)}")
-		for tool in handler.tools[:5]:  #//// Neoffice - "first five only", English (2026-09-04).
+		for tool in handler.tools[:5]:  # //// Neoffice - "first five only", English (2026-09-04).
 			if hasattr(tool, "__name__"):
 				print(f"    • {tool.__name__}")
 
@@ -170,7 +170,7 @@ def test_nora_with_lmstudio():
 
 
 def test_function_calls_with_context():
-	#//// Neoffice - English docstring (2026-09-04), see the file header.
+	# //// Neoffice - English docstring (2026-09-04), see the file header.
 	"""Check that the model still calls functions once the context is injected."""
 
 	print("\n" + "=" * 60)
@@ -208,7 +208,7 @@ def test_function_calls_with_context():
 
 
 def main():
-	#//// Neoffice - English docstring (2026-09-04), see the file header.
+	# //// Neoffice - English docstring (2026-09-04), see the file header.
 	"""Entry point."""
 
 	# Initialize Frappe

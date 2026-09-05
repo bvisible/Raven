@@ -1,4 +1,4 @@
-#//// Neoffice - added file (no upstream equivalent). End-to-end AI workflow test (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
+# //// Neoffice - added file (no upstream equivalent). End-to-end AI workflow test (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 """
 Integration tests for complete workflow
 """

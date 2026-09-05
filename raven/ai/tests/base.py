@@ -1,5 +1,5 @@
-#//// Neoffice - added file (no upstream equivalent). Shared base for the AI test suite
-#//// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"); upstream ships no tests for raven/ai.
+# //// Neoffice - added file (no upstream equivalent). Shared base for the AI test suite
+# //// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"); upstream ships no tests for raven/ai.
 """
 Base test class with common functionality
 """

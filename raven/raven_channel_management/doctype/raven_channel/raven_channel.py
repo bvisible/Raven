@@ -261,10 +261,10 @@ def on_doctype_update():
 	Add unique constraint on dm_user_1 and dm_user_2 to prevent duplicate DM channels.
 	NULL values are ignored by MySQL/MariaDB unique constraints, so this only affects DM channels.
 	"""
-	#//// Neoffice - 8fa069523, 2026-01-15 "fix(raven_channel): Check columns exist before adding
-	#//// unique constraint". on_doctype_update runs during migrate, before the doctype sync has
-	#//// necessarily added dm_user_1/dm_user_2; upstream's ALTER TABLE then aborted the whole migrate
-	#//// on a fresh install. TO REVIEW: drop once the fleet is past the version that introduced them.
+	# //// Neoffice - 8fa069523, 2026-01-15 "fix(raven_channel): Check columns exist before adding
+	# //// unique constraint". on_doctype_update runs during migrate, before the doctype sync has
+	# //// necessarily added dm_user_1/dm_user_2; upstream's ALTER TABLE then aborted the whole migrate
+	# //// on a fresh install. TO REVIEW: drop once the fleet is past the version that introduced them.
 	# Check if columns exist before adding constraint (they may not exist during initial migration)
 	if not frappe.db.has_column("Raven Channel", "dm_user_1"):
 		return

@@ -48,9 +48,9 @@ def create_oauth_client():
 
 	oauth_client.app_name = "Raven Mobile"
 	oauth_client.scopes = "all openid"
-	#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): the OAuth redirect scheme must match the bundle id the
-	#//// app is published under (io.synk.app). Upstream's raven.thecommit.company: belongs to their
-	#//// own App Store build. Mirrored in apps/mobile/components/features/auth/AddSite.tsx.
+	# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): the OAuth redirect scheme must match the bundle id the
+	# //// app is published under (io.synk.app). Upstream's raven.thecommit.company: belongs to their
+	# //// own App Store build. Mirrored in apps/mobile/components/features/auth/AddSite.tsx.
 	oauth_client.redirect_uris = "io.synk.app:"
 	oauth_client.default_redirect_uri = "io.synk.app:"
 	oauth_client.grant_type = "Authorization Code"

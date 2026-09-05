@@ -1,5 +1,5 @@
-#//// Neoffice - added file (no upstream equivalent). Doctype backing the confirmation workflow
-#//// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): see raven/ai/pending_action_manager.py.
+# //// Neoffice - added file (no upstream equivalent). Doctype backing the confirmation workflow
+# //// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"): see raven/ai/pending_action_manager.py.
 import json
 import uuid
 from datetime import datetime, timedelta

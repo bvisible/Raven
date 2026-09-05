@@ -1,7 +1,7 @@
 from . import __version__ as app_version
 
 app_name = "raven"
-#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): the app is published as Synk.
+# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): the app is published as Synk.
 app_title = "Synk"
 app_publisher = "The Commit Company (Algocode Technologies Pvt. Ltd.)"
 app_description = "Messaging Application"
@@ -14,12 +14,12 @@ app_logo_url = "/assets/raven/raven-logo.png"
 # Frappe Shell Native pattern — neoffice_theme provides the Lucide sprite,
 # the neoffice-theme.css used by FrappeSidebar/FrappeNavbar, and the
 # `App Customization` doctype for app-switcher grouping.
-#//// Neoffice — org/repo form on purpose (upstream has no such dependency).
-#//// frappe/installer.py runs parse_app_name() on every required_apps entry
-#//// BEFORE the "already installed" check; a bare name is looked up under the
-#//// frappe/ and erpnext/ GitHub orgs -> 404 for a private app ->
-#//// InvalidRemoteException aborts every install-app. "org/repo" is split
-#//// locally into the package name, no network involved.
+# //// Neoffice — org/repo form on purpose (upstream has no such dependency).
+# //// frappe/installer.py runs parse_app_name() on every required_apps entry
+# //// BEFORE the "already installed" check; a bare name is looked up under the
+# //// frappe/ and erpnext/ GitHub orgs -> 404 for a private app ->
+# //// InvalidRemoteException aborts every install-app. "org/repo" is split
+# //// locally into the package name, no network involved.
 required_apps = ["bvisible/neoffice_theme"]
 
 # Includes in <head>
@@ -34,8 +34,8 @@ app_include_js = "raven.bundle.js"
 add_to_apps_screen = [
 	{
 		"name": "raven",
-		#//// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk" + 49ee6e172, 2025-04-05 "change name to synk" / f5dd1d497, 2025-06-27 "change logo and name"): apps-screen tile logo and title.
-		#//// TO REVIEW: lower-case "synk" here while app_title above is "Synk".
+		# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk" + 49ee6e172, 2025-04-05 "change name to synk" / f5dd1d497, 2025-06-27 "change logo and name"): apps-screen tile logo and title.
+		# //// TO REVIEW: lower-case "synk" here while app_title above is "Synk".
 		"logo": "/assets/raven/icon-intern-chat.jpg",
 		"title": "synk",
 		"route": "/raven",

@@ -1,5 +1,5 @@
-#//// Neoffice - added file (no upstream equivalent). Curated mini-boot for the Frappe chrome
-#//// embedded in /raven (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven", then 779ebff6e, 2026-06-11 "feat(boot): run inject_instance_config in the curated boot").
+# //// Neoffice - added file (no upstream equivalent). Curated mini-boot for the Frappe chrome
+# //// embedded in /raven (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven", then 779ebff6e, 2026-06-11 "feat(boot): run inject_instance_config in the curated boot").
 """Mini-boot for the Frappe Desk shell (sidebar + navbar) embedded in /raven.
 
 Frappe Desk bundles (billing.bundle.js, nora_debug.js, etc.) expect certain

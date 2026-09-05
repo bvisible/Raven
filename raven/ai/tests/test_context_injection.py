@@ -1,6 +1,6 @@
-#//// Neoffice - added file (no upstream equivalent). Covers the prompt context injection
-#//// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"; skip guard added in 7519d12c6, 2026-09-03 when neoffice_theme.ai
-#//// is absent). Prose translated from French on 2026-09-04: source files are English.
+# //// Neoffice - added file (no upstream equivalent). Covers the prompt context injection
+# //// (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"; skip guard added in 7519d12c6, 2026-09-03 when neoffice_theme.ai
+# //// is absent). Prose translated from French on 2026-09-04: source files are English.
 #!/usr/bin/env python3
 """
 Prompt context injection for Nora on LM Studio.

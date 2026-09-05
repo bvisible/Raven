@@ -1,6 +1,6 @@
 import frappe
 from frappe import _, client
-#//// Neoffice - date helpers for the tool implementations (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
+# //// Neoffice - date helpers for the tool implementations (7cdc45189, 2025-08-22 "Feat add SDK LM Studio").
 from frappe.utils import now_datetime, nowdate
 
 
@@ -197,8 +197,8 @@ def get_list(doctype: str, filters: dict = None, fields: list = None, limit: int
 		filters = {}
 
 	if fields is None:
-		#//// Neoffice - renamed local variable so it no longer shadows the `fields` parameter
-		#//// (05bccee36, 2025-08-07 "add get_report_result"). Behaviour unchanged.
+		# //// Neoffice - renamed local variable so it no longer shadows the `fields` parameter
+		# //// (05bccee36, 2025-08-07 "add get_report_result"). Behaviour unchanged.
 		filtered_fields = ["*"]
 	else:
 		meta = frappe.get_meta(doctype)
