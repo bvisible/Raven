@@ -63,7 +63,7 @@
     "sites": "Sites",
     "selectExistingSite": "Select an existing site",
     "siteUrl": "Site URL",
-    "siteUrlPlaceholder": "moninstance.neoffice.me",
+    "siteUrlPlaceholder": "votre-instance.neoffice.me",
     "addSite": "Add Site",
     "login": "Login",
     "logout": "Log Out",
