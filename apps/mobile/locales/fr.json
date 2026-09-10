@@ -63,7 +63,7 @@
     "sites": "Sites",
     "selectExistingSite": "Sélectionner un site existant",
     "siteUrl": "URL du site",
-    "siteUrlPlaceholder": "moninstance.neoffice.me",
+    "siteUrlPlaceholder": "votre-site.neoffice.me",
     "addSite": "Ajouter un site",
     "login": "Connexion",
     "logout": "Déconnexion",
