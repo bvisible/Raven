@@ -353,7 +353,12 @@ def raven_workspace_query(user):
 	workspace_names = [frappe.db.escape(member.workspace) for member in workspace_members]
 
 	if workspace_names:
-		return f"`tabRaven Workspace`.name in ({', '.join(workspace_names)}) OR `tabRaven Workspace`.type = 'Public'"
+		# //// Neoffice — parenthesised. Frappe concatenates this fragment into a larger
+		# //// WHERE with `and` (db_query.build_match_conditions), and AND binds tighter
+		# //// than OR: unwrapped, `OR type = 'Public'` escaped every other condition
+		# //// ANDed in front of it — a User Permission, another app's `*` hook — and every
+		# //// public workspace came back regardless (neoffice-maintenance#348).
+		return f"(`tabRaven Workspace`.name in ({', '.join(workspace_names)}) OR `tabRaven Workspace`.type = 'Public')"
 	else:
 		return "`tabRaven Workspace`.type = 'Public'"
 
