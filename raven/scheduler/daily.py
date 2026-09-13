@@ -14,10 +14,22 @@ def sync_invalid_tokens():
 	"""
 	raven_settings = frappe.get_single("Raven Settings")
 
+	# //// Neoffice — only Raven Cloud's relay has invalid tokens to hand back. On a
+	# //// site using another push service, or none, no secret is set: get_password
+	# //// raised and this job failed every night on every instance of our fleet.
+	if (
+		raven_settings.push_notification_service != "Raven"
+		or not raven_settings.push_notification_api_key
+	):
+		return
+	api_secret = raven_settings.get_password("push_notification_api_secret", raise_exception=False)
+	if not api_secret:
+		return
+
 	client = FrappeClient(
 		url=raven_settings.push_notification_server_url,
 		api_key=raven_settings.push_notification_api_key,
-		api_secret=raven_settings.get_password("push_notification_api_secret"),
+		api_secret=api_secret,  # //// Neoffice — read once above, without raising
 	)
 
 	batch_size = 10
