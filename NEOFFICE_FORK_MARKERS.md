@@ -52,6 +52,19 @@ build reverts it. The Neoffice divergence it contains is marked in the sources:
 | `raven/public/raven/splash_screens/**` | Copies of `frontend/public/splash_screens/**` (Neoffice artwork, `040d0b8a9`). |
 | `raven/www/raven.html` | Generated from `frontend/index.html` by `yarn copy-html-entry`. Carries the same regenerated `////` header. |
 
+### Binary files
+
+A binary diff has no line a marker could sit on, so `fork_markers.py check` excuses a binary we add
+or change only when this manifest names it, or when a pattern of this table matches it
+(neoffice-maintenance#414). Measured from the common base above, these are all of them.
+
+| Binary | Why |
+|---|---|
+| `frontend/public/splash_screens/*` | The Neoffice splash screens of the PWA, replacing upstream's (`040d0b8a9`, 2024-10-07). |
+| `raven/public/raven/splash_screens/*` | Their copies, made by `vite build` (commit-the-build, above). Never edit them: rebuild. |
+| `raven/public/manifest/*` | The Neoffice favicons and PWA icons, same commit as the splash screens. |
+| `apps/mobile/assets/*` | The Synk icon, adaptive icon and splash of the mobile app, replacing upstream's (`32a2c1201`, 2026-01-04). |
+
 ### Bench bundle — `raven/public/js/raven.bundle.js`
 
 Not commentable for the marker tool (`.bundle.js`), but it **is** source: the desk chat widget
