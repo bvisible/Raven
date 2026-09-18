@@ -2,6 +2,7 @@ import json
 from urllib.parse import urlparse
 
 import frappe
+from frappe import _
 from frappe.frappeclient import FrappeClient
 from frappe.utils import get_datetime, get_system_timezone
 from pytz import timezone, utc
@@ -12,6 +13,16 @@ from raven.utils import get_channel_members, make_api_call
 MAX_NOTIFICATION_CONTENT_LENGTH = 1000
 
 
+def push_disabled():
+	"""No pushes from developer mode / localhost — restored backups from local
+	environments must never notify real devices."""
+	return (
+		frappe.conf.developer_mode
+		or frappe.utils.get_url().startswith("http://localhost")
+		or frappe.utils.get_url().startswith("http://127.0.0.1")
+	)
+
+
 def send_notification_for_message(message):
 	"""
 	Send a push notification for a message.
@@ -19,13 +30,7 @@ def send_notification_for_message(message):
 	This is called in the "after_response" hook for user initiated requests.
 	"""
 
-	# if in developer mode or frappe.utils.get_url() is a localhost URL, then we should not send the push notification
-	# reason: avoid sending notifications from restored backups from local environments
-	if (
-		frappe.conf.developer_mode
-		or frappe.utils.get_url().startswith("http://localhost")
-		or frappe.utils.get_url().startswith("http://127.0.0.1")
-	):
+	if push_disabled():
 		return
 
 	raven_settings = frappe.get_cached_doc("Raven Settings")
@@ -126,15 +131,16 @@ def send_push_notification_via_raven_cloud(message, raven_settings):
 		workspace = "" if channel_doc.is_dm_thread else channel_doc.workspace
 
 		url = frappe.utils.get_url() + "/raven/"
-		if workspace:
+		if channel_doc.is_direct_message:
+			url += "dm-channel/"
+		elif workspace and not channel_doc.is_thread:
 			url += f"{workspace}/"
+		elif channel_doc.is_thread:
+			url += "threads/"
 		else:
-			url += "channels/"
+			url += "notifications/"
 
-		if channel_doc.is_thread:
-			url += f"thread/{channel_doc.name}/"
-		else:
-			url += f"{channel_doc.name}/"
+		url += f"{channel_doc.name}/"
 
 		image = get_image_absolute_url(message_owner_image)
 
@@ -230,6 +236,55 @@ def make_post_call_for_notification(messages, raven_settings):
 # The below functions are used to send push notifications via the Frappe Push Notification Service
 
 
+def send_reminder_push(reminder, user_id):
+	"""Push for a fired reminder — body is the note, else a message snippet.
+	Same service split as message pushes; the Frappe relay builds its own
+	permalink from data.message_id instead of honouring click_action."""
+	if push_disabled():
+		return
+
+	try:
+		raven_settings = frappe.get_cached_doc("Raven Settings")
+
+		# Message doc only loads for the fallback body.
+		body = reminder.description or (
+			frappe.get_doc("Raven Message", reminder.message).get_notification_message_content() or ""
+		)
+		body = truncate_notification_content(body)
+		title = _("⏰ Reminder")
+
+		url = frappe.utils.get_url() + f"/raven/later/{reminder.channel_id}/{reminder.message}"
+		data = {
+			"base_url": frappe.utils.get_url(),
+			"message_url": url,
+			"sitename": frappe.local.site,
+			"message_id": reminder.message,
+			"channel_id": reminder.channel_id,
+			"type": "Reminder",
+			"reminder_id": reminder.name,
+		}
+
+		if raven_settings.push_notification_service == "Raven":
+			make_post_call_for_notification(
+				[
+					{
+						"users": [user_id],
+						"notification": {"title": title, "body": body},
+						"data": data,
+						# One reminder = one notification — tag by the reminder, not the
+						# channel, so it never coalesces with message notifications.
+						"tag": reminder.name,
+						"click_action": url,
+					}
+				],
+				raven_settings,
+			)
+		else:
+			send_notification_to_user(user_id, title, body, data=data)
+	except Exception:
+		frappe.log_error(title=f"Failed to send reminder push for {reminder.name}")
+
+
 def send_notification_to_user(user_id, title, message, data=None, user_image_path=None):
 	"""
 	Send a push notification to a user
@@ -248,9 +303,13 @@ def send_notification_to_user(user_id, title, message, data=None, user_image_pat
 
 		if push_notification.is_enabled():
 			icon_url = get_image_absolute_url(user_image_path)
+			# v3 has no /channel/:id route — link to the message permalink
+			# (client resolves its real home) or fall back to the app root.
 			link = None
-			if data.get("channel_id"):
-				link = frappe.utils.get_url() + "/raven/channel/" + data.get("channel_id", "")
+			if data.get("message_id"):
+				link = frappe.utils.get_url() + "/raven/message/" + data.get("message_id")
+			elif data.get("channel_id"):
+				link = frappe.utils.get_url() + "/raven"
 			push_notification.send_notification_to_user(
 				user_id=user_id,
 				title=title,
@@ -284,9 +343,13 @@ def send_notification_to_topic(channel_id, title, message, data=None, user_image
 
 		if push_notification.is_enabled():
 			icon_url = get_image_absolute_url(user_image_path)
+			# v3 has no /channel/:id route — link to the message permalink
+			# (client resolves its real home) or fall back to the app root.
 			link = None
-			if data.get("channel_id"):
-				link = frappe.utils.get_url() + "/raven/channel/" + data.get("channel_id", "")
+			if data.get("message_id"):
+				link = frappe.utils.get_url() + "/raven/message/" + data.get("message_id")
+			elif data.get("channel_id"):
+				link = frappe.utils.get_url() + "/raven"
 			push_notification.send_notification_to_topic(
 				topic_name=channel_id,
 				title=title,
