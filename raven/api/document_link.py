@@ -1,4 +1,7 @@
 import frappe
+
+# //// Neoffice — _() for the card's field labels (see get_preview_data).
+from frappe import _
 from frappe.custom.doctype.property_setter.property_setter import delete_property_setter
 from frappe.desk.utils import slug
 from frappe.model import no_value_fields, table_fields
@@ -79,11 +82,17 @@ def get_preview_data(doctype, docname):
 
 	for key, val in preview_data.items():
 		if val and meta.has_field(key) and key not in [image_field, title_field, "name"]:
-			formatted_preview_data[meta.get_field(key).label] = frappe.format(
+			# //// Neoffice — the VALUE was translated and its LABEL was not, so a
+			# //// French desk read "Payment Due Date · Payé". The key is the
+			# //// DocField's raw label; this endpoint runs inside the READER's
+			# //// request, so frappe.local.lang is theirs and _() belongs here.
+			# //// Drop this if upstream translates the key itself.
+			formatted_preview_data[_(meta.get_field(key).label)] = frappe.format(
 				val,
 				meta.get_field(key).fieldtype,
 				translated=True,
 			)
+			# //// END Neoffice ////
 
 	return formatted_preview_data
 
