@@ -9,7 +9,11 @@ readme = "README.md"
 dynamic = ["version"]
 dependencies = [
  "linkpreview~=0.9.0",
- "openai>=2.30.0",
+ # //// Neoffice - upper bound added at the v3 merge (2026-09-22). Upstream declares an unbounded
+ # //// "openai>=2.30.0", which pip resolves to 3.x on a Neoffice bench and breaks `builder`:
+ # //// litellm 1.95.0 requires openai<3.0.0, and builder is what generates client sites.
+ # //// TO REVIEW: drop the bound once litellm supports openai 3.
+ "openai>=2.30.0,<3",
  "blurhash-python",
  "openai-agents>=0.17.2",
  # //// Neoffice - markitdown pinned (d8ddbafec + 04eb1abec, 2025-11-10 "Pin markitdown to 0.0.2 to
