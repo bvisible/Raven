@@ -278,6 +278,10 @@ const SETTINGS_TABS_UPSTREAM: {
 ////    There is nothing here a customer should touch, and the panel only offers Raven Cloud.
 ////  - about: version, installed apps and resource links — that is our build, not theirs.
 const NEOFFICE_HIDDEN_TABS = new Set([
+    //// Frappe HR: the integration is configured by us, on by default. Leaving the panel would
+    //// only let a customer switch off something we support — and the label says "Frappe HR",
+    //// which names software they never bought.
+    "hr",
     "agents",
     "functions",
     "file-sources",
