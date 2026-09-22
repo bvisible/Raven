@@ -290,6 +290,13 @@ const NEOFFICE_HIDDEN_TABS = new Set([
 
 const SETTINGS_TABS = SETTINGS_TABS_UPSTREAM.filter((tab) => !NEOFFICE_HIDDEN_TABS.has(tab.id))
 
+//// Neoffice — a group whose every panel is hidden must not leave its header behind: filtering
+//// the panels alone left an empty "AI" heading in the sidebar, which advertises exactly what we
+//// took away. Derived from the panels, so it needs no maintenance when NEOFFICE_HIDDEN_TABS moves.
+const VISIBLE_SETTINGS_TAB_GROUPS = SETTINGS_TAB_GROUPS.filter(
+    (group) => SETTINGS_TABS.some((tab) => tab.group === group.id)
+)
+
 export type SettingsTabId = (typeof SETTINGS_TABS)[number]["id"]
 
 const RavenSettingsDialog = () => {
@@ -314,7 +321,7 @@ const RavenSettingsDialog = () => {
                 defaultValue={"profile"} value={openTab}
                 onValueChange={(value) => setOpenTab(value as (typeof SETTINGS_TABS)[number]["id"])}>
                 <SettingsTabs>
-                    {SETTINGS_TAB_GROUPS.map((group) => (
+                    {VISIBLE_SETTINGS_TAB_GROUPS.map((group) => (
                         <SettingsTabGroup key={group.id} header={group.label}>
                             {SETTINGS_TABS.filter((tab) => tab.group === group.id).map((tab) => {
 
