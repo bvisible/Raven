@@ -1,0 +1,1 @@
+var e={onScrollCapture:e=>{let t=e.target;t.toggleAttribute(`data-vaul-no-drag`,t.scrollTop>0)}},t=()=>e;export{t};

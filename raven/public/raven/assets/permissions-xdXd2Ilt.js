@@ -1,0 +1,1 @@
+var e=e=>{var t;return((t=window.frappe)==null||(t=t.boot)==null||(t=t.user)==null||(t=t.can_create)==null?void 0:t.includes(e))||!1},t=e=>{var t;return((t=window.frappe)==null||(t=t.boot)==null||(t=t.user)==null||(t=t.roles)==null?void 0:t.includes(e))||!1},n=e=>e?e.is_admin===1?!0:!!e.member_id&&t(`Raven Admin`):!1;export{n,t as r,e as t};

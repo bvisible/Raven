@@ -8,7 +8,11 @@ repos:
     hooks:
       - id: trailing-whitespace
         files: "raven.*"
-        exclude: ".*json$|.*txt$|.*csv|.*md|.*svg"
+        # //// Neoffice - commit-the-build: raven/public/raven/** is the committed vite output.
+        # //// Rewriting minified bundles after the build makes the committed files differ from
+        # //// what vite produced, and v3 ships a service worker whose precache manifest records a
+        # //// revision per asset. Never let a formatting hook touch build output.
+        exclude: ".*json$|.*txt$|.*csv|.*md|.*svg|^raven/public/raven/"
       - id: check-yaml
       - id: check-merge-conflict
       - id: check-ast

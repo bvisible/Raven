@@ -1,0 +1,1 @@
+function e(e){let{messageID:t,channelID:n,parentChannelID:r,isThreadRoot:i,isDirectMessage:a,peer:o}=e,s=!!r&&r!==n,c=s||i;return{channelID:c?s?n:t:n,messageID:t,isDirectMessage:a,peer:o,isThread:c}}export{e as t};

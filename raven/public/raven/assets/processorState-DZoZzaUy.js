@@ -1,0 +1,1 @@
+var e=e=>e===`ENABLED`||e===1;export{e as t};

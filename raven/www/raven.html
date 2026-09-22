@@ -1,138 +1,172 @@
-<!DOCTYPE html>
-<!-- //// Neoffice - this file is a COPY of frontend/index.html. raven/www/raven.html (yarn
-     //// copy-html-entry) and raven/public/raven/index.html (vite) are both generated from it and both
-     //// committed, because upstream rebuilds on every instance and a 4 GB Neoffice instance OOM-kills
-     //// on vite (commit-the-build, e47b794fe, 2026-05-07 - upstream gitignores all three paths).
-     //// EDIT frontend/index.html, never a copy: the next build reverts it silently. The Neoffice
-     //// divergence in the markup is marked in frontend/index.html. -->
+<!doctype html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
+  <!-- viewport-fit=cover: required for env(safe-area-inset-*) to report real values on iOS
+       (composer, sidebars, drawers all pad by it) — without it they resolve to 0.
+       interactive-widget=resizes-content (Android Chrome 108+ only; iOS ignores it):
+       make the on-screen keyboard SHRINK the layout viewport instead of overlaying it —
+       h-dvh then tracks the keyboard and the composer stays fully above it. With the
+       default (resizes-visual), Chrome only scrolls the caret into view, so a growing
+       multi-line composer slid its bottom edge (send button) under the keyboard. -->
   <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
   <title>{{ app_name }}</title>
   <meta name="description" content="Simple, work messaging tool.">
   <link rel="apple-touch-icon" sizes="180x180" href="{{ apple_touch_icon }}">
   <link rel="icon" type="image/png" href="{{ icon_96 }}" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="{{ favicon_svg }}" />
   <link rel="shortcut icon" href="{{ favicon_ico }}" />
+  <link rel="manifest" href="/assets/raven/raven/manifest.webmanifest">
   <meta name="msapplication-TileColor" content="#000000">
-  <meta name="theme-color" content="#191919">
+  <!-- Android status bar color (pre-JS paint; the ThemeProvider overwrites
+       these with the resolved theme's --surface-base once the app boots). -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#171717">
   <link rel="mask-icon" href="{{ mask_icon }}" color="#000000">
   <meta name="apple-itunes-app" content="app-id=6741682327, app-argument={{sitename}}">
 
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <!-- //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk" / 49ee6e172, 2025-04-05): iOS home-screen title. -->
+  <!-- //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): iOS home-screen title. -->
   <meta name="apple-mobile-web-app-title" content="{{ app_name }} | Synk" />
   <meta name="apple-touch-fullscreen" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="screen-orientation" content="portrait">
   <meta name="mobile-web-app-capable" content="yes">
 
-
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/iPhone_14_Pro_Max_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/iPhone_14_Pro_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_landscape.png">
   <link rel="apple-touch-startup-image"
     media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_landscape.png">
+    href="/assets/raven/raven/splash_screens/iPhone_17e__iPhone_16e__iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_landscape.png">
   <link rel="apple-touch-startup-image"
     media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
     href="/assets/raven/raven/splash_screens/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_landscape.png">
   <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/iPhone_11_Pro_Max__iPhone_XS_Max_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/iPhone_11__iPhone_XR_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/4__iPhone_SE__iPod_touch_5th_generation_and_later_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/12.9__iPad_Pro_landscape.png">
+    media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_portrait.png">
   <link rel="apple-touch-startup-image"
     media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
     href="/assets/raven/raven/splash_screens/11__iPad_Pro__10.5__iPad_Pro_landscape.png">
   <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_landscape.png">
+  <link rel="apple-touch-startup-image"
     media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
     href="/assets/raven/raven/splash_screens/10.9__iPad_Air_landscape.png">
   <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/10.5__iPad_Air_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/10.2__iPad_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
-    href="/assets/raven/raven/splash_screens/8.3__iPad_Mini_landscape.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/iPhone_14_Pro_Max_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/iPhone_14_Pro_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/iPhone_11__iPhone_XR_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/4__iPhone_SE__iPod_touch_5th_generation_and_later_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/12.9__iPad_Pro_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/11__iPad_Pro__10.5__iPad_Pro_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/10.9__iPad_Air_portrait.png">
-  <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/10.5__iPad_Air_portrait.png">
+    media="screen and (device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_Air_portrait.png">
   <link rel="apple-touch-startup-image"
     media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
     href="/assets/raven/raven/splash_screens/10.2__iPad_portrait.png">
   <link rel="apple-touch-startup-image"
-    media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    href="/assets/raven/raven/splash_screens/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_portrait.png">
+    media="screen and (device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/13__iPad_Pro_M4_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/12.9__iPad_Pro_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/iPhone_Air_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/iPhone_16__iPhone_15_Pro__iPhone_15__iPhone_14_Pro_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_17_Pro__iPhone_17__iPhone_16_Pro_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/iPhone_11_Pro_Max__iPhone_XS_Max_landscape.png">
   <link rel="apple-touch-startup-image"
     media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
     href="/assets/raven/raven/splash_screens/8.3__iPad_Mini_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_16_Plus__iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/10.5__iPad_Air_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_17_Pro_Max__iPhone_16_Pro_Max_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_17e__iPhone_16e__iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/12.9__iPad_Pro_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/8.3__iPad_Mini_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/iPhone_16_Plus__iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/iPhone_17_Pro__iPhone_17__iPhone_16_Pro_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/11__iPad_Pro_M4_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_11__iPhone_XR_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/10.5__iPad_Air_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/11__iPad_Pro_M4_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/iPhone_11__iPhone_XR_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/11__iPad_Pro__10.5__iPad_Pro_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/13__iPad_Pro_M4_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_16__iPhone_15_Pro__iPhone_15__iPhone_14_Pro_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/4__iPhone_SE__iPod_touch_5th_generation_and_later_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/10.9__iPad_Air_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/4__iPhone_SE__iPod_touch_5th_generation_and_later_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/assets/raven/raven/splash_screens/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/10.2__iPad_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/assets/raven/raven/splash_screens/iPhone_17_Pro_Max__iPhone_16_Pro_Max_landscape.png">
 
   <!-- {{ preload_links }} -->
   <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven").
@@ -146,6 +180,7 @@
        We do NOT load desk.bundle.js (timing + dependency hell with billing/nora). -->
   {% if desk_css_url %}<link rel="stylesheet" href="{{ desk_css_url }}" />{% endif %}
   <link rel="stylesheet" href="{{ neoffice_theme_css_url }}" />
+
 
   <style>
     /* === Tailwind .collapse override ===
@@ -282,63 +317,109 @@
 
     #root { width: 100%; min-height: 100vh; }
   </style>
-  <!-- //// Neoffice — commit-the-build: hashed asset filename regenerated by the frontend rebuild (0de73102f "build(raven): bump cockpit pin -> f54177e91 + rebuild"). -->
-  <script type="module" crossorigin src="/assets/raven/raven/assets/index-Da4PjC8B.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/raven/raven/assets/index-BT73-K5g.css">
-<link rel="manifest" href="/assets/raven/raven/manifest.webmanifest"></head>
+
+  <script type="module" crossorigin src="/assets/raven/raven/assets/index-Dj0nx6fq.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/asyncToGenerator-BVcl5FgL.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/chunk-Cyuzqnbw.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/objectSpread2-DcXfsnCq.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/jsx-runtime-CIX9vIE_.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/frappe-react-sdk.es-gEd36ub8.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/translate-DHK7Etrq.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/button-CM3ar23Y.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/label-CrGdZVaj.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/preload-helper-c5Zhss-F.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/ChannelIcon-DcMu7_KK.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/draft-BWRO7b84.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/drawer-BeL8mUsT.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/dist-BqGB564z.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/select-ZJUG7EnM.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/CreateChannelButton-BFXcWKYY.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/react-B_doTrv5.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/settingsDialogAtom-DHIQXiML.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/avatar-GwanJyig.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/badge-CBNS1SsQ.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/switch-iYCbuHtV.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/dist-BgqAuJB5.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/dropdown-menu-DKytZXIk.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/empty-_3Yq3ItR.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/kbd-4h7yEYDO.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/skeleton-Biij3Xqh.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/tooltip-CXze7DTq.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/store-oSy7BG5R.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/js.cookie-p4JvAUsj.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/store-DeEAJkfg.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/chunk-QUQL4437-CrdhqSPw.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/useNavigateFromDrawer-v02idp6a.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/useNoDragWhileScrolled-BQdVW_8-.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/useWorkspaces-BeYowUKa.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/useChannelList-BA7XaxDF.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/utils-C0TZkujq.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/lastVisitedAtoms-DoOcvoUC.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/dayjs.min-jxfP9_BW.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/ellipsis-vertical-1cfpboHf.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/hash-CT_o5Njk.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/plus-CYov1EJ4.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/search-zhGjj7PX.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/dist-Bhu4eNNS.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/dist-_B-OXgjl.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/useCurrentRavenUser-C8SIuVz4.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/HomeWorkspacesDrawer-cCzeFavS.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/index.esm-Dw3v8OI1.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/form-CbX8RVfP.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/date-B-m2SH8f.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/permissions-xdXd2Ilt.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/external-link-B0Tw9_Hn.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/LinkFieldCombobox-Kiduy-ET.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/bot-B-LOJnZ_.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/UserAvatar-DMYzeCX2.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/input-BHNzeTY6.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/separator-B-vW5D0T.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/emojiMart-DWe96hjo.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/db-2B2VL1C4.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/usersStore-BF2f-JHC.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/preferences-Ckd40bEs.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/underline-W4NFe5oo.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/code-D46_Ru9d.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/eye-off-DnvOOdPV.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/link-DWZ3IPGv.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/list-ordered-C9hFzI5t.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/list-B9Rk5IFM.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/useRavenEditor-yYYwe0vv.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/copy-C3w2gtzI.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/MessageCodeBlock-C-_fUjF7.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/alert-dialog-D3dJE5ab.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/chevron-left-CQl1ClZ8.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/calendar-D8TopUFy.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/checkbox-DMyAETLp.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/hover-card-Cib_CjdM.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/radio-group-DSmWACqh.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/arrow-up-O5zFSy6D.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/arrow-right-BgNEbvxz.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/bell-BAw26-80.js">
+  <link rel="modulepreload" crossorigin href="/assets/raven/raven/assets/file-text-BcqbeNqM.js">
+  <link rel="stylesheet" crossorigin href="/assets/raven/raven/assets/button-CzPFhknJ.css">
+  <link rel="stylesheet" crossorigin href="/assets/raven/raven/assets/index-CrvUllEL.css">
+</head>
 
 <body>
   <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): host node for the three
        //// inlined Frappe icon sprites, so <use href="#es-line-..."> resolves without desk.bundle.js. -->
-  <!-- Frappe Shell Native: container for inlined Frappe icon sprites
-       (timeless + espresso + lucide) so <use href="#es-line-..."> and
-       <use href="#icon-..."> resolve to actual <symbol> definitions. -->
   <div id="all-symbols" style="display: none; position: absolute; width: 0; height: 0;"></div>
-
-  <div id="root" vaul-drawer-wrapper="true"></div>
-  <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): the boot script is expanded below. -->
-  <script>
-    window.csrf_token = '{{ csrf_token }}';
+  <div id="root"></div>
+  <script>window.csrf_token = '{{ csrf_token }}';
     if (!window.frappe) window.frappe = {};
 
     window.app_name = "{{ app_name }}";
 
     frappe.boot = JSON.parse({{ boot }});
-    <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): minimal window['__'] i18n shim.
-         //// Without desk.bundle.js, Frappe's translate() never gets installed and the embedded chrome
-         //// would render in English regardless of the user's language. BRACKET NOTATION IS MANDATORY
-         //// here, in code AND in comments: Frappe's Jinja safe_render (frappe/utils/jinja.py)
-         //// refuses a template containing a dot followed by two underscores, anywhere, as an
-         //// anti-SSTI guard, and answers HTTP 417 Illegal Template - the whole page dies. Which
-         //// is exactly what this comment did on 2026-09-03, by spelling that substring out:
-         //// /raven returned 417 for every visitor until 2026-09-04. Never write it literally.
-         //// The comment below it, older, already said so without naming it. -->
-    frappe._messages = frappe.boot["__messages"];
-
-    // Minimal i18n shim for the embedded shell. We do not load desk.bundle.js
-    // so Frappe's full translate function never gets installed. This does
-    // just enough for our React components:
-    //   - dict lookup in frappe._messages
-    //   - positional substitution via {0}, {1}, ...
-    //   - context-aware lookup ("Source|Context" pattern Frappe uses)
-    //
-    // Bracket notation is REQUIRED throughout (assignment AND comments):
-    // Frappe's safe_render Jinja check refuses any dot+double-underscore
-    // substring as a SSTI guard, so even the literal name in a JS comment
-    // would trigger HTTP 417 Illegal Template at template-render time.
-    window['__'] = function (text, args, context) {
-      if (!text) return text;
-      var msgs = window.frappe && window.frappe['_messages'] || {};
-      var lookupKey = context ? text + '|' + context : text;
-      var translated = msgs[lookupKey] || msgs[text] || text;
-      if (args && args.length) {
-        translated = translated.replace(/\{(\d+)\}/g, function (_, i) {
-          var v = args[+i];
-          return v === undefined || v === null ? '' : v;
-        });
-      }
-      return translated;
-    };
+    <!-- //// Neoffice - the v2 i18n shim that used to sit here is GONE at the v3 merge:
+         //// upstream's apps/web/src/main.tsx now assigns frappe._messages from the boot payload
+         //// itself, and @lib/translate reads it. Our get_navbar_boot() still bakes the catalogue
+         //// into that boot key, so the embedded chrome keeps rendering in the user's language.
+         //// KEEP THE WARNING: inside a Jinja template, never spell a dot followed by two
+         //// underscores - frappe/utils/jinja.py safe_render refuses the whole template as an
+         //// anti-SSTI guard and answers HTTP 417, killing the page. That exact mistake made
+         //// /raven return 417 for every visitor from 2026-09-03 to 2026-09-04. Bracket notation only. -->
 
     // Integration flag — MUST be set BEFORE the bundle loads because App.tsx
     // evaluates the layout swap at module load time. Bracket notation (not

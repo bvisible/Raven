@@ -1,0 +1,1 @@
+import{n as e}from"./jsx-runtime-CIX9vIE_.js";import{t}from"./dist-Bhu4eNNS.js";var n=e(),r=(e,r)=>{let i=(0,n.c)(5),a=r===void 0?!0:r,o;i[0]===a?o=i[1]:(o={enabled:a,enableOnFormTags:!0,preventDefault:!0},i[0]=a,i[1]=o);let s;i[2]!==e||i[3]!==a?(s=[e,a],i[2]=e,i[3]=a,i[4]=s):s=i[4],t(`mod+b`,e,o,s)};export{r as t};
