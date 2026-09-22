@@ -413,6 +413,10 @@ def is_portal_account(user: str) -> bool:
 	"""
 	if not user or user in ("Guest", "Administrator"):
 		return False
+	# //// Neoffice — added (647a131e7 "fix(permissions): the directory guard must not
+	# //// depend on its own role"): frappe auto-creates "Raven User" with desk_access=1
+	# //// on a fresh site, which would make `user_type` itself depend on this very role.
+	# //// So ask whether the account holds any OTHER desk-opening role instead.
 	roles = [r for r in frappe.get_roles(user) if r not in ("Raven User", "All", "Guest")]
 	if not roles:
 		return True
