@@ -27,17 +27,6 @@ CUSTOMER = "raven-dir-portal@yopmail.com"
 STRANGER = "raven-dir-stranger@yopmail.com"
 
 
-#: `user_type` is DERIVED from the roles, not from what you declare. Measured on a bare site:
-#: a User inserted as "System User" with no role is stored as "Website User", and it only
-#: becomes a System User once a role with `desk_access` is added. Our `Raven User` role carries
-#: `desk_access = 0` on every real instance — deliberately, so the role cannot promote a portal
-#: customer to a paid seat (WI-00353) — which means a colleague fixture holding ONLY that role is
-#: not a colleague at all: it is demoted, `is_portal_account` answers True for it, and the test
-#: then measures the restricted path for both identities and fails on the half it should keep.
-#: So a colleague gets a desk role, the way a real one does.
-DESK_ROLE = "System Manager"
-
-
 def _user(email, user_type):
 	if not frappe.db.exists("User", email):
 		doc = frappe.get_doc(
@@ -52,12 +41,20 @@ def _user(email, user_type):
 		doc.flags.ignore_permissions = True
 		doc.insert(ignore_permissions=True)
 	doc = frappe.get_doc("User", email)
-	wanted = ["Raven User"] + ([DESK_ROLE] if user_type == "System User" else [])
-	missing = [r for r in wanted if not any(x.role == r for x in doc.roles)]
-	if missing:
-		for role in missing:
+	wanted = ["Raven User"]
+	#: 🔴 `user_type` is DERIVED from the roles, not from what we declared
+	#: above: a user holding only "Raven User" is stored as a Website User on
+	#: every instance where that role does not open the desk — which is ours,
+	#: deliberately. Declaring "System User" and stopping there produced a
+	#: fixture that was a customer, so the half this file exists to protect
+	#: passed for the wrong reason.
+	if user_type == "System User":
+		wanted.append("System Manager")
+	have = {r.role for r in doc.roles}
+	for role in wanted:
+		if role not in have:
 			doc.append("roles", {"role": role})
-		doc.save(ignore_permissions=True)
+	doc.save(ignore_permissions=True)
 	if not frappe.db.exists("Raven User", {"user": email}):
 		frappe.get_doc({"doctype": "Raven User", "user": email, "type": "User"}).insert(
 			ignore_permissions=True
@@ -181,6 +178,35 @@ class TestUserDirectoryIsNotPublic(IntegrationTestCase):
 		finally:
 			frappe.set_user("Administrator")
 		self.assertEqual(staff_first, staff_after, "the colleague lost rows to a portal call")
+
+	def test_the_guard_holds_when_its_own_role_opens_the_desk(self):
+		"""🔴 The silent failure this guard would otherwise have.
+
+		Nothing here ships a `Role` document, so frappe auto-creates "Raven
+		User" with `desk_access = 1` on a fresh site. `user_type` is derived
+		from the roles, so holding it would promote a customer to System User
+		— and a filter that keys on `user_type` would stop applying to exactly
+		the accounts it exists for, with the directory looking perfectly
+		normal. An instance that set `desk_access = 0` by hand is protected;
+		one that never did is not, and the difference is invisible.
+		"""
+		before = frappe.db.get_value("Role", "Raven User", "desk_access")
+		frappe.db.set_value("Role", "Raven User", "desk_access", 1)
+		frappe.clear_cache()
+		try:
+			self.assertTrue(
+				is_portal_account(CUSTOMER),
+				"the role opening the desk must not turn a customer into a colleague",
+			)
+			frappe.set_user(CUSTOMER)
+			try:
+				names = {u["name"] for u in get_list()}
+			finally:
+				frappe.set_user("Administrator")
+			self.assertNotIn(COLLEAGUE, names)
+		finally:
+			frappe.db.set_value("Role", "Raven User", "desk_access", before)
+			frappe.clear_cache()
 
 	def test_a_bot_stays_visible_so_a_conversation_still_renders(self):
 		"""Hiding the peer would leave a customer writing to a blank name."""
