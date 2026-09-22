@@ -392,6 +392,55 @@ def raven_channel_member_query(user):
 	return f"`tabRaven Channel Member`.user_id = {frappe.db.escape(user)}"
 
 
+# //// Neoffice — added: THE USER DIRECTORY WAS FILTERED BY NOTHING.
+# //// Upstream gates `Raven User` with `raven_user_has_permission` above, which
+# //// answers True to any read — the right call for a team messenger, where
+# //// colleagues are meant to see each other. But `get_list` never consults
+# //// `has_permission`, and no `permission_query_conditions` existed here, so a
+# //// LIST of the doctype came back whole: every name and e-mail address on the
+# //// instance, to anyone holding the role.
+# ////
+# //// That only matters because we hand the role to accounts upstream never
+# //// imagined: portal customers. A colleague still sees the whole directory —
+# //// nothing changes for staff, and the SPA is untouched. A PORTAL account sees
+# //// itself, the bots, and whoever it already shares a channel with, which is
+# //// exactly what a conversation needs and nothing more.
+# ////
+# //// Drop this when upstream filters the directory itself.
+def is_portal_account(user: str) -> bool:
+	"""A customer, not a colleague — `user_type` is the line the framework draws."""
+	if not user or user in ("Guest", "Administrator"):
+		return False
+	return frappe.db.get_value("User", user, "user_type") == "Website User"
+
+
+def raven_users_visible_to(user: str) -> set[str]:
+	"""Themselves, every bot, and whoever they already share a channel with.
+
+	The bots matter: a portal account talking to one has its conversation in a
+	direct channel, and hiding the peer would leave them writing to a blank.
+	"""
+	mine = frappe.get_all("Raven Channel Member", filters={"user_id": user}, pluck="channel_id")
+	peers = set()
+	if mine:
+		peers = set(
+			frappe.get_all("Raven Channel Member", filters={"channel_id": ("in", mine)}, pluck="user_id")
+		)
+	bots = set(frappe.get_all("Raven User", filters={"type": "Bot"}, pluck="name"))
+	return {u for u in (peers | bots | {user}) if u}
+
+
+def raven_user_query(user):
+	if not user:
+		user = frappe.session.user
+	if not is_portal_account(user):
+		#: A colleague sees the directory, as upstream intends.
+		return ""
+	allowed = raven_users_visible_to(user)
+	names = ", ".join(frappe.db.escape(u) for u in sorted(allowed))
+	return f"`tabRaven User`.name in ({names})"
+
+
 def raven_channel_query(user):
 	if not user:
 		user = frappe.session.user

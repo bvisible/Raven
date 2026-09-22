@@ -278,6 +278,9 @@ website_route_rules = [
 page_renderer = ["raven.page_renderers.RavenV3ServiceWorker"]
 
 permission_query_conditions = {
+	# //// Neoffice — the user directory had no entry here at all, so a LIST of
+	# //// it came back whole to anyone holding the role. See raven.permissions.
+	"Raven User": "raven.permissions.raven_user_query",
 	"Raven Channel": "raven.permissions.raven_channel_query",
 	"Raven Message": "raven.permissions.raven_message_query",
 	"Raven Poll": "raven.permissions.raven_poll_query",

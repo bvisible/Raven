@@ -55,8 +55,49 @@ def get_list():
 			title=_("Insufficient permissions. Please contact your administrator."),
 		)
 
+	# //// Neoffice — a SECOND way out of the directory, and the one the app
+	# //// actually uses. `get_users()` below is a `frappe.db.get_all`, which
+	# //// consults neither `has_permission` nor `permission_query_conditions`:
+	# //// the query condition we added for the REST path does not reach it.
+	# //// It is also `@redis_cache()`d on no argument, so the first caller's
+	# //// answer is served to everyone.
+	# ////
+	# //// A colleague still gets exactly upstream's list, from upstream's cache.
+	# //// A PORTAL account gets the same shape, restricted to itself, the bots
+	# //// and the people it already shares a channel with — computed each time
+	# //// rather than cached, because these accounts are few and a per-user
+	# //// cache key would be a cache per customer.
+	from raven.permissions import is_portal_account
+
+	if is_portal_account(frappe.session.user):
+		return get_users_for_portal_account(frappe.session.user)
+
 	# Get users is cached since this won't change frequently
 	return get_users()
+
+
+# //// Neoffice — added (no upstream equivalent). See get_list above.
+def get_users_for_portal_account(user: str):
+	from raven.permissions import raven_users_visible_to
+
+	allowed = raven_users_visible_to(user)
+	if not allowed:
+		return []
+	return frappe.db.get_all(
+		"Raven User",
+		fields=[
+			"full_name",
+			"user_image",
+			"name",
+			"first_name",
+			"enabled",
+			"type",
+			"availability_status",
+			"custom_status",
+		],
+		filters=[["name", "!=", "Administrator"], ["name", "in", sorted(allowed)]],
+		order_by="full_name",
+	)
 
 
 @redis_cache()
