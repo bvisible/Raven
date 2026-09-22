@@ -2,7 +2,9 @@
 //// Replaces the v2 `components/layout/frappe/FrappeLayout.tsx`, which upstream deleted with the
 //// whole `frontend/` folder at v3.0.0 (ac601a48f:frontend/src/components/layout/frappe/).
 import type { ReactNode } from 'react'
+import { useSetAtom } from 'jotai'
 import { NeoCockpit } from '@neoffice/frappe-sidebar-react'
+import { commandMenuOpenAtom } from '@components/features/cmdk/atoms'
 import { useFrappeThemeBridge } from './useFrappeThemeBridge'
 
 /**
@@ -22,14 +24,30 @@ import { useFrappeThemeBridge } from './useFrappeThemeBridge'
  *
  * `onSynk` is deliberately NOT passed: that button opens the docked Raven chat from elsewhere in
  * Neoffice, and here we already are Raven. The lib only renders it when the prop is given.
+ *
+ * `onSearch` IS passed, and it is what lets the two searches become one. The cockpit rail already
+ * carries a search field; wiring it to Raven's own command palette means the user has a single
+ * place to search from, and Raven's duplicate magnifier comes out of its rail (PrimarySidebar).
+ * The lib turns its input read-only and click-through as soon as the prop is there — the same
+ * pattern Drive uses for its own overlay.
  */
 export function NeoCockpitShell({ children }: { children: ReactNode }) {
 	//// Neoffice - the panel must follow the theme of the desk around it, and mirror it onto
 	//// <html data-theme>, which is what the injected chrome stylesheets read.
 	useFrappeThemeBridge(true)
 
+	//// Neoffice - one search bar for both: the cockpit's field opens Raven's command palette,
+	//// the same overlay its own magnifier opened. `searchKbd` shows the shortcut Raven actually
+	//// binds for it, so the hint does not promise a key that does something else.
+	const openCommandMenu = useSetAtom(commandMenuOpenAtom)
+
 	return (
-		<NeoCockpit env='spa' homeUrl='/app/home'>
+		<NeoCockpit
+			env='spa'
+			homeUrl='/app/home'
+			onSearch={() => openCommandMenu(true)}
+			searchKbd={navigator.platform.toLowerCase().includes('mac') ? '⌘K' : 'Ctrl K'}
+		>
 			{children}
 		</NeoCockpit>
 	)

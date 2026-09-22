@@ -14,6 +14,8 @@ import _ from "@lib/translate"
 import { cn } from "@lib/utils"
 import { useAtom, useSetAtom } from "jotai"
 import { BellIcon, BookmarkIcon, CalendarClockIcon, MessageSquareTextIcon, MoreHorizontalIcon, SearchIcon, UsersIcon } from "lucide-react"
+//// Neoffice - the cockpit rail carries the search field; see below.
+import { FRAPPE_INTEGRATION } from "../NeoCockpitShell"
 import { NavLink } from "react-router"
 import { settingsDialogOpenTab } from "@components/features/settings/settingsDialogAtom"
 import { useMemo } from "react"
@@ -62,7 +64,12 @@ const PrimarySidebar = () => {
                     <div className="px-3.5 w-full">
                         <Separator />
                     </div>
-                    <SearchButton />
+                    {/* //// Neoffice - two search entry points became one. Embedded in Neoffice the
+                        cockpit rail already shows a search field, and NeoCockpitShell wires its
+                        onSearch to this very command palette — so this magnifier would be a second
+                        button opening the same overlay, one rail apart. Served standalone (dev
+                        server, PWA) there is no cockpit, so it stays. */}
+                    {!FRAPPE_INTEGRATION && <SearchButton />}
                     <NotificationsLink />
                     <DirectMessagesLink />
                     <ThreadsLink />
