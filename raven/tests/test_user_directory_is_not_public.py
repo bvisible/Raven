@@ -125,6 +125,49 @@ class TestUserDirectoryIsNotPublic(IntegrationTestCase):
 		finally:
 			frappe.set_user("Administrator")
 
+	def test_two_identities_in_a_row_do_not_share_one_cached_answer(self):
+		"""🔴 The trap a future merge will walk into.
+
+		`get_users()` is `@redis_cache()`d on NO argument, so its key does not
+		carry the caller. Filter inside it and the first caller decides for
+		everyone: a colleague who opens the directory first would serve their
+		whole list to the next portal account, and nothing would look wrong —
+		the number is plausible. The filter therefore lives in `get_list`,
+		BEFORE the cached call, and this test is what says so.
+
+		Two identities, back to back, in the same process.
+		"""
+		frappe.set_user(COLLEAGUE)
+		try:
+			staff_first = {u["name"] for u in get_list()}
+		finally:
+			frappe.set_user("Administrator")
+		frappe.set_user(CUSTOMER)
+		try:
+			portal_after = {u["name"] for u in get_list()}
+		finally:
+			frappe.set_user("Administrator")
+		self.assertNotEqual(
+			len(staff_first),
+			len(portal_after),
+			"the portal account was served the colleague's cached list",
+		)
+		self.assertNotIn(COLLEAGUE, portal_after)
+
+		#: And the other way round, because a cache poisoned by the portal
+		#: account would shrink the directory for staff instead of widening it.
+		frappe.set_user(CUSTOMER)
+		try:
+			get_list()
+		finally:
+			frappe.set_user("Administrator")
+		frappe.set_user(COLLEAGUE)
+		try:
+			staff_after = {u["name"] for u in get_list()}
+		finally:
+			frappe.set_user("Administrator")
+		self.assertEqual(staff_first, staff_after, "the colleague lost rows to a portal call")
+
 	def test_a_bot_stays_visible_so_a_conversation_still_renders(self):
 		"""Hiding the peer would leave a customer writing to a blank name."""
 		if not frappe.db.exists("Raven User", {"type": "Bot"}):
