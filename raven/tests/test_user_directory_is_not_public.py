@@ -27,6 +27,17 @@ CUSTOMER = "raven-dir-portal@yopmail.com"
 STRANGER = "raven-dir-stranger@yopmail.com"
 
 
+#: `user_type` is DERIVED from the roles, not from what you declare. Measured on a bare site:
+#: a User inserted as "System User" with no role is stored as "Website User", and it only
+#: becomes a System User once a role with `desk_access` is added. Our `Raven User` role carries
+#: `desk_access = 0` on every real instance — deliberately, so the role cannot promote a portal
+#: customer to a paid seat (WI-00353) — which means a colleague fixture holding ONLY that role is
+#: not a colleague at all: it is demoted, `is_portal_account` answers True for it, and the test
+#: then measures the restricted path for both identities and fails on the half it should keep.
+#: So a colleague gets a desk role, the way a real one does.
+DESK_ROLE = "System Manager"
+
+
 def _user(email, user_type):
 	if not frappe.db.exists("User", email):
 		doc = frappe.get_doc(
@@ -41,8 +52,11 @@ def _user(email, user_type):
 		doc.flags.ignore_permissions = True
 		doc.insert(ignore_permissions=True)
 	doc = frappe.get_doc("User", email)
-	if not any(r.role == "Raven User" for r in doc.roles):
-		doc.append("roles", {"role": "Raven User"})
+	wanted = ["Raven User"] + ([DESK_ROLE] if user_type == "System User" else [])
+	missing = [r for r in wanted if not any(x.role == r for x in doc.roles)]
+	if missing:
+		for role in missing:
+			doc.append("roles", {"role": role})
 		doc.save(ignore_permissions=True)
 	if not frappe.db.exists("Raven User", {"user": email}):
 		frappe.get_doc({"doctype": "Raven User", "user": email, "type": "User"}).insert(
