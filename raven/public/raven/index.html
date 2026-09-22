@@ -412,14 +412,18 @@
     window.app_name = "{{ app_name }}";
 
     frappe.boot = JSON.parse({{ boot }});
-    <!-- //// Neoffice - the v2 i18n shim that used to sit here is GONE at the v3 merge:
-         //// upstream's apps/web/src/main.tsx now assigns frappe._messages from the boot payload
-         //// itself, and @lib/translate reads it. Our get_navbar_boot() still bakes the catalogue
-         //// into that boot key, so the embedded chrome keeps rendering in the user's language.
+    <!-- //// Neoffice - REQUIRED, and it fills an upstream GAP, not a preference.
+         //// apps/web/src/main.tsx only assigns frappe._messages in two branches: the DEV
+         //// fetch, and the offline cache recovery. In production the boot is inlined by this
+         //// very template, so `if (!window.frappe?.boot)` is false and the assignment never
+         //// runs — @lib/translate then reads an empty dict and EVERY string falls back to
+         //// English, upstream included. Measured on osiris 2026-09-22: frappe.boot carried
+         //// 50569 translations while frappe._messages was empty.
          //// KEEP THE WARNING: inside a Jinja template, never spell a dot followed by two
          //// underscores - frappe/utils/jinja.py safe_render refuses the whole template as an
          //// anti-SSTI guard and answers HTTP 417, killing the page. That exact mistake made
-         //// /raven return 417 for every visitor from 2026-09-03 to 2026-09-04. Bracket notation only. -->
+         //// /raven return 417 for every visitor from 2026-09-03 to 2026-09-04. Brackets only. -->
+    frappe._messages = frappe.boot["__messages"];
 
     // Integration flag — MUST be set BEFORE the bundle loads because App.tsx
     // evaluates the layout swap at module load time. Bracket notation (not
