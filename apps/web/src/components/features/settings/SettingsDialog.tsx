@@ -58,7 +58,9 @@ const HR_ICON = <svg width="61" height="61" viewBox="0 0 61 61" fill="none" xmln
 </svg>
 
 
-const SETTINGS_TABS: {
+//// Neoffice — renamed from SETTINGS_TABS so the Neoffice filter below can keep that name and
+//// every consumer stays untouched. See NEOFFICE_HIDDEN_TABS for what we take out and why.
+const SETTINGS_TABS_UPSTREAM: {
     id: string
     group: (typeof SETTINGS_TAB_GROUPS)[number]["id"]
     label: string
@@ -264,6 +266,29 @@ const SETTINGS_TABS: {
             description: _("Raven version, installed apps, and resource links."),
         }
     ]
+
+//// Neoffice — what a Neoffice customer must not be able to change, in ONE place.
+//// A single filter instead of twenty edits: an upstream release that adds a panel goes through
+//// it without a conflict, and removing an entry here is all it takes to give a panel back.
+////
+////  - the six AI panels: we do not route through Raven's AI at all. Users talk to NORA
+////    directly, and the tools, the RAG and the memory stay on our side. Exposing providers,
+////    agents, functions and instructions here would offer a second, unsupported brain.
+////  - push notifications: configured by us, per instance, against our own Firebase project.
+////    There is nothing here a customer should touch, and the panel only offers Raven Cloud.
+////  - about: version, installed apps and resource links — that is our build, not theirs.
+const NEOFFICE_HIDDEN_TABS = new Set([
+    "agents",
+    "functions",
+    "file-sources",
+    "instructions",
+    "document-processors",
+    "ai-settings",
+    "push-notifications",
+    "about",
+])
+
+const SETTINGS_TABS = SETTINGS_TABS_UPSTREAM.filter((tab) => !NEOFFICE_HIDDEN_TABS.has(tab.id))
 
 export type SettingsTabId = (typeof SETTINGS_TABS)[number]["id"]
 

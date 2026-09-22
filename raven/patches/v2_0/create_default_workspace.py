@@ -8,7 +8,10 @@ def execute():
 	default_workspace = frappe.get_doc(
 		{
 			"doctype": "Raven Workspace",
-			"workspace_name": "Raven",
+			# //// Neoffice — the product ships as Synk. This name is not decoration: Raven Workspace
+			# //// autonames on this field, so it IS the record name and what the switcher shows.
+			# //// Existing sites are renamed by patches/neoffice/rename_default_workspace_to_synk.py.
+			"workspace_name": "Synk",
 			"type": "Public",
 		}
 	)

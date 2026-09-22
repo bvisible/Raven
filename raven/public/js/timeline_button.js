@@ -1,3 +1,6 @@
+// //// Neoffice — the button this file adds to every DocType timeline read 'Send a Raven'.
+// //// The product ships as Synk, and this is the single most visible place the old name
+// //// surfaced: it sits in the footer of every document in the desk.
 // Timeline button for Frappe
 $(document).on('app_ready', function () {
   $.each(frappe.boot.user.can_read, function (i, doctype) {
@@ -166,7 +169,7 @@ $(document).on('app_ready', function () {
                 let dialog;
                 if (!dialog) {
                   dialog = new frappe.ui.Dialog({
-                    title: __('Send a Raven'),
+                    title: __('Send a Synk'),
                     fields: [
                       {
                         fieldname: 'type',
@@ -221,7 +224,7 @@ $(document).on('app_ready', function () {
                 dialog.show();
               } else {
                 frappe.msgprint({
-                  title: __('Send a Raven'),
+                  title: __('Send a Synk'),
                   indicator: 'blue',
                   message: __('No channels found'),
                 });
@@ -321,7 +324,7 @@ $(document).on('app_ready', function () {
             // check the button is not already added by checking the class name 'send-raven-button'
 
             timeline.add_action_button(
-              __('Send a Raven'),
+              __('Send a Synk'),
               send_raven,
               'share',
               'btn-secondary send-raven-button'

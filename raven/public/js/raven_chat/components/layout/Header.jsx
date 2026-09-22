@@ -95,8 +95,9 @@ const ChannelHeader = ({ channelID, onBackClick }) => {
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"></path></svg>
         </button>
 
+        {/* //// Neoffice — the tooltip read "Open channel in Raven"; the product ships as Synk. */}
         {channel?.is_direct_message ? <DMChannelHeader channel={channel} /> :
-            <a href={`/raven/channel/${channelID}`} target="_blank" title="Open channel in Raven">
+            <a href={`/raven/channel/${channelID}`} target="_blank" title="Open channel in Synk">
                 <ChannelIcon channelType={channel?.channel_type} />
                 <span className="raven-channel-header-name cal-sans">{channel?.channel_name ?? channelID}</span>
             </a>
@@ -108,7 +109,8 @@ const ChannelHeader = ({ channelID, onBackClick }) => {
 const DMChannelHeader = ({ channel }) => {
 
     const user = useGetUser(channel.peer_user_id)
-    return <a title="Open channel in Raven" className="raven-dm-channel-header" href={`/raven/channel/${channel.name}`} target="_blank">
+    //// Neoffice — the tooltip read "Open channel in Raven"; the product ships as Synk.
+    return <a title="Open channel in Synk" className="raven-dm-channel-header" href={`/raven/channel/${channel.name}`} target="_blank">
         <Avatar user={user} fallback={channel.peer_user_id} />
         <span className="raven-channel-header-name cal-sans">{user?.full_name ?? user?.name}</span>
     </a>

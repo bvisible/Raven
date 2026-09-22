@@ -194,11 +194,12 @@
    "label": "Only show channels I have joined"
   },
   {
-   "default": "12-hour",
+   "default": "24-hour",
    "fieldname": "time_format",
    "fieldtype": "Select",
    "label": "Time Format",
-   "options": "12-hour\n24-hour"
+   "options": "12-hour\n24-hour",
+   "description": "//// Neoffice - default flipped to 24-hour: our customers are in Suisse romande, where 12-hour time is not how anyone reads a clock."
   },
   {
    "fieldname": "sort_channels_by",
