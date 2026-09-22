@@ -39,6 +39,8 @@ import DocumentTitle from "./DocumentTitle"
 import { AppUpdateAlert } from "./AppUpdateAlert"
 import { SessionBroadcast } from "./SessionBroadcast"
 import RavenSettingsDialog from "@components/features/settings/SettingsDialog"
+//// Neoffice - the Neoffice chrome around /raven (see NeoCockpitShell).
+import { NeoCockpitShell, FRAPPE_INTEGRATION } from "./NeoCockpitShell"
 import { MessageActionDialogs } from "@components/features/message/actions/MessageActionDialogs"
 
 /**
@@ -240,13 +242,24 @@ const AppShellLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
     }
 
-    return <div className="flex h-dvh overflow-hidden bg-surface-elevation-1">
+    //// Neoffice - when /raven is served embedded in Frappe, the Neoffice chrome (rail + app
+    //// switcher + theme) wraps the whole app. Raven's own PrimarySidebar stays: the cockpit rail
+    //// navigates BETWEEN Neoffice apps, Raven's rail navigates WITHIN Raven — they are not
+    //// duplicates. Served standalone (dev server, PWA), the cockpit is skipped and upstream's
+    //// layout renders untouched.
+    const layout = <div className="flex h-dvh overflow-hidden bg-surface-elevation-1">
         <PrimarySidebar />
         <RavenSettingsDialog />
         <main className="flex min-w-0 flex-1 flex-col">
             {children}
         </main>
     </div>
+
+    if (FRAPPE_INTEGRATION) {
+        return <NeoCockpitShell>{layout}</NeoCockpitShell>
+    }
+
+    return layout
 }
 
 export default AppShell
