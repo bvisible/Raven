@@ -194,6 +194,19 @@ class TestUserDirectoryIsNotPublic(IntegrationTestCase):
 		frappe.db.set_value("Role", "Raven User", "desk_access", 1)
 		frappe.clear_cache()
 		try:
+			#: 🔴 The account is made AFTER the flip, which is the whole point.
+			#: Flipping it around an account created while the role was still
+			#: closed proves nothing: the promotion never happens, `Desk User`
+			#: is never granted, and the test passes on a scenario that cannot
+			#: occur. The real one is a fresh instance where the role already
+			#: opens the desk when the customer is added to the messenger.
+			late = _user("raven-dir-portal-late@yopmail.com", "Website User")
+			frappe.db.commit()
+			self.assertIn("Desk User", frappe.get_roles(late), "frappe promoted them, as it does")
+			self.assertTrue(
+				is_portal_account(late),
+				"a promoted customer is still a customer: Desk User must not answer for the role",
+			)
 			self.assertTrue(
 				is_portal_account(CUSTOMER),
 				"the role opening the desk must not turn a customer into a colleague",

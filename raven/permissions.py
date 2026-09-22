@@ -425,19 +425,21 @@ def is_portal_account(user: str) -> bool:
 	"""
 	if not user or user in ("Guest", "Administrator"):
 		return False
-	#: `Desk User` is excluded for the SAME reason as "Raven User", one hop further out, and
-	#: leaving it in put the whole guard back where it started. Measured on a bare site:
-	#:
-	#:     Website User created                     -> "Website User"
-	#:     + role "Raven User" (desk_access = 1)    -> promoted to "System User"
-	#:     frappe.get_roles() then returns          -> [..., "Desk User", "Raven User"]
-	#:
-	#: `Desk User` is AUTOMATIC — granted from `user_type`, never in `Has Role` — and it carries
-	#: `desk_access = 1`. So it answered the question on behalf of the very role we excluded:
-	#: "Raven User" flips user_type, user_type grants "Desk User", and "Desk User" says colleague.
-	#: Asking only about roles a human actually GRANTED is what makes the answer independent.
-	AUTOMATIC = ("All", "Guest", "Desk User")
-	roles = [r for r in frappe.get_roles(user) if r not in AUTOMATIC and r != "Raven User"]
+	# //// Neoffice — added (647a131e7, then corrected): frappe auto-creates
+	# //// "Raven User" with desk_access=1 on a fresh site, which would make
+	# //// `user_type` itself depend on this very role. So ask whether the
+	# //// account holds any OTHER desk-opening role instead.
+	# ////
+	# //// `Desk User` belongs in the exclusion list, and leaving it out moved
+	# //// the dependency rather than removing it: it is an AUTOMATIC role —
+	# //// frappe grants it from `user_type`, it never appears in `Has Role` —
+	# //// and it carries desk_access=1. The chain closed behind our back:
+	# //// "Raven User" flips `user_type`, `user_type` grants `Desk User`, and
+	# //// `Desk User` answers "colleague" for the role we had just excluded.
+	# //// Asking only about roles a HUMAN granted is what makes the answer
+	# //// independent of the setting it protects.
+	automatic = ("All", "Guest", "Desk User", "Raven User")
+	roles = [r for r in frappe.get_roles(user) if r not in automatic]
 	if not roles:
 		return True
 	return not frappe.db.count("Role", {"name": ("in", roles), "desk_access": 1})
