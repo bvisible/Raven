@@ -1,0 +1,133 @@
+# //// Neoffice — added file (no upstream equivalent).
+# ////
+# //// THE USER DIRECTORY, AND WHO MAY ENUMERATE IT.
+# ////
+# //// Upstream's `raven_user_has_permission` answers True to any read, which is
+# //// right for a team messenger: colleagues see each other. What it does not
+# //// cover is a LIST — `get_list` never consults `has_permission` — and there
+# //// was no `permission_query_conditions` on the doctype, so a list came back
+# //// whole: every name and e-mail address on the instance.
+# ////
+# //// That only bites because we give the role to accounts upstream never
+# //// imagined: portal customers. So this file pins the line rather than the
+# //// mechanism — a colleague still sees everyone, a customer sees only what a
+# //// conversation needs. Both directions are tested, because a fix that hid
+# //// the directory from staff would break the messenger instead of securing it.
+
+import frappe
+from frappe.tests import IntegrationTestCase
+
+from raven.api.raven_users import get_list
+from raven.permissions import is_portal_account, raven_users_visible_to
+
+EXTRA_TEST_RECORD_DEPENDENCIES = ["User", "Raven User"]
+
+COLLEAGUE = "raven-dir-staff@yopmail.com"
+CUSTOMER = "raven-dir-portal@yopmail.com"
+STRANGER = "raven-dir-stranger@yopmail.com"
+
+
+def _user(email, user_type):
+	if not frappe.db.exists("User", email):
+		doc = frappe.get_doc(
+			{
+				"doctype": "User",
+				"email": email,
+				"first_name": email.split("@")[0],
+				"user_type": user_type,
+				"send_welcome_email": 0,
+			}
+		)
+		doc.flags.ignore_permissions = True
+		doc.insert(ignore_permissions=True)
+	doc = frappe.get_doc("User", email)
+	if not any(r.role == "Raven User" for r in doc.roles):
+		doc.append("roles", {"role": "Raven User"})
+		doc.save(ignore_permissions=True)
+	if not frappe.db.exists("Raven User", {"user": email}):
+		frappe.get_doc({"doctype": "Raven User", "user": email, "type": "User"}).insert(
+			ignore_permissions=True
+		)
+	return email
+
+
+class TestUserDirectoryIsNotPublic(IntegrationTestCase):
+	@classmethod
+	def setUpClass(cls):
+		super().setUpClass()
+		frappe.set_user("Administrator")
+		for email, kind in (
+			(COLLEAGUE, "System User"),
+			(CUSTOMER, "Website User"),
+			(STRANGER, "Website User"),
+		):
+			_user(email, kind)
+		frappe.db.commit()
+		frappe.clear_cache()
+
+	def setUp(self):
+		frappe.set_user("Administrator")
+
+	def tearDown(self):
+		frappe.set_user("Administrator")
+
+	# ------------------------------------------------------- what it must keep
+	def test_a_colleague_still_sees_the_whole_directory(self):
+		"""🔴 The half that a careless fix breaks: this is a team messenger."""
+		frappe.set_user("Administrator")
+		everyone = frappe.db.count("Raven User")
+		frappe.set_user(COLLEAGUE)
+		try:
+			self.assertFalse(is_portal_account(COLLEAGUE))
+			seen = frappe.get_list("Raven User", limit_page_length=0, ignore_permissions=False)
+			#: Administrator is hidden from the app's own endpoint, not from the
+			#: doctype, so the list is the whole table for a colleague.
+			self.assertEqual(len(seen), everyone)
+		finally:
+			frappe.set_user("Administrator")
+
+	# --------------------------------------------------- what it must refuse
+	def test_a_portal_account_cannot_enumerate_the_directory(self):
+		"""A customer sees themselves, the bots, and nobody they never spoke to."""
+		frappe.set_user(CUSTOMER)
+		try:
+			self.assertTrue(is_portal_account(CUSTOMER))
+			seen = {
+				r.name for r in frappe.get_list("Raven User", limit_page_length=0, ignore_permissions=False)
+			}
+			self.assertIn(CUSTOMER, seen)
+			self.assertNotIn(COLLEAGUE, seen, "a customer must not read a colleague out of the directory")
+			self.assertNotIn(STRANGER, seen, "nor another customer")
+		finally:
+			frappe.set_user("Administrator")
+
+	def test_the_apps_own_endpoint_is_filtered_too(self):
+		"""🔴 The path the SPA actually uses, and the one a query condition misses.
+
+		`raven.api.raven_users.get_list` calls `frappe.db.get_all`, which consults
+		neither permission layer. Fixing only the REST path would have left the
+		real door open while the audit looked green.
+		"""
+		frappe.set_user(CUSTOMER)
+		try:
+			names = {u["name"] for u in get_list()}
+			self.assertIn(CUSTOMER, names)
+			self.assertNotIn(COLLEAGUE, names)
+			self.assertNotIn(STRANGER, names)
+		finally:
+			frappe.set_user("Administrator")
+
+		frappe.set_user(COLLEAGUE)
+		try:
+			names = {u["name"] for u in get_list()}
+			self.assertIn(CUSTOMER, names, "a colleague still gets upstream's list")
+			self.assertIn(STRANGER, names)
+		finally:
+			frappe.set_user("Administrator")
+
+	def test_a_bot_stays_visible_so_a_conversation_still_renders(self):
+		"""Hiding the peer would leave a customer writing to a blank name."""
+		if not frappe.db.exists("Raven User", {"type": "Bot"}):
+			self.skipTest("no bot on this site")
+		bot = frappe.db.get_value("Raven User", {"type": "Bot"}, "name")
+		self.assertIn(bot, raven_users_visible_to(CUSTOMER))
