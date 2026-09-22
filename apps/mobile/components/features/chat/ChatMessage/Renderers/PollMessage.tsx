@@ -86,7 +86,7 @@ const PollMessageBox = ({ data, messageID }: { data: Poll; messageID: string }) 
     )
 }
 
-const PollOption = ({ data, option }: { data: Poll; option: RavenPollOption }) => {
+const PollOption = ({ data, option, showVoteNumber }: { data: Poll; option: RavenPollOption; showVoteNumber: boolean }) => {
 
     const width = useSharedValue(0)
 
@@ -128,25 +128,27 @@ const PollOption = ({ data, option }: { data: Poll; option: RavenPollOption }) =
                 {option.option}
             </Text>
             <Text className={`px-2.5 py-1.5 text-sm w-[30%] text-right ${isCurrentUserVote ? 'font-semibold' : ''}`}>
-                {percentage.toFixed(1)}%
+                {showVoteNumber ? `${option.votes} vote${option.votes === 1 ? '' : 's'}` : `${percentage.toFixed(1)}%`}
             </Text>
         </View>
     )
 }
 
 const PollResults = ({ data }: { data: Poll }) => {
-    //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): useTranslation() added to feed the t() calls below.
-    const { t } = useTranslation()
+    const [showVoteNumber, setShowVoteNumber] = useState(false)
+    const toggleVoteNumber = () => {
+        setShowVoteNumber(!showVoteNumber)
+    }
     return (
-        <View className="w-full">
+        <Pressable className="w-full" onPress={toggleVoteNumber}>
             {data.poll.options.map((option) => (
-                <PollOption key={option.name} data={data} option={option} />
+                <PollOption key={option.name} data={data} option={option} showVoteNumber={showVoteNumber} />
             ))}
             <Text className="pl-2 text-sm font-medium text-muted-foreground">
                 {/* //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json. */}
                 {`${data.poll.total_votes || 0} ${data.poll.total_votes === 1 ? t('polls.vote') : t('polls.votes')}`}
             </Text>
-        </View>
+        </Pressable>
     )
 }
 

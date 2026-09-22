@@ -76,18 +76,10 @@ const ChannelMemberRow = ({ member }: { member: Member }) => {
         const { deleteDoc, error, loading: deletingDoc } = useFrappeDeleteDoc()
         const { mutate } = useSWRConfig()
 
-        const { data: memberInfo, error: errorFetchingChannelMember } = useFrappeGetCall<{ message: { name: string } }>('frappe.client.get_value', {
-            doctype: "Raven Channel Member",
-            filters: JSON.stringify({ channel_id: channelId, user_id: member?.name }),
-            fieldname: JSON.stringify(["name"])
-        }, undefined, {
-            revalidateOnFocus: false
-        })
 
         const deleteMember = async () => {
-            return deleteDoc('Raven Channel Member', memberInfo?.message.name).then(() => {
-                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): English literal replaced by t(), FR in locales/fr.json.
-                toast.success(t('members.removedFromChannel', { name: member.full_name }))
+            return deleteDoc('Raven Channel Member', member?.channel_member_name).then(() => {
+                toast.success(`Removed ${member.full_name} from the channel`)
                 mutate(["channel_members", channelId])
             })
         }

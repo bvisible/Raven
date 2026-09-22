@@ -15,7 +15,7 @@ def after_install():
 		click.secho("Thank you for installing Synk!", fg="green")
 
 	except Exception as e:
-		BUG_REPORT_URL = "https://github.com/The-Commit-Company/Raven/issues/new"
+		BUG_REPORT_URL = "https://github.com/frappe/Raven/issues/new"
 		click.secho(
 			# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): install output. TO REVIEW: the BUG_REPORT_URL just
 			# //// above still points at The-Commit-Company/Raven, so a Neoffice install failure is reported

@@ -3,8 +3,12 @@ from frappe import _
 from frappe.query_builder import Order
 from frappe.query_builder.functions import Coalesce, Count
 
-from raven.api.raven_channel import get_peer_user_id, is_channel_member
-from raven.utils import get_channel_members, get_thread_reply_count
+from raven.api.raven_channel import get_peer_user_id_from_dm_users, is_channel_member
+from raven.utils import (
+	create_members_added_system_message,
+	get_channel_members,
+	get_thread_reply_count,
+)
 
 
 @frappe.whitelist(methods=["GET"])
@@ -16,14 +20,29 @@ def get_number_of_replies(thread_id: str):
 
 
 @frappe.whitelist(methods=["GET"])
+def get_thread_details(thread_id: str):
+	"""
+	Get the members and count of messages in a thread
+	"""
+	if not frappe.has_permission(doctype="Raven Message", doc=thread_id, ptype="read"):
+		frappe.throw(_("You do not have permission to read this thread."), frappe.PermissionError)
+
+	return {
+		"members": get_channel_members(thread_id),
+		"message_count": get_thread_reply_count(thread_id),
+	}
+
+
+@frappe.whitelist(methods=["GET"])
 def get_all_threads(
 	workspace: str = None,
-	content=None,
-	channel_id=None,
-	is_ai_thread=0,
-	start_after=0,
-	limit=10,
-	only_show_unread=False,
+	content: str = None,
+	channel_id: str = None,
+	is_ai_thread: int = 0,
+	start_after: int = 0,
+	limit: int = 10,
+	only_show_unread: bool = False,
+	fetch_members: bool = True,
 ):
 	"""
 	Get all the threads in which the user is a participant
@@ -97,21 +116,30 @@ def get_all_threads(
 
 	query = query.orderby(channel.last_message_timestamp, order=Order.desc)
 
-	# return
 	threads = query.run(as_dict=True)
 
-	for thread in threads:
-		# Fetch the participants of the thread if it's not an AI thread or a DM thread
-		if not thread["is_ai_thread"] and not thread["is_dm_thread"]:
-			thread_members = get_channel_members(thread["name"])
-			thread["participants"] = [{"user_id": member} for member in thread_members]
+	# v2 renders participants in the list, so it fetches them inline (the default). v3 sends
+	# fetch_members=False and lazy-loads members per row on view (get_thread_details →
+	# channelMembersStore), avoiding this per-thread get_channel_members fan-out. reply_count
+	# is computed in the query above (free) either way.
+	if fetch_members not in (False, "false", "False", 0, "0"):
+		for thread in threads:
+			if not thread["is_ai_thread"] and not thread["is_dm_thread"]:
+				thread_members = get_channel_members(thread["name"])
+				thread["participants"] = [{"user_id": member} for member in thread_members]
 
 	return threads
 
 
 @frappe.whitelist(methods=["GET"])
 def get_other_threads(
-	workspace: str = None, content=None, channel_id=None, is_ai_thread=0, start_after=0, limit=10
+	workspace: str = None,
+	content: str = None,
+	channel_id: str = None,
+	is_ai_thread: int = 0,
+	start_after: int = 0,
+	limit: int = 10,
+	fetch_members: bool = True,
 ):
 	"""
 	Get all the threads in which the user is not a participant, but is a member of the channel
@@ -154,7 +182,9 @@ def get_other_threads(
 		.left_join(main_thread_message)
 		.on((main_thread_message.is_thread == 1) & (main_thread_message.name == thread_channel.name))
 		.left_join(thread_message)
-		.on((thread_channel.name == thread_message.channel_id) & (thread_message.message_type != "System"))
+		.on(
+			(thread_channel.name == thread_message.channel_id) & (thread_message.message_type != "System")
+		)
 		.left_join(channel_member)
 		.on(
 			(main_thread_message.channel_id == channel_member.channel_id)
@@ -187,11 +217,13 @@ def get_other_threads(
 
 	threads = query.run(as_dict=True)
 
-	for thread in threads:
-		# Fetch the participants of the thread if it's not an AI thread or a DM thread
-		if not thread["is_ai_thread"] and not thread["is_dm_thread"]:
-			thread_members = get_channel_members(thread["name"])
-			thread["participants"] = [{"user_id": member} for member in thread_members]
+	# v2 fetches members inline (default); v3 sends fetch_members=False and lazy-loads on
+	# row view (see get_all_threads) to avoid the per-thread fan-out.
+	if fetch_members not in (False, "false", "False", 0, "0"):
+		for thread in threads:
+			if not thread["is_ai_thread"] and not thread["is_dm_thread"]:
+				thread_members = get_channel_members(thread["name"])
+				thread["participants"] = [{"user_id": member} for member in thread_members]
 
 	return threads
 
@@ -208,7 +240,13 @@ def get_unread_threads(workspace: str = None, thread_id: str = None):
 
 	query = (
 		frappe.qb.from_(channel)
-		.select(channel.name, Count(message.name).as_("unread_count"))
+		.select(
+			channel.name,
+			channel.workspace,
+			# A batch (messages sharing message_batch_id, e.g. several files) counts as ONE
+			# unread; un-batched messages fall back to their unique name.
+			Count(Coalesce(message.message_batch_id, message.name)).distinct().as_("unread_count"),
+		)
 		.left_join(channel_member)
 		.on(
 			(channel.name == channel_member.channel_id) & (channel_member.user_id == frappe.session.user)
@@ -219,6 +257,7 @@ def get_unread_threads(workspace: str = None, thread_id: str = None):
 		.where(channel.is_ai_thread == 0)
 		.where(message.message_type != "System")
 		.where(message.creation > Coalesce(channel_member.last_visit, "2000-11-11"))
+		.where(message.owner != frappe.session.user)
 		.where(channel_member.user_id == frappe.session.user)
 		.groupby(channel.name)
 	)
@@ -233,7 +272,7 @@ def get_unread_threads(workspace: str = None, thread_id: str = None):
 
 
 @frappe.whitelist(methods=["POST"])
-def create_thread(message_id):
+def create_thread(message_id: str):
 	"""
 	A thread can be created by any user with read access to the channel in which the message has been sent.
 	The thread will be created with this user as the first participant.
@@ -263,9 +302,12 @@ def create_thread(message_id):
 	creator = thread_message.owner
 
 	if creator != frappe.session.user:
-		frappe.get_doc(
+		creator_member = frappe.get_doc(
 			{"doctype": "Raven Channel Member", "channel_id": thread_channel.name, "user_id": creator}
-		).insert(ignore_permissions=True)
+		)
+		# One combined system message for everyone added is sent below.
+		creator_member.flags.ignore_system_message = True
+		creator_member.insert(ignore_permissions=True)
 		users_added_to_thread.append(creator)
 
 	else:
@@ -275,17 +317,19 @@ def create_thread(message_id):
 		# In this case, the creator is already a participant of the thread, but it's peer is not.
 
 		if channel_doc.is_direct_message == 1 and not channel_doc.is_self_message:
-			# Get the peer of the DM channel
-			peer_user_id = get_peer_user_id(channel_doc.name, 1)
+			# Get the peer of the DM channel (from dm_user fields — no member lookup)
+			peer_user_id = get_peer_user_id_from_dm_users(channel_doc)
 
 			if peer_user_id:
-				frappe.get_doc(
+				peer_member = frappe.get_doc(
 					{
 						"doctype": "Raven Channel Member",
 						"channel_id": thread_channel.name,
 						"user_id": peer_user_id,
 					}
-				).insert(ignore_permissions=True)
+				)
+				peer_member.flags.ignore_system_message = True
+				peer_member.insert(ignore_permissions=True)
 				users_added_to_thread.append(peer_user_id)
 
 	# In the original message, any mentioned users should also be added as participants
@@ -294,16 +338,24 @@ def create_thread(message_id):
 			try:
 				# Check if this user is a member of the parent channel
 				if is_channel_member(channel_doc.name, mention.user):
-					frappe.get_doc(
+					mention_member = frappe.get_doc(
 						{
 							"doctype": "Raven Channel Member",
 							"channel_id": thread_channel.name,
 							"user_id": mention.user,
 						}
-					).insert(ignore_permissions=True)
+					)
+					mention_member.flags.ignore_system_message = True
+					mention_member.insert(ignore_permissions=True)
 					users_added_to_thread.append(mention.user)
 			except Exception:
 				pass
+
+	# ONE combined "added A, B and n others" system message for everyone pulled into
+	# the thread (original author, DM peer, mentioned users) — per-member messages
+	# are suppressed on each insert above.
+	if users_added_to_thread:
+		create_members_added_system_message(thread_channel.name, users_added_to_thread)
 
 	# Update the message to mark it as a thread
 	thread_message.is_thread = 1

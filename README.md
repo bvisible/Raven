@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/The-Commit-Company/raven">
+  <a href="https://github.com/frappe/raven">
   <img src="raven_logo.png" alt="Raven logo" height="100" />
      </a>
    <hr />
@@ -8,23 +8,19 @@
     <br />
     <a href="https://frappecloud.com/dashboard/signup?product=raven"><strong>Install on Frappe Cloud</strong></a>
     <br />
-    <a href="https://ravenchat.ai">Website (ravenchat.ai)</a>
+    <a href="https://frappe.io/products/raven">Website</a>
     <br />
-    <a href="https://github.com/The-Commit-Company/raven/issues">Issues</a>
-    ·
-    <a href="https://community.ravenapp.cloud">Community & Support</a>
-     ·
-    <a href="https://github.com/sponsors/The-Commit-Company?frequency=one-time">Sponsor Us!</a>
+    <a href="https://github.com/frappe/raven/issues">Issues</a>
   </p>
 </p>
 
 
 <p align="center">
-  <a href="https://github.com/The-Commit-Company/Raven/blob/main/LICENSE">
+  <a href="https://github.com/frappe/raven/blob/main/LICENSE">
     <img alt="license" src="https://img.shields.io/badge/license-AGPLv3-blue">
   </a>
-     <a href="https://github.com/The-Commit-Company/raven/stargazers"><img src="https://img.shields.io/github/stars/The-Commit-Company/raven" alt="Github Stars"></a>
-     <a href="https://github.com/The-Commit-Company/raven/pulse"><img src="https://img.shields.io/github/commit-activity/m/The-Commit-Company/raven" alt="Commits-per-month"></a>
+     <a href="https://github.com/frappe/raven/stargazers"><img src="https://img.shields.io/github/stars/frappe/raven" alt="Github Stars"></a>
+     <a href="https://github.com/frappe/raven/pulse"><img src="https://img.shields.io/github/commit-activity/m/frappe/raven" alt="Commits-per-month"></a>
 </p>
 
 <p align="center">
@@ -57,7 +53,7 @@ It's built using [Frappe Framework](https://frappeframework.com) and offers deep
 
 - [Frappe Framework](https://frappeframework.com) - an open-source full stack development framework. It uses Python, MariaDB/Postgres, socket.io and Redis
 - [React](https://react.dev)
-- [Frappe React SDK](https://github.com/The-Commit-Company/frappe-react-sdk) - React Hooks library that we created/maintain to handle auth, data fetching and API calls to the Frappe Framework backend
+- [Frappe React SDK](https://github.com/frappe/frappe-react-sdk) - React Hooks library that we created/maintain to handle auth, data fetching and API calls to the Frappe Framework backend
 - [Tailwind CSS](https://tailwindcss.com/) - 
 - [Firebase](https://firebase.google.com) - Push notifications, Crash Analytics and Performance Monitoring
 
@@ -137,10 +133,10 @@ You need Docker, docker-compose and git setup on your machine. Refer [Docker doc
     cd raven
 
     # Download the docker-compose file
-    wget -O docker-compose.yml https://raw.githubusercontent.com/The-Commit-Company/raven/develop/docker/docker-compose.yml
+    wget -O docker-compose.yml https://raw.githubusercontent.com/frappe/raven/develop/docker/docker-compose.yml
 
     # Download the setup script
-    wget -O init.sh https://raw.githubusercontent.com/The-Commit-Company/raven/develop/docker/init.sh
+    wget -O init.sh https://raw.githubusercontent.com/frappe/raven/develop/docker/init.sh
 
 **Step 2**: Run the container and daemonize it
 
@@ -169,7 +165,7 @@ bench --site raven.test add-to-hosts
 ```
 5. Download the Raven app. Run 
 ```bash
-bench get-app https://github.com/The-Commit-Company/raven
+bench get-app https://github.com/frappe/raven
 ```
 6. Install the app on the site 
 ```bash
@@ -195,7 +191,7 @@ bench --site raven.test set-config ignore_csrf 1
 
 ##### Web App
 
-Raven's **web app** is a React based single page app located in the `/frontend` directory. It uses Vite to compile the app.
+Raven's **web app** is a React based single page app located in the `/apps/web` directory. It uses Vite to compile the app.
 If you want to make changes to the frontend with hot reloading, follow the steps below:
 
 1. Navigate to the apps/raven folder in your bench directory
@@ -207,7 +203,7 @@ cd apps/raven
 yarn run dev
 ```
 
-This will start a local server at `http://localhost:8080` where the frontend app can be previewed in real time as you make changes. To make sure the setup works correctly, add a `.env.local` file in the `/frontend` directory with the following contents:
+This will start a local server at `http://localhost:8080` where the frontend app can be previewed in real time as you make changes. To make sure the setup works correctly, add a `.env.local` file in the `/apps/web` directory with the following contents:
 
 ```
 VITE_BASE_NAME='' # This needs to be set as empty
@@ -254,13 +250,13 @@ This *should* start the emulators with the app running. For more info, please re
 
 ## Contributors
 
-<a href="https://github.com/The-Commit-Company/raven/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=The-Commit-Company/raven" />
+<a href="https://github.com/frappe/raven/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=frappe/raven" />
 </a>
 
 
 ## Reporting Bugs
-If you find any bugs, feel free to report them here on [GitHub Issues](https://github.com/The-Commit-Company/raven/issues). Make sure you share enough information (app screenshots, browser console screenshots, stack traces, etc) for project maintainers to replicate your bug.
+If you find any bugs, feel free to report them here on [GitHub Issues](https://github.com/frappe/raven/issues). Make sure you share enough information (app screenshots, browser console screenshots, stack traces, etc) for project maintainers to replicate your bug.
 
 
 <hr>

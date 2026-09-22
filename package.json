@@ -1,22 +1,22 @@
 {
   "private": true,
   "name": "raven",
-  "version": "2.6.6",
+  "version": "2.8.11",
   "description": "Messaging Application",
   "workspaces": [
-    "frontend",
-    "apps/*",
+    "apps/web",
     "packages/*"
   ],
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cd frontend && yarn dev",
+    "dev": "cd apps/web && yarn dev",
+    "//// Neoffice": "commit-the-build: the vite output is committed (a 4 GB instance OOM-kills on yarn build), so a plain `yarn build` must NOT rebuild when artefacts are already there. FORCE_REBUILD=1 forces it.",
     "build": "if [ -d 'raven/public/raven/assets' ] && [ -z \"$FORCE_REBUILD\" ]; then echo '[skip-build] pre-built artifacts present at raven/public/raven/assets (set FORCE_REBUILD=1 to force rebuild)'; else yarn build:force; fi",
-    "build:force": "cd frontend && NODE_OPTIONS=\"--max-old-space-size=2048\" yarn build",
-    "postinstall": "yarn install-web && yarn install-desk",
+    "build:force": "cd apps/web && NODE_OPTIONS=\"--max-old-space-size=4096\" yarn build",
+    "postinstall": "yarn install-desk && yarn install-web",
     "install-desk": "cd raven && yarn install",
-    "install-web": "cd frontend && yarn install"
+    "install-web": "cd apps/web && yarn install"
   },
   "keywords": [],
   "author": "",
@@ -24,8 +24,12 @@
   "devDependencies": {
     "turbo": "^2.3.3"
   },
-  "dependencies": {},
   "resolutions": {
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
     "react-native-css-interop": "0.1.22"
-  }
+  },
+  "dependencies": {}
 }

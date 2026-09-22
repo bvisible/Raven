@@ -1,8 +1,8 @@
 import 'expo-dev-client';
-import { router, Slot, usePathname } from 'expo-router';
+import { router, Slot } from 'expo-router';
 import { ThemeProvider } from '@react-navigation/native';
 import "../global.css";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { setNavigationBar, themeAtom } from '@hooks/useColorScheme';
@@ -29,6 +29,9 @@ import { useColorScheme } from 'nativewind';
 //// catalogues in apps/mobile/locales/{en,fr}.json, picker in app/[site_id]/(tabs)/profile/language.tsx.
 import '@lib/i18n';
 import { loadSavedLanguage } from '@lib/i18n';
+import * as SplashScreen from 'expo-splash-screen';
+import * as SystemUI from 'expo-system-ui';
+import { Appearance } from 'react-native';
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -46,64 +49,81 @@ if (__DEV__) {
     ]);
 }
 
+// Prevent splash from auto-hiding before app is ready
+SplashScreen.preventAutoHideAsync()
+
+SplashScreen.setOptions({
+    duration: 200,
+    fade: true,
+});
+
 const messaging = getMessaging()
 
 export default function RootLayout() {
 
-    // const path = usePathname()
-    // console.log(path)
 
-    const { getItem } = useAsyncStorage(`default-site`)
+    const [appIsReady, setAppIsReady] = useState(false);
+    const { getItem } = useAsyncStorage(`default-site`);
+    const { colorScheme, setColorScheme } = useColorScheme();
+    const isDarkColorScheme = colorScheme === 'dark';
+    const [theme] = useAtom(themeAtom);
+
+    // Set system UI background color early to prevent flash
+    useEffect(() => {
+        const setSystemBackground = async () => {
+            const scheme = Appearance.getColorScheme();
+            const bgColor = scheme === 'dark' ? '#121212' : '#ffffff';
+            await SystemUI.setBackgroundColorAsync(bgColor);
+        };
+        setSystemBackground();
+    }, []);
 
 
     useEffect(() => {
 
         const onMount = async () => {
-            //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): restore the saved language before the first screen
-            //// renders, otherwise the app flashes the device locale then switches.
-            // Load saved language preference
-            await loadSavedLanguage();
 
-            // Get the defualt site from the async storage
-            // Also check if the app was started by a notification
-            const initialNotification = await messaging.getInitialNotification();
+            try {
+                //// Neoffice - mobile i18n (e9ee1845e, 2026-01-04): restore the saved language before the
+                //// first screen renders, otherwise the app flashes the device locale then switches.
+                await loadSavedLanguage();
 
-            if (initialNotification) {
-                //// Neoffice - push-notification deep links (b30ad1930, 2026-01-05 "fix(mobile): Android push notifications and notification toggle").
-                //// The tracing left over from that pass ran on every cold start and printed the whole
-                //// notification payload; put behind __DEV__ on 2026-09-04 so a release build is quiet.
-                if (__DEV__) console.log('[Notification] App started from notification:', JSON.stringify(initialNotification.data));
-                if (initialNotification.data?.channel_id && initialNotification.data?.sitename) {
-                    //// Neoffice - push-notification deep links (b30ad1930, 2026-01-05 "fix(mobile): Android push notifications and notification toggle"): builds the in-app route from the
-                    //// notification payload (sitename + channel_id + is_thread). Upstream only opened the app.
-                    const targetPath = `/${initialNotification.data.sitename}/${initialNotification.data.is_thread ? 'thread' : 'chat'}/${initialNotification.data.channel_id}`;
-                    //// Neoffice - __DEV__ only (2026-09-04), see above.
-                    if (__DEV__) console.log('[Notification] Navigating to:', targetPath);
-                    setDefaultSite(initialNotification.data.sitename as string)
-                    let path = 'chat'
-                    if (initialNotification.data.is_thread) {
-                        path = 'thread'
+                // Get the defualt site from the async storage
+                // Also check if the app was started by a notification
+                const initialNotification = await messaging.getInitialNotification();
+
+                if (initialNotification) {
+                    if (initialNotification.data?.channel_id && initialNotification.data?.sitename) {
+                        setDefaultSite(initialNotification.data.sitename as string)
+                        let path = 'chat'
+                        if (initialNotification.data.is_thread) {
+                            path = 'thread'
+                        }
+                        router.navigate(`/${initialNotification.data.sitename}/${path}/${initialNotification.data.channel_id}`, {
+                            withAnchor: true
+                        })
+
+                        return
                     }
-                    router.navigate(`/${initialNotification.data.sitename}/${path}/${initialNotification.data.channel_id}`, {
-                        withAnchor: true
-                    })
-
-                    return
-                //// Neoffice - push-notification deep links (b30ad1930, 2026-01-05 "fix(mobile): Android push notifications and notification toggle"): log the payloads that carry no route.
-                //// __DEV__ only (2026-09-04), see above.
-                } else {
-                    if (__DEV__) console.log('[Notification] Missing channel_id or sitename in initial notification');
                 }
+
+                // If not started by notification
+                // On load, check if the user has a site set
+                const defaultSite = await getItem()
+                if (defaultSite) {
+                    router.replace(`/${defaultSite}`)
+                } else {
+                    router.replace('/landing')
+                }
+
+            } catch (error) {
+                console.warn('Error during app initialization:', error);
+                router.replace('/landing');
+            } finally {
+                // mark app as ready regardless of success or failure
+                setAppIsReady(true);
             }
 
-            // If not started by notification
-            // On load, check if the user has a site set
-            const defaultSite = await getItem()
-            if (defaultSite) {
-                router.replace(`/${defaultSite}`)
-            } else {
-                router.replace('/landing')
-            }
         }
 
         // Handle notification open when app is in background
@@ -138,11 +158,12 @@ export default function RootLayout() {
         };
     }, []);
 
-    const { colorScheme, setColorScheme } = useColorScheme();
-
-    const isDarkColorScheme = colorScheme === 'dark'
-
-    const [theme] = useAtom(themeAtom);
+    // Hide splash screen when app is ready
+    useEffect(() => {
+        if (appIsReady) {
+            SplashScreen.hide();
+        }
+    }, [appIsReady]);
 
     useEffect(() => {
         if (theme.state === 'hasData') {

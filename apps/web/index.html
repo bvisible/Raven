@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <!-- viewport-fit=cover: required for env(safe-area-inset-*) to report real values on iOS
+       (composer, sidebars, drawers all pad by it) — without it they resolve to 0.
+       interactive-widget=resizes-content (Android Chrome 108+ only; iOS ignores it):
+       make the on-screen keyboard SHRINK the layout viewport instead of overlaying it —
+       h-dvh then tracks the keyboard and the composer stays fully above it. With the
+       default (resizes-visual), Chrome only scrolls the caret into view, so a growing
+       multi-line composer slid its bottom edge (send button) under the keyboard. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+  <title>{{ app_name }}</title>
+  <meta name="description" content="Simple, work messaging tool.">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ apple_touch_icon }}">
+  <link rel="icon" type="image/png" href="{{ icon_96 }}" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="{{ favicon_svg }}" />
+  <link rel="shortcut icon" href="{{ favicon_ico }}" />
+  <link rel="manifest" href="/assets/raven/raven/manifest.webmanifest">
+  <meta name="msapplication-TileColor" content="#000000">
+  <!-- Android status bar color (pre-JS paint; the ThemeProvider overwrites
+       these with the resolved theme's --surface-base once the app boots). -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#171717">
+  <link rel="mask-icon" href="{{ mask_icon }}" color="#000000">
+  <meta name="apple-itunes-app" content="app-id=6741682327, app-argument={{sitename}}">
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!-- //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): iOS home-screen title. -->
+  <meta name="apple-mobile-web-app-title" content="{{ app_name }} | Synk" />
+  <meta name="apple-touch-fullscreen" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="screen-orientation" content="portrait">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/splash_screens/iPhone_17e__iPhone_16e__iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/splash_screens/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/11__iPad_Pro__10.5__iPad_Pro_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/splash_screens/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/10.9__iPad_Air_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/splash_screens/iPhone_Air_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/10.2__iPad_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/13__iPad_Pro_M4_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/12.9__iPad_Pro_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/splash_screens/iPhone_Air_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/splash_screens/iPhone_16__iPhone_15_Pro__iPhone_15__iPhone_14_Pro_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/splash_screens/iPhone_17_Pro__iPhone_17__iPhone_16_Pro_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/splash_screens/iPhone_11_Pro_Max__iPhone_XS_Max_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/8.3__iPad_Mini_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/splash_screens/iPhone_16_Plus__iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/10.5__iPad_Air_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/splash_screens/iPhone_17_Pro_Max__iPhone_16_Pro_Max_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/splash_screens/iPhone_17e__iPhone_16e__iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/12.9__iPad_Pro_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/8.3__iPad_Mini_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/splash_screens/iPhone_16_Plus__iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/splash_screens/iPhone_17_Pro__iPhone_17__iPhone_16_Pro_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/splash_screens/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/11__iPad_Pro_M4_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/iPhone_11__iPhone_XR_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/splash_screens/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/10.5__iPad_Air_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/11__iPad_Pro_M4_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/iPhone_11__iPhone_XR_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/splash_screens/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/11__iPad_Pro__10.5__iPad_Pro_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/splash_screens/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/13__iPad_Pro_M4_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/splash_screens/iPhone_16__iPhone_15_Pro__iPhone_15__iPhone_14_Pro_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/4__iPhone_SE__iPod_touch_5th_generation_and_later_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    href="/splash_screens/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/10.9__iPad_Air_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/4__iPhone_SE__iPod_touch_5th_generation_and_later_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    href="/splash_screens/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_portrait.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    href="/splash_screens/10.2__iPad_landscape.png">
+  <link rel="apple-touch-startup-image"
+    media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    href="/splash_screens/iPhone_17_Pro_Max__iPhone_16_Pro_Max_landscape.png">
+
+  <!-- {{ preload_links }} -->
+  <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven").
+       //// This template is the SOURCE of raven/www/raven.html (copied post-build by yarn
+       //// copy-html-entry) - edit here, never there. It loads desk.bundle.css + neoffice-theme.css so
+       //// the embedded Frappe sidebar/navbar have their styles, WITHOUT loading desk.bundle.js (its
+       //// boot sequence fights ours). The .collapse override below undoes Tailwind's
+       //// `visibility: collapse`, which hides Bootstrap 4's .navbar-collapse that Frappe still uses. -->
+
+  <!-- Frappe Shell Native: desk CSS + neoffice_theme CSS for embedded sidebar/navbar.
+       We do NOT load desk.bundle.js (timing + dependency hell with billing/nora). -->
+  {% if desk_css_url %}<link rel="stylesheet" href="{{ desk_css_url }}" />{% endif %}
+  <link rel="stylesheet" href="{{ neoffice_theme_css_url }}" />
+
+
+  <style>
+    /* === Tailwind .collapse override ===
+       Tailwind ships `.collapse { visibility: collapse }` which clashes with
+       Bootstrap 4 .navbar-collapse and .collapse-sidebar-link used by Frappe.
+       Re-affirm visibility for the navbar and the sidebar subtree. */
+    header.navbar .navbar-collapse,
+    header.navbar .navbar-collapse * { visibility: visible !important; }
+    header.navbar .navbar-collapse { display: flex; }
+    .body-sidebar .collapse-sidebar-link,
+    .body-sidebar [class*="collapse"],
+    .body-sidebar-container [class*="collapse"]:not(.app-switcher-menu) {
+      visibility: visible !important;
+    }
+
+    /* === FrappeSidebar hover-expand (mirrors neoffice-theme.js) === */
+    .body-sidebar-container:not(.expanded) .body-sidebar {
+      position: absolute;
+      z-index: 1031;
+    }
+    .body-sidebar-container:not(.expanded) .body-sidebar-placeholder {
+      display: flex;
+      width: 50px;
+    }
+    .body-sidebar-container:not(.expanded) .body-sidebar {
+      transition: width 0.18s ease-out, box-shadow 0.18s ease-out;
+    }
+    .body-sidebar-container:not(.expanded) .body-sidebar .sidebar-item-label {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      opacity: 0;
+      transition: opacity 0.15s ease-out;
+    }
+
+    .body-sidebar-container.hover-expanded .body-sidebar {
+      width: var(--left-sidebar-width, 220px);
+      box-shadow: var(--shadow-lg);
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .sidebar-item-label {
+      display: flex;
+      align-items: center;
+      opacity: 1;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .standard-sidebar-label { display: block; }
+    .body-sidebar-container.hover-expanded .body-sidebar .modules-section { display: flex; }
+    .body-sidebar-container.hover-expanded .body-sidebar .body-sidebar-top { width: 100%; }
+    .body-sidebar-container.hover-expanded .body-sidebar .sidebar-item-container { width: 100%; }
+    .body-sidebar-container.hover-expanded .body-sidebar .sidebar-item-control { display: block; }
+    .body-sidebar-container.hover-expanded .body-sidebar .sidebar-items { padding: 0px; width: 100%; }
+    .body-sidebar-container.hover-expanded .body-sidebar .collapse-sidebar-link { visibility: visible; }
+    .body-sidebar-container.hover-expanded .body-sidebar .body-sidebar-bottom { width: 100%; }
+    .body-sidebar-container.hover-expanded .body-sidebar .app-switcher-dropdown {
+      width: 100%;
+      left: 0px;
+      padding: 3px;
+    }
+    .body-sidebar-container.hover-expanded .body-sidebar .app-title { display: block !important; }
+
+    .body-sidebar-container.hover-expanded .body-sidebar .sidebar-item-label,
+    .body-sidebar-container.hover-expanded .body-sidebar .standard-sidebar-label,
+    .body-sidebar-container.hover-expanded .body-sidebar .modules-section,
+    .body-sidebar-container.hover-expanded .body-sidebar .app-title-subtitle {
+      animation: sidebar-content-appear 260ms ease-out 80ms both;
+    }
+    @keyframes sidebar-content-appear {
+      from { opacity: 0; transform: translateX(-4px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* App switcher dropdown — show/hide via React state class */
+    .app-switcher-menu.hidden { display: none; }
+    .app-switcher-menu.show {
+      display: block;
+      position: absolute;
+      background: var(--fg-color, #fff);
+      border: 1px solid var(--border-color, #e5e7eb);
+      border-radius: 6px;
+      box-shadow: var(--shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 10%));
+      z-index: 1040;
+      min-width: 200px;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 4px;
+      left: 8px;
+      top: 56px;
+    }
+
+    /* === Frappe-pattern layout : sidebar and main as flex siblings === */
+    .main-section { background: var(--fg-color, white); }
+    .main-section > .navbar-wrapper,
+    header.navbar {
+      position: relative;
+      background: var(--navbar-bg, var(--fg-color, white));
+    }
+
+    /* Concave corner pseudo-element — bottom-left of navbar visually rounds
+       into the top-right of the sidebar. */
+    header.navbar::before {
+      content: "";
+      position: absolute;
+      bottom: -16px;
+      left: 0;
+      width: 16px;
+      height: 16px;
+      background: radial-gradient(
+        circle at bottom right,
+        transparent 16px,
+        var(--navbar-bg, var(--fg-color, white)) 16px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .body-sidebar { background: var(--fg-color, white); }
+
+    /* Raven-specific tweaks vs Mint/Neoconstruction: the Raven SPA needs the
+       full viewport (chat messaging UX), so `.page-content` has NO padding
+       and the inner Raven layout owns the scroll. */
+    body { background: var(--bg-color, oklch(0.965 0.005 80)) !important; display: block !important; }
+    main.main-section { background: transparent !important; }
+    .page-content {
+      padding: 0 !important;
+      /* main.main-section is overflowY:auto with h:100vh; .page-content
+         takes the remaining height after the navbar so Raven's chat fills
+         the viewport. */
+      min-height: calc(100vh - 50px);
+      display: flex;
+      flex-direction: column;
+    }
+    .frappe-desk-root { background: var(--bg-color, oklch(0.965 0.005 80)); }
+
+    #root { width: 100%; min-height: 100vh; }
+  </style>
+
+</head>
+
+<body>
+  <!-- //// Neoffice - Frappe Shell Native (1c1c81edc, 2026-05-11 "feat(frappe-shell): integrate native Frappe sidebar+navbar in /raven"): host node for the three
+       //// inlined Frappe icon sprites, so <use href="#es-line-..."> resolves without desk.bundle.js. -->
+  <div id="all-symbols" style="display: none; position: absolute; width: 0; height: 0;"></div>
+  <div id="root"></div>
+  <script>window.csrf_token = '{{ csrf_token }}';
+    if (!window.frappe) window.frappe = {};
+
+    window.app_name = "{{ app_name }}";
+
+    frappe.boot = JSON.parse({{ boot }});
+    <!-- //// Neoffice - the v2 i18n shim that used to sit here is GONE at the v3 merge:
+         //// upstream's apps/web/src/main.tsx now assigns frappe._messages from the boot payload
+         //// itself, and @lib/translate reads it. Our get_navbar_boot() still bakes the catalogue
+         //// into that boot key, so the embedded chrome keeps rendering in the user's language.
+         //// KEEP THE WARNING: inside a Jinja template, never spell a dot followed by two
+         //// underscores - frappe/utils/jinja.py safe_render refuses the whole template as an
+         //// anti-SSTI guard and answers HTTP 417, killing the page. That exact mistake made
+         //// /raven return 417 for every visitor from 2026-09-03 to 2026-09-04. Bracket notation only. -->
+
+    // Integration flag — MUST be set BEFORE the bundle loads because App.tsx
+    // evaluates the layout swap at module load time. Bracket notation (not
+    // dot) is required: Frappe's safe_render Jinja check refuses any
+    // dot+double-underscore substring as a SSTI guard.
+    window['__FRAPPE_INTEGRATION__'] = true;
+    window['__FRAPPE_BASENAME__'] = '/raven';
+
+    // Fetch Frappe icon sprites and inline them into #all-symbols so that
+    // FrappeNavbar/FrappeSidebar React components can reference them via
+    // <use href="#...">. Best-effort: missing sprites are silently skipped.
+    (function loadIcons() {
+      var sprites = [
+        '/assets/frappe/icons/timeless/icons.svg',
+        '/assets/frappe/icons/espresso/icons.svg',
+        '/assets/neoffice_theme/icons/lucide/sprite.svg',
+      ];
+      sprites.forEach(function (url) {
+        fetch(url)
+          .then(function (r) { return r.text(); })
+          .then(function (svgText) {
+            var div = document.createElement('div');
+            div.innerHTML = svgText;
+            var container = document.getElementById('all-symbols');
+            if (container) container.appendChild(div);
+          })
+          .catch(function () {});
+      });
+    })();
+  </script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+<!-- //// Neoffice - newline at end of file. No content change. -->
+</html>
