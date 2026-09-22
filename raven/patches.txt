@@ -26,3 +26,6 @@ raven.patches.v3_0.set_link_preview_status
 # //// Neoffice — the product ships as Synk; upstream's default workspace is named "Raven",
 # //// which is what users read in the workspace switcher.
 raven.patches.neoffice.rename_default_workspace_to_synk
+# //// Neoffice — the Frappe HR integration is configured by us and its panel is hidden,
+# //// so the values must be set on existing instances, not just defaulted for new ones.
+raven.patches.neoffice.enable_hr_integration

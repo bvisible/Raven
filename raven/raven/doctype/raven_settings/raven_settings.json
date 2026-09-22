@@ -89,8 +89,8 @@
    "label": "Frappe HR"
   },
   {
-   "default": "0",
-   "description": "If checked, a channel will be created in Raven for each department and employees will be synced with Raven Users.",
+   "default": "1",
+   "description": "//// Neoffice - on by default: a channel per department is what our customers expect from the HR integration, and the panel that would let them switch it off is hidden (we configure this centrally). Decision by Jérémy, 2026-09-22.",
    "fieldname": "auto_create_department_channel",
    "fieldtype": "Check",
    "label": "Automatically Create a Channel for each Department"
