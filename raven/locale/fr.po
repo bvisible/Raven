@@ -1,0 +1,1048 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: raven\n"
+"POT-Creation-Date: 2026-09-18 23:48+0553\n"
+"PO-Revision-Date: 2026-09-22 14:02\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. Description of the Onboarding Step 'Add users'
+#: raven/raven/onboarding_step/adding_users_to_raven/adding_users_to_raven.json
+msgid ""
+"## Adding Users\n"
+"\n"
+"To access Raven, users need to have the **Raven User** role.\n"
+"\n"
+"Go to the \"Users\" list and add the role to the users you want on Raven."
+msgstr ""
+"## Ajout d'utilisateurs\n"
+"\n"
+"Pour accéder à Synk, les utilisateurs doivent avoir le rôle **Raven User**.\n"
+"\n"
+"Allez dans la liste \"Utilisateurs\" et ajoutez le rôle aux utilisateurs que vous souhaitez voir sur Synk."
+
+#. Description of the Onboarding Step 'Understanding Channels'
+#: raven/raven/onboarding_step/introduction_to_raven/introduction_to_raven.json
+msgid ""
+"## Channels\n"
+"\n"
+"Raven helps you and your team communicate with each other.\n"
+"\n"
+"Conversation happen in **channels**. \n"
+"\n"
+"All users who have access to Raven can view and send messages in **Open** channels. \n"
+"\n"
+"**Public** channels are visible to everyone, but only members can take send messages in them. Any user can join public channels. \n"
+"\n"
+"**Private** channels are only visible to members and new members can only be added by the channel admin - which is the creator of the channel. \n"
+"\n"
+"You could also send messages to other users privately via **Direct messages** - including yourself!\n"
+"\n"
+"A user could create as many channels and add as many users as they want to in them. "
+msgstr ""
+"## Canaux\n"
+"\n"
+"Synk vous aide, vous et votre équipe, à communiquer entre vous.\n"
+"\n"
+"Les échanges se déroulent dans des **canaux**. \n"
+"\n"
+"Tous les utilisateurs ayant accès à Synk peuvent voir et envoyer des messages dans les canaux **Ouverts**. \n"
+"\n"
+"Les canaux **Publics** sont visibles par tous, mais seuls les membres peuvent y envoyer des messages. Tout utilisateur peut rejoindre un canal public. \n"
+"\n"
+"Les canaux **Privés** ne sont visibles que par leurs membres, et seul l'administrateur du canal - c'est-à-dire son créateur - peut y ajouter de nouveaux membres. \n"
+"\n"
+"Vous pouvez aussi envoyer des messages en privé à d'autres utilisateurs via les **Messages directs** - y compris à vous-même !\n"
+"\n"
+"Un utilisateur peut créer autant de canaux qu'il le souhaite et y ajouter autant d'utilisateurs qu'il le souhaite. "
+
+#. Description of the Onboarding Step 'Review Settings'
+#: raven/raven/onboarding_step/review_raven_settings/review_raven_settings.json
+msgid ""
+"## Raven Settings\n"
+"\n"
+"\n"
+"<em>**Automatically adding users to Raven**</em>\n"
+"\n"
+"To make it easy for you, the Raven User role is assigned to any user who has access to Desk. If you wish to turn this off, please head to Raven Settings."
+msgstr ""
+"## Raven Settings\n"
+"\n"
+"\n"
+"<em>**Ajout automatique d'utilisateurs à Synk**</em>\n"
+"\n"
+"Pour vous simplifier la tâche, le rôle Raven User est attribué à tout utilisateur ayant accès au Desk. Si vous souhaitez désactiver cette fonction, rendez-vous dans Raven Settings."
+
+#. Description of the Onboarding Step 'It's time. Send a Raven.'
+#: raven/raven/onboarding_step/access_the_web_app/access_the_web_app.json
+msgid ""
+"### Access the web and mobile apps\n"
+"\n"
+"\n"
+"Raven is available at <a href=\"/raven\">**/raven**</a> for both web and mobile. On mobile, Raven can be installed as a PWA."
+msgstr ""
+"### Accéder aux applications web et mobile\n"
+"\n"
+"\n"
+"Synk est disponible à l'adresse <a href=\"/raven\">**/raven**</a> sur le web comme sur mobile. Sur mobile, Synk peut être installé comme PWA."
+
+#: apps/web/src/components/features/message/renderers/ThreadMessage.tsx:61
+msgid "1 reply"
+msgstr "1 réponse"
+
+#. Content of the 'html_xuuw' (HTML) field in DocType 'Raven User'
+#: raven/raven/doctype/raven_user/raven_user.json
+msgid ""
+"<p>To disable the user from accessing Raven, go to \"Users\" and remove the "
+"\"Raven User\" role.</p>"
+msgstr ""
+"<p>Pour empêcher un utilisateur d'accéder à Synk, allez dans "
+"\"Utilisateurs\" et retirez-lui le rôle \"Raven User\".</p>"
+
+#. Header text in the Raven Workspace
+#: raven/raven/workspace/raven/raven.json
+msgid "<span class=\"h4\"><a href=\"/raven\">Raven</a></span>"
+msgstr "<span class=\"h4\"><a href=\"/raven\">Synk</a></span>"
+
+#: apps/web/src/components/features/channel/CreateChannel/CreateChannelForm.tsx:199
+#: apps/web/src/components/features/settings/panels/Workspaces/WorkspaceMembers.tsx:263
+#: apps/web/src/components/features/settings/panels/Workspaces/WorkspaceMembers.tsx:268
+msgid "Add Members"
+msgstr "Ajouter des membres"
+
+#. Label of an action in the Onboarding Step 'Add users'
+#: raven/raven/onboarding_step/adding_users_to_raven/adding_users_to_raven.json
+msgid "Add Users to Raven"
+msgstr "Ajouter des utilisateurs à Synk"
+
+#: apps/web/src/components/features/settings/panels/Webhooks/WebhookForm.tsx:134
+msgid ""
+"Add a Webhook Secret so Raven can sign requests. An X-Frappe-Webhook-"
+"Signature header (a base64 HMAC-SHA256 of the payload) is added before the "
+"request is sent. Do not share the secret publicly."
+msgstr ""
+"Ajoutez un secret de webhook pour permettre à Synk de signer les requêtes. "
+"Un en-tête X-Frappe-Webhook-Signature (un HMAC-SHA256 en base64 de la charge"
+" utile) est ajouté avant l'envoi de la requête. Ne partagez pas ce secret "
+"publiquement."
+
+#: apps/web/src/components/features/ChatInput/CreatePollForm.tsx:271
+msgid "Allow multiple choices"
+msgstr "Autoriser les choix multiples"
+
+#: apps/web/src/components/common/filters/ChannelFilter.tsx:132
+msgid "Any Channel"
+msgstr "Tous les canaux"
+
+#. Label of the auto_add_system_users (Check) field in DocType 'Raven
+#. Settings'
+#: raven/raven/doctype/raven_settings/raven_settings.json
+msgid "Automatically add system users to Raven"
+msgstr "Ajouter automatiquement les utilisateurs système à Synk"
+
+#: apps/web/src/components/features/profile/EditProfileDrawer.tsx:100
+#: apps/web/src/components/features/settings/panels/Profile.tsx:139
+msgid "Availability"
+msgstr "Disponibilité"
+
+#. Option for the 'Availability Status' (Select) field in DocType 'Raven User'
+#: apps/web/src/components/features/settings/panels/Profile.tsx:28
+#: apps/web/src/hooks/useSetAvailability.ts:9
+#: raven/raven/doctype/raven_user/raven_user.json
+msgid "Available"
+msgstr "Disponible"
+
+#. Option for the 'Availability Status' (Select) field in DocType 'Raven User'
+#: apps/web/src/components/features/settings/panels/Profile.tsx:29
+#: apps/web/src/hooks/useSetAvailability.ts:10
+#: raven/raven/doctype/raven_user/raven_user.json
+msgid "Away"
+msgstr "Absent"
+
+#. Label of the channel_type (Select) field in DocType 'Raven Document
+#. Notification Recipients'
+#. Option for the 'Conditions On' (Select) field in DocType 'Raven Webhook'
+#. Label of the channel_type (Select) field in DocType 'Raven Webhook'
+#: apps/web/src/components/features/channel/CreateChannel/ChannelTypeSelector.tsx:32
+#: apps/web/src/components/features/settings/panels/DocumentNotifications/DocumentNotificationRecipientsTab.tsx:46
+#: apps/web/src/components/features/settings/panels/Webhooks/WebhookConditionForm.tsx:117
+#: apps/web/src/components/features/settings/panels/Webhooks/WebhookConditionForm.tsx:121
+#: raven/raven_integrations/doctype/raven_document_notification_recipients/raven_document_notification_recipients.json
+#: raven/raven_integrations/doctype/raven_webhook/raven_webhook.json
+msgid "Channel Type"
+msgstr "Type de canal"
+
+#: apps/web/src/components/features/channel/CreateChannel/CreateChannelForm.tsx:154
+msgid "Channel created"
+msgstr "Canal créé"
+
+#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:97
+msgid "Channel {0} does not exist in Raven."
+msgstr "Le canal {0} n'existe pas dans Synk."
+
+#. Label of the channels_section (Section Break) field in DocType 'Raven User'
+#. Label of a Link in the Raven Workspace
+#: apps/web/src/components/features/cmdk/ChannelList.tsx:80
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:131
+#: apps/web/src/components/features/settings/panels/Channels/Channels.tsx:140
+#: apps/web/src/pages/share/ShareTarget.tsx:124
+#: raven/raven/doctype/raven_user/raven_user.json
+#: raven/raven/workspace/raven/raven.json
+msgid "Channels"
+msgstr "Canaux"
+
+#: apps/web/src/components/features/settings/panels/Preferences.tsx:187
+msgid ""
+"Choose what Raven should do when you message someone outside working hours "
+"({0}). Silent messages don't ping anyone - they'll see it when they're back."
+msgstr ""
+"Choisissez ce que Synk doit faire lorsque vous envoyez un message à "
+"quelqu'un en dehors des heures de travail ({0}). Les messages silencieux ne "
+"notifient personne - la personne les verra à son retour."
+
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:240
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:178
+msgid "Configure AI providers to use AI features in Raven."
+msgstr ""
+"Configurez les fournisseurs d'IA pour utiliser les fonctionnalités d'IA dans"
+" Synk."
+
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:92
+#: apps/web/src/components/features/settings/panels/Appearance.tsx:20
+msgid "Configure how you want Raven to look."
+msgstr "Configurez l'apparence de Synk."
+
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:152
+#: apps/web/src/components/features/settings/panels/FrappeHR.tsx:162
+msgid ""
+"Connect your HR system to Raven to sync employee data and send "
+"notifications."
+msgstr ""
+"Connectez votre système RH à Synk pour synchroniser les données des employés"
+" et envoyer des notifications."
+
+#: apps/web/src/components/features/dm-channel/UserProfileDrawer.tsx:93
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:266
+msgid "Copied to clipboard"
+msgstr "Copié dans le presse-papiers"
+
+#: apps/web/src/components/features/message/actions/fileActions.ts:75
+msgid "Copy file link"
+msgstr "Copier le lien du fichier"
+
+#: apps/web/src/hooks/useCreateDM.ts:60
+msgid "Could not create a DM channel"
+msgstr "Impossible de créer le canal de messages directs"
+
+#: apps/web/src/components/features/settings/panels/Channels/Channels.tsx:198
+msgid "Could not leave channel"
+msgstr "Impossible de quitter le canal"
+
+#: apps/web/src/components/layout/AppShell.tsx:137
+msgid "Couldn't load Raven"
+msgstr "Impossible de charger Synk"
+
+#: apps/web/src/components/features/ChatInput/CreatePollDialog.tsx:50
+#: apps/web/src/components/features/ChatInput/CreatePollDialog.tsx:85
+#: apps/web/src/components/features/ChatInput/CreatePollForm.tsx:379
+msgid "Create Poll"
+msgstr "Créer un sondage"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:75
+msgid "Create a Raven Cloud account"
+msgstr "Créer un compte Raven Cloud"
+
+#: apps/web/src/components/features/settings/panels/Agents/AgentListView.tsx:94
+msgid "Create agents to run automations on Raven."
+msgstr "Créez des agents pour exécuter des automatisations sur Synk."
+
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:194
+msgid "Create thread"
+msgstr "Créer un fil"
+
+#. Label of the custom_status (Data) field in DocType 'Raven User'
+#: raven/raven/doctype/raven_user/raven_user.json
+msgid "Custom Status"
+msgstr "Statut personnalisé"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:166
+msgid "Data synced to Raven Cloud."
+msgstr "Données synchronisées avec Raven Cloud."
+
+#: apps/web/src/components/features/message/actions/dialogs/DeleteMessageDialog.tsx:92
+msgid "Delete message?"
+msgstr "Supprimer le message ?"
+
+#: apps/web/src/components/common/filters/ChannelFilter.tsx:117
+#: apps/web/src/components/dm-sidebar/DMSidebar.tsx:144
+#: apps/web/src/components/features/cmdk/CommandMenu.tsx:245
+#: apps/web/src/components/features/message/actions/dialogs/ForwardMessageDialog.tsx:148
+#: apps/web/src/components/layout/DocumentTitle.tsx:55
+#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:199
+msgid "Direct Messages"
+msgstr "Messages directs"
+
+#: apps/web/src/components/features/settings/panels/Agents/AgentDocumentProcessorsTab.tsx:66
+msgid ""
+"Document Processors require Google Cloud APIs to be enabled in your Raven "
+"settings."
+msgstr ""
+"Les processeurs de documents nécessitent que les API Google Cloud soient "
+"activées dans vos réglages Synk."
+
+#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:273
+#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:284
+msgid "Error in Raven Notification"
+msgstr "Erreur dans Raven Notification"
+
+#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:270
+msgid ""
+"Error while evaluating Raven Notification {0}. Please fix your template."
+msgstr ""
+"Erreur lors de l'évaluation de Raven Notification {0}. Veuillez corriger "
+"votre modèle."
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:151
+msgid "Failed to register site on Raven Cloud"
+msgstr "Échec de l'enregistrement du site sur Raven Cloud"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:167
+msgid "Failed to sync data to Raven Cloud"
+msgstr "Échec de la synchronisation des données vers Raven Cloud"
+
+#: apps/web/src/components/features/message/renderers/MessageContent.tsx:131
+msgid "Forwarded"
+msgstr "Transféré"
+
+#: apps/web/src/components/features/settings/panels/KeyboardShortcuts.tsx:197
+msgid "Get around Raven quickly with keyboard shortcuts."
+msgstr "Déplacez-vous rapidement dans Synk grâce aux raccourcis clavier."
+
+#. Label of an action in the Onboarding Step 'It's time. Send a Raven.'
+#. Label of an action in the Onboarding Step 'Understanding Channels'
+#: raven/raven/onboarding_step/access_the_web_app/access_the_web_app.json
+#: raven/raven/onboarding_step/introduction_to_raven/introduction_to_raven.json
+msgid "Go to Raven"
+msgstr "Aller à Synk"
+
+#: apps/web/src/components/features/settings/panels/ai/GoogleAPINotEnabledCallout.tsx:29
+msgid "Google APIs are not enabled. Please enable them in Raven Settings"
+msgstr ""
+"Les API Google ne sont pas activées. Veuillez les activer dans Raven "
+"Settings"
+
+#: raven/ai/google_ai.py:249 raven/ai/google_ai.py:302
+msgid "Google APIs are not enabled. Please enable them in the Raven Settings."
+msgstr ""
+"Les API Google ne sont pas activées. Veuillez les activer dans Raven "
+"Settings."
+
+#. Description of the 'Automatically Create a Channel for each Department'
+#. (Check) field in DocType 'Raven Settings'
+#: raven/raven/doctype/raven_settings/raven_settings.json
+msgid ""
+"If checked, a channel will be created in Raven for each department and "
+"employees will be synced with Raven Users."
+msgstr ""
+"Si cette option est cochée, un canal sera créé dans Synk pour chaque "
+"département, et les employés seront synchronisés avec les Raven Users."
+
+#. Description of the 'Is Global' (Check) field in DocType 'Raven Bot AI
+#. Prompt'
+#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json
+msgid "If checked, this prompt will be available to all users on Raven"
+msgstr ""
+"Si cette option est cochée, ce prompt sera disponible pour tous les "
+"utilisateurs sur Synk"
+
+#: apps/web/src/components/features/settings/panels/FrappeHR.tsx:40
+msgid ""
+"Install Frappe HR on this site to sync employees, departments and leaves "
+"with Raven."
+msgstr ""
+"Installez Frappe HR sur ce site pour synchroniser les employés, départements"
+" et congés avec Synk."
+
+#. Option for the 'Availability Status' (Select) field in DocType 'Raven User'
+#: apps/web/src/components/features/settings/panels/Profile.tsx:31
+#: apps/web/src/hooks/useSetAvailability.ts:12
+#: raven/raven/doctype/raven_user/raven_user.json
+msgid "Invisible"
+msgstr "Invisible"
+
+#: apps/web/src/components/features/settings/panels/Users/AddUserDialog.tsx:65
+msgid "Invite a new user to Raven."
+msgstr "Invitez un nouvel utilisateur sur Synk."
+
+#. Title of an Onboarding Step
+#: raven/raven/onboarding_step/access_the_web_app/access_the_web_app.json
+msgid "It's time. Send a Raven."
+msgstr "Il est temps. Envoyez un Synk."
+
+#: apps/web/src/components/features/ChatInput/composerGate.tsx:129
+#: apps/web/src/components/features/message/renderers/LinkPreview.tsx:592
+msgid "Join"
+msgstr "Rejoindre"
+
+#: apps/web/src/components/features/channel/ChannelSettingsDrawer/LeaveChannelButton.tsx:58
+#: apps/web/src/components/features/channel/ChannelSettingsDrawer/LeaveChannelButton.tsx:103
+msgid "Leave"
+msgstr "Quitter"
+
+#. Title of the Module Onboarding 'Raven'
+#: raven/raven/module_onboarding/raven/raven.json
+msgid "Let's setup Raven"
+msgstr "Configurons Synk"
+
+#: raven/ai/agents_integration.py:58
+msgid "Local LLM API URL is not configured in Raven Settings"
+msgstr "L'URL de l'API du LLM local n'est pas configurée dans Raven Settings"
+
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:118
+#: apps/web/src/components/features/settings/panels/Users/Users.tsx:65
+msgid "Manage users added to Raven."
+msgstr "Gérer les utilisateurs ajoutés à Synk."
+
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:84
+#: apps/web/src/components/features/settings/panels/Profile.tsx:115
+msgid "Manage your Raven profile"
+msgstr "Gérez votre profil Synk"
+
+#: apps/web/src/components/features/schedule-send/ScheduledMessagesList.tsx:112
+msgid "Message deleted"
+msgstr "Message supprimé"
+
+#: apps/web/src/components/features/settings/panels/ai/GoogleAPINotEnabledCallout.tsx:30
+msgid "No Google Project ID is set. Please set a Project ID in Raven Settings"
+msgstr ""
+"Aucun ID de projet Google n'est défini. Veuillez définir un ID de projet "
+"dans Raven Settings"
+
+#: apps/web/src/components/features/threads/ThreadsList.tsx:257
+msgid "No threads yet"
+msgstr "Pas encore de fils"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:98
+msgid "Only change this if you are using a custom Raven Cloud instance."
+msgstr ""
+"Ne modifiez ceci que si vous utilisez une instance Raven Cloud "
+"personnalisée."
+
+#: raven/ai/agents_integration.py:79
+msgid "OpenAI API key is not configured in Raven Settings"
+msgstr "La clé API OpenAI n'est pas configurée dans Raven Settings"
+
+#. Label of the pinned_channels (Table) field in DocType 'Raven User'
+#: raven/raven/doctype/raven_user/raven_user.json
+msgid "Pinned Channels"
+msgstr "Canaux épinglés"
+
+#. Label of the pinned_messages (Table) field in DocType 'Raven Channel'
+#: apps/web/src/components/features/channel/ChannelHeader/ChannelHeader.tsx:116
+#: apps/web/src/components/features/dm-channel/DMChannelHeader.tsx:178
+#: raven/raven_channel_management/doctype/raven_channel/raven_channel.json
+msgid "Pinned Messages"
+msgstr "Messages épinglés"
+
+#: apps/web/src/components/features/channel/ChannelSettingsDrawer/ChannelSettingsDrawer.tsx:78
+msgid "Pins"
+msgstr "Épingles"
+
+#: apps/web/src/components/features/channel/ChannelSettingsDrawer/EditChannelDescriptionButton.tsx:155
+#: apps/web/src/components/features/channel/CreateChannel/CreateChannelForm.tsx:237
+msgid "Please add a channel name"
+msgstr "Veuillez ajouter un nom de canal"
+
+#. Label of the section_break_poll_votes (Section Break) field in DocType
+#. 'Raven Poll'
+#: raven/raven_messaging/doctype/raven_poll/raven_poll.json
+msgid "Poll Votes"
+msgstr "Votes du sondage"
+
+#: apps/web/src/components/features/ChatInput/CreatePollForm.tsx:193
+msgid "Poll question is required"
+msgstr "La question du sondage est requise"
+
+#: raven/api/notification.py:54
+msgid "Push notification service is not set to Raven Cloud."
+msgstr "Le service de notifications push n'est pas défini sur Raven Cloud."
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:66
+msgid "Push notifications are sent through Raven Cloud. To set it up:"
+msgstr ""
+"Les notifications push sont envoyées via Raven Cloud. Pour la configurer :"
+
+#. Label of the question (Small Text) field in DocType 'Raven Poll'
+#: apps/web/src/components/features/ChatInput/CreatePollForm.tsx:191
+#: raven/raven_messaging/doctype/raven_poll/raven_poll.json
+msgid "Question"
+msgstr "Question"
+
+#. Option for the 'Push Notification Service' (Select) field in DocType 'Raven
+#. Settings'
+#. Name of a Workspace
+#: raven/raven/doctype/raven_settings/raven_settings.json
+#: raven/raven/workspace/raven/raven.json
+msgid "Raven"
+msgstr "Raven"
+
+#. Name of a DocType
+#: raven/raven_ai/doctype/raven_ai_bot_files/raven_ai_bot_files.json
+msgid "Raven AI Bot Files"
+msgstr "Raven AI Bot Files"
+
+#. Name of a DocType
+#: raven/raven_ai/doctype/raven_ai_file_source/raven_ai_file_source.json
+msgid "Raven AI File Source"
+msgstr "Raven AI File Source"
+
+#. Name of a DocType
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json
+msgid "Raven AI Function"
+msgstr "Raven AI Function"
+
+#. Name of a DocType
+#: raven/raven_ai/doctype/raven_ai_function_params/raven_ai_function_params.json
+msgid "Raven AI Function Params"
+msgstr "Raven AI Function Params"
+
+#: apps/web/src/components/features/settings/panels/ai/AINotEnabledCallout.tsx:25
+msgid "Raven AI is not enabled. Please enable it in"
+msgstr "L'IA de Synk n'est pas activée. Veuillez l'activer dans"
+
+#. Name of a role
+#: raven/raven/doctype/raven_settings/raven_settings.json
+#: raven/raven/doctype/raven_workspace/raven_workspace.json
+#: raven/raven/doctype/raven_workspace_member/raven_workspace_member.json
+#: raven/raven_ai/doctype/raven_ai_file_source/raven_ai_file_source.json
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json
+#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json
+#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json
+#: raven/raven_bot/doctype/raven_bot/raven_bot.json
+#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.json
+#: raven/raven_integrations/doctype/raven_incoming_webhook/raven_incoming_webhook.json
+#: raven/raven_integrations/doctype/raven_message_action/raven_message_action.json
+#: raven/raven_messaging/doctype/raven_custom_emoji/raven_custom_emoji.json
+msgid "Raven Admin"
+msgstr "Raven Admin"
+
+#. Name of a DocType
+#: raven/raven/doctype/raven_blocked_links/raven_blocked_links.json
+msgid "Raven Blocked Links"
+msgstr "Raven Blocked Links"
+
+#. Label of the raven_bot (Link) field in DocType 'Raven Bot AI Prompt'
+#. Name of a DocType
+#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json
+#: raven/raven_bot/doctype/raven_bot/raven_bot.json
+msgid "Raven Bot"
+msgstr "Raven Bot"
+
+#. Name of a DocType
+#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json
+msgid "Raven Bot AI Prompt"
+msgstr "Raven Bot AI Prompt"
+
+#. Name of a DocType
+#: raven/raven_ai/doctype/raven_bot_functions/raven_bot_functions.json
+msgid "Raven Bot Functions"
+msgstr "Raven Bot Functions"
+
+#. Name of a DocType
+#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json
+msgid "Raven Bot Instruction Template"
+msgstr "Raven Bot Instruction Template"
+
+#. Name of a DocType
+#: raven/raven_channel_management/doctype/raven_channel/raven_channel.json
+msgid "Raven Channel"
+msgstr "Raven Channel"
+
+#. Name of a DocType
+#: raven/raven_channel_management/doctype/raven_channel_groups/raven_channel_groups.json
+msgid "Raven Channel Groups"
+msgstr "Raven Channel Groups"
+
+#. Name of a DocType
+#: raven/raven_channel_management/doctype/raven_channel_member/raven_channel_member.json
+msgid "Raven Channel Member"
+msgstr "Raven Channel Member"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_custom_emoji/raven_custom_emoji.json
+msgid "Raven Custom Emoji"
+msgstr "Raven Custom Emoji"
+
+#. Name of a DocType
+#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.json
+msgid "Raven Document Notification"
+msgstr "Raven Document Notification"
+
+#. Name of a DocType
+#: raven/raven_integrations/doctype/raven_document_notification_recipients/raven_document_notification_recipients.json
+msgid "Raven Document Notification Recipients"
+msgstr "Raven Document Notification Recipients"
+
+#. Name of a DocType
+#: raven/raven/doctype/raven_grouped_channels/raven_grouped_channels.json
+msgid "Raven Grouped Channels"
+msgstr "Raven Grouped Channels"
+
+#. Name of a DocType
+#: raven/raven_integrations/doctype/raven_hr_company_workspace/raven_hr_company_workspace.json
+msgid "Raven HR Company Workspace"
+msgstr "Raven HR Company Workspace"
+
+#. Name of a DocType
+#: raven/raven_integrations/doctype/raven_incoming_webhook/raven_incoming_webhook.json
+msgid "Raven Incoming Webhook"
+msgstr "Raven Incoming Webhook"
+
+#. Option for the 'Provider' (Select) field in DocType 'Raven Link Preview'
+#. Option for the 'Provider' (Select) field in DocType 'Raven Message Links'
+#: raven/raven_messaging/doctype/raven_link_preview/raven_link_preview.json
+#: raven/raven_messaging/doctype/raven_message_links/raven_message_links.json
+msgid "Raven Link"
+msgstr "Raven Link"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_link_preview/raven_link_preview.json
+msgid "Raven Link Preview"
+msgstr "Raven Link Preview"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_mention/raven_mention.json
+msgid "Raven Mention"
+msgstr "Raven Mention"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_message/raven_message.json
+msgid "Raven Message"
+msgstr "Raven Message"
+
+#. Name of a DocType
+#: raven/raven_integrations/doctype/raven_message_action/raven_message_action.json
+msgid "Raven Message Action"
+msgstr "Raven Message Action"
+
+#. Name of a DocType
+#: raven/raven_integrations/doctype/raven_message_action_fields/raven_message_action_fields.json
+msgid "Raven Message Action Fields"
+msgstr "Raven Message Action Fields"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_message_links/raven_message_links.json
+msgid "Raven Message Links"
+msgstr "Raven Message Links"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_message_reaction/raven_message_reaction.json
+msgid "Raven Message Reaction"
+msgstr "Raven Message Reaction"
+
+#. Label of the raven_mobile_tab (Tab Break) field in DocType 'Raven Settings'
+#: raven/raven/doctype/raven_settings/raven_settings.json
+msgid "Raven Mobile"
+msgstr "Raven Mobile"
+
+#. Name of a DocType
+#: raven/raven/doctype/raven_pinned_channels/raven_pinned_channels.json
+msgid "Raven Pinned Channels"
+msgstr "Raven Pinned Channels"
+
+#. Name of a DocType
+#: raven/raven/doctype/raven_pinned_messages/raven_pinned_messages.json
+msgid "Raven Pinned Messages"
+msgstr "Raven Pinned Messages"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_poll/raven_poll.json
+msgid "Raven Poll"
+msgstr "Raven Poll"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_poll_option/raven_poll_option.json
+msgid "Raven Poll Option"
+msgstr "Raven Poll Option"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_poll_vote/raven_poll_vote.json
+msgid "Raven Poll Vote"
+msgstr "Raven Poll Vote"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_poll_vote_selection/raven_poll_vote_selection.json
+msgid "Raven Poll Vote Selection"
+msgstr "Raven Poll Vote Selection"
+
+#. Name of a DocType
+#: raven/raven/doctype/raven_push_token/raven_push_token.json
+msgid "Raven Push Token"
+msgstr "Raven Push Token"
+
+#. Name of a DocType
+#: raven/raven/doctype/raven_reminder/raven_reminder.json
+msgid "Raven Reminder"
+msgstr "Raven Reminder"
+
+#. Name of a DocType
+#: raven/raven_messaging/doctype/raven_scheduled_message/raven_scheduled_message.json
+msgid "Raven Scheduled Message"
+msgstr "Raven Scheduled Message"
+
+#. Name of a DocType
+#: raven/raven_integrations/doctype/raven_scheduler_event/raven_scheduler_event.json
+msgid "Raven Scheduler Event"
+msgstr "Raven Scheduler Event"
+
+#. Name of a DocType
+#. Label of a Link in the Raven Workspace
+#: raven/raven/doctype/raven_settings/raven_settings.json
+#: raven/raven/workspace/raven/raven.json
+msgid "Raven Settings"
+msgstr "Raven Settings"
+
+#. Name of a role
+#. Name of a DocType
+#. Label of the raven_user (Link) field in DocType 'Raven Bot'
+#: raven/raven/doctype/raven_push_token/raven_push_token.json
+#: raven/raven/doctype/raven_reminder/raven_reminder.json
+#: raven/raven/doctype/raven_user/raven_user.json
+#: raven/raven/doctype/raven_workspace/raven_workspace.json
+#: raven/raven/doctype/raven_workspace_member/raven_workspace_member.json
+#: raven/raven_bot/doctype/raven_bot/raven_bot.json
+#: raven/raven_channel_management/doctype/raven_channel/raven_channel.json
+#: raven/raven_channel_management/doctype/raven_channel_member/raven_channel_member.json
+#: raven/raven_integrations/doctype/raven_message_action/raven_message_action.json
+#: raven/raven_messaging/doctype/raven_custom_emoji/raven_custom_emoji.json
+#: raven/raven_messaging/doctype/raven_link_preview/raven_link_preview.json
+#: raven/raven_messaging/doctype/raven_message/raven_message.json
+#: raven/raven_messaging/doctype/raven_message_reaction/raven_message_reaction.json
+#: raven/raven_messaging/doctype/raven_poll/raven_poll.json
+#: raven/raven_messaging/doctype/raven_poll_vote/raven_poll_vote.json
+#: raven/raven_messaging/doctype/raven_scheduled_message/raven_scheduled_message.json
+msgid "Raven User"
+msgstr "Raven User"
+
+#. Name of a DocType
+#: raven/raven/doctype/raven_user_pinned_workspaces/raven_user_pinned_workspaces.json
+msgid "Raven User Pinned Workspaces"
+msgstr "Raven User Pinned Workspaces"
+
+#: raven/raven_integrations/doctype/raven_webhook/raven_webhook.py:198
+msgid "Raven User cannot be triggered on Channel"
+msgstr "Raven User ne peut pas être déclenché sur Channel"
+
+#. Label of a Link in the Raven Workspace
+#: raven/raven/workspace/raven/raven.json
+msgid "Raven Users"
+msgstr "Raven Users"
+
+#. Name of a DocType
+#: raven/raven_integrations/doctype/raven_webhook/raven_webhook.json
+msgid "Raven Webhook"
+msgstr "Raven Webhook"
+
+#. Name of a DocType
+#. Label of the raven_workspace (Link) field in DocType 'Raven HR Company
+#. Workspace'
+#: raven/raven/doctype/raven_workspace/raven_workspace.json
+#: raven/raven_integrations/doctype/raven_hr_company_workspace/raven_hr_company_workspace.json
+msgid "Raven Workspace"
+msgstr "Raven Workspace"
+
+#. Name of a DocType
+#: raven/raven/doctype/raven_workspace_member/raven_workspace_member.json
+msgid "Raven Workspace Member"
+msgstr "Raven Workspace Member"
+
+#: apps/web/src/components/features/settings/panels/QuietHoursAdminSection.tsx:198
+msgid "Raven can nudge users to send messages silently outside work hours."
+msgstr ""
+"Synk peut inciter les utilisateurs à envoyer leurs messages en mode "
+"silencieux en dehors des heures de travail."
+
+#. Success message of the Module Onboarding 'Raven'
+#: raven/raven/module_onboarding/raven/raven.json
+msgid "Raven is setup!"
+msgstr "Synk est configuré !"
+
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:264
+msgid "Raven version, installed apps, and resource links."
+msgstr "Version de Synk, applications installées et liens utiles."
+
+#: apps/web/src/components/layout/AppUpdateAlert.tsx:80
+msgid "Raven was updated"
+msgstr "Synk a été mis à jour"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:156
+msgid "Re-Register Site on Raven Cloud"
+msgstr "Réenregistrer le site sur Raven Cloud"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:156
+msgid "Register Site on Raven Cloud"
+msgstr "Enregistrer le site sur Raven Cloud"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:81
+msgid "Register the site on Raven Cloud, then sync your users' devices."
+msgstr ""
+"Enregistrez le site sur Raven Cloud, puis synchronisez les appareils de vos "
+"utilisateurs."
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:155
+msgid "Registering site on Raven Cloud..."
+msgstr "Enregistrement du site sur Raven Cloud..."
+
+#: apps/web/src/pages/search/Search.tsx:320
+msgid "Search Raven"
+msgstr "Rechercher dans Synk"
+
+#: raven/public/js/timeline_button.js:169
+#: raven/public/js/timeline_button.js:224
+#: raven/public/js/timeline_button.js:324
+msgid "Send a Raven"
+msgstr "Envoyer un Synk"
+
+#: apps/web/src/components/features/ChatInput/SendButton.tsx:81
+#: apps/web/src/components/features/ChatInput/SendButton.tsx:110
+msgid "Send without notification"
+msgstr "Envoyer sans notification"
+
+#: apps/web/src/components/features/settings/panels/QuietHoursAdminSection.tsx:92
+msgid ""
+"Set working hours for your organization, so Raven can nudge users to send "
+"messages silently during off-work hours."
+msgstr ""
+"Définissez les heures de travail de votre organisation afin que Synk puisse "
+"inciter les utilisateurs à envoyer leurs messages en mode silencieux en "
+"dehors de ces heures."
+
+#. Label of the show_raven_on_desk (Check) field in DocType 'Raven Settings'
+#: raven/raven/doctype/raven_settings/raven_settings.json
+msgid "Show Raven on Desk"
+msgstr "Afficher Synk dans le Desk"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:148
+msgid "Site registered on Raven Cloud. You can now send push notifications."
+msgstr ""
+"Site enregistré sur Raven Cloud. Vous pouvez désormais envoyer des "
+"notifications push."
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:56
+msgid "Switch to Raven Cloud"
+msgstr "Basculer vers Raven Cloud"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:172
+msgid "Sync Data to Raven Cloud"
+msgstr "Synchroniser les données vers Raven Cloud"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:171
+msgid "Syncing Data to Raven Cloud..."
+msgstr "Synchronisation des données vers Raven Cloud..."
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:53
+msgid ""
+"The new Raven web app only supports Raven Cloud. Switch to Raven Cloud and "
+"add your credentials to keep push notifications working."
+msgstr ""
+"La nouvelle application web Synk ne prend en charge que Raven Cloud. "
+"Basculez vers Raven Cloud et ajoutez vos identifiants pour continuer à "
+"recevoir les notifications push."
+
+#: raven/api/raven_channel.py:198
+msgid "The user you are trying to message is not a Raven User."
+msgstr "L'utilisateur à qui vous essayez d'écrire n'est pas un Raven User."
+
+#: apps/web/src/components/features/threads/ThreadsList.tsx:260
+msgid ""
+"There are no unread threads to show. Clear the filter to see all threads."
+msgstr "Vous avez lu tous les fils de discussion."
+
+#: apps/web/src/pages/ErrorPage.tsx:40
+msgid ""
+"This one leads to a better Raven - help us climb by reporting the error on"
+msgstr ""
+"Celle-ci mène vers un Synk encore meilleur - aidez-nous à progresser en "
+"signalant l'erreur sur"
+
+#: apps/web/src/components/features/settings/panels/Users/AddUserDialog.tsx:221
+msgid "This user already exists in Frappe. Add them to Raven?"
+msgstr "Cet utilisateur existe déjà dans Frappe. L'ajouter à Synk ?"
+
+#: apps/web/src/components/features/settings/panels/Users/AddUserDialog.tsx:167
+msgid "This user is already on Raven."
+msgstr "Cet utilisateur est déjà sur Synk."
+
+#: apps/web/src/components/features/message/ThreadHeader.tsx:58
+#: apps/web/src/components/features/message/renderers/RavenLinkPreview.tsx:206
+msgid "Thread"
+msgstr "Fil"
+
+#: apps/web/src/components/features/channel/ChannelHeader/ChannelMenu.tsx:123
+#: apps/web/src/components/features/channel/ChannelSettingsDrawer/ChannelSettingsDrawer.tsx:77
+#: apps/web/src/components/features/dm-channel/DMChannelHeader.tsx:124
+#: apps/web/src/components/features/header/AppMobileFooter.tsx:31
+#: apps/web/src/components/features/header/AppMobileFooter.tsx:147
+#: apps/web/src/components/layout/DocumentTitle.tsx:46
+#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:212
+#: apps/web/src/pages/threads/Threads.tsx:69
+msgid "Threads"
+msgstr "Fils"
+
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:65
+msgid "Turn on AI features across Raven."
+msgstr "Activez les fonctionnalités d'IA dans tout Synk."
+
+#: apps/web/src/components/features/ChatInput/ChatInput.tsx:140
+msgid "Type a message..."
+msgstr "Écrivez un message..."
+
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:362
+msgid "Unsave"
+msgstr "Retirer des favoris"
+
+#: apps/web/src/components/features/settings/panels/Users/AddUserDialog.tsx:132
+msgid "User added to Raven"
+msgstr "Utilisateur ajouté à Synk"
+
+#: raven/api/raven_users.py:204 raven/api/raven_users.py:207
+msgid ""
+"User has a role profile set. Please set the role to Raven User manually."
+msgstr ""
+"Cet utilisateur a un profil de rôle défini. Veuillez définir le rôle sur "
+"Raven User manuellement."
+
+#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:91
+msgid "User {0} does not exist in Raven."
+msgstr "L'utilisateur {0} n'existe pas dans Synk."
+
+#: apps/web/src/components/features/settings/panels/Users/Users.tsx:98
+msgid "Users added to Raven will show up here."
+msgstr "Les utilisateurs ajoutés à Synk apparaîtront ici."
+
+#: apps/web/src/components/features/ChatInput/MobileComposerActions.tsx:56
+#: apps/web/src/components/features/message/actions/dialogs/MessagePreview.tsx:21
+msgid "Video"
+msgstr "Vidéo"
+
+#. Label of an action in the Onboarding Step 'Review Settings'
+#: raven/raven/onboarding_step/review_raven_settings/review_raven_settings.json
+msgid "View Raven Settings"
+msgstr "Afficher Raven Settings"
+
+#: apps/web/src/components/features/message/renderers/RavenLinkPreview.tsx:182
+#: apps/web/src/components/features/message/renderers/ThreadMessage.tsx:108
+msgid "View thread"
+msgstr "Voir le fil"
+
+#: apps/web/src/components/features/channel/CreateChannel/CreateChannelForm.tsx:277
+msgid "What is this channel about?"
+msgstr ""
+"Donnez à votre canal une description pour aider les autres à comprendre son "
+"but."
+
+#. Description of the 'Use Google Document/Vision AI to parse documents'
+#. (Check) field in DocType 'Raven Bot'
+#: raven/raven_bot/doctype/raven_bot/raven_bot.json
+msgid ""
+"When images or PDFs are uploaded to the agent, Raven will automatically call"
+" Google Cloud APIs to parse the document and send it's results to the agent."
+msgstr ""
+"Lorsque des images ou des PDF sont envoyés à l'agent, Synk appelle "
+"automatiquement les API Google Cloud pour analyser le document et "
+"transmettre les résultats à l'agent."
+
+#: apps/web/src/components/features/settings/panels/Agents/AgentDocumentProcessorsTab.tsx:79
+msgid ""
+"When images or PDFs are uploaded to the agent, Raven will automatically call"
+" Google Cloud APIs to process the document and send its results to the agent"
+" for better context."
+msgstr ""
+"Lorsque des images ou des PDF sont envoyés à l'agent, Synk appelle "
+"automatiquement les API Google Cloud pour traiter le document et transmettre"
+" les résultats à l'agent afin d'enrichir le contexte."
+
+#: apps/web/src/components/features/channel/ChannelSettingsDrawer/DeleteChannelButton.tsx:109
+msgid "Yes, I understand, permanently delete this channel"
+msgstr "Oui, je comprends, supprimer définitivement ce canal"
+
+#: apps/web/src/components/features/dm-channel/UserProfileDrawer.tsx:36
+#: apps/web/src/components/features/message/renderers/MessageReactions.tsx:238
+msgid "You"
+msgstr "Vous"
+
+#: apps/web/src/components/layout/AppShell.tsx:141
+msgid ""
+"You appear to be offline. Raven will load as soon as you're back online."
+msgstr ""
+"Vous semblez être hors ligne. Synk se chargera dès que vous serez de nouveau"
+" en ligne."
+
+#: raven/api/raven_channel.py:279
+msgid "You are not a member of this channel"
+msgstr "Vous n'êtes pas membre de ce canal"
+
+#: apps/web/src/components/features/channel/ChannelSettingsDrawer/DeleteChannelButton.tsx:99
+msgid "You can archive this channel instead to preserve your messages"
+msgstr "Vous pouvez archiver ce canal à la place pour conserver vos messages"
+
+#: apps/web/src/components/layout/AppShell.tsx:108
+msgid "You cannot access Raven."
+msgstr "Vous ne pouvez pas accéder à Synk."
+
+#: raven/api/raven_users.py:22 raven/api/raven_users.py:52
+#: raven/api/raven_users.py:120
+msgid ""
+"You do not have a <b>Raven User</b> role. Please contact your administrator "
+"to add your user profile as a <b>Raven User</b>."
+msgstr ""
+"Vous n'avez pas le rôle <b>Raven User</b>. Veuillez contacter votre "
+"administrateur pour qu'il ajoute votre profil utilisateur en tant que "
+"<b>Raven User</b>."
+
+#: raven/api/workspaces.py:20
+msgid "You do not have access to Raven."
+msgstr "Vous n'avez pas accès à Synk."
+
+#: apps/web/src/components/layout/AppShell.tsx:109
+msgid ""
+"You do not have the \"Raven User\" role. Please contact your system "
+"administrator."
+msgstr ""
+"Vous n'avez pas le rôle \"Raven User\". Veuillez contacter votre "
+"administrateur système."
+
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:114
+msgid "You need Raven Admin permissions to manage document processors."
+msgstr ""
+"Vous devez disposer des permissions Raven Admin pour gérer les processeurs "
+"de documents."
+
+#: apps/web/src/components/features/settings/panels/AdminSettingsForm.tsx:104
+msgid "You need the Raven Admin role to change these settings."
+msgstr "Vous devez avoir le rôle Raven Admin pour modifier ces réglages."
+
+#: raven/api/raven_channel.py:194
+msgid "You need to be a Raven User to send DMs."
+msgstr "Vous devez être un Raven User pour envoyer des messages directs."
+
+#: apps/web/src/components/features/threads/ThreadsList.tsx:257
+#: apps/web/src/pages/notifications/Notifications.tsx:324
+msgid "You're all caught up"
+msgstr "Vous êtes à jour !"
+
+#: apps/web/src/components/features/settings/panels/KeyboardShortcuts.tsx:173
+msgid ""
+"Your browser provides these. Raven keeps every channel and page in the "
+"history, so they work as you would expect."
+msgstr ""
+"Votre navigateur les fournit. Synk conserve chaque canal et chaque page dans"
+" l'historique, afin qu'ils fonctionnent comme vous vous y attendez."
+
+#: apps/web/src/components/features/message/renderers/MessageContent.tsx:106
+msgid "edited"
+msgstr "modifié"
