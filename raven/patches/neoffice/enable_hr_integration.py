@@ -2,39 +2,72 @@
 # //// centrally and hide its settings panel, so the values have to be set rather than offered.
 import frappe
 
-DEFAULTS = {
-	# A channel per department, which is what customers expect from the integration.
-	# Note this only ever fires on `Department.after_insert` — no channel is created
-	# retroactively for departments that already exist.
-	"auto_create_department_channel": 1,
-	# The field's own default, but the stored Single can hold NULL on a site that never
-	# opened the panel, and a NULL type means no channel gets created at all.
-	"department_channel_type": "Private",
-	# The "this person is on leave" warning when you mention someone. The field defaults to 1
-	# but the stored value is 0 on sites created before it existed.
-	"show_if_a_user_is_on_leave": 1,
-}
+DEFAULT_WORKSPACE = "Synk"
 
 
 def execute():
 	"""Turn the Frappe HR integration on, on every instance.
 
-	The doctype default only applies to a NEW site: an existing one carries whatever the Single
-	already holds, so a default change alone would never reach the fleet. Measured on osiris
-	2026-09-22: auto_create_department_channel=0, department_channel_type=NULL and
-	show_if_a_user_is_on_leave=0, all three against the field defaults.
+	Three things have to happen, in this order, and the order is not cosmetic:
 
-	Idempotent, and it does not fight a deliberate choice: each value is only written when it is
-	empty or falsy, never when someone has already set something else.
+	1. `company_workspace_mapping` must be filled FIRST. `Raven Settings.validate` throws
+	   "Please map the companies to the workspace before enabling this feature." when
+	   `auto_create_department_channel` is set with an empty mapping. Upstream's own
+	   patches/v2_0/create_default_company_workspace_mapping.py fills it, but it returns early
+	   when the flag is off — which it is on every instance of ours — and it hardcodes the
+	   workspace name "Raven", which no longer exists since we renamed it to Synk.
+	2. `department_channel_type` must be non-empty. The stored single can hold NULL on a site
+	   that never opened the panel, and a NULL type means no channel is ever created — the
+	   feature looks enabled and does nothing.
+	3. only then the flag itself.
+
+	A field default would reach none of this: it only applies to a NEW record, so an existing
+	site keeps whatever the single already holds. Measured on osiris 2026-09-22: 0 / NULL / 0,
+	all three against the field defaults.
+
+	⚠️ Nothing here may raise. A patch that throws aborts `bench migrate` for the whole site —
+	the first version of this patch did exactly that on osiris, and on the fleet that is an
+	instance marked Failed for a setting. Every failure is logged and swallowed.
 	"""
-	settings = frappe.get_single("Raven Settings")
-	changed = []
+	try:
+		settings = frappe.get_doc("Raven Settings")
 
-	for field, value in DEFAULTS.items():
-		if not settings.get(field):
-			settings.set(field, value)
-			changed.append(field)
+		if not settings.company_workspace_mapping:
+			workspace = (
+				DEFAULT_WORKSPACE
+				if frappe.db.exists("Raven Workspace", DEFAULT_WORKSPACE)
+				else frappe.db.get_value("Raven Workspace", {"type": "Public"}, "name")
+			)
+			if not workspace:
+				# No workspace to map to: leave the integration alone rather than half-enable it.
+				return
 
-	if changed:
+			companies = (
+				frappe.get_all("Company", pluck="name") if "erpnext" in frappe.get_installed_apps() else []
+			)
+			for company in companies:
+				settings.append(
+					"company_workspace_mapping", {"company": company, "raven_workspace": workspace}
+				)
+
+		if not settings.department_channel_type:
+			settings.department_channel_type = "Private"
+
+		# The "this person is on leave" warning when you mention someone.
+		if not settings.show_if_a_user_is_on_leave:
+			settings.show_if_a_user_is_on_leave = 1
+
+		# Only now, and only if there is something to map it to.
+		if settings.company_workspace_mapping and not settings.auto_create_department_channel:
+			settings.auto_create_department_channel = 1
+
 		settings.save(ignore_permissions=True)
 		frappe.db.commit()
+
+	except Exception:
+		frappe.db.rollback()
+		frappe.log_error(
+			"Synk: HR integration not enabled",
+			f"raven.patches.neoffice.enable_hr_integration could not apply its settings.\n\n"
+			f"{frappe.get_traceback()}",
+		)
