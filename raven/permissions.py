@@ -396,10 +396,27 @@ def raven_workspace_member_query(user):
 # ////
 # //// Drop this when upstream filters the directory itself.
 def is_portal_account(user: str) -> bool:
-	"""A customer, not a colleague — `user_type` is the line the framework draws."""
+	"""A customer, not a colleague.
+
+	🔴 NOT `user_type`, although that is the line the framework draws — because
+	the framework DERIVES it from the roles (`User.has_desk_access`), and this
+	very role can flip it. Nothing here ships a `Role` document, so frappe
+	auto-creates "Raven User" with `desk_access = 1` on a fresh site: holding
+	it would then promote a customer to `System User`, and this filter would
+	stop applying to exactly the accounts it exists for — silently, with the
+	directory looking normal. An instance that sets `desk_access = 0` by hand
+	is protected; one that never did is not, and the difference is invisible.
+
+	So the question is asked in a way the role cannot answer for itself: does
+	this account hold any OTHER role that opens the desk? A colleague does. A
+	customer whose only desk-ish role is this one does not.
+	"""
 	if not user or user in ("Guest", "Administrator"):
 		return False
-	return frappe.db.get_value("User", user, "user_type") == "Website User"
+	roles = [r for r in frappe.get_roles(user) if r not in ("Raven User", "All", "Guest")]
+	if not roles:
+		return True
+	return not frappe.db.count("Role", {"name": ("in", roles), "desk_access": 1})
 
 
 def raven_users_visible_to(user: str) -> set[str]:
