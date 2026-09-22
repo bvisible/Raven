@@ -425,7 +425,19 @@ def is_portal_account(user: str) -> bool:
 	"""
 	if not user or user in ("Guest", "Administrator"):
 		return False
-	roles = [r for r in frappe.get_roles(user) if r not in ("Raven User", "All", "Guest")]
+	#: `Desk User` is excluded for the SAME reason as "Raven User", one hop further out, and
+	#: leaving it in put the whole guard back where it started. Measured on a bare site:
+	#:
+	#:     Website User created                     -> "Website User"
+	#:     + role "Raven User" (desk_access = 1)    -> promoted to "System User"
+	#:     frappe.get_roles() then returns          -> [..., "Desk User", "Raven User"]
+	#:
+	#: `Desk User` is AUTOMATIC — granted from `user_type`, never in `Has Role` — and it carries
+	#: `desk_access = 1`. So it answered the question on behalf of the very role we excluded:
+	#: "Raven User" flips user_type, user_type grants "Desk User", and "Desk User" says colleague.
+	#: Asking only about roles a human actually GRANTED is what makes the answer independent.
+	AUTOMATIC = ("All", "Guest", "Desk User")
+	roles = [r for r in frappe.get_roles(user) if r not in AUTOMATIC and r != "Raven User"]
 	if not roles:
 		return True
 	return not frappe.db.count("Role", {"name": ("in", roles), "desk_access": 1})
