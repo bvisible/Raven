@@ -1046,3 +1046,18 @@ msgstr ""
 #: apps/web/src/components/features/message/renderers/MessageContent.tsx:106
 msgid "edited"
 msgstr "modifié"
+
+msgid "Send a Synk"
+msgstr "Envoyer un message Synk"
+
+msgid "Open channel in Synk"
+msgstr "Ouvrir le canal dans Synk"
+
+msgid "No channels found"
+msgstr "Aucun canal trouvé"
+
+msgid "Message sent"
+msgstr "Message envoyé"
+
+msgid "Error sending message"
+msgstr "Erreur lors de l'envoi du message"

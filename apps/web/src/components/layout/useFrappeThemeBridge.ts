@@ -9,20 +9,26 @@ type Resolved = 'light' | 'dark'
 /**
  * Read the theme Frappe is currently showing, from the SAME-ORIGIN localStorage the desk writes.
  *
- * Frappe keeps two keys: `theme_active` (already resolved to light|dark) and `appearance`
- * (light|dark|automatic, and sometimes JSON-quoted). Prefer the resolved one, fall back to the
- * preference, and resolve `automatic` against the OS.
+ * Frappe keeps two keys and they do NOT always agree:
+ *   - `appearance`    the user's PREFERENCE: light | dark | automatic. Sometimes JSON-quoted.
+ *   - `theme_active`  a resolved light|dark cache.
+ *
+ * `appearance` is authoritative and `theme_active` can lag behind it. Measured on osiris
+ * 2026-09-22: after switching the desk back to light, `appearance` read "light" and the desk
+ * rendered light, while `theme_active` still said "dark" — so an embedded Raven that trusted
+ * `theme_active` sat dark inside a light desk. Read the preference first; `theme_active` is only
+ * a fallback for the case where no preference was ever written.
  */
 function readFrappeTheme(): Resolved | null {
 	try {
-		const active = window.localStorage.getItem('theme_active')
-		if (active === 'dark' || active === 'light') return active
-
 		const pref = (window.localStorage.getItem('appearance') || '').replace(/^"|"$/g, '')
 		if (pref === 'dark' || pref === 'light') return pref
 		if (pref === 'automatic') {
 			return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 		}
+
+		const active = window.localStorage.getItem('theme_active')
+		if (active === 'dark' || active === 'light') return active
 	} catch {
 		// localStorage throws in a sandboxed or blocked context — the caller falls back.
 	}
