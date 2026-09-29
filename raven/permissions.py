@@ -13,7 +13,12 @@ def check_app_permission():
 	if frappe.session.user == "Administrator":
 		return True
 
-	if frappe.db.exists("Raven User", {"user": frappe.session.user}):
+	# //// Neoffice — `"enabled": 1` added. Upstream only tests that a Raven User row exists for the account.
+	# //// add_user_to_raven KEEPS the row of an account that lost the Raven User role or was disabled, with
+	# //// `enabled = 0` (and the user lists skip such rows), so a chat member who had been switched off still
+	# //// got the app tile on the apps screen, pointing at a chat they no longer belong to. Only the tile
+	# //// gate changes; the row-level permissions below are untouched.
+	if frappe.db.exists("Raven User", {"user": frappe.session.user, "enabled": 1}):
 		return True
 
 	return False
