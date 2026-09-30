@@ -5,8 +5,7 @@ from raven.www.raven import get_favicon
 
 # The app's OAuth redirect URI; the RN app used the bare "raven.thecommit.company:".
 NATIVE_REDIRECT_URI = "raven.thecommit.company://oauth"
-# //// Neoffice - the Synk app (apps/mobile, bundle io.synk.app) signs in through this redirect: a
-# //// client that accepts it is usable, like upstream's for its own native app (2026-09-30).
+# //// Neoffice - the Synk app (apps/mobile, bundle io.synk.app) signs in through this redirect.
 SYNK_REDIRECT_URI = "io.synk.app:"
 # Bump to prompt older app builds to update; the app compares its own version against it.
 MIN_APP_VERSION = "3.0.0"
@@ -31,12 +30,11 @@ def get_client_id():
 		frappe.db.get_value("OAuth Client", client_id, "redirect_uris") if client_id else ""
 	)
 	return {
-		# Only a client that accepts the app's redirect URI is usable.
-		# //// Neoffice - upstream only accepts NATIVE_REDIRECT_URI, which our client never holds: the
-		# //// Synk app would read no client_id and stop at « OAuth not configured ». Ours counts too.
-		"client_id": client_id
-		if {SYNK_REDIRECT_URI, NATIVE_REDIRECT_URI} & set((redirect_uris or "").split())
-		else None,
+		# //// Neoffice - upstream (#2266, 2026-09-25) hands out the client only when it accepts its
+		# //// native app's redirect. Our sites' client serves our own apps (the Synk app, io.synk.app:;
+		# //// the Neoffice app, io.neoffice.app: on osiris), which that check does not know: they read
+		# //// no client_id. The configured client is handed out, as before (30.09.2026).
+		"client_id": client_id,
 		"system_timezone": frappe.get_system_settings("time_zone"),
 		"app_name": app_name,
 		"sitename": frappe.local.site,
@@ -70,7 +68,7 @@ def create_oauth_client():
 	# //// app is published under (io.synk.app). Upstream's raven.thecommit.company: belongs to their
 	# //// own App Store build. Mirrored in apps/mobile/components/features/auth/AddSite.tsx.
 	# //// Upstream v3 also registers its Capacitor app's NATIVE_REDIRECT_URI here (2026-09-25,
-	# //// #2266): not ours, so it is left out; get_client_id accepts SYNK_REDIRECT_URI instead.
+	# //// #2266): not ours, so it is left out; get_client_id hands out the configured client.
 	oauth_client.redirect_uris = SYNK_REDIRECT_URI
 	oauth_client.default_redirect_uri = "io.synk.app:"
 	oauth_client.grant_type = "Authorization Code"

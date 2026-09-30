@@ -51,10 +51,12 @@ class TestNative(IntegrationTestCase):
 		# No favicon of its own set: the app shows its initial, not Raven's artwork twice.
 		self.assertIsNone(data["logo"])
 
-	def test_client_info_hides_client_without_native_redirect(self):
-		self.client.redirect_uris = "raven.thecommit.company:"
+	# //// Neoffice - upstream hides a client without its native redirect; ours serves our own apps
+	# //// (Synk, Neoffice), whose redirects it does not know, so the configured client is handed out.
+	def test_client_info_hands_out_the_configured_client(self):
+		self.client.redirect_uris = "io.neoffice.app:"
 		self.client.save(ignore_permissions=True)
-		self.assertIsNone(get_client_id()["client_id"])
+		self.assertEqual(get_client_id()["client_id"], self.client.name)
 
 	# //// Neoffice - the Synk app's client holds only its own redirect, and must be found.
 	def test_client_info_reports_a_synk_client(self):
