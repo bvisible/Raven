@@ -107,11 +107,7 @@ def get_context(context):
 		# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): page title fallback.
 		context["app_name"] = "Synk"
 
-	use_website_favicon = frappe.db.get_single_value("Raven Settings", "use_website_favicon")
-
-	favicon = None
-	if use_website_favicon:
-		favicon = frappe.get_website_settings("favicon")
+	favicon = get_favicon()
 
 	# TODO: Update all favicons here and delete all v2 icons later
 	context["icon_96"] = favicon or "/assets/raven/icons/icon-96x96.png"
@@ -162,3 +158,10 @@ def get_boot():
 	boot_json = json.dumps(boot_json)
 
 	return boot_json
+
+
+def get_favicon():
+	"""The site's own icon when Raven Settings opts into it; None means Raven's own artwork."""
+	if frappe.db.get_single_value("Raven Settings", "use_website_favicon"):
+		return frappe.get_website_settings("favicon")
+	return None
