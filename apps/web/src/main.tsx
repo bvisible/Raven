@@ -12,6 +12,19 @@ scan({
 
 import { initPushNotifications, isStandalone } from "@lib/push";
 
+//// Neoffice - the NeoCockpit menu translates through Frappe's global __(), which the desk defines
+//// and this app does not: its labels stayed English in Synk v3 (« Collapse menu », 30.09.2026).
+//// A thin __ over frappe._messages, read at each call, with Frappe's {0} placeholders.
+type FrappeTranslate = (text: string, args?: (string | number)[]) => string
+const frappeWindow = window as unknown as { __?: FrappeTranslate; frappe?: { _messages?: Record<string, string> } }
+if (typeof frappeWindow.__ !== "function") {
+  frappeWindow.__ = (text, args) => {
+    let translated = frappeWindow.frappe?._messages?.[text] || text
+    if (args) translated = translated.replace(/\{(\d+)\}/g, (_match, index) => String(args[Number(index)] ?? ""))
+    return translated
+  }
+}
+
 if (import.meta.env.DEV) {
   fetch('/api/method/raven.www.raven.get_context_for_dev', {
     method: 'POST',
