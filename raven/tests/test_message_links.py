@@ -22,12 +22,17 @@ class TestPreviewBlocklist(IntegrationTestCase):
 		settings.blocked_links = []
 		for link, match_exact in rows:
 			settings.append("blocked_links", {"link": link, "match_exact": match_exact})
+		# //// Neoffice - only the blocklist is this test's: on a fresh site the push service
+		# //// defaults to Raven Cloud with no URL, and Raven Settings.validate refused the save
+		# //// for it (our CI, 01.10.2026; upstream's CI is red on main as well).
+		settings.flags.ignore_validate = True
 		settings.save(ignore_permissions=True)
 		self.addCleanup(self.clear_blocklist)
 
 	def clear_blocklist(self):
 		settings = frappe.get_doc("Raven Settings")
 		settings.blocked_links = []
+		settings.flags.ignore_validate = True  # //// Neoffice - see set_blocklist
 		settings.save(ignore_permissions=True)
 
 	def test_domain_rows_block_the_whole_domain(self):
