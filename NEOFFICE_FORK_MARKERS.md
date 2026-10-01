@@ -5,11 +5,11 @@ This repository is a **fork of [The-Commit-Company/raven](https://github.com/The
 carries a `//// Neoffice` comment saying **why**, so that `grep -rn "////"` maps the whole
 divergence before an upstream merge.
 
-**Common base with upstream:** `dfde9b1e4a8e1da526a63891e78b5d31404b38d7`
-(2026-01-12, merge of `develop` into `main`, tagged **v2.7.1**). Upstream has no `version-15`
-branch: `origin/version-15` forked off `upstream/main` at that commit. Everything after it on
-`origin/version-15` is Neoffice work — no upstream commit has been merged since, and no commit
-in the range is a cherry-pick of an upstream one.
+**Common base with upstream:** `e890308e96` (2026-09-25, upstream `main` after v3.0.0), merged
+into `origin/version-15` on 2026-09-30 with the v3 port (#567). Upstream has no `version-15`
+branch. Before that merge the base was `dfde9b1e4a8e1da526a63891e78b5d31404b38d7` (2026-01-12,
+tagged **v2.7.1**). Everything on `origin/version-15` that is not in upstream `main` is Neoffice
+work; `fork_markers.py check --base e890308e96` maps it.
 
 This file is the **manifest**: it carries the entries for files that cannot hold a comment —
 JSON, binaries, symlinks, bundled assets — plus the notes that belong to a whole directory.
@@ -79,6 +79,7 @@ is marked in `raven/public/js/raven_chat/**` and `raven/public/scss/raven.bundle
 
 | File | Neoffice change |
 |---|---|
+| `raven/raven/doctype/raven_user/raven_user.json` | `time_format` default `12-hour` → `24-hour`, the reason in the field's own `description`: our customers are in Suisse romande, where nobody reads a 12-hour clock. |
 | `raven/raven/doctype/raven_settings/raven_settings.json` | `push_notification_service` options `Frappe Cloud\nRaven` → `Frappe Cloud\nFirebase\nRaven` (`47b8b2243`): we self-host and push through our own Firebase project, not Raven Cloud. Labels rebranded to Synk. |
 | `raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json` | **New doctype** (`7cdc45189`), no upstream equivalent. Fieldnames: `action_type`, `status`, `channel_id`, `message_id`, `bot`, `priority`, `expires_at`, `confirmed_at`, `executed_at`, `action_data`, `preview_message`, `confirmation_message`, `handler_path`, `execution_result`, `error_message`. Backs the confirmation workflow of `raven/ai/pending_action_manager.py`: a local model is far likelier to propose a wrong write, so a create/update/delete is parked until the user confirms. |
 | `raven/raven_bot/doctype/raven_bot/raven_bot.json` | `model_provider` options gain `Nora` + a `description` (`6375b651f`): a bot can delegate the whole turn to NORA (prompt, RAG, ERP tools). `modified` was hand-edited to `2026-01-04 10:00:00.000000` so the change reimports. |
@@ -94,7 +95,7 @@ is marked in `raven/public/js/raven_chat/**` and `raven/public/scss/raven.bundle
 | `apps/mobile/assets/sync_ios.icon/icon.json` | iOS 18 layered app icon for Synk (`1d6dea095`). |
 | `apps/mobile/package.json` | Expo/RN deps for i18n (`i18next`, `react-i18next`, `expo-localization`) and the `react-native-css-interop` pin. |
 | `apps/mobile/tsconfig.tsbuildinfo` | ⚠️ Build cache committed by accident. Should be gitignored and deleted. |
-| `frontend/package.json` | Adds `@neoffice/frappe-sidebar-react` (the NeoCockpit chrome), pinned to a commit SHA and re-pinned on every cockpit release. |
+| `apps/web/package.json` | Adds `@neoffice/frappe-sidebar-react` (the NeoCockpit chrome), pinned to a commit SHA and re-pinned on every cockpit release (`scripts/cockpit-release.sh` in neoffice-devops). Was `frontend/package.json` before v3 moved the SPA to `apps/web` (2026-09-30). |
 | `package.json` (root) | `build` gated on the presence of `raven/public/raven/assets` (commit-the-build; `FORCE_REBUILD=1` forces it), `build:force` added, and `resolutions.react-native-css-interop = 0.1.22` because 0.1.23+ requires `react-native-worklets`, incompatible with the RN 0.76 of `apps/mobile`. |
 | `app.json` (root) | Empty Expo stub (`{"expo": {}}`), so the Expo CLI walking up from `apps/mobile` finds a workspace root. **TO REVIEW: origin unknown** — it rides along in `0b0db7095`, whose subject is about `react-native-worklets`. |
 | `ios/raven.xcodeproj/project.xcworkspace/contents.xcworkspacedata` | Xcode workspace stub committed with the iOS rebrand. **TO REVIEW: origin unknown** — no commit message mentions it. |

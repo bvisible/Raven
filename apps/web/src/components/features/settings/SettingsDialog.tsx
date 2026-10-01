@@ -325,6 +325,9 @@ const RavenSettingsDialog = () => {
                 defaultValue={"profile"} value={openTab}
                 onValueChange={(value) => setOpenTab(value as (typeof SETTINGS_TABS)[number]["id"])}>
                 <SettingsTabs>
+                    {/* //// Neoffice - only the groups that still show a panel ("fix(synk): hide a
+                        settings group once every panel in it is hidden"): we hide the panels we
+                        configure centrally, and upstream drew their group's header over nothing. */}
                     {VISIBLE_SETTINGS_TAB_GROUPS.map((group) => (
                         <SettingsTabGroup key={group.id} header={group.label}>
                             {SETTINGS_TABS.filter((tab) => tab.group === group.id).map((tab) => {

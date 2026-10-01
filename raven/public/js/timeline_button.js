@@ -169,6 +169,7 @@ $(document).on('app_ready', function () {
                 let dialog;
                 if (!dialog) {
                   dialog = new frappe.ui.Dialog({
+                    //// Neoffice - Synk is Raven's name for our users ("feat(synk): ban the Raven name where users read it"); upstream: 'Send a Raven'.
                     title: __('Send a Synk'),
                     fields: [
                       {
@@ -224,6 +225,7 @@ $(document).on('app_ready', function () {
                 dialog.show();
               } else {
                 frappe.msgprint({
+                  //// Neoffice - Synk is Raven's name for our users ("feat(synk): ban the Raven name where users read it"); upstream: 'Send a Raven'.
                   title: __('Send a Synk'),
                   indicator: 'blue',
                   message: __('No channels found'),
@@ -324,6 +326,7 @@ $(document).on('app_ready', function () {
             // check the button is not already added by checking the class name 'send-raven-button'
 
             timeline.add_action_button(
+              //// Neoffice - Synk is Raven's name for our users ("feat(synk): ban the Raven name where users read it"); upstream: 'Send a Raven'.
               __('Send a Synk'),
               send_raven,
               'share',

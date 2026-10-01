@@ -10,6 +10,9 @@ except ImportError:
 	from frappe.tests.utils import FrappeTestCase as IntegrationTestCase
 
 from raven.api.native import APP_HEADER, APP_ORIGINS, boot, set_cors
+
+# //// Neoffice - SYNK_REDIRECT_URI: the redirect of our Synk app, whose OAuth client the tests
+# //// below expect get_client_id to hand out (30.09.2026, upstream #2266 hid it).
 from raven.api.raven_mobile import (
 	MIN_APP_VERSION,
 	NATIVE_REDIRECT_URI,

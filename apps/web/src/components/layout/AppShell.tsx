@@ -255,6 +255,9 @@ const AppShellLayout = ({ children }: { children: React.ReactNode }) => {
         </main>
     </div>
 
+    //// Neoffice - inside Frappe (/raven), the shared NeoCockpit chrome wraps the app, as it did in
+    //// v2 ("feat(cockpit): put the Neoffice chrome back around /raven in v3"): the same menu as the
+    //// desk, instead of Raven's own sidebar alone.
     if (FRAPPE_INTEGRATION) {
         return <NeoCockpitShell>{layout}</NeoCockpitShell>
     }

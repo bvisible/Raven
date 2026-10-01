@@ -29,6 +29,10 @@ from agents import (
 from frappe import _
 from openai import AsyncOpenAI
 
+# //// Neoffice - the Raven AI Functions of a bot are run through function_executor, which replaced
+# //// the deleted raven/ai/sdk_tools.py (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"). See
+# //// _create_function_tools() below.
+from .function_executor import execute_raven_function
 from .functions import (
 	cancel_document,
 	create_document,
@@ -38,11 +42,6 @@ from .functions import (
 	submit_document,
 	update_document,
 )
-
-# //// Neoffice - the Raven AI Functions of a bot are run through function_executor, which replaced
-# //// the deleted raven/ai/sdk_tools.py (7cdc45189, 2025-08-22 "Feat add SDK LM Studio"). See
-# //// _create_function_tools() below.
-from .function_executor import execute_raven_function
 
 
 # //// Neoffice - local-LLM tool calling (6c5dfb539 + bbe50bc26, 2025-07-31/2025-08-05 "Fix: OpenAI Agents SDK Compatibility with Local LLMs").
@@ -360,6 +359,9 @@ class RavenAgentManager:
 			)
 
 		# Add CRUD tools
+		# //// Neoffice - added 2025-08-05 ("Enable CRUD tools and fix Local LLM function execution"):
+		# //// upstream defines _create_crud_tools and never calls it, so a bot could not create or
+		# //// update a document. Its tools now include them.
 		crud_tools = self._create_crud_tools()
 		if crud_tools:
 			self.tools.extend(crud_tools)
@@ -1131,6 +1133,7 @@ async def handle_ai_request_async(
 						"Raven AI: direct API fallback failed",
 						f"Bot: {bot.name}\nModel: {bot.model}\n{frappe.get_traceback()}",
 					)
+					# //// Neoffice - returned as a failure, not re-raised (see the block above).
 					return {
 						"response": _("Sorry, I could not get a response from the AI provider."),
 						"success": False,

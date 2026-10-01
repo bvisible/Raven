@@ -1,4 +1,7 @@
 import frappe
+
+# //// Neoffice - `from frappe import _` removed: it served only the two Error Log titles that
+# //// sync_invalid_tokens builds by hand now (title and message apart, 01.10.2026).
 from frappe.frappeclient import FrappeClient
 
 from raven.raven_cloud_notifications import get_site_name
