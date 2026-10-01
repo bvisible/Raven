@@ -1,5 +1,4 @@
 import frappe
-from frappe import _
 from frappe.frappeclient import FrappeClient
 
 from raven.raven_cloud_notifications import get_site_name
@@ -57,18 +56,20 @@ def sync_invalid_tokens():
 			for token_data in invalid_tokens:
 				try:
 					frappe.db.delete("Raven Push Token", {"fcm_token": token_data.get("invalid_token")})
-				except Exception as e:
-					frappe.log_error(
-						_(f"Failed to delete local token {token_data.get('invalid_token')}: {str(e)}")
-					)
+				except Exception:
+					# //// Neoffice - title and message apart, as for the sync itself below.
+					frappe.log_error("Raven: invalid push token not deleted", frappe.get_traceback())
 
 			# Check if more tokens exist
 			has_more = message.get("has_more", False)
 			if not has_more:
 				break
 
-		except Exception as e:
-			frappe.log_error(_(f"Failed to sync invalid tokens: {str(e)}"))
+		except Exception:
+			# //// Neoffice - title and message apart: the whole error as the title went past the
+			# //// 140 characters of an Error Log title, and the job died on CharacterLengthExceededError
+			# //// instead of logging why the sync failed (seen in our CI, 01.10.2026).
+			frappe.log_error("Raven: invalid push tokens not synced", frappe.get_traceback())
 			break
 
 	return "Invalid tokens synced successfully"

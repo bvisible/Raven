@@ -33,8 +33,9 @@ def get_client_id():
 		# //// Neoffice - upstream (#2266, 2026-09-25) hands out the client only when it accepts its
 		# //// native app's redirect. Our sites' client serves our own apps (the Synk app, io.synk.app:;
 		# //// the Neoffice app, io.neoffice.app: on osiris), which that check does not know: they read
-		# //// no client_id. The configured client is handed out, as before (30.09.2026).
-		"client_id": client_id,
+		# //// no client_id. The configured client is handed out, as before (30.09.2026), and None
+		# //// when there is none (the single reads "" then; upstream's test expects None).
+		"client_id": client_id or None,
 		"system_timezone": frappe.get_system_settings("time_zone"),
 		"app_name": app_name,
 		"sitename": frappe.local.site,

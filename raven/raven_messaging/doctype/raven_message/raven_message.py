@@ -835,7 +835,12 @@ class RavenMessage(Document):
 			from raven.api.search import RavenSearch
 
 			search = RavenSearch()
-			search.remove_doc(self.doctype, self.name)
+			# //// Neoffice - guarded like frappe's own delete_doc_index, which already removes the
+			# //// message on trash when the index exists: remove_doc raises when the index has not
+			# //// been built yet (a fresh site, an instance just moved to v3 while the background
+			# //// build runs), and deleting any message failed there (our CI, 01.10.2026).
+			if search.is_search_enabled() and search.index_exists():
+				search.remove_doc(self.doctype, self.name)
 
 		# delete poll if the message is of type poll after deleting the message
 		if self.message_type == "Poll":

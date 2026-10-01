@@ -59,7 +59,14 @@ class RavenSettings(Document):
 
 	def validate(self):
 		if self.auto_create_department_channel:
-			if not self.company_workspace_mapping:
+			# //// Neoffice - our field default turns this on for every new site (Jérémy, 22.09.2026),
+			# //// before patches/neoffice/enable_hr_integration has mapped the companies. Upstream's
+			# //// check then refused every save of the settings on such a site (a blocklist, a push
+			# //// setting...) for a feature nobody had just switched on. It now refuses switching it on
+			# //// without a mapping; left on without one, no department channel is created.
+			if not self.company_workspace_mapping and self.has_value_changed(
+				"auto_create_department_channel"
+			):
 				frappe.throw(_("Please map the companies to the workspace before enabling this feature."))
 
 			for row in self.company_workspace_mapping:

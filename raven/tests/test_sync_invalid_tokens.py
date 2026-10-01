@@ -20,28 +20,30 @@ class Settings(frappe._dict):
 
 class TestSyncInvalidTokens(unittest.TestCase):
 	def _run(self, **settings):
+		# v3 calls Raven Cloud through raven.utils.make_api_call, imported inside the job: mocking
+		# FrappeClient, as for v2, let the third test reach the network (CI, 01.10.2026).
 		with (
 			mock.patch.object(daily.frappe, "get_single", return_value=Settings(settings)),
-			mock.patch.object(daily, "FrappeClient") as client,
+			mock.patch("raven.utils.make_api_call") as call,
 			mock.patch.object(daily, "get_site_name", return_value="test-site"),
 		):
-			client.return_value.post_api.return_value = {"invalid_tokens": []}
+			call.return_value = {"message": {"invalid_tokens": []}}
 			daily.sync_invalid_tokens()
-		return client
+		return call
 
 	def test_another_push_service_is_left_alone(self):
 		self.assertFalse(self._run(push_notification_service="Firebase").called)
 
 	def test_no_secret_means_no_call(self):
-		client = self._run(push_notification_service="Raven", push_notification_api_key="key")
-		self.assertFalse(client.called)
+		call = self._run(push_notification_service="Raven", push_notification_api_key="key")
+		self.assertFalse(call.called)
 
 	def test_raven_cloud_with_credentials_still_syncs(self):
-		client = self._run(
+		call = self._run(
 			push_notification_service="Raven",
 			push_notification_api_key="key",
 			push_notification_server_url="https://push.example.invalid",
 			_secret="secret",
 		)
-		client.assert_called_once()
-		self.assertEqual(client.call_args.kwargs["api_secret"], "secret")
+		call.assert_called_once()
+		self.assertEqual(call.call_args.kwargs["api_secret"], "secret")

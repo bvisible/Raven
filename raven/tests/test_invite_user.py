@@ -64,6 +64,10 @@ class TestInviteUser(IntegrationTestCase):
 		user = frappe.get_doc("User", "test1@example.com")
 		user.roles = [r for r in user.roles if r.role != "Raven User"]
 		user.save()
+		# //// Neoffice - without a desk role the save made test1 a Website User, and our guard in
+		# //// invite_user refuses a portal account (it would become a desk user and take a licence
+		# //// seat, WI-00353). The case this test covers is a colleague already on the desk.
+		frappe.db.set_value("User", "test1@example.com", "user_type", "System User")
 
 		invite_user("test1@example.com", workspaces=[self.workspace.name])
 		self.assertTrue(frappe.db.exists("Raven User", "test1@example.com"))

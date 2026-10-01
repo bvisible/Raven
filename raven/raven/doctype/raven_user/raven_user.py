@@ -120,6 +120,10 @@ class RavenUser(Document):
 		Remove the Raven User from all channels
 		"""
 		frappe.db.delete("Raven Channel Member", {"user_id": self.user})
+		# //// Neoffice - its workspace memberships go too: Raven Workspace Member links this doc,
+		# //// and Frappe's link check, which runs after on_trash, refused to delete a user who had
+		# //// ever joined a workspace (the User's own deletion with it). Same as upstream's channels.
+		frappe.db.delete("Raven Workspace Member", {"user": self.name})
 		# Raven Reminder.user links this doc by name (not the frappe user id)
 		frappe.db.delete("Raven Reminder", {"user": self.name})
 		# Scheduled messages are owned by the frappe user. Left behind, the sweep would

@@ -37,6 +37,22 @@ class TestRavenScheduledMessage(IntegrationTestCase):
 		frappe.set_user("Administrator")
 		frappe.clear_cache()
 
+	# //// Neoffice - what a test committed is removed and committed again: the class rollback
+	# //// cannot reach it. Rows first (their sent message is in the channels), then the channels
+	# //// with their messages, then the workspace.
+	def _drop_committed(self, rows, channels):
+		frappe.set_user("Administrator")
+		for doctype, name in rows:
+			frappe.delete_doc(doctype, name, force=True, ignore_permissions=True, ignore_missing=True)
+		for channel in channels:
+			frappe.delete_doc(
+				"Raven Channel", channel, force=True, ignore_permissions=True, ignore_missing=True
+			)
+		frappe.delete_doc(
+			"Raven Workspace", self.workspace.name, force=True, ignore_permissions=True, ignore_missing=True
+		)
+		frappe.db.commit()  # nosemgrep
+
 	def _schedule(self, minutes=60, channel=None, text="<p>later</p>"):
 		return frappe.get_doc(
 			{
@@ -182,6 +198,16 @@ class TestRavenScheduledMessage(IntegrationTestCase):
 		good.db_set("channel_id", other_channel.name)
 		frappe.set_user("Administrator")
 		frappe.delete_doc("Raven Channel Member", member_name)
+		# //// Neoffice - the dispatcher commits each row and rolls back a failed send: that rollback
+		# //// took this test's uncommitted rows with it, and the loop then read « Raven Scheduled
+		# //// Message ... not found » for `good` (our CI, 01.10.2026). Committed first, they outlive
+		# //// it, and the cleanup below removes them.
+		frappe.db.commit()  # nosemgrep
+		self.addCleanup(
+			self._drop_committed,
+			[("Raven Scheduled Message", bad.name), ("Raven Scheduled Message", good.name)],
+			[other_channel.name, self.channel.name],
+		)
 
 		send_due_messages()
 

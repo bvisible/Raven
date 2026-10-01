@@ -5,7 +5,10 @@ from frappe.tests import IntegrationTestCase
 
 from raven.api.chat_stream import get_messages, get_newer_messages, get_older_messages
 
-CHANNEL_ID = "Public Workspace-test-channel"
+# //// Neoffice - v3's Raven Channel.autoname writes the workspace in lower case with dashes; the
+# //// upstream test still names the pre-v3 channel, so tearDown never found it and every test after
+# //// the first one met « A channel with this name already exists ». Upstream's CI is red too.
+CHANNEL_ID = "public-workspace-test-channel"
 
 EXTRA_TEST_RECORD_DEPENDENCIES = ["Raven Workspace"]
 

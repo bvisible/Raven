@@ -4,6 +4,9 @@ on:
   push:
     branches: [version-15]
     paths:
+      # v3 moved the SPA from frontend/ to apps/web, with shared code in packages/ (01.10.2026).
+      - 'apps/web/**'
+      - 'packages/**'
       - 'frontend/**'
       - 'package.json'
       - 'yarn.lock'
@@ -31,7 +34,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # v3's toolchain (@rolldown/plugin-babel) wants Node >= 22.12 or 24, as upstream's CI
+          # runs it: on 20 the build stopped at install (01.10.2026).
+          node-version: 24
           cache: yarn
           cache-dependency-path: yarn.lock
 
