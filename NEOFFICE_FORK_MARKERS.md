@@ -41,7 +41,11 @@ The whole tree is **generated** by `vite build` from `frontend/` and committed o
 build reverts it. The Neoffice divergence it contains is marked in the sources:
 `frontend/index.html`, `frontend/src/**`, `frontend/public/**`.
 
-| Path | Note |
+The first cell of the header must read `Artifact`: `fork_markers.py` takes the paths of this table from
+that exact word, and a table headed `Path` is prose to it. Headed `Path`, it asked for a marker on the
+hash lines of `index.html` and `www/raven.html` after every rebuild (24 hunks, 2026-10-02).
+
+| Artifact | Note |
 |---|---|
 | `raven/public/raven/assets/**` | vite chunks, hashed. Pure build output. |
 | `raven/public/raven/index.html` | Generated from `frontend/index.html`. Carries a `////` header that is regenerated with it. |
