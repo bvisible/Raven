@@ -2976,20 +2976,23 @@ msgstr "Frappe HR n'est pas installé"
 msgid "Frappe Integrations"
 msgstr "Intégrations Frappe"
 
+# //// Neoffice — the French screen showed the upstream product name « Frappe Meet »; Neoffice only says « Meet ». Drop this when the English source itself stops naming the upstream product.
 #: apps/web/src/components/features/message/renderers/LinkPreview.tsx:709
 #: raven/raven_messaging/doctype/raven_link_preview/raven_link_preview.json
 #: raven/raven_messaging/doctype/raven_message_links/raven_message_links.json
 msgid "Frappe Meet"
-msgstr "Frappe Meet"
+msgstr "Meet"
 
+# //// Neoffice — the French screen showed the upstream product name « Frappe Meet »; Neoffice only says « Meet ». Drop this when the English source itself stops naming the upstream product.
 #: raven/raven/doctype/raven_settings/raven_settings.json
 msgid "Frappe Meet Hosted URLs"
-msgstr "URL hébergées par Frappe Meet"
+msgstr "URL hébergées par Meet"
 
+# //// Neoffice — the French screen showed the upstream product name « Frappe Meet »; Neoffice only says « Meet ». Drop this when the English source itself stops naming the upstream product.
 #: apps/web/src/components/features/settings/panels/LinkSettingsAdminSection.tsx:60
 #: apps/web/src/components/features/settings/panels/LinkSettingsAdminSection.tsx:172
 msgid "Frappe Meet sites"
-msgstr "Sites Frappe Meet"
+msgstr "Sites Meet"
 
 #: apps/web/src/components/features/settings/panels/ScheduledMessages/ScheduledMessageForm.tsx:78
 msgid "Frequency is required."
@@ -6520,13 +6523,12 @@ msgstr "Lien du document du site"
 msgid "Site Name"
 msgstr "Nom du site"
 
+# //// Neoffice — the French screen showed the upstream product name « Frappe Meet »; Neoffice only says « Meet ». Drop this when the English source itself stops naming the upstream product.
 #: raven/raven/doctype/raven_settings/raven_settings.json
 msgid ""
 "Site URLs of where Frappe Meet is hosted to show previews of meeting links. "
 "Separated by newline characters."
-msgstr ""
-"URLs des sites où Frappe Meet est hébergé, pour afficher des aperçus des "
-"liens de réunion. Séparées par des retours à la ligne."
+msgstr "URLs des sites où Meet est hébergé, pour afficher des aperçus des liens de réunion. Séparées par des retours à la ligne."
 
 #: apps/web/src/components/features/settings/panels/PushNotifications.tsx:148
 msgid "Site registered on Raven Cloud. You can now send push notifications."
@@ -8846,3 +8848,175 @@ msgstr "Envoyer un message Synk"
 
 msgid "Open channel in Synk"
 msgstr "Ouvrir le canal dans Synk"
+
+# //// Neoffice — message actions menu showed « Pin » in English: wrapped in _() (useMessageActions.tsx) but never translated.
+msgid "Pin"
+msgstr "Épingler"
+
+# //// Neoffice — « Unpin » (message actions menu and the channel's pinned list) showed in English: wrapped in _() but never translated.
+msgid "Unpin"
+msgstr "Désépingler"
+
+# //// Neoffice — tab of the Threads page: SPA calls _(tab.label) (pages/threads/Threads.tsx) but the catalogue had no entry.
+msgid "Participating"
+msgstr "Je participe"
+
+# //// Neoffice — tab of the Threads page: SPA calls _(tab.label) (pages/threads/Threads.tsx) but the catalogue had no entry.
+msgid "AI Agents"
+msgstr "Agents IA"
+
+# //// Neoffice — the thread list builds this msgid at run time (BaseThreadMessage.tsx), so each count needs its own entry; drop these when the source passes the count as a placeholder.
+msgid "1 Reply"
+msgstr "1 réponse"
+
+# //// Neoffice — the thread list builds this msgid at run time (BaseThreadMessage.tsx), so each count needs its own entry; drop these when the source passes the count as a placeholder.
+msgid "2 Replies"
+msgstr "2 réponses"
+
+# //// Neoffice — the thread list builds this msgid at run time (BaseThreadMessage.tsx), so each count needs its own entry; drop these when the source passes the count as a placeholder.
+msgid "3 Replies"
+msgstr "3 réponses"
+
+# //// Neoffice — the thread list builds this msgid at run time (BaseThreadMessage.tsx), so each count needs its own entry; drop these when the source passes the count as a placeholder.
+msgid "4 Replies"
+msgstr "4 réponses"
+
+# //// Neoffice — the thread list builds this msgid at run time (BaseThreadMessage.tsx), so each count needs its own entry; drop these when the source passes the count as a placeholder.
+msgid "5 Replies"
+msgstr "5 réponses"
+
+# //// Neoffice — the thread list builds this msgid at run time (BaseThreadMessage.tsx), so each count needs its own entry; drop these when the source passes the count as a placeholder.
+msgid "6 Replies"
+msgstr "6 réponses"
+
+# //// Neoffice — the thread list builds this msgid at run time (BaseThreadMessage.tsx), so each count needs its own entry; drop these when the source passes the count as a placeholder.
+msgid "7 Replies"
+msgstr "7 réponses"
+
+# //// Neoffice — the thread list builds this msgid at run time (BaseThreadMessage.tsx), so each count needs its own entry; drop these when the source passes the count as a placeholder.
+msgid "8 Replies"
+msgstr "8 réponses"
+
+# //// Neoffice — the thread list builds this msgid at run time (BaseThreadMessage.tsx), so each count needs its own entry; drop these when the source passes the count as a placeholder.
+msgid "9 Replies"
+msgstr "9 réponses"
+
+# //// Neoffice — the thread list builds this msgid at run time (BaseThreadMessage.tsx), so each count needs its own entry; drop these when the source passes the count as a placeholder.
+msgid "10 Replies"
+msgstr "10 réponses"
+
+# //// Neoffice — keyboard shortcuts panel and formatting toolbar: wrapped in _() but never translated.
+msgid "Strikethrough"
+msgstr "Barré"
+
+# //// Neoffice — keyboard shortcuts panel and formatting toolbar: wrapped in _() but never translated.
+msgid "Code block"
+msgstr "Bloc de code"
+
+# //// Neoffice — header of the keyboard shortcuts table: wrapped in _() but never translated.
+msgid "Shortcut"
+msgstr "Raccourci"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Channel {0} archived"
+msgstr "Canal {0} archivé"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Channel {0} restored"
+msgstr "Canal {0} restauré"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Created by {0} on {1}"
+msgstr "Créé par {0} le {1}"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Forward to {0}"
+msgstr "Transférer à {0}"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Manage Workspaces"
+msgstr "Gérer les espaces de travail"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Next page"
+msgstr "Page suivante"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Previous page"
+msgstr "Page précédente"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "No changes will be made to the channel's history or members"
+msgstr "Aucune modification ne sera apportée à l'historique ni aux membres du canal"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "No fields match your search."
+msgstr "Aucun champ ne correspond à votre recherche."
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Document Type is required"
+msgstr "Le type de document est obligatoire"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Sidebar updated"
+msgstr "Barre latérale mise à jour"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "This poll will end on {0}."
+msgstr "Ce sondage se termine le {0}."
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "View Docs"
+msgstr "Voir la documentation"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "{0} can't be uploaded. Allowed file types: {1}."
+msgstr "{0} ne peut pas être téléversé. Types de fichiers autorisés : {1}."
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "{0} this channel?"
+msgstr "{0} ce canal ?"
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "{0} was removed by {1} and {2} is the new admin of this channel."
+msgstr "{0} a été retiré par {1} et {2} est le nouvel administrateur de ce canal."
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "The Server Script to run. It must be of type \"API\"."
+msgstr "Le script serveur à exécuter. Il doit être de type « API »."
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "You can keep this as \"{0}\" if you are using the default Raven Cloud instance."
+msgstr "Vous pouvez conserver « {0} » si vous utilisez l'instance Raven Cloud par défaut."
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Enable this if you want the bot to be able to process files like Excel sheets or data from Insights.\n\nOpenAI Assistants run code in a sandboxed environment (on OpenAI servers) to do this."
+msgstr "Activez cette option si vous voulez que le bot puisse traiter des fichiers comme des feuilles Excel ou des données issues d'Insights.\n\nPour cela, les assistants OpenAI exécutent du code dans un environnement isolé (sur les serveurs d'OpenAI)."
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "Enable this if you want the bot to be able to read PDF files and scan them.\n\nFile search enables the assistant with knowledge from files that you upload.\nOnce a file is uploaded, the assistant automatically decides when to retrieve content based on user requests."
+msgstr "Activez cette option si vous voulez que le bot puisse lire et analyser des fichiers PDF.\n\nLa recherche de fichiers donne à l'assistant la connaissance des fichiers que vous téléversez.\nUne fois un fichier téléversé, l'assistant décide automatiquement quand en récupérer le contenu selon les demandes des utilisateurs."
+
+# //// Neoffice — the SPA wraps this string in _() but the French catalogue had no entry, so the screen showed the English source.
+msgid "If enabled, stack traces of errors will be sent as messages by the bot during runs.\nThis is helpful when you're testing your bots and want to know where things are going wrong."
+msgstr "Si cette option est activée, les traces d'erreur seront envoyées comme messages par le bot pendant les exécutions.\nC'est utile pour tester vos bots et savoir où les choses se passent mal."
+
+# //// Neoffice — label held in a constant list and shown through _(option.label) (search filters / command palette): the catalogue had no entry.
+msgid "Custom Emojis"
+msgstr "Émojis personnalisés"
+
+# //// Neoffice — label held in a constant list and shown through _(option.label) (search filters / command palette): the catalogue had no entry.
+msgid "Other sites"
+msgstr "Autres sites"
+
+# //// Neoffice — label held in a constant list and shown through _(option.label) (search filters / command palette): the catalogue had no entry.
+msgid "Apple Music player"
+msgstr "Lecteur Apple Music"
+
+# //// Neoffice — label held in a constant list and shown through _(option.label) (search filters / command palette): the catalogue had no entry.
+msgid "Apple Podcasts player"
+msgstr "Lecteur Apple Podcasts"
+
+# //// Neoffice — label held in a constant list and shown through _(option.label) (search filters / command palette): the catalogue had no entry.
+msgid "PDFs"
+msgstr "PDF"
