@@ -499,3 +499,11 @@ body {
 [data-sonner-toaster][data-sonner-theme="dark"] [data-sonner-toast] [data-description][data-description] {
   color: var(--ink-base);
 }
+/* //// Neoffice — inside the Neoffice cockpit (NeoCockpitShell, /raven served by Frappe) the app lives in the
+   //// cockpit's rounded panel, 8 px inside the window at the top and at the bottom: there « the whole height » is
+   //// the panel's. Upstream's h-dvh (100dvh) made the layout and the full-height pages 18 px taller than the panel,
+   //// which scrolled (07.10). The mobile layout is not wrapped in the cockpit, and keeps h-dvh following the
+   //// keyboard as upstream wants. */
+.nc-panel .h-dvh {
+  height: 100%;
+}
