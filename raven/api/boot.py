@@ -88,6 +88,19 @@ def _load_ui_translations() -> dict:
 		return {}
 
 
+# //// Neoffice - added function (see get_navbar_boot).
+def _theme_chrome_keys(bootinfo) -> dict:
+	"""neoffice_theme's chrome keys (neo_*, neocockpit_*, neoffice_*) for a desk user, who reads them all on /app.
+	Nothing for a portal account: Raven serves portal customers too."""
+	if frappe.get_cached_value("User", frappe.session.user, "user_type") != "System User":
+		return {}
+	try:
+		from neoffice_theme.cockpit_boot import theme_boot_keys
+	except ImportError:
+		return {}
+	return theme_boot_keys(bootinfo)
+
+
 def _apply_neoffice_theme_filters(bootinfo) -> None:
 	"""Run the `extend_bootinfo` hooks the desk runs, so this page gets what /app/home gets.
 
@@ -167,6 +180,10 @@ def get_navbar_boot() -> dict:
 	_apply_neoffice_theme_filters(full)
 
 	boot = {k: full.get(k) for k in NAVBAR_BOOT_KEYS}
+	# //// Neoffice - and every key neoffice_theme sets for its chrome, whatever its name. The list above lagged twice
+	# //// behind the theme: Simple mode on 05.10, the two-level menu on 07.10, when /raven drew the old one-level menu
+	# //// while the desk listed the spaces. An account without a desk gets nothing more than before.
+	boot.update(_theme_chrome_keys(full))
 	boot.setdefault("is_fc_site", False)
 	boot.setdefault("developer_mode", bool(frappe.conf.get("developer_mode")))
 
