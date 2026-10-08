@@ -1,79 +1,79 @@
 {
-    "name": "Raven",
-    "short_name": "Raven",
-    "description": "Simple, work messaging app.",
+    "name": "Synk",
+    "short_name": "Synk",
+    "description": "La messagerie d'équipe de Neoffice.",
     "start_url": "/raven",
     "scope": "/raven",
     "id": "/raven",
     "display": "standalone",
-    "background_color": "#171717",
-    "theme_color": "#171717",
+    "background_color": "#FAF3EA",
+    "theme_color": "#FAF3EA",
     "icons": [
         {
-            "src": "/assets/raven/icons/icon-48x48.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-48.png",
             "sizes": "48x48",
             "type": "image/png"
         },
         {
-            "src": "/assets/raven/icons/icon-72x72.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-72.png",
             "sizes": "72x72",
             "type": "image/png"
         },
         {
-            "src": "/assets/raven/icons/icon-96x96.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-96.png",
             "sizes": "96x96",
             "type": "image/png"
         },
         {
-            "src": "/assets/raven/icons/icon-128x128.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-128.png",
             "sizes": "128x128",
             "type": "image/png"
         },
         {
-            "src": "/assets/raven/icons/icon-144x144.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-144.png",
             "sizes": "144x144",
             "type": "image/png"
         },
         {
-            "src": "/assets/raven/icons/icon-152x152.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-152.png",
             "sizes": "152x152",
             "type": "image/png"
         },
         {
-            "src": "/assets/raven/icons/icon-192x192.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/assets/raven/icons/icon-256x256.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-256.png",
             "sizes": "256x256",
             "type": "image/png"
         },
         {
-            "src": "/assets/raven/icons/icon-384x384.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-384.png",
             "sizes": "384x384",
             "type": "image/png"
         },
         {
-            "src": "/assets/raven/icons/icon-512x512.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-512.png",
             "sizes": "512x512",
             "type": "image/png"
         },
         {
-            "src": "/assets/raven/icons/icon-maskable-192x192.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-maskable-192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "maskable"
         },
         {
-            "src": "/assets/raven/icons/icon-maskable-512x512.png",
+            "src": "/assets/neoffice_theme/icons/synk/icon-maskable-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
         }
     ],
     "orientation": "portrait",
-    "lang": "en",
+    "lang": "fr",
     "share_target": {
         "action": "/raven/share-target",
         "method": "GET",
