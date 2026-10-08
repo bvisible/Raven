@@ -21,7 +21,8 @@ export const chatStyleAtom = atomWithLazy<ChatStyle>(() => (window.frappe?.boot?
 /**
  * Time format: "12-hour" displays times like "12:00 PM"; "24-hour" displays times like "12:00" in all messages.
  */
-export const timeFormatAtom = atomWithLazy<TimeFormat>(() => (window.frappe?.boot?.raven_time_format as TimeFormat | undefined) ?? "12-hour")
+//// Neoffice — 24-hour when the boot says nothing, as the Raven User default (raven_user.json); upstream: 12-hour.
+export const timeFormatAtom = atomWithLazy<TimeFormat>(() => (window.frappe?.boot?.raven_time_format as TimeFormat | undefined) ?? "24-hour")
 
 /**
  * Whether the user hides read receipts (two-way: theirs are invisible AND

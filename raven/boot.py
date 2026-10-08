@@ -47,7 +47,8 @@ def boot_session(bootinfo):
 		)
 	else:
 		chat_style = "Simple"
-		time_format = "12-hour"
+		# //// Neoffice - 24-hour, as the Raven User default (raven_user.json): upstream fell back to 12-hour.
+		time_format = "24-hour"
 		hide_read_receipts = 0
 		quiet_hours_nudge = "Nudge"
 
@@ -60,7 +61,8 @@ def boot_session(bootinfo):
 		bootinfo.tenor_api_key = "AIzaSyAWkuhLwbMxOlvn_o5fxBke1grUZ7F3ma4"  # should we remove this?
 
 	bootinfo.chat_style = chat_style if chat_style else "Simple"
-	bootinfo.raven_time_format = time_format if time_format else "12-hour"
+	# //// Neoffice - 24-hour fallback, as above.
+	bootinfo.raven_time_format = time_format if time_format else "24-hour"
 	bootinfo.raven_hide_read_receipts = 1 if hide_read_receipts else 0
 	bootinfo.raven_quiet_hours_nudge = quiet_hours_nudge if quiet_hours_nudge else "Nudge"
 

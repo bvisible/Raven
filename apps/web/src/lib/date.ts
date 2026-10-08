@@ -5,6 +5,8 @@ import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
+//// Neoffice — the account's language for dayjs (maintenance#1324).
+import { setDateLocale } from './dateLocale'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(advancedFormat)
@@ -14,6 +16,9 @@ const DEFAULT_TIME_ZONE = 'Asia/Kolkata'
 
 /** Guarded: window is absent in tests/SSR */
 const frappeBoot = typeof window !== 'undefined' ? window.frappe?.boot : undefined
+
+//// Neoffice — dates in the account's language (maintenance#1324): « 25 novembre 2025 », not « 25th November 2025 ».
+setDateLocale(frappeBoot?.lang)
 
 export const SYSTEM_TIMEZONE = frappeBoot?.time_zone?.system || DEFAULT_TIME_ZONE
 

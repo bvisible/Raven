@@ -101,6 +101,17 @@ def _theme_chrome_keys(bootinfo) -> dict:
 	return theme_boot_keys(bootinfo)
 
 
+# //// Neoffice - added function (maintenance#1324), see get_navbar_boot.
+def _raven_keys() -> dict:
+	"""Every key raven.boot.boot_session sets, the same as on the desk: run on its own, so that a key Raven adds to
+	its hook reaches /raven without a list to keep up to date."""
+	from raven.boot import boot_session
+
+	own = frappe._dict()
+	boot_session(own)
+	return dict(own)
+
+
 def _apply_neoffice_theme_filters(bootinfo) -> None:
 	"""Run the `extend_bootinfo` hooks the desk runs, so this page gets what /app/home gets.
 
@@ -184,6 +195,10 @@ def get_navbar_boot() -> dict:
 	# //// behind the theme: Simple mode on 05.10, the two-level menu on 07.10, when /raven drew the old one-level menu
 	# //// while the desk listed the spaces. An account without a desk gets nothing more than before.
 	boot.update(_theme_chrome_keys(full))
+	# //// Neoffice - and every key Raven's own boot hook sets (maintenance#1324): the user's Raven preferences (time
+	# //// format, chat style, read receipts, quiet hours) and the push and preview settings. The list above left them
+	# //// all out, so /raven read « 12-hour » and the default chat style whatever the user had chosen.
+	boot.update(_raven_keys())
 	boot.setdefault("is_fc_site", False)
 	boot.setdefault("developer_mode", bool(frappe.conf.get("developer_mode")))
 
