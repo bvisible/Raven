@@ -178,6 +178,21 @@ class RavenUser(Document):
 			pass
 
 
+# //// Neoffice — added function. Upstream copies the User's name into Raven only while the Raven
+# //// User has none, so a User renamed after joining Raven kept the old name there for good: an account
+# //// first named after its login ("admin") and renamed later still read "admin" in every channel
+# //// (08.10). A name chosen in Raven itself stays (its profile rename writes only Raven User.full_name):
+# //// the new name is carried only while Raven still shows the name the User had before this save.
+def _carry_user_rename(raven_user, user):
+	before = user.get_doc_before_save()
+	if not before or not user.has_value_changed("full_name"):
+		return
+	if (raven_user.full_name or "") not in {before.full_name or "", before.first_name or ""}:
+		return
+	raven_user.full_name = user.full_name or user.first_name
+	raven_user.first_name = user.first_name
+
+
 def add_user_to_raven(doc, method):
 	# called when the user is inserted or updated
 	# If the auto-create setting is set to True, check if the user is a System user. If yes, then create a Raven User record for the user.
@@ -195,6 +210,8 @@ def add_user_to_raven(doc, method):
 
 			if has_raven_role:
 				raven_user = frappe.get_doc("Raven User", {"user": doc.name})
+				# //// Neoffice — carry a rename of the User (see _carry_user_rename).
+				_carry_user_rename(raven_user, doc)
 				if not raven_user.full_name:
 					raven_user.full_name = doc.full_name or doc.first_name
 
@@ -204,6 +221,8 @@ def add_user_to_raven(doc, method):
 				raven_user.save(ignore_permissions=True)
 			else:
 				raven_user = frappe.get_doc("Raven User", {"user": doc.name})
+				# //// Neoffice — carry a rename of the User (see _carry_user_rename).
+				_carry_user_rename(raven_user, doc)
 				if not raven_user.full_name:
 					raven_user.full_name = doc.full_name or doc.first_name
 

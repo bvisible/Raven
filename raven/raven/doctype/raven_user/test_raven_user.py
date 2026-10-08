@@ -48,3 +48,45 @@ class TestRavenUser(IntegrationTestCase):
 		user.first_name = "Custom"
 		user.save()
 		self.assertEqual(user.first_name, "Custom")
+
+	# //// Neoffice — added tests: a rename of the User reaches Raven, a name chosen in Raven stays
+	# //// (add_user_to_raven, 08.10).
+	def test_a_user_rename_reaches_raven(self):
+		user = frappe.get_doc("User", "test@example.com")
+		raven_user = frappe.get_doc("Raven User", "test@example.com")
+		# The premise: Raven shows the name the User has, as it did when the account joined.
+		self.assertEqual(raven_user.full_name, user.full_name)
+
+		user.first_name = "Renamed"
+		user.last_name = "Person"
+		user.save(ignore_permissions=True)
+
+		raven_user.reload()
+		self.assertEqual(raven_user.full_name, "Renamed Person")
+		self.assertEqual(raven_user.first_name, "Renamed")
+
+	def test_a_name_chosen_in_raven_survives_a_user_rename(self):
+		raven_user = frappe.get_doc("Raven User", "test@example.com")
+		raven_user.full_name = "Chosen In Raven"
+		raven_user.save(ignore_permissions=True)
+
+		user = frappe.get_doc("User", "test@example.com")
+		user.first_name = "Renamed"
+		user.last_name = "Person"
+		user.save(ignore_permissions=True)
+
+		raven_user.reload()
+		self.assertEqual(raven_user.full_name, "Chosen In Raven")
+		self.assertEqual(raven_user.first_name, "Chosen")
+
+	def test_a_user_save_without_rename_leaves_the_raven_name(self):
+		raven_user = frappe.get_doc("Raven User", "test@example.com")
+		raven_user.full_name = "Chosen In Raven"
+		raven_user.save(ignore_permissions=True)
+
+		user = frappe.get_doc("User", "test@example.com")
+		user.bio = "A bio, no new name"
+		user.save(ignore_permissions=True)
+
+		raven_user.reload()
+		self.assertEqual(raven_user.full_name, "Chosen In Raven")
