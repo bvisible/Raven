@@ -69,12 +69,26 @@ export const formatRelativeDate = (timestamp?: string) => {
   if (!timestamp) return ""
   const d = getDateObject(timestamp)
   const startOfToday = dayjs().startOf("day")
-  if (d.isAfter(startOfToday)) return d.format("h:mm A")
+  //// Neoffice — the user's clock (24-hour unless they chose 12, as the messages) and, outside English, the day
+  //// before the month (maintenance#1324): upstream wrote « 4:13 PM » and « Nov 25, 2025 » for every account.
+  if (d.isAfter(startOfToday)) return d.format(listClock())
   if (d.isAfter(startOfToday.subtract(1, "day"))) return _("Yesterday")
   if (d.isAfter(startOfToday.subtract(6, "day"))) return d.format("dddd")
-  if (d.isSame(dayjs(), "year")) return d.format("MMM D")
-  return d.format("MMM D, YYYY")
+  //// Neoffice — the day before the month outside English, in the date's own language (see above).
+  const dayFirst = d.locale() !== "en"
+  if (d.isSame(dayjs(), "year")) return d.format(dayFirst ? "D MMM" : "MMM D")
+  return d.format(dayFirst ? "D MMM YYYY" : "MMM D, YYYY")
 }
+
+//// Neoffice — added (maintenance#1324): a date in the user's language, the day before the month outside English;
+//// upstream wrote « Nov 25th, 2025 » for every account.
+export const formatCalendarDate = (day: dayjs.Dayjs, englishFormat = "MMM Do, YYYY") =>
+  day.format(day.locale() !== "en" ? "D MMM YYYY" : englishFormat)
+
+//// Neoffice — added (maintenance#1324): the user's time format, read when the row is drawn, as timeFormatAtom
+//// seeds itself from the boot.
+const listClock = () =>
+  (typeof window !== "undefined" && window.frappe?.boot?.raven_time_format) === "12-hour" ? "h:mm A" : "HH:mm"
 
 /**
  * Utility function to convert a date string to a Date object

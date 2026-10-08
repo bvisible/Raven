@@ -4,7 +4,8 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@components/ui/ho
 import { useLinkPreview } from "@stores/linkPreviews/useLinkPreview"
 import { linkPreviewStore, type LinkPreviewData } from "@stores/linkPreviews/store"
 import useCurrentRavenUser from "@raven/lib/hooks/useCurrentRavenUser"
-import { getDateObject } from "@lib/date"
+//// Neoffice — formatCalendarDate (maintenance#1324).
+import { formatCalendarDate, getDateObject } from "@lib/date"
 import { BRAND, BrandIcon, PROVIDER_BRAND } from "./BrandIcons"
 import { fitImageBox } from "./ReservedImage"
 import _ from "@lib/translate"
@@ -40,7 +41,8 @@ const metaLine = (preview: LinkPreviewData): string => {
         // accepts and Safari rejects. Strip it so both show the date. Anything that
         // still does not parse is dropped.
         const date = getDateObject(meta.published_on.replace(/^(\d{4}-\d{2}-\d{2})Z$/, "$1"))
-        if (date.isValid()) parts.push(date.format("MMM D, YYYY"))
+        //// Neoffice — the user's language, the day before the month outside English (maintenance#1324).
+        if (date.isValid()) parts.push(formatCalendarDate(date, "MMM D, YYYY"))
     }
     if (typeof meta.points === "number") parts.push(`${meta.points} ${_("points")}`)
     if (typeof meta.comments === "number") parts.push(`${meta.comments} ${_("comments")}`)

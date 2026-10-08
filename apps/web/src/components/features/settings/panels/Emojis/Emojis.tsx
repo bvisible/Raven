@@ -18,7 +18,8 @@ import { Button } from '@components/ui/button'
 import ErrorBanner from '@components/ui/error-banner'
 import { Spinner } from '@components/ui/spinner'
 import { RavenCustomEmoji } from '@raven/types/RavenMessaging/RavenCustomEmoji'
-import { getDateObject } from '@lib/date'
+//// Neoffice — formatCalendarDate (maintenance#1324).
+import { formatCalendarDate, getDateObject } from '@lib/date'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@components/ui/empty'
 import { SearchIcon, SmilePlus } from 'lucide-react'
 import _ from '@lib/translate'
@@ -143,8 +144,9 @@ export const Emojis = () => {
             accessorKey: 'creation',
             header: _('Added'),
             meta: { gridWidth: 'minmax(120px,1fr)', tabularNums: true } satisfies ListViewColumnMeta,
+            //// Neoffice — the user's language, the day before the month outside English (maintenance#1324).
             cell: ({ row }) => (
-                <span>{getDateObject(row.original.creation).format("MMM Do, YYYY")}</span>
+                <span>{formatCalendarDate(getDateObject(row.original.creation))}</span>
             )
         },
         {

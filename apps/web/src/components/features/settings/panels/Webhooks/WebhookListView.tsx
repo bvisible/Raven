@@ -13,7 +13,8 @@ import { TablePagination } from "@components/ui/table-pagination"
 import usePaginatedList from "@hooks/usePaginatedList"
 import useCreateHotkey from "@hooks/useCreateHotkey"
 import type { RavenWebhook } from "@raven/types/RavenIntegrations/RavenWebhook"
-import { getDateObject } from "@lib/date"
+//// Neoffice — formatCalendarDate (maintenance#1324).
+import { formatCalendarDate, getDateObject } from "@lib/date"
 import { isRavenSettingsAdmin } from "../AdminSettingsForm"
 import _ from "@lib/translate"
 
@@ -70,7 +71,8 @@ const WebhookListView = ({ onOpen, onCreate }: { onOpen: (id: string) => void; o
             accessorKey: "creation",
             header: _("Created On"),
             meta: { gridWidth: "minmax(0,1fr)", tabularNums: true } satisfies ListViewColumnMeta,
-            cell: ({ row }) => <span>{getDateObject(row.original.creation).format("MMM Do, YYYY")}</span>,
+            //// Neoffice — the user's language, the day before the month outside English (maintenance#1324).
+            cell: ({ row }) => <span>{formatCalendarDate(getDateObject(row.original.creation))}</span>,
         },
     ], [])
 
