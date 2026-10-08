@@ -39,9 +39,12 @@ export const About = () => {
             </SettingsPanelHeader>
             <SettingsPanelContent className="min-h-0 gap-6">
                 <div className="flex items-center gap-3">
-                    <img src="/assets/raven/raven_logo.svg" alt="Raven" className="h-10 w-10" />
+                    {/* //// Neoffice - Synk, with the brand's chat bubble (maintenance#1316, 2026-10-08). The v3 merge
+                        brought back upstream's name and mark here; the credit to Frappe above stays. */}
+                    <img src="/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg" alt="Synk" className="h-10 w-10" />
                     <div className="flex flex-col">
-                        <span className="text-base font-semibold text-ink-gray-9">Raven</span>
+                        {/* //// Neoffice - Synk, not upstream's Raven */}
+                        <span className="text-base font-semibold text-ink-gray-9">Synk</span>
                         {versions[0]?.app === "raven" && (
                             <span className="font-numeric text-sm text-ink-gray-5">v{versions[0].version}</span>
                         )}

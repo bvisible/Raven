@@ -507,3 +507,10 @@ body {
 .nc-panel .h-dvh {
   height: 100%;
 }
+
+/* //// Neoffice - the brand's Streamline drawings outline in currentColor, which an <img> cannot inherit: it draws
+   them black. In dark mode they are inverted, the clay second tone kept by the hue turn, as the desk and Suite do
+   (maintenance#1316, 2026-10-08). */
+.dark img[src*="/icons/streamline/"] {
+  filter: invert(1) hue-rotate(180deg);
+}

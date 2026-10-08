@@ -109,12 +109,18 @@ def get_context(context):
 
 	favicon = get_favicon()
 
-	# TODO: Update all favicons here and delete all v2 icons later
-	context["icon_96"] = favicon or "/assets/raven/icons/icon-96x96.png"
-	context["apple_touch_icon"] = favicon or "/assets/raven/icons/icon-192x192.png"
-	context["mask_icon"] = favicon or "/assets/raven/raven_logo.svg"
-	context["favicon_svg"] = favicon or "/assets/raven/raven_logo.svg"
-	context["favicon_ico"] = favicon or "/assets/raven/favicon.ico"
+	# //// Neoffice - Synk's icons are the brand's chat bubble, the drawing the cockpit shows for Synk, rendered
+	# //// by neoffice_theme (maintenance#1316, 2026-10-08): Streamline's licence keeps the drawing and its renders
+	# //// out of this public repository, which only names their address. Upstream's defaults were the Raven mark.
+	# //// The touch icon no longer yields to the site's favicon: it is the icon of the app installed on iOS, and on
+	# //// Android the manifest's icons, which are static, are Synk's whatever the site's favicon.
+	synk_icons = "/assets/neoffice_theme/icons/synk"
+	chat_bubble = "/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg"
+	context["icon_96"] = favicon or f"{synk_icons}/icon-96.png"
+	context["apple_touch_icon"] = f"{synk_icons}/apple-touch-icon.png"
+	context["mask_icon"] = favicon or chat_bubble
+	context["favicon_svg"] = favicon or chat_bubble
+	context["favicon_ico"] = favicon or f"{synk_icons}/icon-48.png"
 	context["sitename"] = boot.get("sitename")
 
 	if frappe.session.user != "Guest":

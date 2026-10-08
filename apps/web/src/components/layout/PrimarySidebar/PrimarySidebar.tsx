@@ -44,7 +44,9 @@ const suppressNextClick = () => {
 }
 
 const RavenLogo = () => {
-    return <img src="/assets/raven/raven_logo.svg" alt="Raven Logo" className="w-8 h-8" />
+    //// Neoffice - Synk's drawing is the brand's chat bubble, the one the cockpit shows (neoffice_theme,
+    //// maintenance#1316, 2026-10-08); its outline follows the text colour, index.css inverts it in dark mode.
+    return <img src="/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg" alt="Synk" className="w-8 h-8" />
 }
 
 /**
