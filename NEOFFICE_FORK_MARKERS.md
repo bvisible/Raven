@@ -68,6 +68,8 @@ or change only when this manifest names it, or when a pattern of this table matc
 | `raven/public/raven/splash_screens/*` | Their copies, made by `vite build` (commit-the-build, above). Never edit them: rebuild. |
 | `raven/public/manifest/*` | The Neoffice favicons and PWA icons, same commit as the splash screens. |
 | `apps/mobile/assets/*` | The Synk icon, adaptive icon and splash of the mobile app, replacing upstream's (`32a2c1201`, 2026-01-04). |
+| `raven/public/icons/*` | Neoffice's Synk icon (`apps_v2/raven.svg` of neoffice_theme) rendered as PNG, sizes 48 to 512, the two `icon-maskable-*` on its own colour with the icon in the safe zone. They replace upstream's black Raven mark in the favicons of `www/raven.py` and the icons of `raven/public/raven/manifest.webmanifest` (2026-10-08, maintenance#1316). |
+| `raven/public/favicon.ico` | The same icon at 128 px (PNG data, as upstream's was), the `favicon_ico` fallback of `www/raven.py` (2026-10-08). `raven/public/raven_logo.svg` carries the same icon and its own marker. |
 
 ### Bench bundle — `raven/public/js/raven.bundle.js`
 

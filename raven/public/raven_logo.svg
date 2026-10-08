@@ -1,4 +1,58 @@
-<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M19.9994 0H8.00063C3.58257 0 0 3.58256 0 8.00062V19.9994C0 24.4174 3.58257 28 8.00063 28H19.9994C24.4174 28 28 24.4174 28 19.9994V8.00062C28 3.58256 24.4174 0 19.9994 0Z" fill="black"/>
-<path d="M6.63123 8.11224C8.27607 8.11249 8.46411 8.11229 12.4665 8.11238C16.2049 8.11246 18.2131 8.13765 20.0251 10.6361C21.8372 13.1346 20.2657 16.8634 20.2657 16.8634L20.6601 18.7846C20.9296 20.0973 19.4202 21.0366 18.3615 20.2151L17.0523 19.1992C16.9106 19.0892 16.7205 19.0687 16.5536 19.1346C15.2105 19.6652 13.4971 19.746 11.9356 19.6548C9.41266 19.5074 7.69377 17.2525 7.69377 14.7253V12.733" stroke="white" stroke-width="2.14084"/>
+<!-- //// Neoffice — rewritten: Neoffice's Synk icon (apps_v2/raven.svg of neoffice_theme) instead of upstream's black Raven mark. Every reference to this file (the sidebar, About, app_logo in hooks.py, the favicon fallbacks of www/raven.py) shows ours. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Raven">
+  <defs>
+    <style>
+    .icon-bg { transform-box: fill-box; transform-origin: center; animation: neo-breathe 5.6s ease-in-out infinite; }
+    .soft-light { transform-box: fill-box; transform-origin: center; animation: neo-drift 7.4s ease-in-out infinite; }
+    .glyph { color: white; animation: neo-glyph-glow 4.8s ease-in-out infinite; }
+    .sparkle { transform-box: fill-box; transform-origin: center; animation: neo-twinkle 3.2s ease-in-out infinite; }
+    .orbit-dot { transform-origin: 512px 512px; animation: neo-orbit 7s linear infinite; }
+    @keyframes neo-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.014); } }
+    @keyframes neo-drift { 0%, 100% { opacity: .54; transform: translate(-18px, -10px) scale(1); } 50% { opacity: .78; transform: translate(18px, 12px) scale(1.035); } }
+    @keyframes neo-glyph-glow { 0%, 100% { opacity: .92; } 50% { opacity: 1; } }
+    @keyframes neo-twinkle { 0%, 100% { opacity: .72; transform: scale(.92) rotate(0deg); } 50% { opacity: 1; transform: scale(1.08) rotate(8deg); } }
+    @keyframes neo-orbit { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .icon-bg, .soft-light, .glyph, .sparkle, .orbit-dot { animation: none; } }
+  </style>
+    <linearGradient id="neo-raven-bg" x1="162" y1="60" x2="868" y2="950" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#627398"/>
+      <stop offset=".58" stop-color="#61687D"/>
+      <stop offset="1" stop-color="#7E7F83"/>
+    </linearGradient>
+    <radialGradient id="neo-raven-pulse" cx="33%" cy="24%" r="64%">
+      <stop offset="0" stop-color="#77A7FF" stop-opacity=".36"/>
+      <stop offset=".54" stop-color="#77A7FF" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#77A7FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="neo-raven-soft-light" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".2"/>
+      <stop offset=".46" stop-color="#77A7FF" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#77A7FF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="neo-raven-shadow" x="-16%" y="-16%" width="132%" height="132%">
+      <feDropShadow dx="0" dy="34" stdDeviation="34" flood-color="#000000" flood-opacity=".28"/>
+    </filter>
+  </defs>
+  <rect class="icon-bg" width="1024" height="1024" rx="238" fill="url(#neo-raven-bg)"/>
+  <rect width="1024" height="1024" rx="238" fill="url(#neo-raven-pulse)"/>
+  <g class="soft-light" opacity=".62">
+    <circle cx="356" cy="310" r="214" fill="url(#neo-raven-soft-light)"/>
+    <circle cx="690" cy="604" r="180" fill="#77A7FF" opacity=".07"/>
+  </g>
+  <g opacity=".11" stroke="white" stroke-width="2">
+    <path d="M174 256H850"/><path d="M174 512H850"/><path d="M174 768H850"/>
+    <path d="M256 174V850"/><path d="M512 174V850"/><path d="M768 174V850"/>
+  </g>
+  <circle cx="512" cy="512" r="264" fill="white" opacity=".055"/>
+  <circle cx="512" cy="512" r="261" fill="none" stroke="white" stroke-opacity=".16" stroke-width="3"/>
+  <circle class="orbit-dot" cx="512" cy="238" r="10" fill="#77A7FF" opacity=".9"/>
+  <g class="glyph" transform="translate(252 252) scale(21.6666667)" filter="url(#neo-raven-shadow)" color="white">
+    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h8m-8 4h4m0 8c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12c0 1.821.487 3.53 1.338 5L2.5 21.5l4.5-.838A9.96 9.96 0 0 0 12 22"/>
+  </g>
+  
+    <g class="sparkle" fill="white">
+      <path d="M770 142L792 198L848 220L792 242L770 298L748 242L692 220L748 198Z" opacity=".92"/>
+      <circle cx="860" cy="164" r="11" opacity=".5"/>
+      <circle cx="704" cy="318" r="8" opacity=".38"/>
+    </g>
 </svg>
