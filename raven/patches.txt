@@ -32,3 +32,5 @@ raven.patches.neoffice.rename_default_workspace_to_synk
 raven.patches.neoffice.enable_hr_integration
 # //// Neoffice — the accounts left on upstream's 12-hour default read the 24-hour clock (maintenance#1324).
 raven.patches.neoffice.raven_users_read_the_24_hour_clock
+# //// Neoffice — the system messages written before Raven v3 take their structured event (maintenance#1324).
+raven.patches.neoffice.legacy_system_messages_carry_their_event
