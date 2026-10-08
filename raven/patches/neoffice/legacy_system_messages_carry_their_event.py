@@ -45,7 +45,8 @@ def _event(row):
 
 def _who(name, owner, channel_id):
 	"""The member the text names, or else the one who wrote it: a member renamed since keeps their own message."""
-	if owner not in NOBODY and name in _names(owner):
+	# A text that names its own author leaves no doubt, Administrator included.
+	if owner and owner != "Guest" and name in _names(owner):
 		return owner
 	members = frappe.get_all(
 		"Raven Channel Member", filters={"channel_id": channel_id}, pluck="user_id"
@@ -57,9 +58,11 @@ def _who(name, owner, channel_id):
 
 
 def _names(user):
+	"""What a v2 text may have called the member: their names today, or the account's own id, which is what an
+	account without a full name (Administrator) was called."""
 	raven = (
 		frappe.db.get_value("Raven User", {"user": user}, ["full_name", "first_name"], as_dict=True)
 		or {}
 	)
 	account = frappe.db.get_value("User", user, ["full_name", "first_name"], as_dict=True) or {}
-	return {value for value in (*raven.values(), *account.values()) if value}
+	return {value for value in (user, *raven.values(), *account.values()) if value}

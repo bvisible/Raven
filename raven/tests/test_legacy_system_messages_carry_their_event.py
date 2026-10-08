@@ -108,6 +108,12 @@ class TestLegacySystemMessagesCarryTheirEvent(IntegrationTestCase):
 		execute()
 		self.assertEqual(self._event(message), {"event": "user_joined", "user": JOINER})
 
+	def test_administrator_who_joined_themselves_is_named(self):
+		# The text names its own author: no doubt, even for Administrator.
+		message = self._legacy("Administrator joined.", "Administrator")
+		execute()
+		self.assertEqual(self._event(message), {"event": "user_joined", "user": "Administrator"})
+
 	def test_what_it_cannot_attribute_keeps_its_text(self):
 		message = self._legacy("Nobody Known joined.", "Administrator")
 		other = self._legacy("Legacy Joiner added Renamed Since.", JOINER)
