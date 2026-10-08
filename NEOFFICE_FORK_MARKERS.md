@@ -69,7 +69,7 @@ or change only when this manifest names it, or when a pattern of this table matc
 | `raven/public/manifest/*` | The Neoffice favicons and PWA icons, same commit as the splash screens. |
 | `apps/mobile/assets/*` | The Synk icon, adaptive icon and splash of the mobile app, replacing upstream's (`32a2c1201`, 2026-01-04). |
 | `raven/public/icons/*` | The `apps_v2` Synk tile rendered as PNG (2026-10-08 morning, maintenance#1316), replacing upstream's black Raven mark. **No longer referenced since 2026-10-08 evening**: the manifest and `www/raven.py` name the renders of the brand's chat bubble that neoffice_theme hosts (`/assets/neoffice_theme/icons/synk/`; Streamline's licence keeps them out of this repository). At the next upstream merge, take upstream's files. |
-| `raven/public/favicon.ico` | The same `apps_v2` tile at 128 px (PNG data, as upstream's was). No longer the `favicon_ico` fallback of `www/raven.py` since 2026-10-08 (the theme's `icon-48.png` is). `raven/public/raven_logo.svg` carries the same tile and its own marker; the rail and the About panel show the theme's `chat-bubble-text.svg` instead. |
+| `raven/public/favicon.ico` | The same `apps_v2` tile at 128 px (PNG data, as upstream's was). No longer the `favicon_ico` fallback of `www/raven.py` since 2026-10-08 (the theme's `icon-48.png` is). `raven/public/raven_logo.svg` carries the same tile and its own marker; the rail shows the theme's `chat-bubble-text.svg` instead (the About panel, which shows `raven_logo.svg`, is hidden in Neoffice). |
 
 ### Bench bundle — `raven/public/js/raven.bundle.js`
 
