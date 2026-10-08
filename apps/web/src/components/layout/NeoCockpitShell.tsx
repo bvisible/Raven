@@ -42,8 +42,10 @@ export function NeoCockpitShell({ children }: { children: ReactNode }) {
 	const openCommandMenu = useSetAtom(commandMenuOpenAtom)
 
 	return (
+		//// Neoffice - tabApp: the browser tab takes the brand's Synk icon from the theme (#1316).
 		<NeoCockpit
 			env='spa'
+			tabApp='raven'
 			homeUrl='/app/home'
 			onSearch={() => openCommandMenu(true)}
 			searchKbd={navigator.platform.toLowerCase().includes('mac') ? '⌘K' : 'Ctrl K'}

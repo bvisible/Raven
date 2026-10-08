@@ -21,10 +21,16 @@ const DocumentTitle = () => {
     const label = useCurrentPageLabel()
 
     const appName = (window as { app_name?: string }).app_name || "Raven"
-    const prefix = unread > 0 ? `(${unread > 99 ? "99+" : unread}) ` : ""
-    const title = label ? `${prefix}${label} | ${appName}` : `${prefix}| ${appName}`
+    //// Neoffice — the title is formatted by tabTitle() below (tested, no leading separator).
 
-    return <title>{title}</title>
+    return <title>{tabTitle(unread, label, appName)}</title>
+}
+
+//// Neoffice — the formatting taken out of the component to be tested, and no leading separator when no page is
+//// open: upstream wrote « | Neoffice | Synk » on /raven itself (maintenance#1316).
+export const tabTitle = (unread: number, label: string | null, appName: string): string => {
+    const prefix = unread > 0 ? `(${unread > 99 ? "99+" : unread}) ` : ""
+    return label ? `${prefix}${label} | ${appName}` : `${prefix}${appName}`
 }
 
 /** Human label for the open page — the channel/DM name, or a static page name. */
