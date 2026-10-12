@@ -131,9 +131,9 @@ export default function ChatStream({ channelID, pinnedMessagesString, initialMes
         }
     }, [target, channelID])
 
-    // Give the window claim back when the user moves to another channel. It intentionally
-    // stays claimed after the scroll lands, so late background fetches still can't replace
-    // the page the user is reading. "Jump to present" releases it explicitly.
+    // Give the window claim back when the user moves to another channel. It stays claimed
+    // after the scroll lands, so a plain latest-page load can't replace the page being read;
+    // the quiet refresh still runs once that page is the latest. "Jump to present" releases it.
     useEffect(() => {
         return () => releaseWindowClaim(channelID)
     }, [channelID])
@@ -256,7 +256,7 @@ export default function ChatStream({ channelID, pinnedMessagesString, initialMes
                         >
                             <div className="flex min-w-0 w-full flex-col md:px-3 pb-6">
                                 {isLoading ? (
-                                    <MessageListSkeleton />
+                                    <MessageListSkeleton followsChatStyle />
                                 ) : error && import.meta.env.VITE_NATIVE && !online ? (
                                     // Native offline: a retry would fail too; the stream refetches itself on reconnect.
                                     <OfflineState />
