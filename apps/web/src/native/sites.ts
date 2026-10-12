@@ -46,18 +46,25 @@ export type ProbeResult = { site: Site } | { error: "unreachable" | "not-raven" 
 
 type ClientInfo = { client_id?: string | null; raven_version?: string; min_app_version?: string; sitename?: string; app_name?: string; logo?: string }
 
-export const probeSite = async (url: string, getJson: GetJson = nativeGetJson): Promise<ProbeResult> => {
+// 404 and 417 are Frappe's answers for a method it does not know.
+const isUnknownMethod = (status: number) => status === 404 || status === 417
+
+export const probeSite = async (url: string, getJson: GetJson = nativeGetJson, { checkBoot = true } = {}): Promise<ProbeResult> => {
+    // The app boots from this method after sign-in: a Raven without it would fail only then.
+    // A guest gets 403 where it exists; a check that gets no answer is left to the boot.
+    const boot = checkBoot ? getJson(`${url}/api/method/raven.api.native.boot`).catch(() => null) : null
     let res: JsonResponse
     try {
         res = await getJson(`${url}/api/method/raven.api.raven_mobile.get_client_id`)
     } catch {
         return { error: "unreachable" }
     }
-    // 404 and 417 are Frappe's answers for a method it does not know: a Raven older than the mobile API.
-    if (res.status === 404 || res.status === 417) return { error: "site-too-old" }
+    if (isUnknownMethod(res.status)) return { error: "site-too-old" }
     const message = (res.data as { message?: ClientInfo } | null)?.message
     if (res.status !== 200 || !message?.sitename || !message.raven_version) return { error: "not-raven" }
     if (!message.client_id) return { error: "no-client" }
+    const bootRes = await boot
+    if (bootRes && isUnknownMethod(bootRes.status)) return { error: "site-too-old" }
     return {
         site: {
             // The origin the site answered from (apex → www, http → https).
@@ -127,7 +134,8 @@ export const completeSite = async (site: Site, getJson: GetJson = nativeGetJson)
 }
 
 export const refreshSite = async (site: Site, getJson: GetJson = nativeGetJson) => {
-    const result = await probeSite(site.url, getJson)
+    // The open site already booted.
+    const result = await probeSite(site.url, getJson, { checkBoot: false })
     if ("error" in result) return
     const fresh = { ...site, name: result.site.name, logo: result.site.logo, ravenVersion: result.site.ravenVersion, minAppVersion: result.site.minAppVersion }
     if (JSON.stringify(fresh) !== JSON.stringify(site)) await saveSite(fresh)

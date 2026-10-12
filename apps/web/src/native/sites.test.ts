@@ -71,6 +71,7 @@ describe("probeSite", () => {
         const result = await probeSite("https://a.com", getJson)
         expect(result).toEqual({ site: { url: "https://www.a.com", name: "Acme", sitename: "a.com", clientId: "C", logo: "/files/logo.png", ravenVersion: "3.0.0", minAppVersion: "2.0.0" } })
         expect(getJson).toHaveBeenCalledWith("https://a.com/api/method/raven.api.raven_mobile.get_client_id")
+        expect(getJson).toHaveBeenCalledWith("https://a.com/api/method/raven.api.native.boot")
     })
     it("reports a site without the mobile API as too old", async () => {
         expect(await probeSite("https://old.com", vi.fn(async () => ({ status: 404, data: null })))).toEqual({ error: "site-too-old" })
@@ -84,6 +85,19 @@ describe("probeSite", () => {
     it("keeps min_app_version on the site instead of blocking", async () => {
         const result = await probeSite("https://a.com", answer({ ...good, min_app_version: "9.0.0" }))
         expect("site" in result && result.site.minAppVersion).toBe("9.0.0")
+    })
+    // Client info is good; the boot method answers with `boot`.
+    const withBoot = (boot: () => Promise<{ status: number; data: unknown }>) =>
+        vi.fn(async (url: string) => (url.endsWith("raven.api.native.boot") ? boot() : { status: 200, data: { message: good } }))
+
+    it("reports a site without the boot method as too old", async () => {
+        const getJson = withBoot(async () => ({ status: 417, data: null }))
+        expect(await probeSite("https://a.com", getJson)).toEqual({ error: "site-too-old" })
+        expect("site" in await probeSite("https://a.com", getJson, { checkBoot: false })).toBe(true)
+    })
+    it("lets a guest-refused or unanswered boot check pass", async () => {
+        expect("site" in await probeSite("https://a.com", withBoot(async () => ({ status: 403, data: null })))).toBe(true)
+        expect("site" in await probeSite("https://a.com", withBoot(async () => { throw new Error("timeout") }))).toBe(true)
     })
     it("reports a site without a usable OAuth client", async () => {
         expect(await probeSite("https://a.com", answer({ ...good, client_id: null }))).toEqual({ error: "no-client" })
