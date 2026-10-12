@@ -1,5 +1,5 @@
-import { isPrivateFile, siteToken, siteUrl } from "@lib/site"
-import { mediaFolder } from "./mediaUrl"
+import { isPrivateFile, siteOrigin, siteToken, siteUrl } from "@lib/site"
+import { mediaFolder, safeFileName } from "./mediaUrl"
 import { nativePlugin } from "./platform"
 
 // Share-out needs the whole file on disk. RavenDownload streams it natively with the bearer (no
@@ -15,33 +15,37 @@ type RavenDownloadPlugin = {
 
 const downloader = nativePlugin<RavenDownloadPlugin>("RavenDownload")
 
+/** A site API download (the batch zip): its path names no file, and it needs the bearer. */
+export type ApiDownload = { fileName: string }
+
 /** Cache path of a site file, shared with the media proxy so one download serves both. */
-export const downloadName = (path: string) => {
+export const downloadName = (path: string, fileName?: string) => {
     const { folder, file } = mediaFolder(path)
-    return `${DIR}/${folder}/${file}`
+    return `${DIR}/${folder}/${(fileName && safeFileName(fileName)) || file}`
 }
 
 const inflight = new Map<string, Promise<string>>()
 
 /** Downloads a site file into the cache directory; resolves to its file URI, rejects "cancelled" on cancel. */
-export const downloadToCache = (path: string, id: string, onProgress?: (fraction: number) => void): Promise<string> => {
+export const downloadToCache = (path: string, id: string, onProgress?: (fraction: number) => void, api?: ApiDownload): Promise<string> => {
     // A second tap while the same file is on its way joins that transfer; registered before any await.
     const running = inflight.get(path)
     if (running) return running
-    const promise = fetchToCache(path, id, onProgress).finally(() => inflight.delete(path))
+    const promise = fetchToCache(path, id, onProgress, api).finally(() => inflight.delete(path))
     inflight.set(path, promise)
     return promise
 }
 
-const fetchToCache = async (path: string, id: string, onProgress?: (fraction: number) => void): Promise<string> => {
+const fetchToCache = async (path: string, id: string, onProgress?: (fraction: number) => void, api?: ApiDownload): Promise<string> => {
     const { Filesystem, Directory } = await import("@capacitor/filesystem")
-    const file = { path: downloadName(path), directory: Directory.Cache }
+    const file = { path: downloadName(path, api?.fileName), directory: Directory.Cache }
     // Already on disk from an earlier share: the native side only writes the final name when complete.
     const cached = await Filesystem.stat(file).catch(() => null)
     if (cached) return cached.uri
     const { plugin } = await downloader()
-    // Only private files need the token, and only the site may see it.
-    const token = isPrivateFile(path) ? siteToken() : undefined
+    // Only private files and the caller's own API downloads get the token, and only on the site:
+    // a file URL in a message is someone else's, and may point at an API method.
+    const token = isPrivateFile(path) || (api && path.startsWith(`${siteOrigin()}/`)) ? siteToken() : undefined
     const progress = onProgress && await plugin.addListener("progress", (e) => {
         if (e.id === id && e.total > 0) onProgress(e.bytes / e.total)
     })

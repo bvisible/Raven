@@ -12,12 +12,12 @@ const shareSheet = async (options: { title: string; uri: string }) => {
 }
 
 // Downloaded natively, then handed to the share sheet from the cache.
-export const shareFileNative = async (absoluteUrl: string, fileName: string): Promise<"shared" | "cancelled" | "failed"> => {
+export const shareFileNative = async (absoluteUrl: string, fileName: string, { api = false } = {}): Promise<"shared" | "cancelled" | "failed"> => {
     const id = crypto.randomUUID()
     const show = (percent?: number) => showDownloadToast(id, fileName, percent, () => { cancelDownload(id) })
     show()
     try {
-        const uri = await downloadToCache(absoluteUrl, id, (fraction) => show(Math.round(fraction * 100)))
+        const uri = await downloadToCache(absoluteUrl, id, (fraction) => show(Math.round(fraction * 100)), api ? { fileName } : undefined)
         toast.dismiss(id)
         await shareSheet({ title: fileName, uri })
         return "shared"

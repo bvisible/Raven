@@ -7,7 +7,7 @@ import type { MessageDialog } from "@utils/channelAtoms"
 import { channelMessagesStore } from "@stores/messages/store"
 import { hasFile } from "./fileMessage"
 import { downloadBlob, downloadFile, getAbsoluteFileURL } from "@lib/file"
-import { siteFetch } from "@lib/site"
+import { siteFetch, siteUrl } from "@lib/site"
 import { getFileName } from "@raven/lib/utils/operations"
 
 // Native hands files to the share sheet.
@@ -120,8 +120,14 @@ export const buildFileActions = (
                 const endpoint = `/api/method/raven.api.raven_message.download_batch_files?message_ids=${encodeURIComponent(
                     JSON.stringify(ids),
                 )}`
-                // Native: the zip goes to the share sheet like a single file.
-                if (import.meta.env.VITE_NATIVE) { downloadFile(endpoint, "raven-files.zip"); return }
+                // Native: the zip goes to the share sheet like a single file. Not through
+                // downloadFile, which drops the query this endpoint needs.
+                if (import.meta.env.VITE_NATIVE) {
+                    void import("../../../../native/share")
+                        .then(({ shareFileNative }) => shareFileNative(siteUrl(endpoint), "raven-files.zip", { api: true }))
+                        .then((result) => { if (result === "failed") toast.error(_("Could not download files")) })
+                    return
+                }
                 siteFetch(endpoint)
                     .then(async (response) => {
                         if (!response.ok) throw new Error(String(response.status))

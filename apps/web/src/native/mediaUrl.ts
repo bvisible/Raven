@@ -3,11 +3,14 @@ import { siteUrl } from "@lib/site"
 // Pure: imported by the page's render path, so nothing here may touch Capacitor.
 
 /** Stable cache location per site file: a hash folder, so the file keeps its own name for the share sheet. */
+/** A name safe on disk: no separators, no leading dots. */
+export const safeFileName = (name: string) => name.replace(/[^\w.-]/g, "_").replace(/^\.+/, "")
+
 export const mediaFolder = (path: string) => {
     const url = siteUrl(path)
     let hash = 5381
     for (let i = 0; i < url.length; i++) hash = ((hash * 33) ^ url.charCodeAt(i)) >>> 0
-    const base = decodeURIComponent(url.split("?")[0].split("/").pop() ?? "").replace(/[^\w.-]/g, "_").replace(/^\.+/, "")
+    const base = safeFileName(decodeURIComponent(url.split("?")[0].split("/").pop() ?? ""))
     return { folder: hash.toString(36), file: base || "file" }
 }
 
