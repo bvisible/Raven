@@ -51,7 +51,7 @@ final class RavenMediaHandler: NSObject, WKURLSchemeHandler {
         var blocks: [Int: Data] = [:]
         // Least recently used first.
         var used: [Int] = []
-        var waiting: [Int: [(Bool) -> Void]] = [:]
+        var waiting: [Int: [(Data?) -> Void]] = [:]
         init(src: URL, target: URL) { self.src = src; self.target = target }
     }
     // Net queue only, oldest first.
@@ -94,12 +94,12 @@ final class RavenMediaHandler: NSObject, WKURLSchemeHandler {
         let asked = Self.parse(range)
         // The first block needed also tells the file's size, which an open or suffix range needs.
         let opening = (asked?.first ?? 0) / Self.block
-        load(file, blocks: [opening], bearer: bearer) { ok in
-            guard ok, let total = file.total else { return self.fail(delivery, status: 502) }
+        load(file, blocks: [opening], bearer: bearer) { loaded in
+            guard loaded != nil, let total = file.total else { return self.fail(delivery, status: 502) }
             guard let (start, end) = Self.bounds(asked, total: total) else { return self.fail(delivery, status: 416) }
             let wanted = Array(start / Self.block ... end / Self.block)
-            self.load(file, blocks: wanted, bearer: bearer) { ok in
-                guard ok, let body = self.assemble(file, from: start, to: end) else { return self.fail(delivery, status: 502) }
+            self.load(file, blocks: wanted, bearer: bearer) { loaded in
+                guard let loaded = loaded, let body = Self.assemble(loaded, from: start, to: end) else { return self.fail(delivery, status: 502) }
                 var headers = ["Content-Type": file.type, "Accept-Ranges": "bytes", "Content-Length": String(body.count), "X-Content-Type-Options": "nosniff"]
                 if range != nil { headers["Content-Range"] = "bytes \(start)-\(end)/\(total)" }
                 self.deliver(delivery, status: range == nil ? 200 : 206, headers: headers, body: body)
@@ -108,25 +108,28 @@ final class RavenMediaHandler: NSObject, WKURLSchemeHandler {
         }
     }
 
-    private func load(_ file: File, blocks: [Int], bearer: String, done: @escaping (Bool) -> Void) {
+    /// The blocks asked for, or nil if one failed. Held here, not in the cache: a range past
+    /// keepBlocks would evict its own first blocks before the last ones arrive.
+    private func load(_ file: File, blocks: [Int], bearer: String, done: @escaping ([Int: Data]?) -> Void) {
         var remaining = blocks.count
+        var loaded: [Int: Data] = [:]
         var ok = true
-        guard remaining > 0 else { return done(true) }
+        guard remaining > 0 else { return done(loaded) }
         for index in blocks {
-            fetch(file, index: index, bearer: bearer) { fetched in
-                ok = ok && fetched
+            fetch(file, index: index, bearer: bearer) { data in
+                if let data = data { loaded[index] = data } else { ok = false }
                 remaining -= 1
-                if remaining == 0 { done(ok) }
+                if remaining == 0 { done(ok ? loaded : nil) }
             }
         }
     }
 
-    private func fetch(_ file: File, index: Int, bearer: String, done: @escaping (Bool) -> Void) {
-        if file.blocks[index] != nil {
+    private func fetch(_ file: File, index: Int, bearer: String, done: @escaping (Data?) -> Void) {
+        if let block = file.blocks[index] {
             touch(file, index)
-            return done(true)
+            return done(block)
         }
-        if let total = file.total, index * Self.block >= total { return done(false) }
+        if let total = file.total, index * Self.block >= total { return done(nil) }
         if file.waiting[index] != nil {
             file.waiting[index]?.append(done)
             return
@@ -139,7 +142,7 @@ final class RavenMediaHandler: NSObject, WKURLSchemeHandler {
         session.dataTask(with: request) { data, response, _ in
             let waiters = file.waiting.removeValue(forKey: index) ?? []
             guard let http = response as? HTTPURLResponse, let data = data, http.statusCode == 200 || http.statusCode == 206 else {
-                return waiters.forEach { $0(false) }
+                return waiters.forEach { $0(nil) }
             }
             if let type = http.value(forHTTPHeaderField: "Content-Type") { file.type = self.inert(type) }
             if http.statusCode == 200 {
@@ -158,9 +161,10 @@ final class RavenMediaHandler: NSObject, WKURLSchemeHandler {
                 }
                 file.blocks[index] = data
             }
+            let block = file.blocks[index]
             self.touch(file, index)
             self.keepIfWhole(file)
-            waiters.forEach { $0(true) }
+            waiters.forEach { $0(block) }
         }.resume()
     }
 
@@ -183,12 +187,12 @@ final class RavenMediaHandler: NSObject, WKURLSchemeHandler {
         }
     }
 
-    private func assemble(_ file: File, from start: Int, to end: Int) -> Data? {
+    private static func assemble(_ blocks: [Int: Data], from start: Int, to end: Int) -> Data? {
         var body = Data(capacity: end - start + 1)
         var position = start
         while position <= end {
             let index = position / Self.block
-            guard let block = file.blocks[index] else { return nil }
+            guard let block = blocks[index] else { return nil }
             let offset = position - index * Self.block
             let take = min(block.count - offset, end - position + 1)
             // A block shorter than the file says would loop here forever.
