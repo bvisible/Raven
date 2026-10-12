@@ -94,32 +94,30 @@ final class RavenMediaHandler: NSObject, WKURLSchemeHandler {
         let asked = Self.parse(range)
         // The first block needed also tells the file's size, which an open or suffix range needs.
         let opening = (asked?.first ?? 0) / Self.block
-        load(file, blocks: [opening], bearer: bearer) { loaded in
-            guard loaded != nil, let total = file.total else { return self.fail(delivery, status: 502) }
+        fetch(file, index: opening, bearer: bearer) { block in
+            guard block != nil, let total = file.total else { return self.fail(delivery, status: 502) }
             guard let (start, end) = Self.bounds(asked, total: total) else { return self.fail(delivery, status: 416) }
-            let wanted = Array(start / Self.block ... end / Self.block)
-            self.load(file, blocks: wanted, bearer: bearer) { loaded in
-                guard let loaded = loaded, let body = Self.assemble(loaded, from: start, to: end) else { return self.fail(delivery, status: 502) }
-                var headers = ["Content-Type": file.type, "Accept-Ranges": "bytes", "Content-Length": String(body.count), "X-Content-Type-Options": "nosniff"]
-                if range != nil { headers["Content-Range"] = "bytes \(start)-\(end)/\(total)" }
-                self.deliver(delivery, status: range == nil ? 200 : 206, headers: headers, body: body)
-                self.readAhead(file, after: end / Self.block, bearer: bearer)
-            }
+            var headers = ["Content-Type": file.type, "Accept-Ranges": "bytes", "Content-Length": String(end - start + 1), "X-Content-Type-Options": "nosniff"]
+            if range != nil { headers["Content-Range"] = "bytes \(start)-\(end)/\(total)" }
+            self.begin(delivery, status: range == nil ? 200 : 206, headers: headers)
+            self.stream(delivery, file: file, from: start, to: end, bearer: bearer)
         }
     }
 
-    /// The blocks asked for, or nil if one failed. Held here, not in the cache: a range past
-    /// keepBlocks would evict its own first blocks before the last ones arrive.
-    private func load(_ file: File, blocks: [Int], bearer: String, done: @escaping ([Int: Data]?) -> Void) {
-        var remaining = blocks.count
-        var loaded: [Int: Data] = [:]
-        var ok = true
-        guard remaining > 0 else { return done(loaded) }
-        for index in blocks {
-            fetch(file, index: index, bearer: bearer) { data in
-                if let data = data { loaded[index] = data } else { ok = false }
-                remaining -= 1
-                if remaining == 0 { done(ok ? loaded : nil) }
+    /// Sends the body a block at a time, so a request holds no more than the cache does,
+    /// however large the file. The next block is asked for only once this one is handed over.
+    private func stream(_ delivery: Delivery, file: File, from position: Int, to end: Int, bearer: String) {
+        let index = position / Self.block
+        defer { readAhead(file, after: index, bearer: bearer) }
+        fetch(file, index: index, bearer: bearer) { block in
+            let offset = position - index * Self.block
+            // A block shorter than the file says would never reach the end.
+            guard let block = block, block.count > offset else { return self.abort(delivery) }
+            let take = min(block.count - offset, end - position + 1)
+            let from = block.startIndex + offset
+            let next = position + take
+            self.send(delivery, block[from..<(from + take)], last: next > end) {
+                self.net.async { self.stream(delivery, file: file, from: next, to: end, bearer: bearer) }
             }
         }
     }
@@ -187,23 +185,6 @@ final class RavenMediaHandler: NSObject, WKURLSchemeHandler {
         }
     }
 
-    private static func assemble(_ blocks: [Int: Data], from start: Int, to end: Int) -> Data? {
-        var body = Data(capacity: end - start + 1)
-        var position = start
-        while position <= end {
-            let index = position / Self.block
-            guard let block = blocks[index] else { return nil }
-            let offset = position - index * Self.block
-            let take = min(block.count - offset, end - position + 1)
-            // A block shorter than the file says would loop here forever.
-            guard take > 0 else { return nil }
-            let from = block.startIndex + offset
-            body.append(block[from..<(from + take)])
-            position += take
-        }
-        return body
-    }
-
     /// A file read end to end goes to disk, where replays and seeks are answered at once.
     private func keepIfWhole(_ file: File) {
         guard let total = file.total else { return }
@@ -250,14 +231,31 @@ final class RavenMediaHandler: NSObject, WKURLSchemeHandler {
 
     // MARK: - Handing to WebKit (main thread)
 
-    private func deliver(_ delivery: Delivery, status: Int, headers: [String: String], body: Data) {
+    private func begin(_ delivery: Delivery, status: Int, headers: [String: String]) {
+        DispatchQueue.main.async {
+            guard !delivery.stopped else { return }
+            let task = delivery.scheme
+            task.didReceive(HTTPURLResponse(url: task.request.url!, statusCode: status, httpVersion: "HTTP/1.1", headerFields: headers)!)
+        }
+    }
+
+    /// One piece of the body; `more` runs only while WebKit still wants the rest.
+    private func send(_ delivery: Delivery, _ piece: Data, last: Bool, more: @escaping () -> Void) {
+        DispatchQueue.main.async {
+            guard !delivery.stopped else { return }
+            delivery.scheme.didReceive(piece)
+            guard last else { return more() }
+            self.live.removeValue(forKey: ObjectIdentifier(delivery.scheme))
+            delivery.scheme.didFinish()
+        }
+    }
+
+    /// The status went out with the headers: a block failing after them can only end the response.
+    private func abort(_ delivery: Delivery) {
         DispatchQueue.main.async {
             guard !delivery.stopped else { return }
             self.live.removeValue(forKey: ObjectIdentifier(delivery.scheme))
-            let task = delivery.scheme
-            task.didReceive(HTTPURLResponse(url: task.request.url!, statusCode: status, httpVersion: "HTTP/1.1", headerFields: headers)!)
-            task.didReceive(body)
-            task.didFinish()
+            delivery.scheme.didFailWithError(URLError(.networkConnectionLost))
         }
     }
 
