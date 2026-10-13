@@ -9,6 +9,7 @@ public class RavenMediaPlugin: CAPPlugin, CAPBridgedPlugin {
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "setSession", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "trim", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "clear", returnType: CAPPluginReturnPromise),
     ]
     private var folder: URL { FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("media") }
 
@@ -20,6 +21,11 @@ public class RavenMediaPlugin: CAPPlugin, CAPBridgedPlugin {
             RavenMediaHandler.shared.token = token
             call.resolve()
         }
+    }
+
+    @objc func clear(_ call: CAPPluginCall) {
+        RavenMediaHandler.shared.clear()
+        call.resolve()
     }
 
     // Nothing goes while the folder fits the budget. Over it, the oldest folders go first.

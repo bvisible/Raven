@@ -80,6 +80,11 @@ final class RavenMediaHandler: NSObject, WKURLSchemeHandler {
         live.removeValue(forKey: ObjectIdentifier(schemeTask))?.stopped = true
     }
 
+    /// Logout: the next account must never be answered from the last one's blocks.
+    func clear() {
+        net.async { self.files.removeAll() }
+    }
+
     // MARK: - Blocks (net queue)
 
     private func file(src: URL, target: URL) -> File {

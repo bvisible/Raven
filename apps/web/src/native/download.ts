@@ -62,8 +62,11 @@ export const cancelDownload = async (id: string) => {
     await plugin.cancel({ id }).catch(() => { })
 }
 
-/** Logout: nothing of the site's files stays on disk. */
+/** Logout: nothing of the site's files stays on disk or in the media handler's memory. */
 export const clearMediaCache = async () => {
     const { Filesystem, Directory } = await import("@capacitor/filesystem")
-    await Filesystem.rmdir({ path: DIR, directory: Directory.Cache, recursive: true }).catch(() => { })
+    await Promise.all([
+        Filesystem.rmdir({ path: DIR, directory: Directory.Cache, recursive: true }).catch(() => { }),
+        import("./media").then((m) => m.clearMediaMemory()),
+    ])
 }

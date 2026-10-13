@@ -1,10 +1,12 @@
 import { siteOrigin } from "@lib/site"
-import { nativePlugin } from "./platform"
+import { nativePlatform, nativePlugin } from "./platform"
 
 // Contract of the RavenMedia plugin (apps/native/{android,ios}); the URL shape lives in mediaUrl.ts.
 type RavenMediaPlugin = {
     setSession(options: { origin: string; token: string }): Promise<void>
     trim(options: { budgetBytes: number }): Promise<void>
+    /** iOS only: the handler keeps recent blocks in memory; Android reads from disk alone. */
+    clear(): Promise<void>
 }
 const media = nativePlugin<RavenMediaPlugin>("RavenMedia")
 
@@ -12,6 +14,12 @@ const media = nativePlugin<RavenMediaPlugin>("RavenMedia")
 export const setMediaSession = async (token: string) => {
     const { plugin } = await media()
     await plugin.setSession({ origin: siteOrigin(), token }).catch(() => { })
+}
+
+/** Logout: the next account must not be served the last one's blocks from memory. */
+export const clearMediaMemory = async () => {
+    if (nativePlatform() !== "ios") return
+    await media().then(({ plugin }) => plugin.clear()).catch(() => { })
 }
 
 const BUDGET_BYTES = 200 * 1024 * 1024
