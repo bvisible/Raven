@@ -54,10 +54,14 @@ class TestImagesSentAsFilesAreImages(IntegrationTestCase):
 				}
 			).insert(ignore_permissions=True)
 		frappe.get_doc("User", TEST_USER).add_roles("Raven User")
-		frappe.set_user(TEST_USER)
+		# A workspace is an administrator's to make; the test user is put in it, then makes the channel.
 		workspace = frappe.get_doc(
 			{"doctype": "Raven Workspace", "workspace_name": "Images Test Workspace", "type": "Public"}
-		).insert()
+		).insert(ignore_permissions=True)
+		frappe.get_doc(
+			{"doctype": "Raven Workspace Member", "workspace": workspace.name, "user": TEST_USER}
+		).insert(ignore_permissions=True)
+		frappe.set_user(TEST_USER)
 		self.channel = frappe.get_doc(
 			{
 				"doctype": "Raven Channel",
