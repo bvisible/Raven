@@ -165,6 +165,11 @@ doc_events = {
 		"on_update": "raven.raven_integrations.controllers.employee.on_update",
 		"on_trash": "raven.raven_integrations.controllers.employee.on_trash",
 	},
+	# //// Neoffice — a person who gets the messaging joins the workspaces anyone may join, so that their channels
+	# //// show (Jérémy, 13.10.2026, maintenance#1553); see raven/open_workspaces.py.
+	"Raven User": {
+		"after_insert": "raven.open_workspaces.join_open_workspaces_on_insert",
+	},
 }
 
 # Scheduled Tasks

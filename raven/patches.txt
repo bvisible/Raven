@@ -36,3 +36,5 @@ raven.patches.neoffice.raven_users_read_the_24_hour_clock
 raven.patches.neoffice.legacy_system_messages_carry_their_event #2
 # //// Neoffice — the photos sent as files while Suite's Drive wrote a category into File.file_type (maintenance#1538).
 raven.patches.neoffice.images_sent_as_files_are_images
+# //// Neoffice — the people already in the messaging join the workspaces anyone may join (maintenance#1553).
+raven.patches.neoffice.everyone_joins_the_open_workspaces
