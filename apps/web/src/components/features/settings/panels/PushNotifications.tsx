@@ -102,7 +102,11 @@ const PushNotificationFields = () => {
             <DataField
                 name="push_notification_api_key"
                 label={_("Push Notification API Key")}
-                rules={{ maxLength: { value: 140, message: _("API Key cannot be more than 140 characters.") } }}
+                isRequired
+                rules={{
+                    required: _("Please add your Push Notification API Key"),
+                    maxLength: { value: 140, message: _("API Key cannot be more than 140 characters.") },
+                }}
                 inputProps={{ placeholder: _("Your API Key"), ...NO_AUTOFILL }}
             />
             <DataField
@@ -120,8 +124,8 @@ const PushNotificationFields = () => {
 
 /**
  * Register / Sync buttons act on the SAVED settings, not the form, so they only
- * appear once Raven Cloud is saved with a server URL (and, for Sync, a VAPID key
- * from a successful registration).
+ * appear once Raven Cloud is saved with a server URL, or while Frappe Cloud setup
+ * is pending (and, for Sync, a VAPID key from a successful registration).
  */
 const ServiceActions = () => {
     const { ravenSettings, mutate } = useRavenSettings()
@@ -129,8 +133,10 @@ const ServiceActions = () => {
     const canRegister = hasRole("System Manager")
     const canSync = hasRole("Raven Admin")
     const savedRavenCloud = ravenSettings?.push_notification_service === "Raven" && Boolean(ravenSettings?.push_notification_server_url)
+    // On Frappe Cloud, a System Manager can retry a setup that failed before anything was saved.
+    const frappeCloudSetupPending = Boolean(window.frappe?.boot?.raven_cloud_push_setup_pending)
 
-    if (!savedRavenCloud) return null
+    if (!savedRavenCloud && !frappeCloudSetupPending) return null
     return (
         <div className="flex flex-wrap gap-2">
             <RegisterSiteButton registered={Boolean(ravenSettings?.vapid_public_key)} disabled={!canRegister} onDone={() => mutate()} />
