@@ -107,8 +107,9 @@ class TestImagesSentAsFilesAreImages(IntegrationTestCase):
 
 		message.reload()
 		self.assertEqual(message.message_type, "Image")
-		self.assertEqual((message.image_width, message.image_height), (64, 32))
-		self.assertEqual((message.thumbnail_width, message.thumbnail_height), (64, 32))
+		# The sizes are Data fields of Raven Message: they come back as text.
+		self.assertEqual((message.image_width, message.image_height), ("64", "32"))
+		self.assertEqual((message.thumbnail_width, message.thumbnail_height), ("64", "32"))
 		self.assertTrue(message.blurhash)
 
 	def test_a_file_that_is_not_an_image_stays_a_file(self):
