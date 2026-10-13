@@ -50,6 +50,55 @@ def upload_JPEG_wrt_EXIF(content, filename, optimize=False):
 	return file_doc
 
 
+# //// Neoffice — added: an image is told by the extension of its name, not by File.file_type. An app that overrides
+# //// File may write its own category there: Suite's Drive writes « Image » for every upload made outside Drive (its
+# //// #638), which matched none of the extensions upstream compared it with, and every photo sent in a conversation
+# //// became a « File » message, drawn as a file and left out of the channel's images (maintenance#1538).
+IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "webp"}
+
+
+def is_image_file(file_name_or_url: str | None) -> bool:
+	"""True for a file whose name ends with an image extension, whatever the case."""
+	name = (file_name_or_url or "").rsplit("/", 1)[-1]
+	return "." in name and name.rsplit(".", 1)[-1].lower() in IMAGE_EXTENSIONS
+
+
+# //// Neoffice — upstream's image branch of upload_file_with_message, unchanged, moved into a function so that the
+# //// patch raven.patches.neoffice.images_sent_as_files_are_images types the photos sent as files again with it.
+def set_image_details(message_doc, file_url: str) -> None:
+	"""Makes the message an image: its size, the size of its thumbnail and its blurhash."""
+	message_doc.message_type = "Image"
+
+	image, filename, extn = get_local_image(file_url)
+	width, height = image.size
+
+	MAX_WIDTH = 480
+	MAX_HEIGHT = 320
+	is_landscape = width > height
+
+	# If it's a landscape image, then the thumbnail needs to be 480px wide
+	if is_landscape:
+		thumbnail_width = min(width, MAX_WIDTH)
+		thumbnail_height = int(height * thumbnail_width / width)
+
+	else:
+		thumbnail_height = min(height, MAX_HEIGHT)
+		thumbnail_width = int(width * thumbnail_height / height)
+
+	image.thumbnail((thumbnail_width, thumbnail_height))
+
+	x_components = 4 if is_landscape else 3
+	y_components = 3 if is_landscape else 4
+
+	blurhash_string = blurhash.encode(image, x_components=x_components, y_components=y_components)
+
+	message_doc.blurhash = blurhash_string
+	message_doc.image_width = width
+	message_doc.image_height = height
+	message_doc.thumbnail_width = thumbnail_width
+	message_doc.thumbnail_height = thumbnail_height
+
+
 @frappe.whitelist()
 def upload_file_with_message():
 	"""
@@ -62,8 +111,7 @@ def upload_file_with_message():
 	3. If the file is an image, we need to measure it's dimensions
 	4. Store the file URL and the dimensions in the Raven Message Doc
 	"""
-	fileExt = ["jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "gif", "GIF", "webp", "WEBP"]
-	thumbnailExt = ["jpg", "JPG", "jpeg", "JPEG", "png", "PNG"]
+	# //// Neoffice — the image extensions are IMAGE_EXTENSIONS, read from the file's name (is_image_file).
 
 	frappe.form_dict.doctype = "Raven Message"
 	frappe.form_dict.fieldname = "file"
@@ -119,59 +167,10 @@ def upload_file_with_message():
 
 	message_doc.file = file_doc.file_url
 
-	if file_doc.file_type in fileExt:
-
-		message_doc.message_type = "Image"
-
-		image, filename, extn = get_local_image(file_doc.file_url)
-		width, height = image.size
-
-		MAX_WIDTH = 480
-		MAX_HEIGHT = 320
-		is_landscape = width > height
-
-		# If it's a landscape image, then the thumbnail needs to be 480px wide
-		if is_landscape:
-			thumbnail_width = min(width, MAX_WIDTH)
-			thumbnail_height = int(height * thumbnail_width / width)
-
-		else:
-			thumbnail_height = min(height, MAX_HEIGHT)
-			thumbnail_width = int(width * thumbnail_height / height)
-
-		image.thumbnail((thumbnail_width, thumbnail_height))
-
-		x_components = 4 if is_landscape else 3
-		y_components = 3 if is_landscape else 4
-
-		blurhash_string = blurhash.encode(image, x_components=x_components, y_components=y_components)
-
-		message_doc.blurhash = blurhash_string
-
-		# thumbnail_size = thumbnail_width, thumbnail_height
-
-		# if extn in thumbnailExt:
-
-		# TODO: Generate thumbnail of the image
-
-		# Need to add a provision in Frappe to generate thumbnails for all images - not just public files
-		# Generated thumbnail here throws a permissions error when trying to access.
-		# thumbnail_url = f"{filename}_small.{extn}"
-
-		# path = os.path.abspath(frappe.get_site_path(thumbnail_url.lstrip("/")))
-		# image.thumbnail(thumbnail_size, Image.Resampling.LANCZOS)
-
-		# try:
-		#     image.save(path)
-		# except OSError:
-		#     frappe.msgprint(_("Unable to write file format for {0}").format(path))
-		#     thumbnail_url = file_doc.file_url
-
-		message_doc.image_width = width
-		message_doc.image_height = height
-		# message_doc.file_thumbnail = thumbnail_url
-		message_doc.thumbnail_width = thumbnail_width
-		message_doc.thumbnail_height = thumbnail_height
+	# //// Neoffice — by the name's extension (is_image_file), not by file_doc.file_type; the branch itself is
+	# //// set_image_details, upstream's code. Its commented thumbnail sketch (« TODO: Generate thumbnail ») went with it.
+	if is_image_file(file_doc.file_name or file_doc.file_url):
+		set_image_details(message_doc, file_doc.file_url)
 
 	# TODO (video dimensions): for video uploads, probe width/height here
 	# (e.g. ffprobe / moviepy) and store them on image_width/image_height the

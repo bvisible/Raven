@@ -34,3 +34,5 @@ raven.patches.neoffice.enable_hr_integration
 raven.patches.neoffice.raven_users_read_the_24_hour_clock
 # //// Neoffice — the system messages written before Raven v3 take their structured event (maintenance#1324).
 raven.patches.neoffice.legacy_system_messages_carry_their_event #2
+# //// Neoffice — the photos sent as files while Suite's Drive wrote a category into File.file_type (maintenance#1538).
+raven.patches.neoffice.images_sent_as_files_are_images
