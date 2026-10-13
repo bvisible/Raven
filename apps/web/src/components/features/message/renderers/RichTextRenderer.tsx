@@ -32,6 +32,10 @@ const SAFE_HREF = /^(https?:|mailto:|tel:|\/|#)/i
 /** Custom-emoji image src: same-origin (relative) or http(s) only — never data:/js:. */
 const SAFE_IMG_SRC = /^(https?:|\/)/i
 
+/** Tags no message needs: they load another document, run script, or reach the whole page.
+ *  Stored HTML is not sanitized server-side, so a sender can put any of them in. */
+const DROPPED_TAGS = new Set(["script", "iframe", "frame", "frameset", "object", "embed", "base", "meta", "link", "style", "form", "svg", "math"])
+
 /** Visible text of a node, minus a leading @/# — the fallback mention label. */
 const mentionLabel = (node: Element): string =>
     node.children
@@ -152,6 +156,8 @@ const options: HTMLReactParserOptions = {
         }
 
         if (!(node instanceof Element)) return
+
+        if (DROPPED_TAGS.has(node.name)) return <></>
 
         // Strip author classes. v2 Raven baked presentational utilities (e.g.
         // `text-sm`) into the stored HTML; because those classes also exist in
