@@ -49,6 +49,16 @@ describe("first-login push registration", () => {
         expect(options.refreshInterval(undefined)).toBe(0)
     })
 
+    it("takes a configured boot as ready without asking the site", () => {
+        // An older site has no get_push_notification_config; the boot is enough.
+        window.frappe.boot.raven_cloud_push_setup_pending = false
+        mocks.configured.mockReturnValue(true)
+        expect(ReadPushAvailability()).toBe(true)
+        expect(mocks.call.mock.calls[0][2]).toBeNull()
+        mocks.supported.mockReturnValue(false)
+        expect(ReadPushAvailability()).toBe(false)
+    })
+
     it("does not check a browser without push support or a site without setup", () => {
         mocks.supported.mockReturnValue(false)
         ReadPushAvailability()

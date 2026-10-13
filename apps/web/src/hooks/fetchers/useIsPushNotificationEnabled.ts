@@ -14,11 +14,15 @@ const pollUntil = Date.now() + 60_000
 
 /** Discover background registration without requiring a first-login page reload. */
 export function useIsPushNotificationEnabled(): boolean {
+    const supported = isPushSupportedByBrowser()
     const pending = window.frappe?.boot?.raven_cloud_push_setup_pending
+    // Boot carries the config once setup is done, so only a running setup is asked about. The native
+    // app also runs against sites older than this method, which answer it with an error.
+    const configured = isRavenPushConfigured()
     const { data } = useFrappeGetCall<{ message: PushConfiguration }>(
         "raven.api.notification.get_push_notification_config",
         undefined,
-        isPushSupportedByBrowser() && (isRavenPushConfigured() || pending) ? undefined : null,
+        supported && pending && !configured ? undefined : null,
         {
             refreshInterval: (response) =>
                 pending && !isReady(response?.message) && Date.now() < pollUntil ? 5000 : 0,
@@ -33,5 +37,5 @@ export function useIsPushNotificationEnabled(): boolean {
             },
         },
     )
-    return isReady(data?.message)
+    return supported && (configured || isReady(data?.message))
 }
