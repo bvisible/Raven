@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 import datetime
 import json
+import re  # //// Neoffice — TYPED_LINK
 
 import frappe
 from bs4 import BeautifulSoup
@@ -24,6 +25,11 @@ from raven.utils import (
 	is_channel_member,
 	refresh_thread_reply_count,
 )
+
+# //// Neoffice — an address typed in the words (parse_html_content): http(s) up to a space or a tag, without the
+# //// sentence's own punctuation at its end.
+TYPED_LINK = re.compile(r"\bhttps?://[^\s<>\"']+", re.IGNORECASE)
+TYPED_LINK_TRAILING = ".,;:!?)]}»"
 
 
 class RavenMessage(Document):
@@ -136,6 +142,31 @@ class RavenMessage(Document):
 					},
 				)
 				self.links += f"{href}\n"
+
+		# //// Neoffice — an address typed in the words is a link too. A message written in the phone's bar or in
+		# //// Neodesk carries « https://… » as plain text, and only anchors were read: no preview was ever made for
+		# //// it (12 addresses typed on osiris in 60 days, none of them an anchor; 14.10.2026). Not in code, and
+		# //// not twice when an anchor already names it.
+		listed = {row.url for row in self.links_table}
+		for words in soup.find_all(string=True):
+			if words.find_parent(["a", "code", "pre"]):
+				continue
+			for match in TYPED_LINK.finditer(str(words)):
+				href = match.group(0).rstrip(TYPED_LINK_TRAILING)
+				if href in listed:
+					continue
+				listed.add(href)
+				normalized = normalize_url(href)
+				self.append(
+					"links_table",
+					{
+						"url": href,
+						"normalized_url": normalized,
+						"provider": detect_provider(normalized),
+					},
+				)
+				self.links += f"{href}\n"
+		# //// END Neoffice ////
 
 		# Spoilers (||text||) must not leak in the derived preview (DM list, push
 		# notifications, search) — replace each spoiler's text with a placeholder
