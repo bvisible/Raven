@@ -8,7 +8,10 @@ def after_install():
 		print("Setting up Raven...")
 		add_all_roles_to("Administrator")
 		create_raven_user_for_administrator()
-		create_general_channel()
+		if should_create_default_workspace():
+			create_default_workspace_and_channel()
+		else:
+			frappe.db.set_single_value("Raven Settings", "setup_pending", 1)
 
 		click.secho("Thank you for installing Raven!", fg="green")
 
@@ -36,7 +39,17 @@ def create_raven_user_for_administrator():
 		).insert(ignore_permissions=True)
 
 
-def create_general_channel():
+def should_create_default_workspace() -> bool:
+	"""From v16 the first admin creates the first workspace in the setup flow."""
+	return get_frappe_major_version() < 16
+
+
+def get_frappe_major_version() -> int:
+	"""`17.0.0-dev` → 17."""
+	return int(frappe.__version__.split(".")[0])
+
+
+def create_default_workspace_and_channel():
 	default_workspace = frappe.get_doc(
 		{
 			"doctype": "Raven Workspace",
