@@ -105,7 +105,15 @@ def get_doctype_naming(doctype: str):
 	if not frappe.has_permission(doctype, "read"):
 		frappe.throw(_("You do not have permission to access this document"), frappe.PermissionError)
 	meta = frappe.get_meta(doctype)
-	return {"label": _(doctype), "random_id": (meta.autoname or "").lower() == "hash"}
+	return {"label": _(doctype), "random_id": _is_drawn_by_lot(meta)}
+
+
+# //// Neoffice — added with get_doctype_naming (no upstream equivalent).
+def _is_drawn_by_lot(meta) -> bool:
+	"""Whether the doctype's ids are random: « hash » or « UUID », told by its autoname or by its naming rule alone
+	(a doctype can say « Random » with no autoname). Nothing else is guessed: an empty autoname may still name the
+	document in its controller (a User is its e-mail address), and showing a number beats hiding one."""
+	return (meta.autoname or "").lower() in ("hash", "uuid") or meta.naming_rule in ("Random", "UUID")
 
 
 @frappe.whitelist(methods=["POST"])
