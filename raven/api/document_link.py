@@ -96,6 +96,18 @@ def get_preview_data(doctype: str, docname: str | int):
 	return formatted_preview_data
 
 
+# //// Neoffice — added (no upstream equivalent): how a document card names its document's type, in the reader's
+# //// language, and whether the document's id means anything to a person. The mobile app's card said « ToDo », in
+# //// English, above the id « juqfmt4qgg » (14.10.2026); a numbered document (SAL-INV-2026-00042) keeps its number.
+# //// A method of its own and not a key of get_preview_data: every client lists that one's keys as the card's fields.
+@frappe.whitelist(methods=["GET"])
+def get_doctype_naming(doctype: str):
+	if not frappe.has_permission(doctype, "read"):
+		frappe.throw(_("You do not have permission to access this document"), frappe.PermissionError)
+	meta = frappe.get_meta(doctype)
+	return {"label": _(doctype), "random_id": (meta.autoname or "").lower() == "hash"}
+
+
 @frappe.whitelist(methods=["POST"])
 def update_preview_fields(doctype: str, fields: list[str]):
 	# Writes property setters, which change the doctype for the whole site.
