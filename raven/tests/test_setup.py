@@ -3,8 +3,9 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from raven.api.setup import complete_setup, is_setup_pending
-from raven.install import after_install, get_frappe_major_version, should_create_default_workspace
+from raven.api.setup import complete_setup
+from raven.boot import boot_session
+from raven.install import after_install, should_create_default_workspace
 
 EXTRA_TEST_RECORD_DEPENDENCIES = ["User", "Raven User"]
 
@@ -30,22 +31,36 @@ class TestSetup(IntegrationTestCase):
 		frappe.set_user("Administrator")
 		frappe.db.rollback()
 
-	def test_pending_for_admin(self):
-		self.assertTrue(is_setup_pending())
+	def _boot_flag(self):
+		bootinfo = frappe._dict()
+		boot_session(bootinfo)
+		return bootinfo.raven_setup_pending
 
-	def test_not_pending_once_cleared(self):
+	def test_boot_flags_pending_for_admin(self):
+		self.assertEqual(self._boot_flag(), 1)
+
+	def test_boot_not_pending_once_cleared(self):
 		frappe.db.set_single_value("Raven Settings", "setup_pending", 0)
-		self.assertFalse(is_setup_pending())
+		self.assertEqual(self._boot_flag(), 0)
 
-	def test_not_pending_for_member(self):
+	def test_boot_not_pending_for_member(self):
 		frappe.set_user(MEMBER)
-		self.assertFalse(is_setup_pending())
+		self.assertEqual(self._boot_flag(), 0)
 
 	def test_complete_setup_clears_flag_and_is_idempotent(self):
 		complete_setup(["invite", "workspace"], ["channel"])
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
 		complete_setup('["workspace"]', "[]")
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
+
+	def test_complete_setup_survives_malformed_steps(self):
+		complete_setup("not json", '["hr", "<script>"]')
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
+
+	def test_complete_setup_refuses_guest(self):
+		frappe.set_user("Guest")
+		with self.assertRaises(frappe.PermissionError):
+			complete_setup([], [])
 
 	def test_complete_setup_refuses_member(self):
 		frappe.set_user(MEMBER)
@@ -54,25 +69,13 @@ class TestSetup(IntegrationTestCase):
 		frappe.set_user("Administrator")
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 1)
 
-	def test_boot_flags_pending_admin_only(self):
-		from raven.boot import boot_session
-
-		bootinfo = frappe._dict()
-		boot_session(bootinfo)
-		self.assertEqual(bootinfo.raven_setup_pending, 1)
-
-		frappe.set_user(MEMBER)
-		bootinfo = frappe._dict()
-		boot_session(bootinfo)
-		self.assertEqual(bootinfo.raven_setup_pending, 0)
-
-	def test_major_version_parses_release_and_dev_builds(self):
-		for version, expected in (("15.42.1", 15), ("16.0.0", 16), ("17.0.0-dev", 17)):
-			with patch("frappe.__version__", version):
-				self.assertEqual(get_frappe_major_version(), expected)
-
 	def test_install_defaults_only_below_v16(self):
-		for version, expected in (("15.42.1", True), ("16.0.0", False), ("17.0.0-dev", False)):
+		for version, expected in (
+			("15.42.1", True),
+			("16.0.0", False),
+			("17.0.0-dev", False),
+			("custom", True),
+		):
 			with patch("frappe.__version__", version):
 				self.assertEqual(should_create_default_workspace(), expected)
 

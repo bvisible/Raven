@@ -1,6 +1,7 @@
 import click
 import frappe
 from frappe.desk.page.setup_wizard.setup_wizard import add_all_roles_to, make_records
+from frappe.utils import cint
 
 
 def after_install():
@@ -40,13 +41,9 @@ def create_raven_user_for_administrator():
 
 
 def should_create_default_workspace() -> bool:
-	"""From v16 the first admin creates the first workspace in the setup flow."""
-	return get_frappe_major_version() < 16
-
-
-def get_frappe_major_version() -> int:
-	"""`17.0.0-dev` → 17."""
-	return int(frappe.__version__.split(".")[0])
+	"""From v16 the first admin creates the first workspace in the setup flow.
+	An unreadable version reads as 0, keeping the pre-v16 install."""
+	return cint(frappe.__version__.split(".")[0]) < 16
 
 
 def create_default_workspace_and_channel():

@@ -3,7 +3,7 @@ from urllib.parse import urlsplit
 import frappe
 from frappe.utils.safe_exec import is_safe_exec_enabled
 
-from raven.api.setup import is_setup_pending
+from raven.api.setup import is_setup_admin
 from raven.frappe_cloud_push import (
 	is_on_frappe_cloud_push,
 	is_push_setup_pending,
@@ -21,7 +21,7 @@ def boot_session(bootinfo):
 	bootinfo.show_raven_chat_on_desk = raven_settings.show_raven_on_desk
 
 	# Opens the first-admin setup flow in the web app.
-	bootinfo.raven_setup_pending = 1 if is_setup_pending() else 0
+	bootinfo.raven_setup_pending = 1 if raven_settings.setup_pending and is_setup_admin() else 0
 
 	if raven_settings.frappe_meet_hosted_urls:
 		bootinfo.frappe_meet_hosted_urls = raven_settings.frappe_meet_hosted_urls

@@ -1,15 +1,14 @@
-import json
+from contextlib import suppress
 
 import frappe
 from frappe.utils.telemetry import capture
 
 SETUP_ADMIN_ROLES = ("System Manager", "Raven Admin")
+SETUP_STEPS = ("invite", "workspace", "channel", "hr")
 
 
-def is_setup_pending() -> bool:
-	"""The first-admin setup flow should open for the session user."""
-	if not frappe.db.get_single_value("Raven Settings", "setup_pending"):
-		return False
+def is_setup_admin() -> bool:
+	"""Only these roles run the first-admin setup flow."""
 	return bool(set(SETUP_ADMIN_ROLES) & set(frappe.get_roles()))
 
 
@@ -21,18 +20,19 @@ def complete_setup(
 	frappe.only_for(SETUP_ADMIN_ROLES)
 
 	frappe.db.set_single_value("Raven Settings", "setup_pending", 0)
-	capture(
-		"setup_completed",
-		"raven",
-		properties={
-			"completed_steps": _as_list(completed_steps),
-			"skipped_steps": _as_list(skipped_steps),
-		},
-	)
+
+	# Telemetry is best-effort: a malformed step list must not fail the request and undo the flag.
+	with suppress(ValueError, TypeError):
+		capture(
+			"setup_completed",
+			"raven",
+			properties={
+				"completed_steps": _known_steps(completed_steps),
+				"skipped_steps": _known_steps(skipped_steps),
+			},
+		)
 
 
-def _as_list(value) -> list:
-	"""Whitelisted list args arrive as JSON strings from form posts."""
-	if isinstance(value, str):
-		value = json.loads(value)
-	return value or []
+def _known_steps(value) -> list[str]:
+	"""Step names from a list or its JSON string; anything unknown is dropped."""
+	return [step for step in frappe.parse_json(value) or [] if step in SETUP_STEPS]
