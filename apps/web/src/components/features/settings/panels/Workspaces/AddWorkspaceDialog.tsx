@@ -30,8 +30,8 @@ type WorkspaceFormData = RavenWorkspace & {
     only_admins_can_create_channels?: 0 | 1
 }
 
-/** "Create" in the Workspaces panel header; jumps to the new workspace's detail view on success. */
-const CreateWorkspaceButton = ({ onCreated }: { onCreated: (workspaceID: string) => void }) => {
+/** "Create" in the Workspaces panel header; `onCreated` gets the new workspace's ID. */
+const CreateWorkspaceButton = ({ onCreated, label }: { onCreated: (workspaceID: string) => void; label?: string }) => {
     const [open, setOpen] = useState(false)
     useCreateHotkey(() => setOpen(true))
     const isRavenAdmin = hasRole("Raven Admin")
@@ -41,7 +41,7 @@ const CreateWorkspaceButton = ({ onCreated }: { onCreated: (workspaceID: string)
             <DialogTrigger asChild>
                 <Button size="sm" disabled={!isRavenAdmin}>
                     <PlusIcon />
-                    {_("Create")}
+                    {label ?? _("Create")}
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[520px]">

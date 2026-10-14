@@ -67,6 +67,52 @@ def join_workspace(workspace: str):
 	return member
 
 
+@frappe.whitelist(methods=["POST"])
+def join_default_workspace():
+	"""
+	Puts a user who is in no workspace into the oldest public workspace open to
+	everyone. Returns the workspace they're in, or None when there's none to join.
+	Safe to repeat: someone already in a workspace gets theirs back.
+	"""
+	# The role, not just a Raven User record: removing the role keeps the record (disabled).
+	frappe.only_for("Raven User")
+
+	current = get_first_membership()
+	if current:
+		return current
+
+	workspace = get_default_workspace()
+	if not workspace:
+		return None
+
+	try:
+		join_workspace(workspace)
+	except frappe.ValidationError:
+		# Another request (a second tab) joined first: hand back what it joined.
+		current = get_first_membership()
+		if not current:
+			raise
+		frappe.clear_last_message()
+		return current
+	return workspace
+
+
+def get_first_membership() -> str | None:
+	return frappe.db.get_value(
+		"Raven Workspace Member", {"user": frappe.session.user}, "workspace", order_by="creation asc"
+	)
+
+
+def get_default_workspace() -> str | None:
+	"""The oldest public workspace anyone can join: usually the one made during setup."""
+	return frappe.db.get_value(
+		"Raven Workspace",
+		{"type": "Public", "can_only_join_via_invite": 0},
+		"name",
+		order_by="creation asc",
+	)
+
+
 @frappe.whitelist()
 def leave_workspace(workspace: str):
 	"""
