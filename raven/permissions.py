@@ -73,11 +73,14 @@ def workspace_has_permission(doc, user=None, ptype=None):
 
 def workspace_member_has_permission(doc, user=None, ptype=None):
 
-	# If the workspace is a public workspace, anyone can join
+	# If the workspace is a public workspace, anyone can join unless it's invite-only
 	if ptype == "create":
-		workspace_type = frappe.get_cached_value("Raven Workspace", doc.workspace, "type")
+		# `or`: a missing workspace returns None, which can't be unpacked
+		workspace_type, invite_only = frappe.get_cached_value(
+			"Raven Workspace", doc.workspace, ["type", "can_only_join_via_invite"]
+		) or (None, None)
 		if workspace_type == "Public":
-			if user == doc.user:
+			if user == doc.user and not invite_only:
 				return True
 			else:
 				workspace_member = get_workspace_member(doc.workspace, user)

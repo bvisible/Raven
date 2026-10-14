@@ -320,6 +320,46 @@ class TestPermissions(IntegrationTestCase):
 			3, frappe.db.count("Raven Workspace Member", {"workspace": test_workspace.name})
 		)
 
+	def test_invite_only_workspace_member_create_permissions(self):
+		"""
+		An invite-only public workspace can't be joined on your own; its admins can still add people.
+		"""
+		frappe.set_user("test@example.com")
+		test_workspace = self.create_test_workspace(workspace_type="Public")
+		test_workspace.can_only_join_via_invite = 1
+		test_workspace.insert()
+
+		frappe.set_user("test1@example.com")
+		with self.assertRaises(frappe.PermissionError):
+			frappe.get_doc(
+				{
+					"doctype": "Raven Workspace Member",
+					"user": "test1@example.com",
+					"workspace": test_workspace.name,
+				}
+			).insert()
+
+		frappe.set_user("test@example.com")
+		invited = frappe.get_doc(
+			{
+				"doctype": "Raven Workspace Member",
+				"user": "test1@example.com",
+				"workspace": test_workspace.name,
+			}
+		).insert()
+		self.assertEqual("test1@example.com", invited.user)
+
+	def test_member_create_for_missing_workspace_is_refused_not_crashed(self):
+		frappe.set_user("test1@example.com")
+		member = frappe.get_doc(
+			{
+				"doctype": "Raven Workspace Member",
+				"user": "test1@example.com",
+				"workspace": "does-not-exist",
+			}
+		)
+		self.assertFalse(member.has_permission("create"))
+
 	def test_workspace_member_update_permissions(self):
 		"""
 		Workspace members can be updated by admins only since it contains the "is_admin" field
