@@ -5,11 +5,12 @@ from frappe.tests.utils import FrappeTestCase
 
 
 class TestTypedLinks(FrappeTestCase):
+	# As Administrator: the parsing is the message's own, whoever writes it, and a site cloned from real data has no
+	# test@example.com (Frappe v15 does not create Raven's test records).
 	@classmethod
 	def setUpClass(cls):
 		super().setUpClass()
-		frappe.get_doc("User", "test@example.com").add_roles("Raven User")
-		frappe.set_user("test@example.com")
+		frappe.set_user("Administrator")
 		suffix = frappe.generate_hash(length=8)
 		cls.workspace = frappe.get_doc(
 			{
@@ -26,12 +27,6 @@ class TestTypedLinks(FrappeTestCase):
 				"workspace": cls.workspace.name,
 			}
 		).insert()
-
-	def setUp(self):
-		frappe.set_user("test@example.com")
-
-	def tearDown(self):
-		frappe.set_user("Administrator")
 
 	def message(self, text: str):
 		return frappe.get_doc(
