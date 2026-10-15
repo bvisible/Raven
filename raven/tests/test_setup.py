@@ -96,3 +96,28 @@ class TestSetup(IntegrationTestCase):
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 1)
 		self.assertEqual(frappe.db.count("Raven Workspace"), workspaces)
 		self.assertEqual(frappe.db.count("Raven Channel"), channels)
+
+	def _forget_settings(self):
+		# A fresh install has no stored Raven Settings yet.
+		frappe.db.delete("Singles", {"doctype": "Raven Settings"})
+		frappe.clear_document_cache("Raven Settings", "Raven Settings")
+		frappe.local.db.value_cache.pop("Raven Settings", None)
+
+	def test_install_stores_settings_defaults(self):
+		self._forget_settings()
+		with patch("frappe.__version__", "16.0.0"):
+			after_install()
+		# Frappe only fills defaults for singles with nothing stored, and the flag above stores one.
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "auto_add_system_users"), 1)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "show_raven_on_desk"), 1)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 1)
+
+	def test_install_below_v16_stores_defaults_without_setup(self):
+		self._forget_settings()
+		with (
+			patch("frappe.__version__", "15.42.1"),
+			patch("raven.install.create_default_workspace_and_channel"),
+		):
+			after_install()
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "auto_add_system_users"), 1)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)

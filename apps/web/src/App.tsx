@@ -29,9 +29,6 @@ import { useWorkspaces } from "@hooks/useWorkspaces"
 import WorkspaceLayout from "@pages/workspace/WorkspaceLayout"
 import NoWorkspace from "@components/features/workspaces/NoWorkspace"
 import { getIndexTarget } from "@utils/indexTarget"
-import { isSetupPending } from "@utils/setup"
-import { ProtectedRoute } from "@components/layout/ProtectedRoute"
-import { SetupPageSkeleton } from "@pages/setup/SetupPageSkeleton"
 
 // Code-split the rarely-visited pages out of the main bundle. React.lazy +
 // Suspense (not the data router's route.lazy) on purpose: route.lazy blocks
@@ -48,7 +45,6 @@ const Later = lazy(() => import("@pages/later/Later"))
 const MobileProfile = lazy(() => import("@pages/profile/Profile"))
 const Search = lazy(() => import("@pages/search/Search"))
 const ScheduledMessages = lazy(() => import("@pages/scheduled-messages/ScheduledMessages"))
-const Setup = lazy(() => import("@pages/setup/Setup"))
 
 /**
  * Home ("/") redirect, evaluated at RENDER time — module-scope reads froze
@@ -60,9 +56,6 @@ const IndexRedirect = () => {
   const lastChannel = useAtomValue(lastChannelAtom)
   const isMobile = useIsMobile()
   const { workspaces, isLoading, error } = useWorkspaces()
-
-  // Pending first-admin setup needs only boot, so it doesn't wait for the list.
-  if (isSetupPending()) return <Navigate to="/setup" replace />
 
   // Decide only on a list the fetch proved: a failed fetch also leaves it empty,
   // and that must not read as "in no workspace".
@@ -82,16 +75,9 @@ const IndexRedirect = () => {
  */
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <>
-    {/* First-admin setup: full screen, outside the shell's sidebar and listeners. */}
-    <Route
-      path="setup"
-      errorElement={<ErrorPage />}
-      element={<ProtectedRoute><Suspense key="setup" fallback={<SetupPageSkeleton />}><Setup /></Suspense></ProtectedRoute>}
-    />
-    {/* errorElement: the last-resort boundary for uncaught render/route errors
-        anywhere in the tree (incl. stale-chunk failures after a deploy) — the
-        router swaps the view for ErrorPage instead of white-screening. */}
+    // errorElement: the last-resort boundary for uncaught render/route errors
+    // anywhere in the tree (incl. stale-chunk failures after a deploy) — the
+    // router swaps the view for ErrorPage instead of white-screening.
     <Route path="/" element={<AppShell />} errorElement={<ErrorPage />}>
       <Route index element={<IndexRedirect />} />
       {/* Workspace: channels and settings only; search is global at /search above */}
@@ -149,8 +135,7 @@ const router = createBrowserRouter(
           blank-while-loading tradeoff doesn't matter for a page nobody lands
           on intentionally, and it keeps the chunk out of the main bundle. */}
       <Route path="*" lazy={() => import("@pages/NotFound")} />
-    </Route>
-    </>,
+    </Route>,
   ),
   { basename: import.meta.env.VITE_BASE_NAME },
 )

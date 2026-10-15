@@ -9,10 +9,11 @@ def after_install():
 		print("Setting up Raven...")
 		add_all_roles_to("Administrator")
 		create_raven_user_for_administrator()
-		if should_create_default_workspace():
+		create_default_workspace = should_create_default_workspace()
+		init_settings(setup_pending=not create_default_workspace)
+		import_existing_system_users()
+		if create_default_workspace:
 			create_default_workspace_and_channel()
-		else:
-			frappe.db.set_single_value("Raven Settings", "setup_pending", 1)
 
 		click.secho("Thank you for installing Raven!", fg="green")
 
@@ -38,6 +39,54 @@ def create_raven_user_for_administrator():
 				"type": "User",
 			}
 		).insert(ignore_permissions=True)
+
+
+def init_settings(setup_pending: bool):
+	"""
+	Stores Raven Settings with its defaults. Frappe fills a single's defaults only after
+	after_install, and only if nothing is stored yet, so writing just the setup flag would
+	leave every other setting (auto-add system users, …) reading as unset.
+	"""
+	settings = frappe.get_single("Raven Settings")
+	settings.setup_pending = 1 if setup_pending else 0
+	settings.flags.ignore_mandatory = True
+	settings.flags.ignore_validate = True
+	settings.save(ignore_permissions=True)
+
+
+def import_existing_system_users():
+	"""
+	System users made before Raven was installed are otherwise only added the next time
+	their User is saved. "Automatically add system users" means now.
+	"""
+	if not frappe.db.get_single_value("Raven Settings", "auto_add_system_users"):
+		return
+
+	users = frappe.get_all(
+		"User",
+		filters={
+			"user_type": "System User",
+			"enabled": 1,
+			"name": ["not in", ["Administrator", "Guest"]],
+		},
+		pluck="name",
+	)
+	already_in_raven = set(frappe.get_all("Raven User", filters={"type": "User"}, pluck="user"))
+	for name in users:
+		if name in already_in_raven:
+			continue
+		user = frappe.get_doc("User", name)
+		# Their roles come from a role profile; it would drop a role added here.
+		if user.role_profile_name or getattr(user, "role_profiles", None):
+			continue
+		# The role's save-time hook creates the Raven User. One user that fails to save must
+		# not fail the install; they're added the next time their User is saved.
+		frappe.db.savepoint("raven_import_user")
+		try:
+			user.add_roles("Raven User")
+		except Exception:
+			frappe.db.rollback(save_point="raven_import_user")
+			frappe.log_error(title=f"Raven: could not add {name} on install")
 
 
 def should_create_default_workspace() -> bool:

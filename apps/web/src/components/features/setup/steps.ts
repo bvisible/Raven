@@ -4,25 +4,16 @@ export type SetupStepName = "invite" | "workspace" | "channel" | "hr"
 
 export type StepStatus = "completed" | "skipped"
 
-/** Filled in as steps finish; later steps read it. */
-export type SetupContext = {
-    workspace?: string
-    channel?: string
-}
-
-export type SetupStepProps = {
-    context: SetupContext
-    /** The last step's primary action finishes setup */
-    isLast: boolean
-    /** Finishing is in flight */
-    finishing: boolean
-    onDone: (patch?: Partial<SetupContext>) => void
-    onSkip: () => void
-}
-
-/** Invites first; HR last since its company → workspace mapping needs a workspace. */
-export const getSetupSteps = ({ hrInstalled }: { hrInstalled: boolean }): SetupStepName[] =>
-    hrInstalled ? ["invite", "workspace", "channel", "hr"] : ["invite", "workspace", "channel"]
+/**
+ * Workspace and channel first, so invitees are added straight into them. Invites
+ * only for admins who can create users (System Manager). HR maps companies to workspaces.
+ */
+export const getSetupSteps = ({ canInvite, hrInstalled }: { canInvite: boolean; hrInstalled: boolean }): SetupStepName[] => [
+    "workspace",
+    "channel",
+    ...(canInvite ? ["invite" as const] : []),
+    ...(hrInstalled ? ["hr" as const] : []),
+]
 
 export const getSetupStepTitle = (step: SetupStepName): string => {
     switch (step) {

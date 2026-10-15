@@ -225,12 +225,15 @@ def invite_user(
 def add_user_to_workspaces_and_channels(user: str, workspaces: list[str], channels: list[str]):
 	"""
 	Workspaces first, since channel membership needs workspace membership.
-	Both calls run under the caller's own permissions.
+	Both calls run under the caller's own permissions. Existing memberships are
+	skipped, so inviting someone again (or someone already there) doesn't fail.
 	"""
 	for workspace in workspaces:
-		add_workspace_members(workspace, [user])
+		if not frappe.db.exists("Raven Workspace Member", {"workspace": workspace, "user": user}):
+			add_workspace_members(workspace, [user])
 	for channel in channels:
-		add_channel_members(channel, [user])
+		if not frappe.db.exists("Raven Channel Member", {"channel_id": channel, "user_id": user}):
+			add_channel_members(channel, [user])
 
 
 def get_employee_details(user: str):
