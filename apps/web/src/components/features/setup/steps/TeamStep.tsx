@@ -11,16 +11,15 @@ import { EMPTY_INVITE, InviteTable, type InviteForm } from "./InviteTable"
 import { normalizeEmail } from "./inviteValidation"
 import { SiteUsersBox } from "./SiteUsersBox"
 import { StepFooter } from "./StepFooter"
-import type { Invitee, SetupStepBodyProps, SiteUser } from "../types"
+import type { SetupStepBodyProps, SiteUser } from "../types"
 
 type TeamStepProps = SetupStepBodyProps & { siteUsers: SiteUser[]; canInvite: boolean }
 
 /** Adds people already in Raven and invites others by email, into the workspace and channel made earlier. */
-export const TeamStep = ({ setup, completed, isLast, finishing, onBack, onDone, onSkip, siteUsers, canInvite }: TeamStepProps) => {
+export const TeamStep = ({ setup, completed, isLast, finishing, onBack, onDone, onSkip, onSave, siteUsers, canInvite }: TeamStepProps) => {
     const form = useForm<InviteForm>({ defaultValues: { rows: [EMPTY_INVITE] } })
     const rows = useWatch({ control: form.control, name: "rows" })
-    const [invited, setInvited] = useState<Invitee[]>(setup.invited)
-    const [addedUsers, setAddedUsers] = useState<SiteUser[]>(setup.addedSiteUsers)
+    const { invited, addedSiteUsers: addedUsers } = setup
     const [addSiteUsers, setAddSiteUsers] = useState(true)
     const [sending, setSending] = useState(false)
     const [addError, setAddError] = useState<FrappeError | null>(null)
@@ -57,7 +56,7 @@ export const TeamStep = ({ setup, completed, isLast, finishing, onBack, onDone, 
             try {
                 await call.post("raven.api.setup.add_users_without_workspace", { workspace: setup.workspace, channel: setup.channel?.id })
                 nowAdded = siteUsers
-                setAddedUsers(siteUsers)
+                onSave({ addedSiteUsers: siteUsers })
             } catch (error) {
                 setAddError(error as FrappeError)
                 setSending(false)
@@ -92,7 +91,7 @@ export const TeamStep = ({ setup, completed, isLast, finishing, onBack, onDone, 
         }
 
         // Keep the failed rows, with their errors, and tick the ones that went through.
-        setInvited(nowInvited)
+        onSave({ invited: nowInvited })
         form.reset({ rows: rows.filter((_row, index) => !sent.includes(index)) })
         for (const { index, message } of failed) {
             const shift = sent.filter((sentIndex) => sentIndex < index).length

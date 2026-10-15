@@ -5,10 +5,10 @@ import { useJoinWorkspace } from "@hooks/useWorkspaceMembership"
 import type { WorkspaceFields } from "@hooks/useWorkspaces"
 import _ from "@lib/translate"
 
-/** Workspaces with a Join button each. A join opens the workspace through `onJoined`. */
+/** Workspaces with a Join button each. `onJoined` runs once the workspace lists show the join. */
 export const WorkspaceJoinList = ({ workspaces, onJoined, ...listProps }: {
     workspaces: WorkspaceFields[]
-    onJoined: (workspace: WorkspaceFields) => void
+    onJoined?: (workspace: WorkspaceFields) => void
 } & Omit<React.ComponentProps<"ul">, "children">) => {
     const joinWorkspace = useJoinWorkspace()
     // One join at a time: the joined workspace opens right after.
@@ -17,7 +17,7 @@ export const WorkspaceJoinList = ({ workspaces, onJoined, ...listProps }: {
     const join = (workspace: WorkspaceFields) => {
         setJoining(workspace.name)
         joinWorkspace(workspace)
-            .then(() => onJoined(workspace))
+            .then(() => onJoined?.(workspace))
             .catch(() => { })
             .finally(() => setJoining(null))
     }
