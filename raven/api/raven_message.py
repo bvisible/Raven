@@ -177,6 +177,24 @@ def _create_batch_idempotent(
 	return _create_batch(channel_id, client_id, specs, send_silently)
 
 
+def validate_files_uploaded_by_user(file_urls: list[str]):
+	"""Throw unless the current user uploaded every one of these files.
+
+	Without this, a user could send someone else's private file. On insert,
+	older Frappe versions attach any unattached File with that URL to the
+	new message.
+	"""
+	if not file_urls:
+		return
+	uploaded = frappe.get_all(
+		"File",
+		filters={"file_url": ["in", file_urls], "owner": frappe.session.user},
+		pluck="file_url",
+	)
+	if set(file_urls) - set(uploaded):
+		frappe.throw(_("You can only send files that you uploaded."), frappe.PermissionError)
+
+
 @frappe.whitelist(methods=["POST"])
 def send_message_with_attachments(
 	channel_id: str,
@@ -228,6 +246,8 @@ def send_message_with_attachments(
 
 	if not has_body and not files and not has_linked_document:
 		frappe.throw(_("Cannot send an empty message"))
+
+	validate_files_uploaded_by_user([f["file_url"] if isinstance(f, dict) else f for f in files])
 
 	# Every message from a send carries the client_id as its batch id: it groups
 	# multi-message sends in the UI AND lets the client match the realtime echo of
