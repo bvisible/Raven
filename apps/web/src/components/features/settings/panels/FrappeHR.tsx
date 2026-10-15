@@ -19,7 +19,7 @@ import { isHRInstalled } from "@lib/apps"
 const FORM_ID = "settings-hr-form"
 
 /** Own component, not a render prop — see AdminSettingsForm. */
-const FrappeHRFields = () => {
+export const FrappeHRFields = () => {
     const { control } = useFormContext<RavenSettings>()
     const autoCreate = useWatch({ control, name: "auto_create_department_channel" })
 

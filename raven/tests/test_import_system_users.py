@@ -20,7 +20,11 @@ class TestImportSystemUsers(IntegrationTestCase):
 
 		if not frappe.db.exists("Role Profile", ROLE_PROFILE):
 			frappe.get_doc(
-				{"doctype": "Role Profile", "role_profile": ROLE_PROFILE, "roles": [{"role": "System Manager"}]}
+				{
+					"doctype": "Role Profile",
+					"role_profile": ROLE_PROFILE,
+					"roles": [{"role": "System Manager"}],
+				}
 			).insert(ignore_permissions=True)
 
 		self._user(SYSTEM_USER, roles=["System Manager"])

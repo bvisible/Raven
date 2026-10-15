@@ -34,6 +34,7 @@ import DocumentTitle from "./DocumentTitle"
 import { AppUpdateAlert } from "./AppUpdateAlert"
 import { SessionBroadcast } from "./SessionBroadcast"
 import RavenSettingsDialog from "@components/features/settings/SettingsDialog"
+import { SetupGate } from "@components/features/setup/SetupGate"
 import { MessageActionDialogs } from "@components/features/message/actions/MessageActionDialogs"
 
 /**
@@ -143,6 +144,7 @@ const AppListeners = ({ children }: { children: React.ReactNode }) => {
         <DocumentTitle />
         {children}
         <CommandMenu />
+        <SetupGate />
         <AttachmentPreviewModal />
         {/* "App was updated — refresh" prompt (chunk failures, deploys, SW updates) */}
         <AppUpdateAlert />

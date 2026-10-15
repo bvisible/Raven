@@ -39,6 +39,22 @@ def get_users_without_workspace() -> list[dict]:
 	return _users_without_workspace()
 
 
+@frappe.whitelist(methods=["GET"])
+def get_company() -> dict | None:
+	"""
+	The site's default company, which ERPNext's setup wizard creates, to start the workspace from.
+	Only a public logo is returned: every member sees the workspace logo.
+	"""
+	frappe.only_for(SETUP_ADMIN_ROLES)
+	company = frappe.defaults.get_global_default("company")
+	if (
+		not company or not frappe.db.table_exists("Company") or not frappe.db.exists("Company", company)
+	):
+		return None
+	logo = frappe.db.get_value("Company", company, "company_logo")
+	return {"name": company, "logo": logo if logo and logo.startswith("/files/") else None}
+
+
 @frappe.whitelist(methods=["POST"])
 def add_users_without_workspace(workspace: str, channel: str | None = None) -> int:
 	"""

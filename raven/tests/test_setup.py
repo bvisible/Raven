@@ -6,6 +6,7 @@ from frappe.tests import IntegrationTestCase
 from raven.api.setup import (
 	add_users_without_workspace,
 	complete_setup,
+	get_company,
 	get_users_without_workspace,
 )
 from raven.boot import boot_session
@@ -213,3 +214,37 @@ class TestUsersWithoutWorkspace(IntegrationTestCase):
 			get_users_without_workspace()
 		with self.assertRaises(frappe.PermissionError):
 			add_users_without_workspace(self.workspace.name)
+
+
+class TestCompanyDefaults(IntegrationTestCase):
+	def tearDown(self):
+		frappe.set_user("Administrator")
+
+	def test_none_without_a_default_company(self):
+		with patch("frappe.defaults.get_global_default", return_value=None):
+			self.assertIsNone(get_company())
+
+	def test_name_and_public_logo_of_the_default_company(self):
+		with (
+			patch("frappe.defaults.get_global_default", return_value="Acme"),
+			patch.object(frappe.db, "table_exists", return_value=True),
+			patch.object(frappe.db, "exists", return_value=True),
+			patch.object(frappe.db, "get_value", return_value="/files/acme.png"),
+		):
+			self.assertEqual(get_company(), {"name": "Acme", "logo": "/files/acme.png"})
+
+	def test_leaves_out_a_private_logo(self):
+		# Every member sees the workspace logo; a private file wouldn't load for them.
+		with (
+			patch("frappe.defaults.get_global_default", return_value="Acme"),
+			patch.object(frappe.db, "table_exists", return_value=True),
+			patch.object(frappe.db, "exists", return_value=True),
+			patch.object(frappe.db, "get_value", return_value="/private/files/acme.png"),
+		):
+			self.assertEqual(get_company(), {"name": "Acme", "logo": None})
+
+	def test_members_cannot_read_it(self):
+		_make_raven_user(MEMBER, "Setup Member")
+		frappe.set_user(MEMBER)
+		with self.assertRaises(frappe.PermissionError):
+			get_company()

@@ -1,0 +1,30 @@
+/** Someone in Raven but in no workspace yet (imported from the site's users on install). */
+export type SiteUser = { user: string; full_name: string; user_image?: string }
+
+export type Invitee = { email: string; first_name: string }
+
+/** What setup has made so far; later steps read it. */
+export type SetupState = {
+    /** Workspace doc name */
+    workspace?: string
+    /** Channel doc name, and the name people see */
+    channel?: { id: string; name: string }
+    invited: Invitee[]
+    addedSiteUsers: SiteUser[]
+}
+
+export type SetupStepBodyProps = {
+    setup: SetupState
+    /** Finished before: the form edits what it made */
+    completed: boolean
+    /** The step's main button finishes setup */
+    isLast: boolean
+    /** Finishing is in flight */
+    finishing: boolean
+    /** Absent on the first step */
+    onBack?: () => void
+    onDone: (patch?: Partial<SetupState>) => void
+    onSkip: () => void
+    /** Records what a step made without moving on (e.g. a rename whose follow-up save failed) */
+    onSave: (patch: Partial<SetupState>) => void
+}
