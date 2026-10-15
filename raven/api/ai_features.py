@@ -77,6 +77,12 @@ def test_llm_configuration(
 	"""
 	frappe.has_permission(doctype="Raven Settings", ptype="write", throw=True)
 
+	# Only System Managers choose which LLM server Raven talks to.
+	# Anyone else (like a Raven Admin) can only test the saved one.
+	if provider == "Local LLM" and "System Manager" not in frappe.get_roles():
+		settings = frappe.get_cached_doc("Raven Settings")
+		api_url, local_llm_provider = settings.local_llm_api_url, settings.local_llm_provider
+
 	try:
 		if provider == "Local LLM" and api_url:
 			# Test local LLM endpoint
