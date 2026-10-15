@@ -6,6 +6,7 @@ from frappe.utils import cint
 
 from raven.api.chat_stream import message_columns
 from raven.api.raven_channel import create_direct_message_channel, get_peer_user_id_from_dm_users
+from raven.api.search import channel_access_condition
 from raven.utils import get_channel_member
 
 
@@ -651,10 +652,25 @@ def get_message_readers(message_id: str):
 
 @frappe.whitelist()
 def get_timeline_message_content(doctype: str, docname: str | int):
+	"""Raven messages linked to a document, for its Desk form timeline.
+
+	Only for users who can read the document. Each message also needs read
+	access to its channel, the same rule search uses. For a thread message,
+	the thread's parent channel decides.
+	"""
+	# Empty, not an error: this runs on every form load.
+	if not frappe.has_permission(doctype=doctype, ptype="read", doc=docname):
+		return []
+
+	user_id = frappe.session.user
 	channel = frappe.qb.DocType("Raven Channel")
 	channel_member = frappe.qb.DocType("Raven Channel Member")
+	workspace_member = frappe.qb.DocType("Raven Workspace Member")
 	message = frappe.qb.DocType("Raven Message")
 	user = frappe.qb.DocType("User")
+	# A thread channel is named after the message it started from.
+	thread_root = frappe.qb.DocType("Raven Message").as_("thread_root")
+	perm_channel = frappe.qb.DocType("Raven Channel").as_("perm_channel")
 	query = (
 		frappe.qb.from_(message)
 		.select(
@@ -674,13 +690,20 @@ def get_timeline_message_content(doctype: str, docname: str | int):
 		)
 		.join(channel)
 		.on(message.channel_id == channel.name)
-		.join(channel_member)
+		.left_join(thread_root)
+		.on(thread_root.name == channel.name)
+		.left_join(perm_channel)
 		.on(
-			(message.channel_id == channel_member.channel_id) & (message.owner == channel_member.user_id)
+			perm_channel.name
+			== Case().when(channel.is_thread == 1, thread_root.channel_id).else_(channel.name)
 		)
+		.left_join(channel_member)
+		.on((channel_member.channel_id == perm_channel.name) & (channel_member.user_id == user_id))
+		.left_join(workspace_member)
+		.on((workspace_member.workspace == perm_channel.workspace) & (workspace_member.user == user_id))
 		.join(user)
 		.on(message.owner == user.name)
-		.where((channel.type != "Private") | (channel_member.user_id == frappe.session.user))
+		.where(channel_access_condition(perm_channel, channel_member, workspace_member, user_id))
 		.where(message.link_doctype == doctype)
 		.where(message.link_document == str(docname))
 	)
