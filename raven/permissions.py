@@ -77,7 +77,8 @@ def workspace_member_has_permission(doc, user=None, ptype=None):
 	if ptype == "create":
 		workspace_type = frappe.get_cached_value("Raven Workspace", doc.workspace, "type")
 		if workspace_type == "Public":
-			if user == doc.user:
+			# Anyone can join a public workspace, but not as an admin
+			if user == doc.user and not doc.is_admin:
 				return True
 			else:
 				workspace_member = get_workspace_member(doc.workspace, user)

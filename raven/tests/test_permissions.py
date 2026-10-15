@@ -3,6 +3,8 @@ from frappe.tests import IntegrationTestCase
 
 from raven.api.raven_channel import create_channel, create_direct_message_channel
 from raven.api.threads import create_thread
+from raven.api.workspaces import join_workspace
+from raven.utils import get_workspace_member
 
 EXTRA_TEST_RECORD_DEPENDENCIES = ["User", "Raven User"]
 
@@ -319,6 +321,31 @@ class TestPermissions(IntegrationTestCase):
 		self.assertEqual(
 			3, frappe.db.count("Raven Workspace Member", {"workspace": test_workspace.name})
 		)
+
+	def test_cannot_join_a_public_workspace_as_admin(self):
+		frappe.set_user("test@example.com")
+		test_workspace = self.create_test_workspace(workspace_type="Public")
+		test_workspace.insert()
+
+		# The creator of a workspace is its admin
+		creator = get_workspace_member(test_workspace.name, "test@example.com")
+		self.assertTrue(creator.get("is_admin"))
+
+		# The audit's case: test1 joins with is_admin set
+		frappe.set_user("test1@example.com")
+		with self.assertRaises(frappe.PermissionError):
+			frappe.get_doc(
+				{
+					"doctype": "Raven Workspace Member",
+					"user": "test1@example.com",
+					"workspace": test_workspace.name,
+					"is_admin": 1,
+				}
+			).insert()
+
+		# Joining as a regular member still works
+		member = join_workspace(test_workspace.name)
+		self.assertFalse(member.is_admin)
 
 	def test_workspace_member_update_permissions(self):
 		"""
