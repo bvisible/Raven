@@ -31,10 +31,7 @@ Left over from the v2 frontend.
 | `raven.api.raven_channel_member.remove_channel_member` | `raven/api/raven_channel_member.py` | |
 | `raven.api.raven_message.fetch_recent_files` | `raven/api/raven_message.py` | |
 | `raven.api.raven_users.add_users_to_raven` | `raven/api/raven_users.py` | |
-| `raven.api.raven_users.is_user_on_leave` | `raven/api/raven_users.py` | |
 | `raven.api.search.get_search_result` | `raven/api/search.py` | |
-| `raven.api.search.rebuild_search_index` | `raven/api/search.py` | |
-| `raven.api.support_request.submit_support_request` | `raven/api/support_request.py` | |
 | `raven.api.workspaces.can_create_channel` | `raven/api/workspaces.py` | |
 | `raven.api.workspaces.get_workspace_member_count` | `raven/api/workspaces.py` | |
 | `raven.api.workspaces.is_workspace_admin` | `raven/api/workspaces.py` | |

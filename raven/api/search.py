@@ -376,14 +376,6 @@ def get_channel_files(
 
 
 @frappe.whitelist()
-def rebuild_search_index():
-	search = RavenSearch()
-	search.drop_index()
-	search.build_index()
-	return "Search index rebuilt"
-
-
-@frappe.whitelist()
 def get_search_result(
 	filter_type: str,
 	search_text: str | None = None,
