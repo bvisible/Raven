@@ -62,6 +62,12 @@ class TestSetup(IntegrationTestCase):
 		with self.assertRaises(frappe.PermissionError):
 			complete_setup([], [])
 
+	def test_complete_setup_drops_cached_boot(self):
+		# Boot is cached per user; a stale copy would still open the setup flow.
+		frappe.cache.hset("bootinfo", "some-admin@example.com", {"raven_setup_pending": 1})
+		complete_setup([], [])
+		self.assertIsNone(frappe.cache.hget("bootinfo", "some-admin@example.com"))
+
 	def test_complete_setup_refuses_member(self):
 		frappe.set_user(MEMBER)
 		with self.assertRaises(frappe.PermissionError):

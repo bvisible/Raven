@@ -20,6 +20,8 @@ def complete_setup(
 	frappe.only_for(SETUP_ADMIN_ROLES)
 
 	frappe.db.set_single_value("Raven Settings", "setup_pending", 0)
+	# Boot is cached per user and carries the flag; every admin's copy is now stale.
+	frappe.cache.delete_key("bootinfo")
 
 	# Telemetry is best-effort: a malformed step list must not fail the request and undo the flag.
 	with suppress(ValueError, TypeError):
