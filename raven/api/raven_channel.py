@@ -316,12 +316,11 @@ def mark_all_messages_as_read(channel_ids: list):
 	return "Ok"
 
 
-@frappe.whitelist()
-def create_channel(
-	channel_name: str, channel_description: str, type: str, workspace: str, members: list = None
-):
+@frappe.whitelist(methods=["POST"])
+def create_channel(channel_name: str, channel_description: str, type: str, workspace: str):
 	"""
-	Create a new channel
+	Create a new channel. Members are added afterwards with add_channel_members,
+	which checks permissions for each member.
 	"""
 	channel = frappe.get_doc(
 		{
@@ -332,9 +331,6 @@ def create_channel(
 			"workspace": workspace,
 		}
 	).insert()
-
-	if members:
-		channel.add_members(members)
 
 	return channel.as_dict()
 

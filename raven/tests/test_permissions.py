@@ -1,7 +1,7 @@
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from raven.api.raven_channel import create_direct_message_channel
+from raven.api.raven_channel import create_channel, create_direct_message_channel
 from raven.api.threads import create_thread
 
 EXTRA_TEST_RECORD_DEPENDENCIES = ["User", "Raven User"]
@@ -586,6 +586,47 @@ class TestPermissions(IntegrationTestCase):
 		frappe.set_user("test1@example.com")
 		with self.assertRaises(frappe.PermissionError):
 			create_thread(message_id=test_message.name)
+
+	def test_channel_create_needs_workspace_membership(self):
+		"""
+		Even when any member may create channels, an outsider may not.
+		"""
+		frappe.set_user("test@example.com")
+		test_workspace = self.create_test_workspace(
+			workspace_type="Private", only_admins_can_create_channels=False
+		)
+		test_workspace.insert()
+		frappe.clear_cache()
+
+		# test3 is a Raven User, but not a member of the workspace
+		frappe.set_user("test3@example.com")
+		with self.assertRaises(frappe.PermissionError):
+			create_channel(
+				channel_name="outsider-channel",
+				channel_description="",
+				type="Public",
+				workspace=test_workspace.name,
+			)
+
+		# test1 joins the workspace and can now create a channel
+		frappe.set_user("test@example.com")
+		frappe.get_doc(
+			{
+				"doctype": "Raven Workspace Member",
+				"user": "test1@example.com",
+				"workspace": test_workspace.name,
+			}
+		).insert(ignore_permissions=True)
+		frappe.clear_cache()
+
+		frappe.set_user("test1@example.com")
+		channel = create_channel(
+			channel_name="member-channel",
+			channel_description="",
+			type="Public",
+			workspace=test_workspace.name,
+		)
+		self.assertEqual(channel.workspace, test_workspace.name)
 
 	def test_channel_delete_permissions(self):
 		"""
