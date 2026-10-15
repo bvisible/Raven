@@ -3,28 +3,49 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from raven.api.setup import complete_setup
+from raven.api.setup import (
+	add_users_without_workspace,
+	complete_setup,
+	get_users_without_workspace,
+)
 from raven.boot import boot_session
 from raven.install import after_install, should_create_default_workspace
 
 EXTRA_TEST_RECORD_DEPENDENCIES = ["User", "Raven User"]
 
 MEMBER = "setup-member@example.com"
+LONER = "setup-loner@example.com"
+
+
+def _make_raven_user(email: str, first_name: str):
+	if not frappe.db.exists("User", email):
+		frappe.get_doc(
+			{
+				"doctype": "User",
+				"email": email,
+				"first_name": first_name,
+				"send_welcome_email": 0,
+				"roles": [{"role": "Raven User"}],
+			}
+		).insert(ignore_permissions=True)
+
+
+def _make_workspace(name: str):
+	return frappe.get_doc(
+		{"doctype": "Raven Workspace", "workspace_name": name, "type": "Public"}
+	).insert()
+
+
+def _make_channel(workspace: str, name: str, type: str = "Public"):
+	return frappe.get_doc(
+		{"doctype": "Raven Channel", "channel_name": name, "type": type, "workspace": workspace}
+	).insert()
 
 
 class TestSetup(IntegrationTestCase):
 	def setUp(self):
 		frappe.set_user("Administrator")
-		if not frappe.db.exists("User", MEMBER):
-			frappe.get_doc(
-				{
-					"doctype": "User",
-					"email": MEMBER,
-					"first_name": "Setup Member",
-					"send_welcome_email": 0,
-					"roles": [{"role": "Raven User"}],
-				}
-			).insert(ignore_permissions=True)
+		_make_raven_user(MEMBER, "Setup Member")
 		frappe.db.set_single_value("Raven Settings", "setup_pending", 1)
 
 	def tearDown(self):
@@ -48,7 +69,7 @@ class TestSetup(IntegrationTestCase):
 		self.assertEqual(self._boot_flag(), 0)
 
 	def test_complete_setup_clears_flag_and_is_idempotent(self):
-		complete_setup(["invite", "workspace"], ["channel"])
+		complete_setup(["workspace", "team"], ["channel"])
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
 		complete_setup('["workspace"]', "[]")
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
@@ -121,3 +142,74 @@ class TestSetup(IntegrationTestCase):
 			after_install()
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "auto_add_system_users"), 1)
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
+
+
+class TestUsersWithoutWorkspace(IntegrationTestCase):
+	def setUp(self):
+		frappe.set_user("Administrator")
+		_make_raven_user(LONER, "Loner")
+		frappe.db.delete("Raven Workspace Member", {"user": LONER})
+		self.workspace = _make_workspace("Setup Test Workspace")
+		self.channel = _make_channel(self.workspace.name, "setup-test")
+
+	def tearDown(self):
+		frappe.set_user("Administrator")
+		frappe.db.rollback()
+
+	def _listed(self):
+		return [row["user"] for row in get_users_without_workspace()]
+
+	def test_lists_people_in_no_workspace(self):
+		self.assertIn(LONER, self._listed())
+
+	def test_leaves_out_workspace_members_and_the_caller(self):
+		frappe.get_doc(
+			{"doctype": "Raven Workspace Member", "workspace": self.workspace.name, "user": LONER}
+		).insert()
+		listed = self._listed()
+		self.assertNotIn(LONER, listed)
+		self.assertNotIn("Administrator", listed)
+
+	def test_leaves_out_disabled_people(self):
+		frappe.db.set_value("Raven User", {"user": LONER}, "enabled", 0)
+		self.assertNotIn(LONER, self._listed())
+
+	def test_add_puts_them_in_the_workspace_and_channel(self):
+		self.assertGreaterEqual(add_users_without_workspace(self.workspace.name, self.channel.name), 1)
+		self.assertTrue(
+			frappe.db.exists("Raven Workspace Member", {"workspace": self.workspace.name, "user": LONER})
+		)
+		self.assertTrue(
+			frappe.db.exists("Raven Channel Member", {"channel_id": self.channel.name, "user_id": LONER})
+		)
+		# Everyone is in a workspace now, so a second call has no one to add.
+		self.assertEqual(add_users_without_workspace(self.workspace.name, self.channel.name), 0)
+
+	def test_add_without_a_channel(self):
+		add_users_without_workspace(self.workspace.name)
+		self.assertTrue(
+			frappe.db.exists("Raven Workspace Member", {"workspace": self.workspace.name, "user": LONER})
+		)
+		self.assertFalse(frappe.db.exists("Raven Channel Member", {"user_id": LONER}))
+
+	def test_add_to_an_open_channel_adds_no_member_rows(self):
+		# Everyone in the workspace is in an Open channel; rows are made on first visit.
+		general = _make_channel(self.workspace.name, "setup-general", type="Open")
+		add_users_without_workspace(self.workspace.name, general.name)
+		self.assertTrue(
+			frappe.db.exists("Raven Workspace Member", {"workspace": self.workspace.name, "user": LONER})
+		)
+		self.assertFalse(frappe.db.exists("Raven Channel Member", {"user_id": LONER}))
+
+	def test_add_refuses_a_channel_from_another_workspace(self):
+		other = _make_workspace("Setup Other Workspace")
+		elsewhere = _make_channel(other.name, "setup-elsewhere")
+		with self.assertRaises(frappe.ValidationError):
+			add_users_without_workspace(self.workspace.name, elsewhere.name)
+
+	def test_members_cannot_list_or_add(self):
+		frappe.set_user(LONER)
+		with self.assertRaises(frappe.PermissionError):
+			get_users_without_workspace()
+		with self.assertRaises(frappe.PermissionError):
+			add_users_without_workspace(self.workspace.name)
