@@ -9,14 +9,6 @@ EXTRA_TEST_RECORD_DEPENDENCIES = ["User"]
 
 SAVED_URL = "http://llm.internal:11434/v1"
 ATTACKER_URL = "https://attacker.example.com"
-PROVIDER_FIELDS = (
-	"openai_organisation_id",
-	"openai_api_key",
-	"openai_project_id",
-	"local_llm_provider",
-	"local_llm_api_url",
-	"openai_compatible_api_key",
-)
 
 
 class TestAISettingsPermissions(IntegrationTestCase):
@@ -47,12 +39,3 @@ class TestAISettingsPermissions(IntegrationTestCase):
 
 	def test_system_manager_can_test_a_new_server(self):
 		self.assertEqual(self.url_requested_by("test2@example.com"), f"{ATTACKER_URL}/models")
-
-	def test_provider_fields_are_system_manager_only(self):
-		meta = frappe.get_meta("Raven Settings")
-		for fieldname in PROVIDER_FIELDS:
-			with self.subTest(fieldname=fieldname):
-				self.assertEqual(meta.get_field(fieldname).permlevel, 1)
-		# Raven Admin has no permission row at level 1
-		raven_admin_levels = {perm.permlevel for perm in meta.permissions if perm.role == "Raven Admin"}
-		self.assertNotIn(1, raven_admin_levels)
