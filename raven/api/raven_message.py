@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 import frappe
 from frappe import _
 from frappe.query_builder import Case, JoinType, Order
@@ -8,7 +6,7 @@ from frappe.utils import cint
 
 from raven.api.chat_stream import message_columns
 from raven.api.raven_channel import create_direct_message_channel, get_peer_user_id_from_dm_users
-from raven.utils import get_channel_member, is_channel_member, track_channel_visit
+from raven.utils import get_channel_member
 
 
 @frappe.whitelist(methods=["POST"])
@@ -364,41 +362,6 @@ def fetch_recent_files(channel_id: str):
 	return files
 
 
-def get_messages(channel_id: str):
-
-	messages = frappe.db.get_all(
-		"Raven Message",
-		filters={"channel_id": channel_id},
-		fields=[
-			"name",
-			"owner",
-			"creation",
-			"modified",
-			"text",
-			"file",
-			"message_type",
-			"message_reactions",
-			"is_reply",
-			"linked_message",
-			"_liked_by",
-			"channel_id",
-			"thumbnail_width",
-			"thumbnail_height",
-			"file_thumbnail",
-			"link_doctype",
-			"link_document",
-			"replied_message_details",
-			"content",
-			"is_edited",
-			"is_thread",
-			"is_forwarded",
-		],
-		order_by="creation asc",
-	)
-
-	return messages
-
-
 @frappe.whitelist()
 def save_message(message_id: str, add: str | bool = False):
 	"""
@@ -551,48 +514,6 @@ def get_saved_messages(
 		query = query.orderby(raven_message.creation, order=Order.asc)
 
 	return query.run(as_dict=True)
-
-
-def parse_messages(messages):
-
-	messages_with_date_header = []
-	previous_message = None
-
-	for i in range(len(messages)):
-		message = messages[i]
-		is_continuation = (
-			previous_message
-			and message["owner"] == previous_message["owner"]
-			and (message["creation"] - previous_message["creation"]) < timedelta(minutes=2)
-		)
-		message["is_continuation"] = int(bool(is_continuation))
-
-		if i == 0 or message["creation"].date() != previous_message["creation"].date():
-			messages_with_date_header.append({"block_type": "date", "data": message["creation"].date()})
-
-		messages_with_date_header.append({"block_type": "message", "data": message})
-
-		previous_message = message
-
-	return messages_with_date_header
-
-
-def check_permission(channel_id):
-	if frappe.get_cached_value("Raven Channel", channel_id, "type") == "Private":
-		if is_channel_member(channel_id):
-			pass
-		elif frappe.session.user == "Administrator":
-			pass
-		else:
-			frappe.throw(_("You don't have permission to view this channel"), frappe.PermissionError)
-
-
-@frappe.whitelist()
-def get_messages_with_dates(channel_id: str):
-	check_permission(channel_id)
-	messages = get_messages(channel_id)
-	track_channel_visit(channel_id=channel_id, publish_event_for_user=True, commit=True)
-	return parse_messages(messages)
 
 
 @frappe.whitelist()
@@ -842,8 +763,7 @@ def get_all_files_shared_in_channel(
 	page_length: int | None = None,
 ):
 
-	# check if the user has permission to view the channel
-	check_permission(channel_id)
+	frappe.has_permission("Raven Channel", doc=channel_id, ptype="read", throw=True)
 
 	message = frappe.qb.DocType("Raven Message")
 	user = frappe.qb.DocType("Raven User")
@@ -902,48 +822,6 @@ def get_all_files_shared_in_channel(
 	)
 
 	return files
-
-
-@frappe.whitelist()
-def get_count_for_pagination_of_files(
-	channel_id: str, file_name: str | None = None, file_type: str | None = None
-):
-
-	# check if the user has permission to view the channel
-	check_permission(channel_id)
-
-	message = frappe.qb.DocType("Raven Message")
-	# user = frappe.qb.DocType("Raven User")
-	file = frappe.qb.DocType("File")
-
-	query = (
-		frappe.qb.from_(message)
-		.join(file, JoinType.left)
-		.on(message.name == file.attached_to_name)
-		.select(Count(message.name).as_("count"))
-		.where(message.channel_id == channel_id)
-	)
-
-	# search for file name
-	if file_name:
-		query = query.where(file.file_name.like("%" + file_name + "%"))
-
-	# search for file type
-	if file_type:
-		if file_type == "image":
-			query = query.where(message.message_type == "Image")
-		elif file_type == "pdf":
-			query = query.where(file.file_type == "pdf")
-		else:
-			# Get the list of extensions for the given file type
-			extensions = file_extensions.get(file_type)
-			if extensions:
-				query = query.where((file.file_type).isin(extensions))
-	else:
-		query = query.where(message.message_type.isin(["Image", "File"]))
-	count = query.run(as_dict=True)
-
-	return count[0]["count"]
 
 
 # The Raven Message fields that survive a forward. Everything else (batch id,
