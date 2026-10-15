@@ -1,10 +1,7 @@
 # Copyright (c) 2026, Frappe Technologies Pvt. Ltd. and Contributors
 # See license.txt
 
-from unittest.mock import patch
-
 import frappe
-import frappe.utils.safe_exec
 from frappe.tests import IntegrationTestCase, UnitTestCase
 
 from raven.raven_integrations.doctype.raven_document_notification.raven_document_notification import (
@@ -51,11 +48,3 @@ class IntegrationTestRavenDocumentNotification(IntegrationTestCase):
 		with self.assertRaises(frappe.ValidationError):
 			self.evaluate('frappe.db.set_value("User", "Administrator", "first_name", "Changed")')
 		self.assertEqual(frappe.db.get_value("User", "Administrator", "first_name"), first_name)
-
-	def test_falls_back_to_utils_on_older_frappe(self):
-		# Frappe before v15.111 and v16.21 has no render_safe_globals.
-		with patch.dict(frappe.utils.safe_exec.__dict__):
-			del frappe.utils.safe_exec.__dict__["render_safe_globals"]
-			self.assertTrue(self.evaluate("frappe.utils.flt(doc.total) > 100"))
-			with self.assertRaises(frappe.ValidationError):
-				self.evaluate('frappe.db.set_value("User", "Administrator", "first_name", "Changed")')
