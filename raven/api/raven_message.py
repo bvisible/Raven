@@ -955,56 +955,28 @@ def forward_message(
 	"""
 	Forward a message to multiple users/ or in multiple channels
 	"""
-	# The v3 client sends just the message id and the payloads are built here,
-	# from the database — including every member when the message is part of a
-	# batch (the client couldn't collect siblings itself: outside the open
-	# channel it only holds the one message). `forwarded_message` remains for
-	# older clients that send the copy's content themselves; those forward the
-	# single message as before.
-	if message_id:
-		payloads = _forward_payloads(message_id)
-		for receiver in message_receivers:
-			if receiver["type"] == "User":
-				channel_id = create_direct_message_channel(receiver["name"])
-			else:
-				channel_id = receiver["name"]
-			# A fresh batch id per destination, so a batch's copies group into one
-			# album there without fusing with any other batch.
-			new_batch_id = frappe.generate_hash(length=12) if len(payloads) > 1 else None
-			for payload in payloads:
-				if new_batch_id:
-					payload = {**payload, "message_batch_id": new_batch_id}
-				add_forwarded_message_to_channel(channel_id, payload)
-		return "messages forwarded"
-
-	if not forwarded_message:
+	# The copy is always built from the database, including every member when
+	# the message is part of a batch. The v3 client sends just the message id.
+	# Older clients (the old mobile app) send the whole message: only its name
+	# is used, so they can't forward content or files that aren't theirs to read.
+	if not message_id and forwarded_message:
+		message_id = forwarded_message.get("name")
+	if not message_id:
 		frappe.throw(_("Nothing to forward"))
 
-	# Forwarding drops the reply link (linked_message lives in the source channel); inline the
-	# replied message as a blockquote once, up front, so the quote survives every forward.
-	if forwarded_message.get("is_reply"):
-		quote = build_reply_blockquote(
-			forwarded_message.get("replied_message_details"),
-			linked_message=forwarded_message.get("linked_message"),
-		)
-		if quote:
-			forwarded_message["text"] = quote + (forwarded_message.get("text") or "")
-		# Drop the reply markers: the copy carries the quote in its body, and keeping
-		# linked_message would point at another channel — which validate_linked_message
-		# rejects, so a copy that kept it could never be inserted.
-		forwarded_message.pop("linked_message", None)
-		forwarded_message.pop("replied_message_details", None)
-
+	payloads = _forward_payloads(message_id)
 	for receiver in message_receivers:
 		if receiver["type"] == "User":
-			# send forwarded message as a DM to the user
-			# get DM channel ID, create a copy of the message and send it to the channel, change the message owner to current sender
-			dm_channel_id = create_direct_message_channel(receiver["name"])
-			add_forwarded_message_to_channel(dm_channel_id, forwarded_message)
+			channel_id = create_direct_message_channel(receiver["name"])
 		else:
-			# send forwarded message to the channel
-			add_forwarded_message_to_channel(receiver["name"], forwarded_message)
-
+			channel_id = receiver["name"]
+		# A fresh batch id per destination, so a batch's copies group into one
+		# album there without fusing with any other batch.
+		new_batch_id = frappe.generate_hash(length=12) if len(payloads) > 1 else None
+		for payload in payloads:
+			if new_batch_id:
+				payload = {**payload, "message_batch_id": new_batch_id}
+			add_forwarded_message_to_channel(channel_id, payload)
 	return "messages forwarded"
 
 
