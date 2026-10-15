@@ -284,7 +284,7 @@ def get_site_host() -> str:
 	# Not frappe.utils.get_host_name(): that keeps the port (a dev bench
 	# returns "site:8000"). urlsplit's .hostname strips the port and
 	# lowercases in one step, matching how link hosts are parsed above.
-	return (urlsplit(frappe.utils.get_url()).hostname or "").lower()
+	return (urlsplit(frappe.utils.get_url(allow_header_override=False)).hostname or "").lower()
 
 
 def get_frappe_meet_hosts() -> set[str]:

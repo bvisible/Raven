@@ -18,8 +18,8 @@ def push_disabled():
 	environments must never notify real devices."""
 	return (
 		frappe.conf.developer_mode
-		or frappe.utils.get_url().startswith("http://localhost")
-		or frappe.utils.get_url().startswith("http://127.0.0.1")
+		or frappe.utils.get_url(allow_header_override=False).startswith("http://localhost")
+		or frappe.utils.get_url(allow_header_override=False).startswith("http://127.0.0.1")
 	)
 
 
@@ -130,7 +130,7 @@ def send_push_notification_via_raven_cloud(message, raven_settings):
 
 		workspace = "" if channel_doc.is_dm_thread else channel_doc.workspace
 
-		url = frappe.utils.get_url() + "/raven/"
+		url = frappe.utils.get_url(allow_header_override=False) + "/raven/"
 		if channel_doc.is_direct_message:
 			url += "dm-channel/"
 		elif workspace and not channel_doc.is_thread:
@@ -145,7 +145,7 @@ def send_push_notification_via_raven_cloud(message, raven_settings):
 		image = get_image_absolute_url(message_owner_image)
 
 		data = {
-			"base_url": frappe.utils.get_url(),
+			"base_url": frappe.utils.get_url(allow_header_override=False),
 			"message_url": url,
 			"sitename": frappe.local.site,
 			"message_id": message.name,
@@ -253,9 +253,12 @@ def send_reminder_push(reminder, user_id):
 		body = truncate_notification_content(body)
 		title = _("⏰ Reminder")
 
-		url = frappe.utils.get_url() + f"/raven/later/{reminder.channel_id}/{reminder.message}"
+		url = (
+			frappe.utils.get_url(allow_header_override=False)
+			+ f"/raven/later/{reminder.channel_id}/{reminder.message}"
+		)
 		data = {
-			"base_url": frappe.utils.get_url(),
+			"base_url": frappe.utils.get_url(allow_header_override=False),
 			"message_url": url,
 			"sitename": frappe.local.site,
 			"message_id": reminder.message,
@@ -296,9 +299,12 @@ def send_notification_to_user(user_id, title, message, data=None, user_image_pat
 		push_notification = PushNotification("raven")
 
 		if data is None:
-			data = {"base_url": frappe.utils.get_url(), "sitename": frappe.local.site}
+			data = {
+				"base_url": frappe.utils.get_url(allow_header_override=False),
+				"sitename": frappe.local.site,
+			}
 		else:
-			data["base_url"] = frappe.utils.get_url()
+			data["base_url"] = frappe.utils.get_url(allow_header_override=False)
 			data["sitename"] = frappe.local.site
 
 		if push_notification.is_enabled():
@@ -307,9 +313,11 @@ def send_notification_to_user(user_id, title, message, data=None, user_image_pat
 			# (client resolves its real home) or fall back to the app root.
 			link = None
 			if data.get("message_id"):
-				link = frappe.utils.get_url() + "/raven/message/" + data.get("message_id")
+				link = (
+					frappe.utils.get_url(allow_header_override=False) + "/raven/message/" + data.get("message_id")
+				)
 			elif data.get("channel_id"):
-				link = frappe.utils.get_url() + "/raven"
+				link = frappe.utils.get_url(allow_header_override=False) + "/raven"
 			push_notification.send_notification_to_user(
 				user_id=user_id,
 				title=title,
@@ -336,9 +344,12 @@ def send_notification_to_topic(channel_id, title, message, data=None, user_image
 		push_notification = PushNotification("raven")
 
 		if data is None:
-			data = {"base_url": frappe.utils.get_url(), "sitename": frappe.local.site}
+			data = {
+				"base_url": frappe.utils.get_url(allow_header_override=False),
+				"sitename": frappe.local.site,
+			}
 		else:
-			data["base_url"] = frappe.utils.get_url()
+			data["base_url"] = frappe.utils.get_url(allow_header_override=False)
 			data["sitename"] = frappe.local.site
 
 		if push_notification.is_enabled():
@@ -347,9 +358,11 @@ def send_notification_to_topic(channel_id, title, message, data=None, user_image
 			# (client resolves its real home) or fall back to the app root.
 			link = None
 			if data.get("message_id"):
-				link = frappe.utils.get_url() + "/raven/message/" + data.get("message_id")
+				link = (
+					frappe.utils.get_url(allow_header_override=False) + "/raven/message/" + data.get("message_id")
+				)
 			elif data.get("channel_id"):
-				link = frappe.utils.get_url() + "/raven"
+				link = frappe.utils.get_url(allow_header_override=False) + "/raven"
 			push_notification.send_notification_to_topic(
 				topic_name=channel_id,
 				title=title,
@@ -416,7 +429,7 @@ def get_image_absolute_url(image_path):
 		return None
 
 	if image_path.startswith("/"):
-		return frappe.utils.get_url() + image_path
+		return frappe.utils.get_url(allow_header_override=False) + image_path
 	else:
 		return image_path
 
