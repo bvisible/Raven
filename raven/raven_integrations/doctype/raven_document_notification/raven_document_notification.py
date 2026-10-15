@@ -2,14 +2,12 @@
 # For license information, please see license.txt
 import html
 import re
-from collections import namedtuple
 
 import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import nowdate
 from frappe.utils.jinja import validate_template
-from frappe.utils.safe_exec import get_safe_globals
 
 FORBIDDEN_DOCUMENT_TYPES = frozenset("Raven Message")
 
@@ -299,10 +297,29 @@ def send_raven_notifications(doc, notifications_to_send, link_doctype, link_docu
 
 
 def get_context(doc):
-	Frappe = namedtuple("Frappe", ["frappe"])
-	frappe = Frappe(frappe=get_safe_globals().get("frappe"))
+	"""The names a condition, message or recipient template can use.
+
+	Raven Admins can edit these, and they are not System Managers.
+	So only the read-only helpers Frappe gives Jinja templates are passed in.
+	Nothing here can write data or make network calls.
+	"""
 	return {
 		"doc": doc,
 		"nowdate": nowdate,
-		"frappe": frappe.frappe,
+		"frappe": get_read_only_frappe(),
 	}
+
+
+def get_read_only_frappe():
+	"""Frappe's read-only template helpers, or just its utils on older versions.
+
+	render_safe_globals arrived in Frappe v15.111 and v16.21.
+	"""
+	try:
+		from frappe.utils.safe_exec import render_safe_globals
+	except ImportError:
+		from frappe.utils.safe_exec import get_safe_globals
+
+		return frappe._dict(utils=get_safe_globals().get("frappe").get("utils"))
+
+	return render_safe_globals().get("frappe")

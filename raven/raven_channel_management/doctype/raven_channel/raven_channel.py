@@ -257,6 +257,11 @@ class RavenChannel(Document):
 		if self.is_direct_message == 1:
 			self.type = "Private"
 			users = self.channel_name.split(" _ ")
+			# A DM is between two users, or one user for notes to self.
+			# Every name here is added as a member, so more names would let
+			# someone join another user's DM.
+			if len(users) > 2:
+				frappe.throw(_("A direct message can only be between two users."))
 			if len(users) == 2:
 				# Canonical order - user1 > user_2(alphabetically)
 				if users[0] > users[1]:
