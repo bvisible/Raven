@@ -604,6 +604,17 @@ def get_unread_count_for_channels():
 	channel = frappe.qb.DocType("Raven Channel")
 	channel_member = frappe.qb.DocType("Raven Channel Member")
 	message = frappe.qb.DocType("Raven Message")
+	# //// Neoffice - the counter counts what the channel list can show. Direct messages with
+	# //// Administrator are hidden from Raven (raven_channel.get_all_channels), so their unread
+	# //// messages must not be counted either: the header read "2 unread" about a conversation
+	# //// that is in no list, and no row could ever carry the count. Same two tests as the list:
+	# //// the peer's id, and the channel name (a DM keeps the name it was created with).
+	# //// Coalesce: a NULL peer id must not turn the NOT into NULL and drop the row.
+	hidden_administrator_dm = (channel.is_direct_message == 1) & (
+		(Coalesce(channel.dm_user_1, "") == "Administrator")
+		| (Coalesce(channel.dm_user_2, "") == "Administrator")
+		| Coalesce(channel.channel_name, "").like("%Administrator%")
+	)
 	query = (
 		frappe.qb.from_(channel)
 		.left_join(channel_member)
@@ -613,6 +624,8 @@ def get_unread_count_for_channels():
 		.where(channel_member.user_id == frappe.session.user)
 		.where(channel.is_archived == 0)
 		.where(channel.is_thread == 0)
+		# //// Neoffice - never count what the list hides (hidden_administrator_dm, above).
+		.where(hidden_administrator_dm.negate())
 		.where(message.message_type != "System")
 		.where(
 			message.creation > Coalesce(channel_member.last_visit, "2000-11-11")
