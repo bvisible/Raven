@@ -64,10 +64,9 @@ def boot_session(bootinfo):
 	if document_link_override and len(document_link_override) > 0:
 		bootinfo.raven_document_link_override = True
 
+	# Only a key the site set for itself: Raven ships no Tenor key of its own.
 	if tenor_api_key:
 		bootinfo.tenor_api_key = tenor_api_key
-	else:
-		bootinfo.tenor_api_key = "AIzaSyAWkuhLwbMxOlvn_o5fxBke1grUZ7F3ma4"  # should we remove this?
 
 	bootinfo.chat_style = chat_style if chat_style else "Simple"
 	bootinfo.raven_time_format = time_format if time_format else "12-hour"

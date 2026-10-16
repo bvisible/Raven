@@ -14,11 +14,12 @@ def after_install():
 		import_existing_system_users()
 		if create_default_workspace:
 			create_default_workspace_and_channel()
+		create_native_oauth_client()
 
 		click.secho("Thank you for installing Raven!", fg="green")
 
 	except Exception as e:
-		BUG_REPORT_URL = "https://github.com/frappe/Raven/issues/new"
+		BUG_REPORT_URL = "https://github.com/frappe/raven/issues/new"
 		click.secho(
 			"Installation for Raven failed due to an error."
 			" Please try re-installing the app or"
@@ -93,6 +94,20 @@ def should_create_default_workspace() -> bool:
 	"""From v16 the first admin creates the first workspace in the setup flow.
 	An unreadable version reads as 0, keeping the pre-v16 install."""
 	return cint(frappe.__version__.split(".")[0]) < 16
+
+
+def create_native_oauth_client():
+	"""The OAuth client the native app signs in with, so a new site works with the app at once."""
+	from raven.api.raven_mobile import create_oauth_client
+
+	try:
+		create_oauth_client()
+	except Exception:
+		# The install still succeeds: `bench execute raven.api.raven_mobile.create_oauth_client` repairs it.
+		frappe.log_error(title="Raven: could not create the native app's OAuth client")
+		click.secho(
+			"Could not create the OAuth client for the Raven app; see the Error Log.", fg="yellow"
+		)
 
 
 def create_default_workspace_and_channel():

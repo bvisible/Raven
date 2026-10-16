@@ -23,4 +23,4 @@ export const TAB_PANEL = "flex min-h-0 flex-col group-data-[orientation=horizont
 // A subtler fade floor than the chat stream's 0.25: these tabs show image
 // thumbnails and cards, where the full dim reads as too heavy.
 export const TAB_SCROLLER =
-	"flex-1 min-h-0 overflow-y-auto scroll-fade [--scroll-fade-floor:0.5] pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
+	"flex-1 min-h-0 overflow-y-auto scroll-fade [--scroll-fade-floor:0.5] pb-[calc(var(--inset-bottom)+1.5rem)]"

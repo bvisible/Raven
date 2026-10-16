@@ -1,9 +1,9 @@
 import { useEffect } from "react"
-import Cookies from "js-cookie"
 import { AlertCircle, WifiOffIcon } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@components/ui/alert"
 import { Button } from "@components/ui/button"
 import _ from "@lib/translate"
+import { isLoggedIn } from "@lib/sessionUser"
 
 /** Check if the user has the Raven User role */
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -12,8 +12,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     // logged in, and App.tsx is redirecting them to login. Render nothing so
     // the "no access" alert can't flash at them on the way out (it's meant for
     // LOGGED-IN users who genuinely lack the Raven User role).
-    const userId = Cookies.get('user_id')
-    if (!userId || userId === 'Guest') {
+    if (!isLoggedIn()) {
         return null
     }
 

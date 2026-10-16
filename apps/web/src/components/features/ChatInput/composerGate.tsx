@@ -81,7 +81,8 @@ export const useComposerGate = (
     // resolved list drops members whose user records haven't loaded yet, so on
     // a refresh it could briefly miss the current user — flashing the
     // "not a member" banner before the composer.
-    const isMember = isDM || memberIds.includes(currentUser)
+    // member_id on the channel-list entry answers before the roster fetch lands.
+    const isMember = isDM || memberIds.includes(currentUser) || Boolean(channel?.member_id)
 
     // The DM sidebar already hides disabled peers, but the DM stays reachable by URL,
     // from a mention hover card or the command menu.
@@ -96,8 +97,15 @@ export const useComposerGate = (
         joinChannel().catch((e) => errorResponseToast(_("Could not join"), e))
     }, [joinChannel])
 
+    // A known member_id means we already know the answer. Don't wait for the roster.
     const state = resolveComposerGateState({
-        channelsLoaded, isDM, membersLoading, isArchived, isOpen, isMember, peerDisabled,
+        channelsLoaded,
+        isDM,
+        membersLoading: membersLoading && !channel?.member_id,
+        isArchived,
+        isOpen,
+        isMember,
+        peerDisabled,
     })
 
     return { state, onJoin, joining, canJoin }
@@ -145,7 +153,7 @@ const ComposerBlockedBanner = ({
     return <div className="md:px-3 md:pb-3 w-full">
         {/* max(inset, 1rem): Android Chrome reports a 0 safe-area inset (unlike
             iOS's 34px), which left this flush against the screen bottom. */}
-        <div className="flex md:min-h-[98px] flex-col items-center justify-center gap-2 md:rounded-lg rounded-none md:border border-t border-outline-gray-2 bg-surface-gray-1 md:px-3 px-4 py-4 standalone:pb-[max(env(safe-area-inset-bottom),1rem)] text-sm text-ink-gray-6">
+        <div className="flex md:min-h-[98px] flex-col items-center justify-center gap-2 md:rounded-lg rounded-none md:border border-t border-outline-gray-2 bg-surface-gray-1 md:px-3 px-4 py-4 standalone:pb-[max(var(--inset-bottom),1rem)] text-sm text-ink-gray-6">
             <span className="text-p-base text-center">
                 {message}
             </span>
