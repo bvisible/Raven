@@ -97,6 +97,11 @@ class TestSetup(IntegrationTestCase):
 		frappe.set_user("Administrator")
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 1)
 
+	def test_complete_setup_keeps_profile_step(self):
+		from raven.api.setup import _known_steps
+
+		self.assertEqual(_known_steps(["profile", "workspace", "bogus"]), ["profile", "workspace"])
+
 	def test_install_defaults_only_below_v16(self):
 		for version, expected in (
 			("15.42.1", True),

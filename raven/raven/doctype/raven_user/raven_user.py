@@ -42,6 +42,7 @@ class RavenUser(Document):
 		hide_read_receipts: DF.Check
 		last_mention_viewed_on: DF.Datetime | None
 		link_previews: DF.Literal["Link Hover", "Preview Card"]
+		onboarded: DF.Check
 		pinned_channels: DF.Table[RavenPinnedChannels]
 		pinned_workspaces: DF.Table[RavenUserPinnedWorkspaces]
 		quiet_hours_nudge: DF.Literal["No Nudge", "Nudge", "Auto Silent"]

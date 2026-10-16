@@ -50,16 +50,18 @@ def boot_session(bootinfo):
 		and frappe.session.user != "Guest"
 		and frappe.db.exists("Raven User", frappe.session.user)
 	):
-		chat_style, time_format, hide_read_receipts, quiet_hours_nudge = frappe.db.get_value(
+		chat_style, time_format, hide_read_receipts, quiet_hours_nudge, onboarded = frappe.db.get_value(
 			"Raven User",
 			frappe.session.user,
-			["chat_style", "time_format", "hide_read_receipts", "quiet_hours_nudge"],
+			["chat_style", "time_format", "hide_read_receipts", "quiet_hours_nudge", "onboarded"],
 		)
 	else:
 		chat_style = "Simple"
 		time_format = "12-hour"
 		hide_read_receipts = 0
 		quiet_hours_nudge = "Nudge"
+		# No Raven User: nothing to set up in the web app.
+		onboarded = 1
 
 	if document_link_override and len(document_link_override) > 0:
 		bootinfo.raven_document_link_override = True
@@ -73,6 +75,7 @@ def boot_session(bootinfo):
 	bootinfo.raven_time_format = time_format if time_format else "12-hour"
 	bootinfo.raven_hide_read_receipts = 1 if hide_read_receipts else 0
 	bootinfo.raven_quiet_hours_nudge = quiet_hours_nudge if quiet_hours_nudge else "Nudge"
+	bootinfo.raven_onboarded = 1 if onboarded else 0
 
 	# Quiet hours: outside these working hours the composer nudges toward (or
 	# defaults to, per the user's preference above) silent sends. Only shipped

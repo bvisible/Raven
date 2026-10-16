@@ -8,7 +8,7 @@ from raven.api.raven_channel_member import add_channel_members
 from raven.api.workspaces import add_workspace_members
 
 SETUP_ADMIN_ROLES = ("System Manager", "Raven Admin")
-SETUP_STEPS = ("workspace", "channel", "team", "hr")
+SETUP_STEPS = ("profile", "workspace", "channel", "team", "hr")
 
 
 def is_setup_admin() -> bool:
