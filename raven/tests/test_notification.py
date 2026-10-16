@@ -21,11 +21,15 @@ class TestNotificationLabels(IntegrationTestCase):
 
 
 class TestAppPushSplit(IntegrationTestCase):
-	"""The app's Android devices get a push with no title, so the app draws it itself."""
+	"""Web keeps the plain title, the iOS app gets the site in it, the Android app draws its own."""
 
 	def setUp(self):
 		self.user = "Administrator"
-		for device, token in (("android native app", "TOKEN-APP"), ("Chrome on Mac", "TOKEN-WEB")):
+		for device, token in (
+			("android native app", "TOKEN-APP"),
+			("ios native app", "TOKEN-IOS"),
+			("Chrome on Mac", "TOKEN-WEB"),
+		):
 			row = frappe.get_doc(
 				{
 					"doctype": "Raven Push Token",
@@ -40,7 +44,9 @@ class TestAppPushSplit(IntegrationTestCase):
 			row.db_insert()
 
 	def tearDown(self):
-		frappe.db.delete("Raven Push Token", {"fcm_token": ["in", ["TOKEN-APP", "TOKEN-WEB"]]})
+		frappe.db.delete(
+			"Raven Push Token", {"fcm_token": ["in", ["TOKEN-APP", "TOKEN-IOS", "TOKEN-WEB"]]}
+		)
 
 	def message(self):
 		return {
@@ -53,9 +59,12 @@ class TestAppPushSplit(IntegrationTestCase):
 	def test_each_device_gets_the_push_it_can_draw(self):
 		split = split_for_app([self.message()])
 		by_token = {message["tokens"][0]: message for message in split}
-		self.assertEqual(set(by_token), {"TOKEN-APP", "TOKEN-WEB"})
-		# The device draws the web copy, so its title names the site; the app draws the site as a header.
-		self.assertEqual(by_token["TOKEN-WEB"]["notification"]["title"], with_site("Arya in #north"))
+		self.assertEqual(set(by_token), {"TOKEN-APP", "TOKEN-IOS", "TOKEN-WEB"})
+		# A web install is one site, so its title stays plain.
+		self.assertEqual(by_token["TOKEN-WEB"]["notification"]["title"], "Arya in #north")
+		# The iOS app shows many sites and draws the push itself, so its title names the site.
+		self.assertEqual(by_token["TOKEN-IOS"]["notification"]["title"], with_site("Arya in #north"))
+		# The Android app draws the push from the data, so its copy carries no title.
 		self.assertNotIn("notification", by_token["TOKEN-APP"])
 		self.assertEqual(by_token["TOKEN-APP"]["data"]["push_title"], "Arya in #north")
 		self.assertEqual(by_token["TOKEN-APP"]["data"]["push_body"], "Winter is here")

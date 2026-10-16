@@ -14,7 +14,7 @@ MAX_NOTIFICATION_CONTENT_LENGTH = 1000
 
 
 def with_site(title: str) -> str:
-	"""Names the site in a title the device itself draws; the app draws the site as a header instead."""
+	"""Names the site in a title for a mobile device that draws it itself: one app shows many sites."""
 	return f"{title} · {get_site_name()}"
 
 
@@ -234,54 +234,74 @@ def send_push_notification_via_raven_cloud(message, raven_settings):
 
 # The app draws its own notification from the data; every other device shows what the site sent.
 ANDROID_APP_DEVICE = "android native app"
+KINDS = ("app", "mobile", "web")
 
 
 def split_for_app(messages):
-	"""Android draws any push carrying a title itself, so the app's copy carries none.
+	"""One push per kind of device, so each gets what it can draw.
 
-	The app's notification service builds the chat-style notification from the data instead.
+	Web keeps the plain title: a web install is already one site. Other mobile devices (the iOS
+	app) get the site in the title, because one app shows many sites. Android draws any push
+	carrying a title itself, so the app's copy carries none: the app's notification service
+	builds the chat-style notification from the data instead.
 	"""
 	tokens = push_tokens({user for message in messages for user in message.get("users", [])})
 	split = []
 	for message in messages:
-		app_tokens, other_tokens = [], []
-		for user in message.get("users", []):
-			app, others = tokens.get(user, ([], []))
-			app_tokens += app
-			other_tokens += others
+		kinds = tokens_by_kind(message.get("users", []), tokens)
 		plain = {key: value for key, value in message.items() if key != "users"}
 		notification = message.get("notification") or {}
-		if other_tokens:
+		if kinds["web"]:
+			split.append({**plain, "tokens": kinds["web"]})
+		if kinds["mobile"]:
 			titled = {**notification, "title": with_site(notification.get("title", ""))}
-			split.append({**plain, "tokens": other_tokens, "notification": titled})
-		if app_tokens:
-			data = {
-				**(message.get("data") or {}),
-				# The relay writes its own empty title and body into the data of a push without one.
-				"push_title": notification.get("title", ""),
-				"push_body": notification.get("body", ""),
-			}
-			split.append(
-				{key: value for key, value in plain.items() if key != "notification"}
-				| {"tokens": app_tokens, "data": data}
-			)
+			split.append({**plain, "tokens": kinds["mobile"], "notification": titled})
+		if kinds["app"]:
+			split.append(app_push(plain, notification, kinds["app"]))
 	return split
 
 
+def tokens_by_kind(users, tokens):
+	"""The message's tokens, gathered per kind of device."""
+	kinds = {kind: [] for kind in KINDS}
+	for user in users:
+		for kind, user_tokens in tokens.get(user, {}).items():
+			kinds[kind] += user_tokens
+	return kinds
+
+
+def app_push(plain, notification, tokens):
+	"""The app's copy: no title, so Android leaves drawing it to the app."""
+	data = {
+		**(plain.get("data") or {}),
+		# The relay writes its own empty title and body into the data of a push without one.
+		"push_title": notification.get("title", ""),
+		"push_body": notification.get("body", ""),
+	}
+	without_title = {key: value for key, value in plain.items() if key != "notification"}
+	return without_title | {"tokens": tokens, "data": data}
+
+
 def push_tokens(users):
-	"""This site's tokens per user, each as (the app's Android ones, everything else)."""
+	"""This site's tokens per user, grouped by kind of device: the Android app, other mobile, web."""
 	if not users:
 		return {}
 	rows = frappe.get_all(
 		"Raven Push Token",
 		filters={"user": ["in", list(users)]},
-		fields=["user", "fcm_token", "device_information"],
+		fields=["user", "fcm_token", "environment", "device_information"],
 	)
 	tokens = {}
 	for row in rows:
-		app, others = tokens.setdefault(row.user, ([], []))
-		(app if (row.device_information or "") == ANDROID_APP_DEVICE else others).append(row.fcm_token)
+		kinds = tokens.setdefault(row.user, {kind: [] for kind in KINDS})
+		kinds[device_kind(row)].append(row.fcm_token)
 	return tokens
+
+
+def device_kind(row):
+	if (row.device_information or "") == ANDROID_APP_DEVICE:
+		return "app"
+	return "mobile" if row.environment == "Mobile" else "web"
 
 
 def make_post_call_for_notification(messages, raven_settings):
@@ -400,7 +420,7 @@ def send_notification_to_user(user_id, title, message, data=None, user_image_pat
 				link = frappe.utils.get_url(allow_header_override=False) + "/raven"
 			push_notification.send_notification_to_user(
 				user_id=user_id,
-				title=with_site(title),
+				title=title,
 				body=message,
 				icon=icon_url,
 				data=data,
@@ -445,7 +465,7 @@ def send_notification_to_topic(channel_id, title, message, data=None, user_image
 				link = frappe.utils.get_url(allow_header_override=False) + "/raven"
 			push_notification.send_notification_to_topic(
 				topic_name=channel_id,
-				title=with_site(title),
+				title=title,
 				body=message,
 				icon=icon_url,
 				data=data,

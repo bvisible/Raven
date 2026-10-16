@@ -73,9 +73,11 @@ Gates for the page: `cd apps/web && yarn tsc -b && yarn vitest run src/native`.
   a copy on another device could not be read.
 - API calls use the sdk with a bearer token; the site allows the app's origins through
   `raven.api.native.set_cors` (`before_request`), so sites need no CORS configuration. The
-  app sends `X-Raven-App` on every request and the hook requires it: a browser page at
-  `https://localhost` shares the Android app's origin but cannot add that header. A site
-  whose own config sets `allow_cors` answers before the hook and is not covered by it.
+  app sends `X-Raven-App` on every request to mark it as the app's. The header is not a
+  security check: a page at `https://localhost` could add it too. The origin allowlist is
+  the real boundary, and those origins only exist on the user's own device. For the app's
+  origins the hook's answer overrides a site's own `allow_cors` config. For every other
+  origin the site config applies as before.
 - Set up once per site (Raven Settings → OAuth Client):
   `bench --site <site> execute raven.api.raven_mobile.create_oauth_client`.
 - Local bench: add `http://10.0.2.2:8004` on the emulator, `http://127.0.0.1:8004` on the
