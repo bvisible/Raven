@@ -1,6 +1,6 @@
 import _ from "@lib/translate"
 
-export type SetupStepName = "workspace" | "channel" | "team" | "hr"
+export type SetupStepName = "profile" | "workspace" | "channel" | "team" | "hr"
 
 export type StepStatus = "completed" | "skipped"
 
@@ -19,6 +19,8 @@ export const getSetupSteps = ({ hasTeamStep, hrInstalled }: { hasTeamStep: boole
 
 export const getSetupStepTitle = (step: SetupStepName): string => {
     switch (step) {
+        case "profile":
+            return _("Set up your profile")
         case "workspace":
             return _("Create your workspace")
         case "channel":

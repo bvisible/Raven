@@ -26,7 +26,7 @@ export const WorkspaceStep = (props: SetupStepBodyProps) => {
     return <WorkspaceForm key={saved?.name ?? "new"} {...props} saved={saved} />
 }
 
-const WorkspaceForm = ({ saved, onDone, onSave }: SetupStepBodyProps & { saved?: WorkspaceFields }) => {
+const WorkspaceForm = ({ saved, onDone, onSave, onPreview }: SetupStepBodyProps & { saved?: WorkspaceFields }) => {
     const form = useForm<WorkspaceForm>({
         defaultValues: { name: saved?.name ?? "", workspace_name: saved?.workspace_name ?? "", logo: saved?.logo ?? "" },
     })
@@ -38,6 +38,10 @@ const WorkspaceForm = ({ saved, onDone, onSave }: SetupStepBodyProps & { saved?:
         { revalidateOnFocus: false, revalidateIfStale: false },
     )
     const typedName = useWatch({ control: form.control, name: "workspace_name" })
+    const typedLogo = useWatch({ control: form.control, name: "logo" })
+    useEffect(() => {
+        onPreview({ workspace: { name: typedName ?? "", logo: typedLogo || undefined } })
+    }, [typedName, typedLogo]) // eslint-disable-line react-hooks/exhaustive-deps
     const { createWorkspace, updateWorkspace, loading, error } = useCreateWorkspace()
     const isMobile = useIsMobile()
 

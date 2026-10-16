@@ -183,9 +183,9 @@ export function ChannelSidebar() {
     )
 }
 
-const ChannelSidebarSkeleton = () => (
+export const ChannelSidebarSkeleton = ({ count = 18 }: { count?: number }) => (
     <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-hidden px-2 py-2">
-        {Array.from({ length: 18 }).map((_, index) => (
+        {Array.from({ length: count }).map((_, index) => (
             <div key={index} className="flex h-7 items-center gap-2 px-2">
                 <Skeleton className="h-4 w-4 rounded-sm" />
                 <Skeleton className="h-4 rounded-sm" style={{ width: `${45 + ((index * 17) % 40)}%` }} />

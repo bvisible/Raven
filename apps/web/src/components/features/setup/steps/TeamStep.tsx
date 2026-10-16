@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import { FrappeContext, type FrappeConfig, type FrappeError } from "frappe-react-sdk"
 import { Button } from "@components/ui/button"
@@ -11,12 +11,13 @@ import { EMPTY_INVITE, InviteTable, type InviteForm } from "./InviteTable"
 import { normalizeEmail } from "./inviteValidation"
 import { SiteUsersBox } from "./SiteUsersBox"
 import { StepFooter } from "./StepFooter"
+import { teamPreviewPeople } from "./teamPreview"
 import type { SetupStepBodyProps, SiteUser } from "../types"
 
 type TeamStepProps = SetupStepBodyProps & { siteUsers: SiteUser[]; canInvite: boolean }
 
 /** Adds people already in Raven and invites others by email, into the workspace and channel made earlier. */
-export const TeamStep = ({ setup, completed, isLast, finishing, onDone, onSkip, onSave, siteUsers, canInvite }: TeamStepProps) => {
+export const TeamStep = ({ setup, completed, isLast, finishing, onDone, onSkip, onSave, onPreview, siteUsers, canInvite }: TeamStepProps) => {
     const form = useForm<InviteForm>({ defaultValues: { rows: [EMPTY_INVITE] } })
     const rows = useWatch({ control: form.control, name: "rows" })
     const { invited, addedSiteUsers: addedUsers } = setup
@@ -33,6 +34,10 @@ export const TeamStep = ({ setup, completed, isLast, finishing, onDone, onSkip, 
     const pendingSiteUsers = siteUsers.length > 0 && addSiteUsers && !added
     const hasFilledRow = rows.some((row) => row.email.trim())
     const somethingToSend = hasFilledRow || pendingSiteUsers
+
+    useEffect(() => {
+        onPreview({ people: teamPreviewPeople(rows, invited, shownSiteUsers) })
+    }, [rows, shownSiteUsers, invited]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const label = hasFilledRow && pendingSiteUsers ? _("Add and invite")
         : pendingSiteUsers ? siteUsers.length === 1 ? _("Add 1 person") : _("Add {0} people", [String(siteUsers.length)])

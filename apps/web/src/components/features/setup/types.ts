@@ -1,3 +1,5 @@
+import type { PreviewDraft } from "./preview/model"
+
 /** Someone in Raven but in no workspace yet (imported from the site's users on install). */
 export type SiteUser = { user: string; full_name: string; user_image?: string }
 
@@ -27,4 +29,6 @@ export type SetupStepBodyProps = {
     onSkip: () => void
     /** Records what a step made without moving on (e.g. a rename whose follow-up save failed) */
     onSave: (patch: Partial<SetupState>) => void
+    /** What the open step's form holds right now, for the preview */
+    onPreview: (patch: PreviewDraft) => void
 }

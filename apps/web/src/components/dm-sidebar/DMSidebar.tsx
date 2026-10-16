@@ -191,10 +191,10 @@ export function DMSidebar() {
 }
 
 
-function DMSidebarSkeleton() {
+export function DMSidebarSkeleton({ count = 10 }: { count?: number }) {
     return (
         <>
-            {Array.from({ length: 10 }).map((_, i) => (
+            {Array.from({ length: count }).map((_, i) => (
                 <div
                     key={i}
                     className="flex items-start gap-3 px-3 py-3 md:py-2"

@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import { useFrappePostCall, useFrappeUpdateDoc } from "frappe-react-sdk"
 import { ChannelNameInput } from "@components/features/channel/CreateChannel/ChannelNameInput"
@@ -20,7 +21,7 @@ type ChannelForm = { channel_name: string; type: RavenChannel["type"] }
 const SUGGESTED_NAME = "general"
 
 /** Open by default, so everyone who joins the workspace is in it. Back here, it edits the same channel. */
-export const ChannelStep = ({ setup, completed, isLast, finishing, onDone, onSkip }: SetupStepBodyProps) => {
+export const ChannelStep = ({ setup, completed, isLast, finishing, onDone, onSkip, onPreview }: SetupStepBodyProps) => {
     const { workspaces } = useWorkspaces()
     const saved = setup.channel ? channelStore.getChannel(setup.channel.id) : undefined
     const form = useForm<ChannelForm>({
@@ -30,6 +31,10 @@ export const ChannelStep = ({ setup, completed, isLast, finishing, onDone, onSki
         },
     })
     const type = useWatch({ control: form.control, name: "type" })
+    const typedChannel = useWatch({ control: form.control, name: "channel_name" })
+    useEffect(() => {
+        onPreview({ channel: { name: typedChannel || SUGGESTED_NAME, type } })
+    }, [typedChannel, type]) // eslint-disable-line react-hooks/exhaustive-deps
     const { call: createChannel, loading: creating, error: createError } = useFrappePostCall<{ message: ChannelListItem }>("raven.api.raven_channel.create_channel")
     const { updateDoc, loading: updating, error: updateError } = useFrappeUpdateDoc()
     const loading = creating || updating

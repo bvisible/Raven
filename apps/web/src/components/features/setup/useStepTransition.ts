@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { nextTransition, settleTransition, type StepTransition } from "./stepTransition"
 
-const OUT_MS = 150
+const OUT_MS = 200
 
 export const prefersReducedMotion = () =>
     typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true

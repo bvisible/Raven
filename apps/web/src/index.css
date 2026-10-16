@@ -78,15 +78,29 @@
 }
 
 /* Setup page motion. Off under reduced motion: the page switches instantly. */
+/* Steps blur out, leave a short gap, then blur back in sharp. */
 @utility animate-setup-step-in {
   @media (prefers-reduced-motion: no-preference) {
-    animation: setup-rise-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: setup-blur-in 250ms ease-out 100ms both;
   }
 }
 
 @utility animate-setup-step-out {
   @media (prefers-reduced-motion: no-preference) {
-    animation: setup-drift-out 150ms ease-out both;
+    animation: setup-blur-out 200ms ease-in both;
+  }
+}
+
+@utility animate-setup-blur-in {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: setup-blur-in 300ms ease-out both;
+  }
+}
+
+/* Skip opens its own room; the full-width main button beside it gives way. */
+@utility animate-setup-skip-in {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: setup-skip-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 }
 
@@ -108,26 +122,26 @@
   }
 }
 
-@utility animate-setup-ring {
-  @media (prefers-reduced-motion: no-preference) {
-    animation: setup-ring 600ms ease-out 1;
-  }
-}
-
 @utility animate-setup-fade-out {
   @media (prefers-reduced-motion: no-preference) {
     animation: setup-fade-out 250ms ease-out both;
   }
 }
 
-@keyframes setup-rise-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes setup-blur-in {
+  from { opacity: 0; filter: blur(6px); }
+  to { opacity: 1; filter: blur(0); }
 }
 
-@keyframes setup-drift-out {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-4px); }
+@keyframes setup-blur-out {
+  from { opacity: 1; filter: blur(0); }
+  to { opacity: 0; filter: blur(6px); }
+}
+
+/* A one-column grid going 0fr → 1fr opens to exactly the content's width. */
+@keyframes setup-skip-in {
+  from { grid-template-columns: 0fr; opacity: 0; }
+  to { grid-template-columns: 1fr; opacity: 1; }
 }
 
 @keyframes setup-open {
@@ -138,12 +152,6 @@
 @keyframes setup-item-in {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
-}
-
-/* One soft ring around a preview item as it lights up. */
-@keyframes setup-ring {
-  from { box-shadow: 0 0 0 0 var(--color-outline-gray-3); }
-  to { box-shadow: 0 0 0 6px transparent; }
 }
 
 @keyframes setup-fade-out {
