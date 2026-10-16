@@ -22,7 +22,7 @@ export const getSetupStepTitle = (step: SetupStepName): string => {
         case "profile":
             return _("Set up your profile")
         case "workspace":
-            return _("Create your workspace")
+            return _("Set up your workspace")
         case "channel":
             return _("Create your first channel")
         case "team":
