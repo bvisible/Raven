@@ -186,9 +186,14 @@ export const SitePicker = () => {
             className={cn("h-dvh overflow-hidden bg-surface-white text-ink-gray-9 flex flex-col gap-6 px-6 pt-[var(--inset-top)] max-w-md mx-auto w-full",
                 keyboard ? "justify-end pb-[calc(var(--keyboard)+0.75rem)]" : "justify-center pb-[max(var(--inset-bottom),1.5rem)]")}>
             <img src={logo} alt="Raven" className="size-14 self-start" />
+            <div className="flex flex-col gap-1">
+                <h1 className="text-2xl-semibold text-ink-gray-9">
+                    {sites.length === 0 ? _("Welcome to Raven") : sharing ? _("Share to") : _("Choose a site")}
+                </h1>
+                {sites.length === 0 && <p className="text-p-base text-ink-gray-6">{_("Sign in to your team's site.")}</p>}
+            </div>
             {sites.length > 0 && (
                 <section className="flex flex-col gap-2">
-                    <p className="text-sm text-ink-gray-6">{sharing ? _("Share to") : _("Select a site")}</p>
                     {/* Capped at four and a half rows, the half hinting at more, so the form stays on screen and in reach.
                         19.5rem is the rest of the column with its bottom padding; the top inset and the keyboard come out too. */}
                     <ul className="flex flex-col gap-2 max-h-[min(20.5rem,calc(100dvh-var(--keyboard)-var(--inset-top)-19.5rem))] overflow-y-auto overscroll-contain scroll-fade">
@@ -205,7 +210,7 @@ export const SitePicker = () => {
                 </section>
             )}
             <form className="flex flex-col gap-2" onSubmit={(e) => { e.preventDefault(); addSite() }}>
-                <label htmlFor="site-url" className="text-sm text-ink-gray-6">{_("Site URL")}</label>
+                <label htmlFor="site-url" className="text-sm text-ink-gray-6">{_("Site address")}</label>
                 {/* type="text": a type="url" input rejects a bare host; normalizeSiteUrl adds the scheme. */}
                 <Input id="site-url" type="text" inputMode="url" inputSize="lg" placeholder="raven.frappe.cloud" autoCapitalize="none" autoCorrect="off" spellCheck={false}
                     value={url} onChange={(e) => setUrl(e.target.value)} />
