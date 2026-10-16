@@ -12,10 +12,11 @@ import type { PreviewModel } from "./model"
 /** The workspace's sidebar: the switcher and channel options on top, then its channels. */
 export const PreviewChannelSidebar = ({ model, activeStep }: { model: PreviewModel; activeStep: SetupStepName }) => (
     <div className="flex h-full w-(--sidebar-width) shrink-0 flex-col gap-3 bg-surface-sidebar px-1 py-2">
-        {/* The workspace switcher and channel options, styled as the app's buttons but not clickable. */}
+        {/* The workspace switcher and channel options, styled as the app's buttons but not clickable.
+            The switcher gives way to a long name (buttons don't shrink by default), which truncates. */}
         <div className="flex shrink-0 items-center justify-between gap-1">
             {model.workspace ? (
-                <div className={cn(buttonVariants({ variant: "ghost", size: "md" }), "min-w-0 cursor-default animate-setup-item-in", hoverLook(activeStep === "workspace"))}>
+                <div className={cn(buttonVariants({ variant: "ghost", size: "md" }), "min-w-0 shrink justify-start cursor-default animate-setup-item-in", hoverLook(activeStep === "workspace"))}>
                     <Avatar key={model.workspace.logo ?? "letter"} className="size-5 shrink-0 rounded-sm">
                         {model.workspace.logo && <AvatarImage src={model.workspace.logo} alt="" />}
                         <AvatarFallback className="rounded-none bg-surface-gray-3 text-2xs text-ink-gray-5">
