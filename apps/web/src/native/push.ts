@@ -59,11 +59,21 @@ const subscribeToken = async (token: string) => {
     await mirrorToken(token).catch(() => { })
 }
 
+// Once per run: FCM can replace the token while the app is open. Registered before getToken,
+// so a rotation in that window is not missed.
+let rotationWatch: Promise<unknown> | undefined
+const watchTokenRotation = () =>
+    (rotationWatch ??= messaging().then(({ fm }) => fm.addListener("tokenReceived", ({ token }) => {
+        // A site with push turned off stays off: a rotation must not subscribe it again.
+        if (isNativePushEnabled()) syncToken(token).catch(() => { })
+    })))
+
 export const enableNativePush = async (): Promise<boolean> => {
     const { fm } = await messaging()
     const { receive } = await fm.requestPermissions()
     if (receive !== "granted") return false
     void reapplyNativeBadge()
+    await watchTokenRotation()
     const { token } = await fm.getToken()
     await syncToken(token)
     await rememberPush(true).catch(() => { })
@@ -201,8 +211,7 @@ export const initNativePush = () => {
         const { receive } = await fm.checkPermissions()
         if (receive === "denied") { await disableNativePush(); return }
         if (receive !== "granted") return
-        // Listen before getToken so a rotation in that window is not missed.
-        await fm.addListener("tokenReceived", ({ token }) => syncToken(token).catch(() => { }))
+        await watchTokenRotation()
         const { token } = await fm.getToken()
         await syncToken(token)
     }).catch((e) => console.error("Native push init failed", e))
