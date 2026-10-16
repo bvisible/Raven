@@ -13,7 +13,7 @@ import { isHRInstalled } from "@lib/apps"
 import { hasRole } from "@lib/permissions"
 import _ from "@lib/translate"
 import { cn } from "@lib/utils"
-import { keepSetupPendingInDev, markSetupDoneLocally } from "@utils/setup"
+import { markSetupDoneLocally } from "@utils/setup"
 import { getSetupSteps, getSetupStepTitle, type SetupStepName, type StepStatus, type StepStatuses } from "./steps"
 import { ChannelStep } from "./steps/ChannelStep"
 import { HRStep } from "./steps/HRStep"
@@ -101,8 +101,7 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
         setFinishing(true)
         const withStatus = (status: StepStatus) => steps.filter((name) => finalStatuses[name] === status)
         // Members only set up their profile; completing the site is the admin flow's.
-        // Dev testing can hold setup pending: the page closes as if done and comes back on reload.
-        const completesSite = mode === "admin" && !keepSetupPendingInDev()
+        const completesSite = mode === "admin"
         // The local flag ends the flow even if this save fails.
         const save = completesSite ? completeSetup({ completed_steps: withStatus("completed"), skipped_steps: withStatus("skipped") }) : Promise.resolve()
         save
