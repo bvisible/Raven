@@ -25,18 +25,31 @@
 
 /* Newsreader (variable: weight 200-800 + optical sizing) — the serif from
    Frappe's own site. Only the Frappe link-preview card uses it, and
-   browsers fetch a font lazily on first use, so nobody else pays for it. */
+   browsers fetch a font lazily on first use, so nobody else pays for it.
+   Bundled with the app (src/fonts), so the web and native builds share one copy. */
 @font-face {
   font-family: Newsreader;
   font-style: normal;
   font-weight: 200 800;
   font-display: swap;
-  src: url("/assets/raven/fonts/NewsreaderVariable.woff2") format("woff2");
+  src: url("./fonts/newsreader/NewsreaderVariable.woff2") format("woff2");
 }
 
 @custom-variant dark (&:is(.dark *));
 
-@custom-variant standalone (@media (display-mode: standalone));
+@custom-variant standalone {
+  @media (display-mode: standalone) { @slot }
+  :root.native & { @slot }
+}
+
+/* Insets the page pads itself with. Browsers and iOS read the safe area; Android native
+   overrides these inline from the system bars (MainActivity), so the page can draw under them. */
+:root {
+  --inset-top: env(safe-area-inset-top, 0px);
+  --inset-bottom: env(safe-area-inset-bottom, 0px);
+  --inset-left: env(safe-area-inset-left, 0px);
+  --inset-right: env(safe-area-inset-right, 0px);
+}
 
 /* Reading/content tier for names + list-row labels: larger on mobile (15px) than
    desktop (13px), built ONLY from existing Espresso tokens (no --text-* overrides).

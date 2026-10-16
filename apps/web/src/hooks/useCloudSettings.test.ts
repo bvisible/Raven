@@ -18,7 +18,10 @@ beforeEach(() => {
     vi.stubGlobal("window", { frappe: { boot: { cloud_settings: { enabled: true } } } })
 })
 
-afterEach(() => vi.unstubAllGlobals())
+afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
+})
 
 describe("isCloudSettingsAvailable", () => {
     it("reads the boot flag Frappe sets on a pilot-managed site", () => {
@@ -29,6 +32,11 @@ describe("isCloudSettingsAvailable", () => {
 
     it("is false on a Frappe version that has no cloud_settings in boot", () => {
         delete window.frappe.boot.cloud_settings
+        expect(isCloudSettingsAvailable()).toBe(false)
+    })
+
+    it("is false in the native app, whatever boot it got", () => {
+        vi.stubEnv("VITE_NATIVE", "1")
         expect(isCloudSettingsAvailable()).toBe(false)
     })
 })
