@@ -6,7 +6,7 @@ from raven.www.raven import get_favicon
 # The app's OAuth redirect URI; the RN app used the bare "raven.thecommit.company:".
 NATIVE_REDIRECT_URI = "raven.thecommit.company://oauth"
 # Bump to prompt older app builds to update; the app compares its own version against it.
-MIN_APP_VERSION = "3.0.0"
+MIN_APP_VERSION = "3.1.0"
 
 
 def has_auth_method() -> bool:

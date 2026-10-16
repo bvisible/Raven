@@ -54,9 +54,9 @@ Gates for the page: `cd apps/web && yarn tsc -b && yarn vitest run src/native`.
 ## Sites and sign-in
 
 - A site is added by origin; the app calls `raven.api.raven_mobile.get_client_id` (guest),
-  the endpoint the React Native app used, so every 3.0.0 site passes. A site without an
-  OAuth client that lists `raven.thecommit.company://oauth` is refused with a message for
-  its admin.
+  the endpoint the React Native app used. A site below Raven 3.1.0 (`MIN_SITE_VERSION`,
+  `native/version.ts`) is refused as too old. A site without an OAuth client that lists
+  `raven.thecommit.company://oauth` is refused with a message for its admin.
 - Sign-in is OAuth PKCE in the system browser (`@capacitor/browser`); tokens live in the
   keychain per site (`raven.tokens.<origin>`) and are refreshed at 80% of their lifetime
   and once more on a 401. A refresh the site refuses (`invalid_grant`, revoked client) ends
@@ -86,17 +86,18 @@ Gates for the page: `cd apps/web && yarn tsc -b && yarn vitest run src/native`.
 
 ## Version policy
 
-Any site with the native API opens, whatever its version. The site's `raven_version` is compared with the version the
+A site must run Raven 3.1.0 or newer (`MIN_SITE_VERSION`): the app's server side, `raven.api.native.boot`
+and `set_cors`, ships from there. The site's `raven_version` is compared with the version the
 bundle was built from (`__RAVEN_VERSION__`, read from `raven/__init__.py` at build): a
 different patch is silent; a different minor or major opens with a warning toast naming
 both versions. `min_app_version` from the site only drives an "update the app"
 toast, never a block. Both notices are queued in Preferences by the picker
 (`pendingNotice`) and shown once the app is up.
 
-A site older than the mobile API (no `get_client_id`) is refused with "runs an older
-Raven". A 3.0.0 site passes the picker but still needs this branch's server side to open:
-`raven.api.native.boot` for the session data, and `set_cors` for the app's origins.
-Opening such sites in a bridge-less native WebView screen is planned (spec, layer 7).
+A site older than 3.1.0, or without the mobile API at all (no `get_client_id`), is refused
+with "runs an older Raven". The site in turn names `min_app_version` (3.1.0, `raven_mobile.py`),
+which only drives the "update the app" toast. Opening older sites in a bridge-less native
+WebView screen is planned (spec, layer 7).
 
 A site row shows a favicon the site set for itself (`use_website_favicon` in Raven
 Settings, a public file), and nothing otherwise: Raven's own artwork is the app's logo.
@@ -317,7 +318,8 @@ account's cloud-managed distribution certificate, so no certificate is needed lo
 ## Before first store submission
 
 The store versions must be higher than the React Native listing (1.1.4); the project
-carries 3.0.0 / build 301 (`project.pbxproj`, `android/app/build.gradle`).
+carries 3.1.0 (`MARKETING_VERSION` in `project.pbxproj`, `versionName` in `android/app/build.gradle`);
+the build number lives beside each.
 
 - App icons + splash art: done. The splash is black in both themes, with light status bar
   icons over it. Android uses vector drawables built from `raven/public/raven_logo.svg`;

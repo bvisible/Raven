@@ -1,3 +1,6 @@
+/** The oldest Raven a site may run: the app's API (native boot, CORS for its origins) ships from here. */
+export const MIN_SITE_VERSION = "3.1.0"
+
 // "3.1.0" >= "3.0.0"; missing segments count as 0; non-numeric segments as 0.
 export const versionAtLeast = (version: string, minimum: string): boolean => {
     const parse = (v: string) => v.split(".").map((part) => parseInt(part, 10) || 0)

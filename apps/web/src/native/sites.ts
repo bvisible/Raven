@@ -1,4 +1,5 @@
 import { withPrefs } from "./platform"
+import { MIN_SITE_VERSION, versionAtLeast } from "./version"
 
 export type Site = {
     /** Origin the site answers from, e.g. https://raven.example.com */
@@ -62,6 +63,7 @@ export const probeSite = async (url: string, getJson: GetJson = nativeGetJson, {
     if (isUnknownMethod(res.status)) return { error: "site-too-old" }
     const message = (res.data as { message?: ClientInfo } | null)?.message
     if (res.status !== 200 || !message?.sitename || !message.raven_version) return { error: "not-raven" }
+    if (!versionAtLeast(message.raven_version, MIN_SITE_VERSION)) return { error: "site-too-old" }
     if (!message.client_id) return { error: "no-client" }
     const bootRes = await boot
     if (bootRes && isUnknownMethod(bootRes.status)) return { error: "site-too-old" }

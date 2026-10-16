@@ -64,12 +64,12 @@ describe("normalizeSiteUrl", () => {
 describe("probeSite", () => {
     const answer = (message: Record<string, unknown>, status = 200, url?: string) =>
         vi.fn(async () => ({ status, data: status === 200 ? { message } : {}, url }))
-    const good = { client_id: "C", raven_version: "3.0.0", min_app_version: "2.0.0", sitename: "a.com", app_name: "Acme", logo: "/files/logo.png" }
+    const good = { client_id: "C", raven_version: "3.1.0", min_app_version: "2.0.0", sitename: "a.com", app_name: "Acme", logo: "/files/logo.png" }
 
     it("returns the site from its client info, on the origin the site answered from", async () => {
         const getJson = answer(good, 200, "https://www.a.com/api/method/raven.api.raven_mobile.get_client_id")
         const result = await probeSite("https://a.com", getJson)
-        expect(result).toEqual({ site: { url: "https://www.a.com", name: "Acme", sitename: "a.com", clientId: "C", logo: "/files/logo.png", ravenVersion: "3.0.0", minAppVersion: "2.0.0" } })
+        expect(result).toEqual({ site: { url: "https://www.a.com", name: "Acme", sitename: "a.com", clientId: "C", logo: "/files/logo.png", ravenVersion: "3.1.0", minAppVersion: "2.0.0" } })
         expect(getJson).toHaveBeenCalledWith("https://a.com/api/method/raven.api.raven_mobile.get_client_id")
         expect(getJson).toHaveBeenCalledWith("https://a.com/api/method/raven.api.native.boot")
     })
@@ -82,6 +82,11 @@ describe("probeSite", () => {
     it("reports an unreachable host", async () => {
         expect(await probeSite("https://a.com", vi.fn(async () => { throw new Error("timeout") }))).toEqual({ error: "unreachable" })
     })
+    it("refuses a site older than the Raven the app was built against", async () => {
+        expect(await probeSite("https://a.com", answer({ ...good, raven_version: "3.0.0" }))).toEqual({ error: "site-too-old" })
+        expect("site" in (await probeSite("https://a.com", answer({ ...good, raven_version: "3.1.2" })))).toBe(true)
+    })
+
     it("keeps min_app_version on the site instead of blocking", async () => {
         const result = await probeSite("https://a.com", answer({ ...good, min_app_version: "9.0.0" }))
         expect("site" in result && result.site.minAppVersion).toBe("9.0.0")
@@ -116,7 +121,7 @@ describe("refreshSite", () => {
 })
 
 describe("completeSite", () => {
-    const clientInfo = (url: string) => async () => ({ status: 200, url: `${url}/api/method/raven.api.raven_mobile.get_client_id`, data: { message: { sitename: "a.com", raven_version: "3.0.0", client_id: "C", app_name: "A" } } })
+    const clientInfo = (url: string) => async () => ({ status: 200, url: `${url}/api/method/raven.api.raven_mobile.get_client_id`, data: { message: { sitename: "a.com", raven_version: "3.1.0", client_id: "C", app_name: "A" } } })
 
     it("forgets the old entry and its default when the site now answers from another origin", async () => {
         prefs.clear()
