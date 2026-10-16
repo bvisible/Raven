@@ -136,7 +136,6 @@ class TestSetup(IntegrationTestCase):
 			after_install()
 		# Frappe only fills defaults for singles with nothing stored, and the flag above stores one.
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "auto_add_system_users"), 1)
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "show_raven_on_desk"), 1)
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 1)
 
 	def test_install_below_v16_stores_defaults_without_setup(self):

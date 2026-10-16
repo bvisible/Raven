@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import { useFrappePostCall, useFrappeUpdateDoc } from "frappe-react-sdk"
-import { ChannelNameInput } from "@components/features/channel/CreateChannel/ChannelNameInput"
+import { ChannelNameInput, channelNameRules } from "@components/features/channel/CreateChannel/ChannelNameInput"
 import { ChannelTypeSelector } from "@components/features/channel/CreateChannel/ChannelTypeSelector"
 import { Button } from "@components/ui/button"
 import ErrorBanner from "@components/ui/error-banner"
@@ -99,11 +99,13 @@ const ChannelForm = ({ setup, isLast, finishing, onDone, onPreview, onBusyChange
                     control={form.control}
                     name="channel_name"
                     rules={{
+                        // The app's channel name rules; left empty, the name is "general", which passes them.
                         validate: (value) => {
-                            const name = value || SUGGESTED_NAME
-                            if (name.length < 3) return _("Channel name cannot be less than 3 characters.")
-                            if (!/^[a-zA-Z0-9][a-zA-Z0-9-]*$/.test(name)) return _("Channel name can only contain letters, numbers and hyphens.")
-                            return true
+                            if (!value) return true
+                            const { minLength, maxLength, pattern } = channelNameRules()
+                            if (value.length < minLength.value) return minLength.message
+                            if (value.length > maxLength.value) return maxLength.message
+                            return pattern.value.test(value) || pattern.message
                         },
                     }}
                     render={({ field }) => (
