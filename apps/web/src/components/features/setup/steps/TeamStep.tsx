@@ -16,7 +16,7 @@ import type { SetupStepBodyProps, SiteUser } from "../types"
 type TeamStepProps = SetupStepBodyProps & { siteUsers: SiteUser[]; canInvite: boolean }
 
 /** Adds people already in Raven and invites others by email, into the workspace and channel made earlier. */
-export const TeamStep = ({ setup, completed, isLast, finishing, onBack, onDone, onSkip, onSave, siteUsers, canInvite }: TeamStepProps) => {
+export const TeamStep = ({ setup, completed, isLast, finishing, onDone, onSkip, onSave, siteUsers, canInvite }: TeamStepProps) => {
     const form = useForm<InviteForm>({ defaultValues: { rows: [EMPTY_INVITE] } })
     const rows = useWatch({ control: form.control, name: "rows" })
     const { invited, addedSiteUsers: addedUsers } = setup
@@ -37,7 +37,7 @@ export const TeamStep = ({ setup, completed, isLast, finishing, onBack, onDone, 
     const label = hasFilledRow && pendingSiteUsers ? _("Add and invite")
         : pendingSiteUsers ? siteUsers.length === 1 ? _("Add 1 person") : _("Add {0} people", [String(siteUsers.length)])
             : hasFilledRow ? _("Send invites")
-                : isLast ? _("Complete setup") : _("Continue")
+                : isLast ? _("Continue to Raven") : _("Continue")
 
     const description = !shownSiteUsers.length
         ? _("They'll get an email to sign in, and are added to {0}.", [where])
@@ -110,7 +110,7 @@ export const TeamStep = ({ setup, completed, isLast, finishing, onBack, onDone, 
                 {canInvite && (
                     <InviteTable invited={invited} label={shownSiteUsers.length ? _("Invite others by email") : _("Invite by email")} />
                 )}
-                <StepFooter onBack={onBack} onSkip={completed ? undefined : onSkip} disabled={sending || finishing}>
+                <StepFooter onSkip={completed ? undefined : onSkip} disabled={sending || finishing}>
                     <Button type="submit" variant="solid" size="md" loading={sending || finishing} disabled={!somethingToSend && !completed}>
                         {label}
                     </Button>

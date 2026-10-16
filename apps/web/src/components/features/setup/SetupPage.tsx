@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from "react"
+import { ArrowLeft } from "lucide-react"
 import { createPortal } from "react-dom"
 import { useNavigate } from "react-router"
 import { useLocalStorage } from "usehooks-ts"
 import { useFrappeGetCall, useFrappePostCall } from "frappe-react-sdk"
+import { Button } from "@components/ui/button"
 import { Progress } from "@components/ui/progress"
 import { useWorkspaces } from "@hooks/useWorkspaces"
 import { isHRInstalled } from "@lib/apps"
 import { hasRole } from "@lib/permissions"
 import _ from "@lib/translate"
+import { cn } from "@lib/utils"
 import { markSetupDoneLocally } from "@utils/setup"
 import { getSetupSteps, getSetupStepTitle, type SetupStepName, type StepStatus, type StepStatuses } from "./steps"
 import { ChannelStep } from "./steps/ChannelStep"
@@ -15,6 +18,7 @@ import { HRStep } from "./steps/HRStep"
 import { TeamStep } from "./steps/TeamStep"
 import { WorkspaceStep } from "./steps/WorkspaceStep"
 import type { SetupState, SetupStepBodyProps, SiteUser } from "./types"
+import { prefersReducedMotion, useStepTransition } from "./useStepTransition"
 
 const ALL_STEPS: SetupStepName[] = ["workspace", "channel", "team", "hr"]
 
@@ -39,6 +43,8 @@ const SetupPage = ({ onFinished }: { onFinished: () => void }) => {
     const { setup, statuses } = saved
     const [current, setCurrent] = useState<SetupStepName>(() => ALL_STEPS.find((step) => !saved.statuses[step]) ?? "workspace")
     const [finishing, setFinishing] = useState(false)
+    // Fades the page out before it closes onto the app.
+    const [leaving, setLeaving] = useState(false)
     const { call: completeSetup } = useFrappePostCall("raven.api.setup.complete_setup")
 
     // Email invites create users, so they need System Manager; anyone can add people already in Raven.
@@ -91,7 +97,8 @@ const SetupPage = ({ onFinished }: { onFinished: () => void }) => {
                     const workspace = `/${encodeURIComponent(finalSetup.workspace)}`
                     navigate(finalSetup.channel ? `${workspace}/${encodeURIComponent(finalSetup.channel.id)}` : workspace)
                 }
-                onFinished()
+                setLeaving(true)
+                window.setTimeout(onFinished, prefersReducedMotion() ? 0 : 250)
             })
     }
 
@@ -115,37 +122,61 @@ const SetupPage = ({ onFinished }: { onFinished: () => void }) => {
         onSave: (patch) => setSaved((current) => ({ ...current, setup: { ...current.setup, ...patch } })),
     }
 
+    const { shown, phase } = useStepTransition(step)
+    // A step still fading out can't settle anything, even from an in-flight save.
+    const shownProps = shown === step ? props : { ...props, onDone: () => { }, onSkip: () => { } }
+
     return createPortal(
-        // Pinned from the top so the header stays put whatever each step's height.
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-surface-base px-4 pt-[12vh] pb-10">
-            {/* Whether there's a team step depends on this list; wait so the step count doesn't jump. */}
-            {!isLoading && (
-                <div
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="setup-title"
-                    className="flex h-fit w-full max-w-md flex-col gap-6"
-                >
-                    <div className="flex flex-col gap-3">
-                        <span className="text-base text-ink-gray-5">{_("Step {0} of {1}", [String(index + 1), String(steps.length)])}</span>
-                        <Progress value={(index / steps.length) * 100} intervals={steps.length} size="md" ariaLabel={_("Setup progress")} />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <h1 id="setup-title" className="text-2xl-semibold text-ink-gray-9">
-                            {getSetupStepTitle(step)}
-                        </h1>
-                        {step === "workspace" ? (
-                            <WorkspaceStep key={step} {...props} />
-                        ) : step === "channel" ? (
-                            <ChannelStep key={step} {...props} />
-                        ) : step === "team" ? (
-                            <TeamStep key={step} {...props} siteUsers={siteUsers} canInvite={hasRole("System Manager")} />
-                        ) : (
-                            <HRStep key={step} {...props} />
-                        )}
-                    </div>
+        <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="setup-title"
+            className={cn("fixed inset-0 z-50 flex bg-surface-base", leaving && "animate-setup-fade-out")}
+        >
+            {/* The live preview. Decorative, so hidden from assistive tech. */}
+            <aside aria-hidden className="hidden min-w-0 overflow-hidden bg-surface-gray-2 lg:flex lg:w-1/2" />
+            <main className="relative flex w-full min-w-0 flex-col overflow-y-auto lg:w-1/2 border-s border-outline-gray-1 bg-surface-base px-6 pb-8 lg:px-12">
+                <div className="h-14 shrink-0 pt-4">
+                    {props.onBack && (
+                        <Button variant="ghost" size="md" onClick={props.onBack} disabled={finishing}>
+                            <ArrowLeft />
+                            {_("Back")}
+                        </Button>
+                    )}
                 </div>
-            )}
+                {/* Whether there's a team step depends on the people list; wait so the steps don't jump. */}
+                {!isLoading && (
+                    <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-6 pt-[12vh] animate-setup-open-late">
+                        {steps.length > 1 && (
+                            <Progress
+                                value={((index + 1) / steps.length) * 100}
+                                intervals={steps.length}
+                                size="md"
+                                ariaLabel={_("Setup progress")}
+                            />
+                        )}
+                        <div
+                            key={shown}
+                            // A step fading out can't be clicked, typed into or submitted again.
+                            inert={phase === "out"}
+                            className={cn("flex flex-col gap-2", phase === "out" ? "animate-setup-step-out" : "animate-setup-step-in")}
+                        >
+                            <h1 id="setup-title" className="text-2xl-semibold text-ink-gray-9">
+                                {getSetupStepTitle(shown)}
+                            </h1>
+                            {shown === "workspace" ? (
+                                <WorkspaceStep {...shownProps} />
+                            ) : shown === "channel" ? (
+                                <ChannelStep {...shownProps} />
+                            ) : shown === "team" ? (
+                                <TeamStep {...shownProps} siteUsers={siteUsers} canInvite={hasRole("System Manager")} />
+                            ) : (
+                                <HRStep {...shownProps} />
+                            )}
+                        </div>
+                    </div>
+                )}
+            </main>
         </div>,
         document.body,
     )

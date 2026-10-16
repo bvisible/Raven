@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { useFrappeGetCall } from "frappe-react-sdk"
 import WorkspaceLogoField from "@components/features/settings/panels/Workspaces/WorkspaceLogoField"
 import { useCreateWorkspace } from "@components/features/workspaces/useCreateWorkspace"
@@ -37,6 +37,7 @@ const WorkspaceForm = ({ saved, onDone, onSave }: SetupStepBodyProps & { saved?:
         saved ? null : undefined,
         { revalidateOnFocus: false, revalidateIfStale: false },
     )
+    const typedName = useWatch({ control: form.control, name: "workspace_name" })
     const { createWorkspace, updateWorkspace, loading, error } = useCreateWorkspace()
     const isMobile = useIsMobile()
 
@@ -78,7 +79,7 @@ const WorkspaceForm = ({ saved, onDone, onSave }: SetupStepBodyProps & { saved?:
                     inputProps={{ autoFocus: !isMobile && !saved, placeholder: _("e.g. Acme") }}
                 />
                 <StepFooter>
-                    <Button type="submit" variant="solid" size="md" loading={loading}>
+                    <Button type="submit" variant="solid" size="md" loading={loading} disabled={!typedName?.trim()}>
                         {!saved ? _("Create workspace") : form.formState.isDirty ? _("Save and continue") : _("Continue")}
                     </Button>
                 </StepFooter>

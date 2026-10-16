@@ -20,7 +20,7 @@ type ChannelForm = { channel_name: string; type: RavenChannel["type"] }
 const SUGGESTED_NAME = "general"
 
 /** Open by default, so everyone who joins the workspace is in it. Back here, it edits the same channel. */
-export const ChannelStep = ({ setup, completed, isLast, finishing, onBack, onDone, onSkip }: SetupStepBodyProps) => {
+export const ChannelStep = ({ setup, completed, isLast, finishing, onDone, onSkip }: SetupStepBodyProps) => {
     const { workspaces } = useWorkspaces()
     const saved = setup.channel ? channelStore.getChannel(setup.channel.id) : undefined
     const form = useForm<ChannelForm>({
@@ -107,11 +107,11 @@ export const ChannelStep = ({ setup, completed, isLast, finishing, onBack, onDon
                     name="type"
                     render={({ field }) => <ChannelTypeSelector value={field.value} onChange={field.onChange} />}
                 />
-                <StepFooter onBack={onBack} onSkip={completed ? undefined : onSkip} disabled={loading || finishing}>
+                <StepFooter onSkip={completed ? undefined : onSkip} disabled={loading || finishing}>
                     <Button type="submit" variant="solid" size="md" loading={loading || finishing}>
                         {!setup.channel
                             ? isLast ? _("Create and finish") : _("Create channel")
-                            : form.formState.isDirty ? _("Save and continue") : isLast ? _("Complete setup") : _("Continue")}
+                            : form.formState.isDirty ? _("Save and continue") : isLast ? _("Continue to Raven") : _("Continue")}
                     </Button>
                 </StepFooter>
             </form>

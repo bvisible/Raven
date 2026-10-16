@@ -12,7 +12,7 @@ import { StepFooter } from "./StepFooter"
 import type { SetupStepBodyProps } from "../types"
 
 /** The Frappe HR settings panel's fields, saved the same way (merged over the current doc). */
-export const HRStep = ({ completed, isLast, finishing, onBack, onDone, onSkip }: SetupStepBodyProps) => {
+export const HRStep = ({ completed, isLast, finishing, onDone, onSkip }: SetupStepBodyProps) => {
     const { ravenSettings, mutate } = useRavenSettings()
     const { updateDoc, loading, error } = useFrappeUpdateDoc<RavenSettings>()
     const form = useForm<RavenSettings>()
@@ -39,9 +39,9 @@ export const HRStep = ({ completed, isLast, finishing, onBack, onDone, onSkip }:
                 <p className="text-p-base text-ink-gray-7">{_("Show who's on leave and keep a channel for each department in sync.")}</p>
                 {error && <ErrorBanner error={error} />}
                 <FrappeHRFields />
-                <StepFooter onBack={onBack} onSkip={completed ? undefined : onSkip} disabled={loading || finishing}>
+                <StepFooter onSkip={completed ? undefined : onSkip} disabled={loading || finishing}>
                     <Button type="submit" variant="solid" size="md" loading={loading || finishing} disabled={!ravenSettings}>
-                        {isLast ? _("Complete setup") : _("Save and continue")}
+                        {isLast ? _("Continue to Raven") : _("Save and continue")}
                     </Button>
                 </StepFooter>
             </form>

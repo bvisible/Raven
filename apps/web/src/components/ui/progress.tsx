@@ -69,7 +69,7 @@ function Progress({
             <div
               key={index}
               data-slot="progress-interval"
-              className={cn("h-full flex-1", index < filled ? "bg-surface-gray-10" : "bg-surface-gray-2")}
+              className={cn("h-full flex-1 transition-colors duration-300 motion-reduce:transition-none", index < filled ? "bg-surface-gray-10" : "bg-surface-gray-2")}
             />
           ))
         ) : (
