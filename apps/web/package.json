@@ -17,7 +17,7 @@
     "copy-html-entry": "cp ../../raven/public/raven/index.html ../../raven/www/raven.html"
   },
   "dependencies": {
-    "@neoffice/frappe-sidebar-react": "git+https://github.com/bvisible/frappe-sidebar-react.git#ec02d6e5864be249733a2e935dafc46e68e9de44",
+    "@neoffice/frappe-sidebar-react": "git+https://github.com/bvisible/frappe-sidebar-react.git#526442ef4aff12ddc1b84b8e78129fe73cb9bc82",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
