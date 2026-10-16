@@ -18,3 +18,14 @@ export const markSetupDoneLocally = () => {
         // Storage blocked: the server flag alone ends the flow on the next load.
     }
 }
+
+/** The installed app's offline launch reads boot from this cache; keep its onboarded flag in step with the save. */
+export const markOnboardedInBootCache = () => {
+    try {
+        const cached = localStorage.getItem("raven-boot-cache")
+        if (!cached) return
+        localStorage.setItem("raven-boot-cache", JSON.stringify({ ...JSON.parse(cached), raven_onboarded: 1 }))
+    } catch {
+        // Corrupt or blocked storage: the next online launch caches a fresh boot.
+    }
+}

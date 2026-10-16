@@ -11,18 +11,20 @@ import { EMPTY_INVITE, InviteTable, type InviteForm } from "./InviteTable"
 import { normalizeEmail } from "./inviteValidation"
 import { SiteUsersBox } from "./SiteUsersBox"
 import { StepFooter } from "./StepFooter"
+import { useReportBusy } from "./useReportBusy"
 import { teamPreviewPeople } from "./teamPreview"
 import type { SetupStepBodyProps, SiteUser } from "../types"
 
 type TeamStepProps = SetupStepBodyProps & { siteUsers: SiteUser[]; canInvite: boolean }
 
 /** Adds people already in Raven and invites others by email, into the workspace and channel made earlier. */
-export const TeamStep = ({ setup, isLast, finishing, onDone, onSkip, onSave, onPreview, siteUsers, canInvite }: TeamStepProps) => {
+export const TeamStep = ({ setup, isLast, finishing, onDone, onSkip, onSave, onPreview, onBusyChange, siteUsers, canInvite }: TeamStepProps) => {
     const form = useForm<InviteForm>({ defaultValues: { rows: [EMPTY_INVITE] } })
     const rows = useWatch({ control: form.control, name: "rows" })
     const { invited, addedSiteUsers: addedUsers } = setup
     const [addSiteUsers, setAddSiteUsers] = useState(true)
     const [sending, setSending] = useState(false)
+    useReportBusy(sending, onBusyChange)
     const [addError, setAddError] = useState<FrappeError | null>(null)
     const { call } = useContext(FrappeContext) as FrappeConfig
     const { workspaces } = useWorkspaces()
@@ -110,12 +112,15 @@ export const TeamStep = ({ setup, isLast, finishing, onDone, onSkip, onSave, onP
             <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
                 <p className="text-p-base text-ink-gray-7">{description}</p>
                 {addError && <ErrorBanner error={addError} />}
-                {shownSiteUsers.length > 0 && (
-                    <SiteUsersBox users={shownSiteUsers} added={added} where={where} checked={addSiteUsers} onCheckedChange={setAddSiteUsers} />
-                )}
-                {canInvite && (
-                    <InviteTable invited={invited} label={shownSiteUsers.length ? _("Invite others by email") : _("Invite by email")} />
-                )}
+                {/* Locked while sending: a failed invite resets the table to the rows that were sent. */}
+                <fieldset disabled={sending} className="contents">
+                    {shownSiteUsers.length > 0 && (
+                        <SiteUsersBox users={shownSiteUsers} added={added} where={where} checked={addSiteUsers} onCheckedChange={setAddSiteUsers} />
+                    )}
+                    {canInvite && (
+                        <InviteTable invited={invited} label={shownSiteUsers.length ? _("Invite others by email") : _("Invite by email")} />
+                    )}
+                </fieldset>
                 <StepFooter>
                     <Button type="submit" variant="solid" size="md" loading={sending || finishing}>
                         {label}

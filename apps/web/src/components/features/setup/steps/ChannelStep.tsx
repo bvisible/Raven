@@ -15,6 +15,7 @@ import { channelStore } from "@stores/channels/store"
 import { useChannels } from "@stores/channels/useChannelList"
 import { findExistingChannel } from "./existingChannel"
 import { StepFooter } from "./StepFooter"
+import { useReportBusy } from "./useReportBusy"
 import type { SetupStepBodyProps } from "../types"
 
 type ChannelForm = { channel_name: string; type: RavenChannel["type"] }
@@ -23,9 +24,16 @@ type ChannelForm = { channel_name: string; type: RavenChannel["type"] }
 const SUGGESTED_NAME = "general"
 
 /** Open by default, so everyone who joins the workspace is in it. Back here, it edits the same channel. */
-export const ChannelStep = ({ setup, isLast, finishing, onDone, onPreview }: SetupStepBodyProps) => {
+export const ChannelStep = (props: SetupStepBodyProps) => {
+    const { isLoading } = useChannels()
+    // Made already but the list isn't in yet: wait, or the form would start from Open and could save it over a private channel.
+    if (props.setup.channel && isLoading) return null
+    const saved = props.setup.channel ? channelStore.getChannel(props.setup.channel.id) : undefined
+    return <ChannelForm {...props} saved={saved} />
+}
+
+const ChannelForm = ({ setup, isLast, finishing, onDone, onPreview, onBusyChange, saved }: SetupStepBodyProps & { saved?: ChannelListItem }) => {
     const { workspaces } = useWorkspaces()
-    const saved = setup.channel ? channelStore.getChannel(setup.channel.id) : undefined
     const form = useForm<ChannelForm>({
         defaultValues: {
             channel_name: setup.channel?.name ?? "",
@@ -43,6 +51,7 @@ export const ChannelStep = ({ setup, isLast, finishing, onDone, onPreview }: Set
     const { call: createChannel, loading: creating, error: createError } = useFrappePostCall<{ message: ChannelListItem }>("raven.api.raven_channel.create_channel")
     const { updateDoc, loading: updating, error: updateError } = useFrappeUpdateDoc()
     const loading = creating || updating
+    useReportBusy(loading, onBusyChange)
     const isMobile = useIsMobile()
 
     const workspaceName = workspaces.find((workspace) => workspace.name === setup.workspace)?.workspace_name
@@ -122,8 +131,16 @@ export const ChannelStep = ({ setup, isLast, finishing, onDone, onPreview }: Set
                 <FormField
                     control={form.control}
                     name="type"
-                    render={({ field }) => <ChannelTypeSelector value={field.value} onChange={field.onChange} />}
+                    render={({ field }) => (
+                        // An existing "general" is used as it is: show its type, and don't offer one that won't apply.
+                        <fieldset disabled={!!existingGeneral} className="contents">
+                            <ChannelTypeSelector value={existingGeneral?.type ?? field.value} onChange={field.onChange} />
+                        </fieldset>
+                    )}
                 />
+                {existingGeneral && workspaceName && (
+                    <p className="text-p-sm text-ink-gray-5">{_("{0} already has #general, so setup uses it.", [workspaceName])}</p>
+                )}
                 <StepFooter>
                     <Button type="submit" variant="solid" size="md" loading={loading || finishing}>
                         {label}

@@ -10,12 +10,14 @@ import { useRavenSettings } from "@hooks/fetchers/useRavenSettings"
 import _ from "@lib/translate"
 import type { RavenSettings } from "@raven/types/Raven/RavenSettings"
 import { StepFooter } from "./StepFooter"
+import { useReportBusy } from "./useReportBusy"
 import type { SetupStepBodyProps } from "../types"
 
 /** Frappe HR's leave indicator, saved as the settings panel saves it (merged over the current doc). */
-export const HRStep = ({ isLast, finishing, onDone, onSkip, onPreview }: SetupStepBodyProps) => {
+export const HRStep = ({ isLast, finishing, onDone, onSkip, onPreview, onBusyChange }: SetupStepBodyProps) => {
     const { ravenSettings, mutate } = useRavenSettings()
     const { updateDoc, loading, error } = useFrappeUpdateDoc<RavenSettings>()
+    useReportBusy(loading, onBusyChange)
     const form = useForm<RavenSettings>()
 
     useEffect(() => {

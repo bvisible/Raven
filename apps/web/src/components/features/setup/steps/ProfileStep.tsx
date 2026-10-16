@@ -9,9 +9,11 @@ import { Form } from "@components/ui/form"
 import { DataField } from "@components/ui/form-elements"
 import { useIsMobile } from "@hooks/use-mobile"
 import _ from "@lib/translate"
+import { markOnboardedInBootCache } from "@utils/setup"
 import { ImageUploadField } from "./ImageUploadField"
 import { buildProfileUpdate } from "./profileUpdate"
 import { StepFooter } from "./StepFooter"
+import { useReportBusy } from "./useReportBusy"
 import type { SetupStepBodyProps } from "../types"
 
 type ProfileForm = { full_name: string; user_image: string }
@@ -24,12 +26,13 @@ export const ProfileStep = (props: SetupStepBodyProps) => {
     return <ProfileFormBody key={myProfile.name} {...props} profile={myProfile} onSaved={() => mutate()} />
 }
 
-const ProfileFormBody = ({ isLast, finishing, onDone, onPreview, profile, onSaved }: SetupStepBodyProps & { profile: RavenUser; onSaved: () => void }) => {
+const ProfileFormBody = ({ isLast, finishing, onDone, onPreview, onBusyChange, profile, onSaved }: SetupStepBodyProps & { profile: RavenUser; onSaved: () => void }) => {
     const form = useForm<ProfileForm>({ defaultValues: { full_name: profile.full_name ?? "", user_image: profile.user_image ?? "" } })
     const typedName = useWatch({ control: form.control, name: "full_name" })
     const typedImage = useWatch({ control: form.control, name: "user_image" })
     const { updateDoc, loading, error } = useFrappeUpdateDoc()
     const [uploadingPhoto, setUploadingPhoto] = useState(false)
+    useReportBusy(loading || uploadingPhoto, onBusyChange)
     const isMobile = useIsMobile()
 
     useEffect(() => {
@@ -42,6 +45,7 @@ const ProfileFormBody = ({ isLast, finishing, onDone, onPreview, profile, onSave
         updateDoc("Raven User", profile.name, buildProfileUpdate(profile, values))
             .then(() => {
                 if (window.frappe?.boot) window.frappe.boot.raven_onboarded = 1
+                markOnboardedInBootCache()
                 onSaved()
                 onDone()
             })

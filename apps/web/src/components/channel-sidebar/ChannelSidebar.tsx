@@ -424,6 +424,24 @@ export const ChannelGroupLabel = ({ groupName, isHighlighted = false }: { groupN
     )
 }
 
+/** A channel row's look, shared with setup's preview so it lands exactly on this one. */
+export const channelRowClassName = ({ isActive, unread }: { isActive: boolean; unread: boolean }) =>
+    cn(
+        "flex min-w-0 select-none items-center gap-1.5 overflow-hidden rounded text-base px-3 md:px-2 text-ink-gray-6 dark:text-ink-gray-7 py-2 md:py-1.5",
+        // `transition` (not transition-colors) so box-shadow animates IN SYNC
+        // with the background — Virtuoso recycles rows on workspace switch, and
+        // transition-colors left the shadow popping while the bg cross-faded.
+        "outline-none ring-outline-gray-2 transition focus-visible:ring-2",
+        "hover:bg-surface-gray-3 active:bg-surface-gray-3",
+        unread && "text-ink-gray-7 dark:text-ink-gray-8",
+        isActive && "bg-surface-elevation-3 shadow-sm text-ink-gray-8 dark:text-ink-gray-9 hover:bg-surface-elevation-3 active:bg-surface-elevation-3",
+    )
+
+/** leading-snug: the type scale's 1.15 line-height is too tight to contain descenders (g/y/p)
+ *  once `truncate` clips overflow — Safari cuts them on some DPIs. */
+export const channelRowLabelClassName = (unread: boolean) =>
+    cn("min-w-0 flex-1 truncate text-lg md:text-sm leading-snug", unread ? "font-semibold" : "font-normal")
+
 const ChannelRow = ({ channel, workspaceID }: { channel: ChannelListItem; workspaceID?: string }) => {
     const { count: unread } = useChannelUnread(channel.name)
     const prefetchHandlers = usePrefetchChannel(channel.name, unread > 0)
@@ -434,31 +452,10 @@ const ChannelRow = ({ channel, workspaceID }: { channel: ChannelListItem; worksp
         <NavLink
             {...prefetchHandlers}
             to={`/${encodeURIComponent(workspaceID ?? "")}/${encodeURIComponent(channel.name)}`}
-            className={({ isActive }) =>
-                cn(
-                    "flex min-w-0 select-none items-center gap-1.5 overflow-hidden rounded text-base px-3 md:px-2 text-ink-gray-6 dark:text-ink-gray-7 py-2 md:py-1.5",
-                    // `transition` (not transition-colors) so box-shadow animates IN SYNC
-                    // with the background — Virtuoso recycles rows on workspace switch, and
-                    // transition-colors left the shadow popping while the bg cross-faded.
-                    "outline-none ring-outline-gray-2 transition focus-visible:ring-2",
-                    "hover:bg-surface-gray-3 active:bg-surface-gray-3",
-                    unread > 0 && !channel.muted && "text-ink-gray-7 dark:text-ink-gray-8",
-                    isActive && "bg-surface-elevation-3 shadow-sm text-ink-gray-8 dark:text-ink-gray-9 hover:bg-surface-elevation-3 active:bg-surface-elevation-3",
-                )
-            }
+            className={({ isActive }) => channelRowClassName({ isActive, unread: unread > 0 && !channel.muted })}
         >
             <ChannelIcon type={channel.type || "Public"} className="h-4 w-4 shrink-0" />
-            <span
-                className={cn(
-                    // leading-snug: the type scale's 1.15 line-height is too tight to contain
-                    // descenders (g/y/p) once `truncate` clips overflow — Safari cuts them on
-                    // some DPIs. A looser single-line height fixes it.
-                    "min-w-0 flex-1 truncate text-lg md:text-sm leading-snug",
-                    unread > 0 && !channel.muted ? "font-semibold" : "font-normal",
-                )}
-            >
-                {channel.channel_name}
-            </span>
+            <span className={channelRowLabelClassName(unread > 0 && !channel.muted)}>{channel.channel_name}</span>
             {draft && (
                 <Tooltip>
                     <TooltipTrigger asChild>

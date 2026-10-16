@@ -8,7 +8,7 @@ import { PreviewDMSidebar } from "./PreviewDMSidebar"
 import { PreviewRail } from "./PreviewRail"
 
 /** Raven as it's being set up: a window from the rail across, cut off at the form column. */
-export const SetupPreview = ({ model, activeStep, expanded = false }: { model: PreviewModel; activeStep: SetupStepName; expanded?: boolean }) => {
+export const SetupPreview = ({ model, activeStep, finished = false, expanded = false }: { model: PreviewModel; activeStep: SetupStepName; finished?: boolean; expanded?: boolean }) => {
     // The team, and then their leave from Frappe HR, show in the DM sidebar, as the app would open it.
     const dmsOpen = activeStep === "team" || activeStep === "hr"
     // On the HR step a DM is open: with the first person in the list, or yourself.
@@ -26,7 +26,7 @@ export const SetupPreview = ({ model, activeStep, expanded = false }: { model: P
             >
                 <PreviewRail model={model} dmsOpen={dmsOpen} />
                 <div key={dmsOpen ? "dms" : "channels"} className="flex h-full shrink-0 animate-setup-blur-in">
-                    {dmsOpen ? <PreviewDMSidebar model={model} /> : <PreviewChannelSidebar model={model} activeStep={activeStep} />}
+                    {dmsOpen ? <PreviewDMSidebar model={model} /> : <PreviewChannelSidebar model={model} activeStep={activeStep} finished={finished} />}
                 </div>
                 {/* The chat area as the app shows it while loading, for the view that's open. */}
                 {dmsOpen ? (

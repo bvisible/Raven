@@ -29,4 +29,6 @@ export type SetupStepBodyProps = {
     onSave: (patch: Partial<SetupState>) => void
     /** What the open step's form holds right now, for the preview */
     onPreview: (patch: PreviewDraft) => void
+    /** A save or upload is in flight; Back waits for it, or the save would settle a step already left */
+    onBusyChange: (busy: boolean) => void
 }

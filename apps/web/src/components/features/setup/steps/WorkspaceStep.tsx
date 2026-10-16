@@ -11,6 +11,7 @@ import { useWorkspaces, type WorkspaceFields } from "@hooks/useWorkspaces"
 import _ from "@lib/translate"
 import { ImageUploadField } from "./ImageUploadField"
 import { StepFooter } from "./StepFooter"
+import { useReportBusy } from "./useReportBusy"
 import type { SetupStepBodyProps } from "../types"
 
 type WorkspaceForm = { workspace_name: string; logo: string; description: string }
@@ -25,7 +26,7 @@ export const WorkspaceStep = (props: SetupStepBodyProps) => {
     return <WorkspaceForm key={saved?.name ?? "new"} {...props} saved={saved} />
 }
 
-const WorkspaceForm = ({ saved, onDone, onSave, onPreview }: SetupStepBodyProps & { saved?: WorkspaceFields }) => {
+const WorkspaceForm = ({ saved, onDone, onSave, onPreview, onBusyChange }: SetupStepBodyProps & { saved?: WorkspaceFields }) => {
     const form = useForm<WorkspaceForm>({
         defaultValues: { workspace_name: saved?.workspace_name ?? "", logo: saved?.logo ?? "", description: saved?.description ?? "" },
     })
@@ -43,6 +44,7 @@ const WorkspaceForm = ({ saved, onDone, onSave, onPreview }: SetupStepBodyProps 
     }, [typedName, typedLogo]) // eslint-disable-line react-hooks/exhaustive-deps
     const { createWorkspace, updateWorkspace, loading, error } = useCreateWorkspace()
     const [uploadingLogo, setUploadingLogo] = useState(false)
+    useReportBusy(loading || uploadingLogo, onBusyChange)
     const isMobile = useIsMobile()
 
     useEffect(() => {

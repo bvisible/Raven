@@ -29,6 +29,8 @@ import type { SetupState, SetupStepBodyProps, SiteUser } from "./types"
 import { prefersReducedMotion, useStepTransition } from "./useStepTransition"
 
 const ALL_STEPS: SetupStepName[] = ["profile", "workspace", "channel", "team", "hr"]
+// One empty list, so a failed people request doesn't hand the team step a new array every render.
+const NO_SITE_USERS: SiteUser[] = []
 
 /**
  * First-admin setup, or a new member's profile: a full page with one step at a time. Covers
@@ -41,7 +43,7 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
         revalidateOnFocus: false,
         revalidateIfStale: false,
     })
-    const siteUsers = data?.message ?? []
+    const siteUsers = data?.message ?? NO_SITE_USERS
 
     // Kept across reloads, so a refresh mid-setup doesn't offer to make a second workspace or channel.
     // Per user, so another admin on the same browser starts their own; per mode, so a profile never ends the admin's.
@@ -144,9 +146,11 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
     // A step's unsaved typing never outlives the step. Reset during render, not in an
     // effect: child effects run first, so an effect would wipe the new step's first draft.
     const [draftStep, setDraftStep] = useState(step)
+    const [stepBusy, setStepBusy] = useState(false)
     if (draftStep !== step) {
         setDraftStep(step)
         setDraft({})
+        setStepBusy(false)
     }
 
     const savedWorkspace = workspaces.find((workspace) => workspace.name === setup.workspace)
@@ -173,16 +177,19 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
         onSkip: () => settle("skipped"),
         onSave: (patch) => setSaved((current) => ({ ...current, setup: { ...current.setup, ...patch } })),
         onPreview: (patch) => setDraft((current) => ({ ...current, ...patch })),
+        onBusyChange: setStepBusy,
     }
 
     const { shown, phase } = useStepTransition(step)
-    // A step fading out renders as itself, busy, and can't settle anything, even from an in-flight save.
+    // A step fading out renders as itself, busy; it can't settle anything, hold Back, or write the next step's preview.
     const shownProps: SetupStepBodyProps = shown === step ? props : {
         ...props,
         isLast: steps.indexOf(shown) === steps.length - 1,
         finishing: true,
         onDone: () => { },
         onSkip: () => { },
+        onBusyChange: () => { },
+        onPreview: () => { },
     }
 
     return createPortal(
@@ -201,7 +208,7 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
                 )}
             >
                 {/* Once done, it shows where the app opens: the workspace, on the new channel. */}
-                <SetupPreview model={preview} activeStep={finale ? "channel" : step} expanded={expanded} />
+                <SetupPreview model={preview} activeStep={finale ? "channel" : step} finished={!!finale} expanded={expanded} />
             </aside>
             <main
                 className={cn(
@@ -212,7 +219,7 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
                 {/* Holds the steps' place; Back sits in the corner, equally far from the top and the side. */}
                 <div className="h-14 shrink-0">
                     {props.onBack && !finale && (
-                        <Button variant="ghost" size="md" className="absolute start-4 top-4 h-10 md:h-8" onClick={props.onBack} disabled={finishing}>
+                        <Button variant="ghost" size="md" className="absolute start-4 top-4 h-10 md:h-8" onClick={props.onBack} disabled={finishing || stepBusy}>
                             <ArrowLeft />
                             {_("Back")}
                         </Button>
