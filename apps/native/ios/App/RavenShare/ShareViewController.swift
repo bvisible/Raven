@@ -12,6 +12,7 @@ final class ShareViewController: UIViewController {
         view.backgroundColor = .clear
         let attachments = (extensionContext?.inputItems.first as? NSExtensionItem)?.attachments ?? []
         Task {
+            clearPreviousShares()
             for (index, provider) in attachments.enumerated() {
                 if let item = await load(provider, index: index) { items.append(item) }
             }
@@ -67,11 +68,22 @@ final class ShareViewController: UIViewController {
         return item(file, type: type)
     }
 
+    private var sharedRoot: URL? {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: group)?.appendingPathComponent("shared", isDirectory: true)
+    }
+
+    // One share at a time: the app only ever reads the latest, and it deletes each copy once read.
+    // Copies of a share the app never opened would otherwise stay until the device runs out of space.
+    private func clearPreviousShares() {
+        guard let root = sharedRoot else { return }
+        try? FileManager.default.removeItem(at: root)
+    }
+
     // The app reads the copy from the shared container; the original's grant ends with this extension.
     // A folder of its own: two shared files can carry the same name.
     private func destination(for name: String) -> URL? {
-        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: group) else { return nil }
-        let folder = container.appendingPathComponent("shared/\(UUID().uuidString)", isDirectory: true)
+        guard let root = sharedRoot else { return nil }
+        let folder = root.appendingPathComponent(UUID().uuidString, isDirectory: true)
         guard (try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)) != nil else { return nil }
         return folder.appendingPathComponent(name)
     }

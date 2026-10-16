@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { pendingShareToParams, readNativeFiles } from "./shareIn"
+import { pendingShareToParams, readNativeFiles, shareCopyFolder } from "./shareIn"
 
 vi.mock("@capacitor/core", () => ({ Capacitor: { convertFileSrc: (uri: string) => uri } }))
 
@@ -20,6 +20,13 @@ describe("pendingShareToParams", () => {
         const p = pendingShareToParams({ files: [{ uri: "file:///a.png", name: "a.png" }, { uri: "file:///b.png", name: "b.png" }] })
         expect(p.get("files")).toBe("2")
         expect(p.get("names")).toBe("a.png, b.png")
+    })
+})
+
+describe("shareCopyFolder", () => {
+    it("names the copy's own folder, and nothing for a sender's content uri", () => {
+        expect(shareCopyFolder("file:///group/shared/ABC/My%20clip.mov")).toBe("file:///group/shared/ABC")
+        expect(shareCopyFolder("content://media/external/images/1")).toBeNull()
     })
 })
 

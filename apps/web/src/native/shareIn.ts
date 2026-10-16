@@ -77,7 +77,21 @@ export const pendingShareToParams = (share: PendingShare): URLSearchParams => {
 export const loadNativeShare = async (): Promise<{ params: URLSearchParams; files: File[] }> => {
     const share = await takePendingShare()
     if (!share) return { params: new URLSearchParams(), files: [] }
-    return { params: pendingShareToParams(share), files: await readNativeFiles(share.files ?? []) }
+    const files = await readNativeFiles(share.files ?? [])
+    await discardShareCopies(share.files ?? [])
+    return { params: pendingShareToParams(share), files }
+}
+
+/** The folder the shell made for one shared copy: each copy sits in a folder of its own. */
+export const shareCopyFolder = (uri: string): string | null =>
+    uri.startsWith("file://") ? uri.replace(/\/[^/]*$/, "") : null
+
+/** Removes the shell's copies once their bytes are in memory. A content uri is the sender's, not ours. */
+const discardShareCopies = async (files: NonNullable<PendingShare["files"]>) => {
+    const folders = files.map((f) => shareCopyFolder(f.uri)).filter((folder): folder is string => folder !== null)
+    if (!folders.length) return
+    const { Filesystem } = await import("@capacitor/filesystem")
+    await Promise.all(folders.map((path) => Filesystem.rmdir({ path, recursive: true }).catch(() => { })))
 }
 
 /** Reads and clears the share the shell stashed for us. */
