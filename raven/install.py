@@ -9,6 +9,7 @@ def after_install():
 		add_all_roles_to("Administrator")
 		create_raven_user_for_administrator()
 		create_general_channel()
+		create_native_oauth_client()
 
 		click.secho("Thank you for installing Raven!", fg="green")
 
@@ -34,6 +35,20 @@ def create_raven_user_for_administrator():
 				"type": "User",
 			}
 		).insert(ignore_permissions=True)
+
+
+def create_native_oauth_client():
+	"""The OAuth client the native app signs in with, so a new site works with the app at once."""
+	from raven.api.raven_mobile import create_oauth_client
+
+	try:
+		create_oauth_client()
+	except Exception:
+		# The install still succeeds: `bench execute raven.api.raven_mobile.create_oauth_client` repairs it.
+		frappe.log_error(title="Raven: could not create the native app's OAuth client")
+		click.secho(
+			"Could not create the OAuth client for the Raven app; see the Error Log.", fg="yellow"
+		)
 
 
 def create_general_channel():

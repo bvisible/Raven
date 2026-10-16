@@ -67,16 +67,16 @@ def get_client_id():
 
 @frappe.whitelist(methods=["POST"])
 def create_oauth_client():
-	"""
-	API to create an OAuth Client for the mobile app.
-	"""
+	"""Creates, or repairs, the OAuth client the app signs in with. Runs on install and by the
+	3.1 patch; by hand with `bench execute` when a site needs it again."""
 	raven_settings = frappe.get_doc("Raven Settings")
 	existing_oauth_client = raven_settings.oauth_client
 
-	if not existing_oauth_client:
-		oauth_client = frappe.new_doc("OAuth Client")
-	else:
+	# A settings link to a client since deleted gets a fresh one.
+	if existing_oauth_client and frappe.db.exists("OAuth Client", existing_oauth_client):
 		oauth_client = frappe.get_doc("OAuth Client", existing_oauth_client)
+	else:
+		oauth_client = frappe.new_doc("OAuth Client")
 
 	oauth_client.app_name = "Raven Mobile"
 	oauth_client.scopes = "all openid"

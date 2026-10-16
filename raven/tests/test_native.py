@@ -130,6 +130,11 @@ class TestNative(IntegrationTestCase):
 		run_redirect_patch()
 		self.assertEqual(get_client_id()["client_id"], self.client.name)
 
+	def test_patch_creates_a_client_where_there_is_none(self):
+		frappe.db.set_single_value("Raven Settings", "oauth_client", None)
+		run_redirect_patch()
+		self.assertTrue(get_client_id()["client_id"])
+
 	def test_older_frappe_without_the_auth_method_field(self):
 		# Frappe 15 and 16: the field is absent from the doctype, so nothing reads or sets it.
 		with patch("raven.api.raven_mobile.has_auth_method", return_value=False) as checked:

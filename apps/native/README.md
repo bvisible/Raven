@@ -78,7 +78,8 @@ Gates for the page: `cd apps/web && yarn tsc -b && yarn vitest run src/native`.
   the real boundary, and those origins only exist on the user's own device. For the app's
   origins the hook's answer overrides a site's own `allow_cors` config. For every other
   origin the site config applies as before.
-- Set up once per site (Raven Settings → OAuth Client):
+- The OAuth client (Raven Settings → OAuth Client) is created on install and by the 3.1
+  migration. To repair one by hand:
   `bench --site <site> execute raven.api.raven_mobile.create_oauth_client`.
 - Local bench: add `http://10.0.2.2:8004` on the emulator, `http://127.0.0.1:8004` on the
   simulator (ATS exception in `Info.plist`); the site's `developer_mode` allows the
