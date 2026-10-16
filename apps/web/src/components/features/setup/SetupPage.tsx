@@ -56,7 +56,8 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
     // After the last step: "Now," then "Send a Raven", the preview growing into the app, then the app.
     const [finale, setFinale] = useState<FinalePhase | null>(null)
     const finaleTimers = useRef<number[]>([])
-    const expanded = finale === "expand" || finale === "leave"
+    // Set by the expand phase only: with no preview (narrow screens) the leave phase isn't expanded.
+    const [expanded, setExpanded] = useState(false)
     useEffect(() => () => finaleTimers.current.forEach(window.clearTimeout), [])
     const { call: completeSetup } = useFrappePostCall("raven.api.setup.complete_setup")
 
@@ -120,7 +121,11 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
                     onFinished()
                 }
                 finaleTimers.current = finaleSchedule({ reducedMotion: prefersReducedMotion(), previewShown }).map(({ at, phase }) =>
-                    window.setTimeout(() => (phase === "closed" ? close() : setFinale(phase)), at),
+                    window.setTimeout(() => {
+                        if (phase === "closed") return close()
+                        if (phase === "expand") setExpanded(true)
+                        setFinale(phase)
+                    }, at),
                 )
             })
     }
@@ -207,7 +212,7 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
                 {/* Holds the steps' place; Back sits in the corner, equally far from the top and the side. */}
                 <div className="h-14 shrink-0">
                     {props.onBack && !finale && (
-                        <Button variant="ghost" size="md" className="absolute start-4 top-4" onClick={props.onBack} disabled={finishing}>
+                        <Button variant="ghost" size="md" className="absolute start-4 top-4 h-10 md:h-8" onClick={props.onBack} disabled={finishing}>
                             <ArrowLeft />
                             {_("Back")}
                         </Button>

@@ -14,7 +14,8 @@ export const SetupPreview = ({ model, activeStep, expanded = false }: { model: P
     // On the HR step a DM is open: with the first person in the list, or yourself.
     const peer = activeStep === "hr" ? model.people.find((person) => person.name) ?? model.profile : undefined
     return (
-        <div className={cn("flex h-full w-full flex-col transition-[padding] transition-setup-expand", expanded ? "p-0" : "py-10 ps-10")}>
+        // Its skeletons hold still under reduced motion, like the rest of setup (the shared Skeleton always pulses).
+        <div className={cn("flex h-full w-full flex-col transition-[padding] transition-setup-expand motion-reduce:[&_[data-slot=skeleton]]:animate-none", expanded ? "p-0" : "py-10 ps-10")}>
             {/* Wider than the pane, so the chat island runs past its right edge and is cut off there.
                 Expanded, it's the app's own frame: edge to edge, no corner, border or shadow. */}
             <div
