@@ -17,8 +17,6 @@ export type SetupState = {
 
 export type SetupStepBodyProps = {
     setup: SetupState
-    /** Finished before: the form edits what it made */
-    completed: boolean
     /** The step's main button finishes setup */
     isLast: boolean
     /** Finishing is in flight */

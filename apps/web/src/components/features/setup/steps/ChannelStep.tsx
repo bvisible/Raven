@@ -12,16 +12,18 @@ import _ from "@lib/translate"
 import type { ChannelListItem } from "@raven/types/common/ChannelListItem"
 import type { RavenChannel } from "@raven/types/RavenChannelManagement/RavenChannel"
 import { channelStore } from "@stores/channels/store"
+import { useChannels } from "@stores/channels/useChannelList"
+import { findExistingChannel } from "./existingChannel"
 import { StepFooter } from "./StepFooter"
 import type { SetupStepBodyProps } from "../types"
 
 type ChannelForm = { channel_name: string; type: RavenChannel["type"] }
 
-/** Left empty, the channel is called "general". */
+/** Left empty, the channel is called "general", so there's always one to land in. */
 const SUGGESTED_NAME = "general"
 
 /** Open by default, so everyone who joins the workspace is in it. Back here, it edits the same channel. */
-export const ChannelStep = ({ setup, completed, isLast, finishing, onDone, onSkip, onPreview }: SetupStepBodyProps) => {
+export const ChannelStep = ({ setup, isLast, finishing, onDone, onPreview }: SetupStepBodyProps) => {
     const { workspaces } = useWorkspaces()
     const saved = setup.channel ? channelStore.getChannel(setup.channel.id) : undefined
     const form = useForm<ChannelForm>({
@@ -32,20 +34,30 @@ export const ChannelStep = ({ setup, completed, isLast, finishing, onDone, onSki
     })
     const type = useWatch({ control: form.control, name: "type" })
     const typedChannel = useWatch({ control: form.control, name: "channel_name" })
+    const { channels } = useChannels()
+    // Left empty in a workspace that already has "general" (a site set up before), setup takes that one.
+    const existingGeneral = !setup.channel && !typedChannel ? findExistingChannel(channels, setup.workspace, SUGGESTED_NAME) : undefined
     useEffect(() => {
-        onPreview({ channel: { name: typedChannel || SUGGESTED_NAME, type } })
-    }, [typedChannel, type]) // eslint-disable-line react-hooks/exhaustive-deps
+        onPreview({ channel: { name: typedChannel || SUGGESTED_NAME, type: existingGeneral?.type ?? type } })
+    }, [typedChannel, type, existingGeneral]) // eslint-disable-line react-hooks/exhaustive-deps
     const { call: createChannel, loading: creating, error: createError } = useFrappePostCall<{ message: ChannelListItem }>("raven.api.raven_channel.create_channel")
     const { updateDoc, loading: updating, error: updateError } = useFrappeUpdateDoc()
     const loading = creating || updating
     const isMobile = useIsMobile()
 
     const workspaceName = workspaces.find((workspace) => workspace.name === setup.workspace)?.workspace_name
+    // Nothing to save goes on; otherwise the button says whether it creates or saves.
+    const label = existingGeneral || (setup.channel && !form.formState.isDirty)
+        ? isLast ? _("Finish") : _("Continue")
+        : !setup.channel
+            ? isLast ? _("Create and finish") : _("Create channel")
+            : isLast ? _("Save and finish") : _("Save and continue")
 
     const onSubmit = ({ channel_name, type }: ChannelForm) => {
         // A second Enter before the first save lands would make a second one.
         if (loading || finishing) return
         const name = channel_name || SUGGESTED_NAME
+        if (existingGeneral) return onDone({ channel: { id: existingGeneral.name, name: existingGeneral.channel_name } })
         if (setup.channel) {
             const id = setup.channel.id
             if (!form.formState.isDirty) return onDone()
@@ -112,11 +124,9 @@ export const ChannelStep = ({ setup, completed, isLast, finishing, onDone, onSki
                     name="type"
                     render={({ field }) => <ChannelTypeSelector value={field.value} onChange={field.onChange} />}
                 />
-                <StepFooter onSkip={completed ? undefined : onSkip} disabled={loading || finishing}>
+                <StepFooter>
                     <Button type="submit" variant="solid" size="md" loading={loading || finishing}>
-                        {!setup.channel
-                            ? isLast ? _("Create and finish") : _("Create channel")
-                            : form.formState.isDirty ? _("Save and continue") : isLast ? _("Continue to Raven") : _("Continue")}
+                        {label}
                     </Button>
                 </StepFooter>
             </form>

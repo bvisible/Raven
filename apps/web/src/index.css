@@ -97,12 +97,6 @@
   }
 }
 
-/* Skip opens its own room; the full-width main button beside it gives way. */
-@utility animate-setup-skip-in {
-  @media (prefers-reduced-motion: no-preference) {
-    animation: setup-skip-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-}
 
 @utility animate-setup-open {
   @media (prefers-reduced-motion: no-preference) {
@@ -125,6 +119,15 @@
 @utility animate-setup-fade-out {
   @media (prefers-reduced-motion: no-preference) {
     animation: setup-fade-out 250ms ease-out both;
+  }
+}
+
+/* Finish: the preview grows into the app. Pairs with a transition-[…] property list; finale.ts times the phases to it. */
+@utility transition-setup-expand {
+  transition-duration: 600ms;
+  transition-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
   }
 }
 
@@ -157,11 +160,6 @@
   to { opacity: 0; filter: blur(6px); }
 }
 
-/* A one-column grid going 0fr → 1fr opens to exactly the content's width. */
-@keyframes setup-skip-in {
-  from { grid-template-columns: 0fr; opacity: 0; }
-  to { grid-template-columns: 1fr; opacity: 1; }
-}
 
 @keyframes setup-open {
   from { opacity: 0; transform: translateY(12px); }

@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar"
 import { Separator } from "@components/ui/separator"
 import { Skeleton } from "@components/ui/skeleton"
 import { cn } from "@lib/utils"
-import type { SetupStepName } from "../steps"
 import type { PreviewModel } from "./model"
 import { RailItem } from "./RailItem"
 
@@ -29,7 +28,7 @@ const RailSeparator = () => (
 )
 
 /** The app's left rail, in its order: logo, nav icons, workspaces; "later" and the user's avatar at the bottom. */
-export const PreviewRail = ({ model, activeStep, dmsOpen }: { model: PreviewModel; activeStep: SetupStepName; dmsOpen: boolean }) => (
+export const PreviewRail = ({ model, dmsOpen }: { model: PreviewModel; dmsOpen: boolean }) => (
     <div className="flex h-full w-(--primary-sidebar-width) shrink-0 flex-col items-center justify-between border-e border-outline-gray-2 bg-surface-sidebar pt-2.5 pb-4">
         <div className="flex w-full flex-col items-center gap-3">
             <img src="/assets/raven/raven_logo.svg" alt="" className="size-8" />
@@ -57,7 +56,7 @@ export const PreviewRail = ({ model, activeStep, dmsOpen }: { model: PreviewMode
             <RailIcon><BookmarkIcon /></RailIcon>
             {model.profile ? (
                 // Round with the "available" dot, as the app's profile button; hovered while the profile step is open.
-                <div className={cn("relative rounded-lg p-0.5 transition-colors duration-200 motion-reduce:transition-none", activeStep === "profile" && "bg-surface-gray-3")}>
+                <div className="relative">
                     <Avatar key={model.profile.image ?? "initials"} className="size-8 rounded-full animate-setup-item-in">
                         {model.profile.image && <AvatarImage src={model.profile.image} alt="" />}
                         <AvatarFallback className="bg-surface-gray-2 text-sm font-medium text-ink-gray-9">{getInitials(model.profile.name)}</AvatarFallback>

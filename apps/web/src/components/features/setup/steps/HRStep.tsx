@@ -13,7 +13,7 @@ import { StepFooter } from "./StepFooter"
 import type { SetupStepBodyProps } from "../types"
 
 /** Frappe HR's leave indicator, saved as the settings panel saves it (merged over the current doc). */
-export const HRStep = ({ completed, isLast, finishing, onDone, onSkip, onPreview }: SetupStepBodyProps) => {
+export const HRStep = ({ isLast, finishing, onDone, onSkip, onPreview }: SetupStepBodyProps) => {
     const { ravenSettings, mutate } = useRavenSettings()
     const { updateDoc, loading, error } = useFrappeUpdateDoc<RavenSettings>()
     const form = useForm<RavenSettings>()
@@ -30,11 +30,13 @@ export const HRStep = ({ completed, isLast, finishing, onDone, onSkip, onPreview
     const onSubmit = (data: RavenSettings) => {
         if (loading || finishing) return
         if (!ravenSettings) return
-        if (!form.formState.isDirty) return onDone()
+        // Going on with leave off is skipping, as setup's telemetry counts it.
+        const settle = data.show_if_a_user_is_on_leave ? () => onDone() : onSkip
+        if (!form.formState.isDirty) return settle()
         updateDoc("Raven Settings", ravenSettings.name, { ...ravenSettings, ...data })
             .then((saved) => {
                 mutate(saved, { revalidate: false })
-                onDone()
+                settle()
             })
             .catch(() => { })
     }
@@ -56,9 +58,9 @@ export const HRStep = ({ completed, isLast, finishing, onDone, onSkip, onPreview
                     label={_("Show if a user is on leave")}
                     formDescription={_("Based on today's attendance in Frappe HR.")}
                 />
-                <StepFooter onSkip={completed ? undefined : onSkip} disabled={loading || finishing}>
+                <StepFooter>
                     <Button type="submit" variant="solid" size="md" loading={loading || finishing} disabled={!ravenSettings}>
-                        {isLast ? _("Continue to Raven") : _("Save and continue")}
+                        {isLast ? _("Finish") : _("Save and continue")}
                     </Button>
                 </StepFooter>
             </form>

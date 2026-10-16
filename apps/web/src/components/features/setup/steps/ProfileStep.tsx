@@ -70,9 +70,9 @@ const ProfileFormBody = ({ isLast, finishing, onDone, onPreview, profile, onSave
                     }}
                     inputProps={{ autoFocus: !isMobile }}
                 />
-                <StepFooter disabled={loading || finishing}>
+                <StepFooter>
                     <Button type="submit" variant="solid" size="md" loading={loading || finishing} disabled={!typedName?.trim() || uploadingPhoto}>
-                        {isLast ? _("Continue to Raven") : _("Continue")}
+                        {isLast ? _("Finish") : _("Continue")}
                     </Button>
                 </StepFooter>
             </form>

@@ -17,7 +17,7 @@ import type { SetupStepBodyProps, SiteUser } from "../types"
 type TeamStepProps = SetupStepBodyProps & { siteUsers: SiteUser[]; canInvite: boolean }
 
 /** Adds people already in Raven and invites others by email, into the workspace and channel made earlier. */
-export const TeamStep = ({ setup, completed, isLast, finishing, onDone, onSkip, onSave, onPreview, siteUsers, canInvite }: TeamStepProps) => {
+export const TeamStep = ({ setup, isLast, finishing, onDone, onSkip, onSave, onPreview, siteUsers, canInvite }: TeamStepProps) => {
     const form = useForm<InviteForm>({ defaultValues: { rows: [EMPTY_INVITE] } })
     const rows = useWatch({ control: form.control, name: "rows" })
     const { invited, addedSiteUsers: addedUsers } = setup
@@ -42,7 +42,7 @@ export const TeamStep = ({ setup, completed, isLast, finishing, onDone, onSkip, 
     const label = hasFilledRow && pendingSiteUsers ? _("Add and invite")
         : pendingSiteUsers ? siteUsers.length === 1 ? _("Add 1 person") : _("Add {0} people", [String(siteUsers.length)])
             : hasFilledRow ? _("Send invites")
-                : isLast ? _("Continue to Raven") : _("Continue")
+                : isLast ? _("Finish") : _("Continue")
 
     const description = !shownSiteUsers.length
         ? _("They'll get an email to sign in, and are added to {0}.", [where])
@@ -53,7 +53,8 @@ export const TeamStep = ({ setup, completed, isLast, finishing, onDone, onSkip, 
     const onSubmit = async ({ rows }: InviteForm) => {
         // A second Enter mid-send would send the same invites again.
         if (sending || finishing) return
-        if (!somethingToSend) return onDone()
+        // Nothing to send: going on, which is skipping unless people were added or invited before.
+        if (!somethingToSend) return added || invited.length > 0 ? onDone() : onSkip()
         setSending(true)
         setAddError(null)
         let nowAdded = addedUsers
@@ -115,8 +116,8 @@ export const TeamStep = ({ setup, completed, isLast, finishing, onDone, onSkip, 
                 {canInvite && (
                     <InviteTable invited={invited} label={shownSiteUsers.length ? _("Invite others by email") : _("Invite by email")} />
                 )}
-                <StepFooter onSkip={completed ? undefined : onSkip} disabled={sending || finishing}>
-                    <Button type="submit" variant="solid" size="md" loading={sending || finishing} disabled={!somethingToSend && !completed}>
+                <StepFooter>
+                    <Button type="submit" variant="solid" size="md" loading={sending || finishing}>
                         {label}
                     </Button>
                 </StepFooter>
