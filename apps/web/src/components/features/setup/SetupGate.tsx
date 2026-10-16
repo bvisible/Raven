@@ -1,31 +1,33 @@
 import { lazy, Suspense, useEffect, useState } from "react"
-import { useSetAtom } from "jotai"
 import { isSetupPending, SETUP_DONE_STORAGE_KEY } from "@utils/setup"
-import { setupOpenAtom } from "./setupAtoms"
+import { getSetupMode, type SetupMode } from "./setupMode"
 
 const SetupPage = lazy(() => import("./SetupPage"))
 
-/** Opens the first-admin setup page while boot flags it. Frappe's own setup wizard runs first. */
-export const SetupGate = () => {
-    const [open, setOpen] = useState(isSetupPending)
-    const setSetupOpen = useSetAtom(setupOpenAtom)
-    useEffect(() => setSetupOpen(open), [open, setSetupOpen])
+const currentMode = (): SetupMode =>
+    getSetupMode({ setupPending: isSetupPending(), onboarded: !!window.frappe?.boot?.raven_onboarded })
 
-    // Finished in another tab: close here too, or this tab would offer to make it all again.
+/** Opens the first admin's setup, or a new user's profile step, until each is done. Frappe's own setup wizard runs first. */
+export const SetupGate = () => {
+    const [mode, setMode] = useState<SetupMode>(currentMode)
+
+    // Admin setup finished in another tab: close here too, or this tab would offer to make it all again.
+    // That flow onboarded the user too; this tab's boot flag just hasn't heard.
     useEffect(() => {
-        if (!open) return
+        if (mode !== "admin") return
         const onStorage = (event: StorageEvent) => {
-            if (event.key === SETUP_DONE_STORAGE_KEY && event.newValue === "1") setOpen(false)
+            if (event.key === SETUP_DONE_STORAGE_KEY && event.newValue === "1") setMode(null)
         }
         window.addEventListener("storage", onStorage)
         return () => window.removeEventListener("storage", onStorage)
-    }, [open])
+    }, [mode])
 
-    if (!open) return null
-    if (!window.frappe?.boot?.setup_complete) return <FrappeSetupRedirect />
+    if (!mode) return null
+    if (mode === "admin" && !window.frappe?.boot?.setup_complete) return <FrappeSetupRedirect />
     return (
         <Suspense fallback={null}>
-            <SetupPage onFinished={() => setOpen(false)} />
+            {/* Either flow starts with the profile step, which onboards the user, so finishing closes it for good. */}
+            <SetupPage mode={mode} onFinished={() => setMode(null)} />
         </Suspense>
     )
 }

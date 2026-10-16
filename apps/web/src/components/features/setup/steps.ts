@@ -7,15 +7,19 @@ export type StepStatus = "completed" | "skipped"
 export type StepStatuses = Partial<Record<SetupStepName, StepStatus>>
 
 /**
- * Workspace and channel first, so the team is added straight into them.
- * HR maps companies to workspaces, so it comes last.
+ * Profile first, then workspace and channel, so the team is added straight into them.
+ * HR maps companies to workspaces, so it comes last. Members only set up their profile.
  */
-export const getSetupSteps = ({ hasTeamStep, hrInstalled }: { hasTeamStep: boolean; hrInstalled: boolean }): SetupStepName[] => [
-    "workspace",
-    "channel",
-    ...(hasTeamStep ? ["team" as const] : []),
-    ...(hrInstalled ? ["hr" as const] : []),
-]
+export const getSetupSteps = ({ mode, hasTeamStep, hrInstalled }: { mode: "admin" | "profile"; hasTeamStep: boolean; hrInstalled: boolean }): SetupStepName[] =>
+    mode === "profile"
+        ? ["profile"]
+        : [
+            "profile",
+            "workspace",
+            "channel",
+            ...(hasTeamStep ? ["team" as const] : []),
+            ...(hrInstalled ? ["hr" as const] : []),
+        ]
 
 export const getSetupStepTitle = (step: SetupStepName): string => {
     switch (step) {

@@ -17,6 +17,7 @@ import { keepSetupPendingInDev, markSetupDoneLocally } from "@utils/setup"
 import { getSetupSteps, getSetupStepTitle, type SetupStepName, type StepStatus, type StepStatuses } from "./steps"
 import { ChannelStep } from "./steps/ChannelStep"
 import { HRStep } from "./steps/HRStep"
+import { ProfileStep } from "./steps/ProfileStep"
 import { TeamStep } from "./steps/TeamStep"
 import { WorkspaceStep } from "./steps/WorkspaceStep"
 import { buildPreviewModel, type PreviewDraft, type PreviewModel } from "./preview/model"
@@ -26,28 +27,30 @@ import { SkipMemoryContext } from "./steps/skipEntrance"
 import type { SetupState, SetupStepBodyProps, SiteUser } from "./types"
 import { prefersReducedMotion, useStepTransition } from "./useStepTransition"
 
-const ALL_STEPS: SetupStepName[] = ["workspace", "channel", "team", "hr"]
+const ALL_STEPS: SetupStepName[] = ["profile", "workspace", "channel", "team", "hr"]
 
 /**
- * First-admin setup: a full page with one step at a time. Covers the app, which can't
- * take focus meanwhile (its chat composer focuses itself on load).
+ * First-admin setup, or a new member's profile: a full page with one step at a time. Covers
+ * the app, which can't take focus meanwhile (its chat composer focuses itself on load).
  */
-const SetupPage = ({ onFinished }: { onFinished: () => void }) => {
+const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished: () => void }) => {
     const navigate = useNavigate()
-    const { data, isLoading } = useFrappeGetCall<{ message: SiteUser[] }>("raven.api.setup.get_users_without_workspace", undefined, undefined, {
+    // Only the admin flow adds people.
+    const { data, isLoading } = useFrappeGetCall<{ message: SiteUser[] }>("raven.api.setup.get_users_without_workspace", undefined, mode === "admin" ? undefined : null, {
         revalidateOnFocus: false,
         revalidateIfStale: false,
     })
     const siteUsers = data?.message ?? []
 
     // Kept across reloads, so a refresh mid-setup doesn't offer to make a second workspace or channel.
-    // Per user, so another admin on the same browser starts their own.
-    const [saved, setSaved, clearSaved] = useLocalStorage<{ setup: SetupState; statuses: StepStatuses }>(`raven_setup_progress:${window.frappe?.boot?.user?.name}`, {
+    // Per user, so another admin on the same browser starts their own; per mode, so a profile never ends the admin's.
+    const progressKey = `${mode === "admin" ? "raven_setup_progress" : "raven_profile_progress"}:${window.frappe?.boot?.user?.name}`
+    const [saved, setSaved, clearSaved] = useLocalStorage<{ setup: SetupState; statuses: StepStatuses }>(progressKey, {
         setup: { invited: [], addedSiteUsers: [] },
         statuses: {},
     })
     const { setup, statuses } = saved
-    const [current, setCurrent] = useState<SetupStepName>(() => ALL_STEPS.find((step) => !saved.statuses[step]) ?? "workspace")
+    const [current, setCurrent] = useState<SetupStepName>(() => ALL_STEPS.find((step) => !saved.statuses[step]) ?? "profile")
     const [finishing, setFinishing] = useState(false)
     // Fades the page out before it closes onto the app.
     const [leaving, setLeaving] = useState(false)
@@ -55,7 +58,7 @@ const SetupPage = ({ onFinished }: { onFinished: () => void }) => {
 
     // Email invites create users, so they need System Manager; anyone can add people already in Raven.
     const hasTeamStep = hasRole("System Manager") || siteUsers.length > 0 || setup.addedSiteUsers.length > 0
-    const steps = getSetupSteps({ hasTeamStep, hrInstalled: isHRInstalled() })
+    const steps = getSetupSteps({ mode, hasTeamStep, hrInstalled: isHRInstalled() })
     // A step can drop out once the data loads (no one to add); land on the next one still to do.
     const step = steps.includes(current) ? current : steps.find((name) => !statuses[name]) ?? steps[steps.length - 1]
     const index = steps.indexOf(step)
@@ -66,7 +69,7 @@ const SetupPage = ({ onFinished }: { onFinished: () => void }) => {
     const { workspaces, isLoading: workspacesLoading } = useWorkspaces()
     const checkedWorkspaces = useRef(false)
     useEffect(() => {
-        if (workspacesLoading || checkedWorkspaces.current) return
+        if (mode !== "admin" || workspacesLoading || checkedWorkspaces.current) return
         checkedWorkspaces.current = true
         if (saved.setup.workspace) return
         const administered = workspaces.filter((workspace) => workspace.workspace_member_name && workspace.is_admin)
@@ -93,14 +96,15 @@ const SetupPage = ({ onFinished }: { onFinished: () => void }) => {
     const finish = (finalSetup: SetupState, finalStatuses: StepStatuses) => {
         setFinishing(true)
         const withStatus = (status: StepStatus) => steps.filter((name) => finalStatuses[name] === status)
+        // Members only set up their profile; completing the site is the admin flow's.
         // Dev testing can hold setup pending: the page closes as if done and comes back on reload.
-        const keepPending = keepSetupPendingInDev()
+        const completesSite = mode === "admin" && !keepSetupPendingInDev()
         // The local flag ends the flow even if this save fails.
-        const save = keepPending ? Promise.resolve() : completeSetup({ completed_steps: withStatus("completed"), skipped_steps: withStatus("skipped") })
+        const save = completesSite ? completeSetup({ completed_steps: withStatus("completed"), skipped_steps: withStatus("skipped") }) : Promise.resolve()
         save
             .catch(() => { })
             .finally(() => {
-                if (!keepPending) markSetupDoneLocally()
+                if (completesSite) markSetupDoneLocally()
                 clearSaved()
                 if (finalSetup.workspace) {
                     const workspace = `/${encodeURIComponent(finalSetup.workspace)}`
@@ -215,7 +219,9 @@ const SetupPage = ({ onFinished }: { onFinished: () => void }) => {
                                 <h1 id="setup-title" className="text-2xl-semibold text-ink-gray-9">
                                     {getSetupStepTitle(shown)}
                                 </h1>
-                                {shown === "workspace" ? (
+                                {shown === "profile" ? (
+                                    <ProfileStep {...shownProps} />
+                                ) : shown === "workspace" ? (
                                     <WorkspaceStep {...shownProps} />
                                 ) : shown === "channel" ? (
                                     <ChannelStep {...shownProps} />

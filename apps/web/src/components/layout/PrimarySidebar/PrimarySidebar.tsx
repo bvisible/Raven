@@ -1,6 +1,5 @@
 import { commandMenuOpenAtom } from "@components/features/cmdk/atoms"
 import NavUserMenu from "@components/features/header/NavUserMenu/NavUserMenu"
-import { ProfileNudge } from "@components/features/setup/ProfileNudge"
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar"
 import { Button } from "@components/ui/button"
 import { KeyboardMetaKeyIcon } from "@components/ui/keyboard-keys"
@@ -75,9 +74,7 @@ const PrimarySidebar = () => {
                     </div>
                     <ScheduledMessagesButton />
                     <LaterLink />
-                    <ProfileNudge>
-                        <NavUserMenu />
-                    </ProfileNudge>
+                    <NavUserMenu />
                 </div>
             </div>
         </TooltipProvider>

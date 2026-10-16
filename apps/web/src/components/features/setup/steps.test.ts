@@ -2,15 +2,19 @@ import { describe, expect, it } from "vitest"
 import { getSetupSteps } from "./steps"
 
 describe("getSetupSteps", () => {
-    it("creates the workspace and channel before adding the team", () => {
-        expect(getSetupSteps({ hasTeamStep: true, hrInstalled: false })).toEqual(["workspace", "channel", "team"])
+    it("starts the admin flow with the profile, then the workspace and channel before the team", () => {
+        expect(getSetupSteps({ mode: "admin", hasTeamStep: true, hrInstalled: false })).toEqual(["profile", "workspace", "channel", "team"])
     })
 
     it("adds the HR step last when Frappe HR is installed", () => {
-        expect(getSetupSteps({ hasTeamStep: true, hrInstalled: true })).toEqual(["workspace", "channel", "team", "hr"])
+        expect(getSetupSteps({ mode: "admin", hasTeamStep: true, hrInstalled: true })).toEqual(["profile", "workspace", "channel", "team", "hr"])
     })
 
     it("drops the team step when there's no one to add or invite", () => {
-        expect(getSetupSteps({ hasTeamStep: false, hrInstalled: false })).toEqual(["workspace", "channel"])
+        expect(getSetupSteps({ mode: "admin", hasTeamStep: false, hrInstalled: false })).toEqual(["profile", "workspace", "channel"])
+    })
+
+    it("asks members for their profile only", () => {
+        expect(getSetupSteps({ mode: "profile", hasTeamStep: true, hrInstalled: true })).toEqual(["profile"])
     })
 })
