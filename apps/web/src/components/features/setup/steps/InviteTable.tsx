@@ -34,8 +34,8 @@ const asRule = (error: InviteError | null) => (error ? errorText(error) : true)
 
 /** Like a Frappe child table: one row per person; people already invited stay with a tick. */
 export const InviteTable = ({ invited, label }: { invited: Invitee[]; label: string }) => {
-    const { control, register, formState: { errors } } = useFormContext<InviteForm>()
-    const { fields, append, remove } = useFieldArray({ control, name: "rows" })
+    const { control, register, clearErrors, formState: { errors } } = useFormContext<InviteForm>()
+    const { fields, append, remove, update } = useFieldArray({ control, name: "rows" })
     const { name: currentUser } = useUserCookieData()
 
     return (
@@ -79,7 +79,8 @@ export const InviteTable = ({ invited, label }: { invited: Invitee[]; label: str
                                         placeholder={_("First name")}
                                         aria-label={_("First name")}
                                         aria-invalid={!!rowErrors?.first_name || undefined}
-                                        className="border-s border-s-outline-gray-1 focus-visible:bg-surface-gray-1"
+                                        // The column line is this cell's own border; it stays when the cell is focused.
+                                        className="border-s border-s-outline-gray-1 focus-visible:border-s-outline-gray-1 active:border-s-outline-gray-1 focus-visible:bg-surface-gray-1"
                                         {...register(`rows.${index}.first_name`, {
                                             validate: (_value, values) => asRule(validateInviteFirstName(values.rows[index])),
                                         })}
@@ -90,8 +91,13 @@ export const InviteTable = ({ invited, label }: { invited: Invitee[]; label: str
                                             variant="ghost"
                                             size="sm"
                                             isIconButton
-                                            aria-label={_("Remove row")}
-                                            onClick={() => (fields.length > 1 ? remove(index) : undefined)}
+                                            aria-label={fields.length > 1 ? _("Remove row") : _("Clear row")}
+                                            onClick={() => {
+                                                if (fields.length > 1) return remove(index)
+                                                // The table always keeps a row; the last one empties instead.
+                                                update(index, EMPTY_INVITE)
+                                                clearErrors(`rows.${index}`)
+                                            }}
                                         >
                                             <X />
                                         </Button>

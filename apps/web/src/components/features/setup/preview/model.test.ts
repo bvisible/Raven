@@ -6,7 +6,7 @@ const saved: PreviewModel = {
     workspace: { name: "Acme", logo: "/files/acme.png" },
     channel: { name: "general" },
     people: [{ id: "user-priya", name: "Priya" }],
-    hr: false,
+    leave: false,
 }
 
 describe("buildPreviewModel", () => {
@@ -32,7 +32,7 @@ describe("buildPreviewModel", () => {
     })
 
     it("leaves a part out when neither saved nor draft has a name", () => {
-        const empty: PreviewModel = { people: [], hr: false }
+        const empty: PreviewModel = { people: [], leave: false }
         const model = buildPreviewModel(empty, { workspace: { name: " " } })
         expect(model.workspace).toBeUndefined()
     })
@@ -51,7 +51,12 @@ describe("buildPreviewModel", () => {
         expect(buildPreviewModel(saved, {}).people).toEqual(saved.people)
     })
 
-    it("keeps the HR flag from saved data", () => {
-        expect(buildPreviewModel({ ...saved, hr: true }, {}).hr).toBe(true)
+    it("shows leave as the HR step's toggle has it", () => {
+        expect(buildPreviewModel(saved, { leave: true }).leave).toBe(true)
+        expect(buildPreviewModel({ ...saved, leave: true }, { leave: false }).leave).toBe(false)
+    })
+
+    it("keeps the saved leave flag when no step is setting it", () => {
+        expect(buildPreviewModel({ ...saved, leave: true }, {}).leave).toBe(true)
     })
 })

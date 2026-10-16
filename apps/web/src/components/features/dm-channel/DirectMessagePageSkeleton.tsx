@@ -40,7 +40,7 @@ const MessageRowSkeleton = ({ index, leftRight }: { index: number; leftRight: bo
  * real page swaps in without anything shifting. The pages pass the identity
  * placeholder their real header shows: a round avatar for a DM, a channel icon.
  */
-const ChatPageSkeleton = ({ identity }: { identity: ReactNode }) => {
+const ChatPageSkeleton = ({ identity, title }: { identity: ReactNode; title?: ReactNode }) => {
     const leftRight = useAtomValue(chatStyleAtom) === "Left-Right"
 
     return (
@@ -51,8 +51,12 @@ const ChatPageSkeleton = ({ identity }: { identity: ReactNode }) => {
                 <div className="flex h-11 w-full shrink-0 items-center justify-between border-b border-outline-gray-2 px-4">
                     <div className="flex min-w-0 items-center gap-2">
                         <Skeleton className="size-8 shrink-0 md:hidden" />
-                        {identity}
-                        <Skeleton className="h-4 w-32" />
+                        {title ?? (
+                            <>
+                                {identity}
+                                <Skeleton className="h-4 w-32" />
+                            </>
+                        )}
                     </div>
                     {/* The members cluster on the right. */}
                     <Skeleton className="h-6 w-16 rounded-full" />
@@ -78,9 +82,9 @@ const ChatPageSkeleton = ({ identity }: { identity: ReactNode }) => {
     )
 }
 
-/** Skeleton for the Direct Message page: a round peer avatar in the header. */
-export function DirectMessagePageSkeleton() {
-    return <ChatPageSkeleton identity={<Skeleton className="h-7 w-7 rounded-full shrink-0" />} />
+/** Skeleton for the Direct Message page: a round peer avatar in the header. `title` shows a known peer in its place. */
+export function DirectMessagePageSkeleton({ title }: { title?: ReactNode }) {
+    return <ChatPageSkeleton identity={<Skeleton className="h-7 w-7 rounded-full shrink-0" />} title={title} />
 }
 
 /** Skeleton for the channel page: a small channel icon in the header, no avatar. */

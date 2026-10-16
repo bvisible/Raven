@@ -144,7 +144,8 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
             ...siteUsers,
             ...setup.addedSiteUsers.filter((added) => !siteUsers.some((user) => user.user === added.user)),
         ]),
-        hr: step === "hr" || statuses.hr === "completed",
+        // The HR step reports its toggle; elsewhere no one shows on leave.
+        leave: false,
     }
     const preview = buildPreviewModel(savedPreview, draft)
 
@@ -185,9 +186,10 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
                     <SetupPreview model={preview} activeStep={step} />
                 </aside>
                 <main className="relative flex w-full min-w-0 flex-col overflow-y-auto lg:w-1/2 border-s border-outline-gray-1 bg-surface-base px-6 pb-8 lg:px-12">
-                    <div className="h-14 shrink-0 pt-4">
+                    {/* Holds the steps' place; Back sits in the corner, equally far from the top and the side. */}
+                    <div className="h-14 shrink-0">
                         {props.onBack && (
-                            <Button variant="ghost" size="md" onClick={props.onBack} disabled={finishing}>
+                            <Button variant="ghost" size="md" className="absolute start-4 top-4" onClick={props.onBack} disabled={finishing}>
                                 <ArrowLeft />
                                 {_("Back")}
                             </Button>

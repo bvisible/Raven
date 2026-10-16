@@ -68,7 +68,7 @@ export const PreviewDMSidebar = ({ model }: { model: PreviewModel }) => {
                     <DMRow
                         key={person.id}
                         person={person}
-                        onLeave={model.hr && index % 2 === 1}
+                        onLeave={model.leave && index % 2 === 0}
                         delay={index * 60}
                     />
                 ))}

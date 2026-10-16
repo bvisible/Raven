@@ -9,11 +9,12 @@ export type PreviewModel = {
     workspace?: { name: string; logo?: string }
     channel?: { name: string; type?: RavenChannel["type"] }
     people: PreviewPerson[]
-    hr: boolean
+    /** Frappe HR's leave indicator is on: people show on leave. */
+    leave: boolean
 }
 
 /** The open step's unsaved fields. Cleared whenever the step changes. The team step lists everyone, so its people replace the saved ones. */
-export type PreviewDraft = Partial<Pick<PreviewModel, "profile" | "workspace" | "channel" | "people">>
+export type PreviewDraft = Partial<Pick<PreviewModel, "profile" | "workspace" | "channel" | "people" | "leave">>
 
 const filled = (value?: string): value is string => !!value?.trim()
 
@@ -29,5 +30,5 @@ export const buildPreviewModel = (saved: PreviewModel, draft: PreviewDraft): Pre
     workspace: merge(saved.workspace, draft.workspace),
     channel: merge(saved.channel, draft.channel),
     people: draft.people ?? saved.people,
-    hr: saved.hr,
+    leave: draft.leave ?? saved.leave,
 })
