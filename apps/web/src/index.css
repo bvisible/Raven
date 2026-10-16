@@ -25,13 +25,14 @@
 
 /* Newsreader (variable: weight 200-800 + optical sizing) — the serif from
    Frappe's own site. Only the Frappe link-preview card uses it, and
-   browsers fetch a font lazily on first use, so nobody else pays for it. */
+   browsers fetch a font lazily on first use, so nobody else pays for it.
+   Bundled with the app (src/fonts), so the web and native builds share one copy. */
 @font-face {
   font-family: Newsreader;
   font-style: normal;
   font-weight: 200 800;
   font-display: swap;
-  src: url("/assets/raven/fonts/NewsreaderVariable.woff2") format("woff2");
+  src: url("./fonts/newsreader/NewsreaderVariable.woff2") format("woff2");
 }
 
 @custom-variant dark (&:is(.dark *));
