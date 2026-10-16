@@ -13,8 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cd apps/web && yarn dev",
     "build": "cd apps/web && yarn build",
-    "postinstall": "yarn install-desk && yarn install-web",
-    "install-desk": "cd raven && yarn install",
+    "postinstall": "yarn install-web",
     "install-web": "cd apps/web && yarn install",
     "native:build": "cd apps/web && yarn build:native",
     "native:sync": "yarn native:build && cd apps/native && yarn sync",
@@ -26,6 +25,9 @@
   "keywords": [],
   "author": "",
   "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "devDependencies": {
     "turbo": "^2.3.3"
   },

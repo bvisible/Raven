@@ -10,8 +10,14 @@ import { SelectItem } from "@components/ui/select"
 import { AdminSettingsForm } from "./AdminSettingsForm"
 import type { RavenSettings } from "@raven/types/Raven/RavenSettings"
 import _ from "@lib/translate"
+import { hasRole } from "@lib/permissions"
 
 const FORM_ID = "settings-ai-form"
+
+/** Shown instead of the provider keys and URLs, which only System Managers can see and change. */
+const ProviderSetByAdmin = () => (
+    <p className="text-p-sm text-ink-gray-5">{_("Only a System Manager can change these settings.")}</p>
+)
 
 /**
  * The fields, as their own component rather than a render prop — see AdminSettingsForm
@@ -25,6 +31,8 @@ const AISettingsFields = () => {
     const localEnabled = useWatch({ control, name: "enable_local_llm" })
     const localProvider = useWatch({ control, name: "local_llm_provider" })
     const localLLMUrl = useWatch({ control, name: "local_llm_api_url" })
+    // Provider keys and URLs are System Manager only (permlevel 1 on Raven Settings).
+    const canEditProviders = hasRole("System Manager")
 
     const { data: openaiVersion } = useFrappeGetCall<{ message: string }>(
         "raven.api.ai_features.get_open_ai_version",
@@ -75,7 +83,8 @@ const AISettingsFields = () => {
                         label={_("Enable OpenAI Services")}
                         formDescription={_("Use OpenAI models for AI features.")}
                     />
-                    {openaiEnabled ? (
+                    {openaiEnabled && !canEditProviders ? <ProviderSetByAdmin /> : null}
+                    {openaiEnabled && canEditProviders ? (
                         <div className="flex flex-col gap-4 pl-1">
                             <DataField
                                 name="openai_organisation_id"
@@ -115,7 +124,21 @@ const AISettingsFields = () => {
                         label={_("Enable Local LLM")}
                         formDescription={_("Use a self-hosted, OpenAI-compatible model.")}
                     />
-                    {localEnabled ? (
+                    {localEnabled && !canEditProviders ? (
+                        <div className="flex flex-col gap-4 pl-1">
+                            <ProviderSetByAdmin />
+                            {/* Tests the saved server. The server ignores any other URL for non-System Managers. */}
+                            <Button type="button" variant="outline" size="sm" className="self-start" onClick={handleTestConnection} disabled={testing}>
+                                {_("Test Connection")}
+                            </Button>
+                            {testResult && (
+                                <Alert theme={testResult.success ? "green" : "red"}>
+                                    <AlertDescription>{testResult.message}</AlertDescription>
+                                </Alert>
+                            )}
+                        </div>
+                    ) : null}
+                    {localEnabled && canEditProviders ? (
                         <div className="flex flex-col gap-4 pl-1">
                             <SelectFormField name="local_llm_provider" label={_("Provider")}>
                                 <SelectItem value="LM Studio">{_("LM Studio")}</SelectItem>

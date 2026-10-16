@@ -79,35 +79,6 @@ def get_users():
 	return users
 
 
-@frappe.whitelist()
-def is_user_on_leave(user: str):
-	"""
-	If the user is on leave, return True
-	"""
-	# Check if FrappeHR is installed
-	if not "hrms" in frappe.get_installed_apps():
-		return False
-
-	employee = frappe.db.exists("Employee", {"user_id": user})
-
-	if employee:
-		# Check if attendance today is marked as "On Leave"
-		attendance = frappe.db.exists(
-			"Attendance",
-			{
-				"employee": employee,
-				"status": "On Leave",
-				"attendance_date": frappe.utils.today(),
-				"docstatus": 1,
-			},
-		)
-
-		if attendance:
-			return True
-
-	return False
-
-
 @frappe.whitelist(methods=["GET"])
 def get_all_users_on_leave():
 
@@ -146,6 +117,30 @@ def get_all_users_on_leave():
 
 	# Return an array of user IDs
 	return query.run(pluck=True)
+
+
+@frappe.whitelist(methods=["POST"])
+def enable_user(user: str):
+	"""Give a user their Raven access back.
+
+	A Raven User is disabled when the site account is disabled, or when the
+	Raven User role was taken away. This restores both, in one save that
+	runs the normal permission checks (writing a User needs System Manager).
+	"""
+	user_doc = frappe.get_doc("User", user)
+	if has_role_profile(user_doc):
+		frappe.throw(
+			_("{0} gets their roles from a role profile. Add the Raven User role there.").format(user)
+		)
+	user_doc.enabled = 1
+	if "Raven User" not in [role.role for role in user_doc.roles]:
+		user_doc.append("roles", {"role": "Raven User"})
+	user_doc.save()
+
+
+def has_role_profile(user_doc) -> bool:
+	"""Roles from a role profile are reapplied on every save, so one added by hand is lost."""
+	return bool(user_doc.role_profile_name or user_doc.get("role_profiles"))
 
 
 @frappe.whitelist(methods=["POST"])
