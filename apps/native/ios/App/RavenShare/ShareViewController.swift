@@ -51,21 +51,33 @@ final class ShareViewController: UIViewController {
         return "\(base).\(ext)"
     }
 
+    // Copied by the file manager, never read into memory: a video can exceed the extension's limit.
     private func copy(_ url: URL) -> [String: String]? {
-        guard let data = try? Data(contentsOf: url) else { return nil }
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        guard let file = destination(for: url.lastPathComponent),
+              (try? FileManager.default.copyItem(at: url, to: file)) != nil else { return nil }
         let type = UTType(filenameExtension: url.pathExtension)?.preferredMIMEType ?? "application/octet-stream"
-        return write(data, name: url.lastPathComponent, type: type)
+        return item(file, type: type)
+    }
+
+    // In-memory items only: a pasted image or bytes with no file behind them.
+    private func write(_ data: Data, name: String, type: String) -> [String: String]? {
+        guard let file = destination(for: name), (try? data.write(to: file)) != nil else { return nil }
+        return item(file, type: type)
     }
 
     // The app reads the copy from the shared container; the original's grant ends with this extension.
-    private func write(_ data: Data, name: String, type: String) -> [String: String]? {
+    // A folder of its own: two shared files can carry the same name.
+    private func destination(for name: String) -> URL? {
         guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: group) else { return nil }
-        // A folder of its own: two shared files can carry the same name.
         let folder = container.appendingPathComponent("shared/\(UUID().uuidString)", isDirectory: true)
         guard (try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)) != nil else { return nil }
-        let file = folder.appendingPathComponent(name)
-        guard (try? data.write(to: file)) != nil else { return nil }
-        return ["title": name, "description": "", "type": type, "url": file.absoluteString]
+        return folder.appendingPathComponent(name)
+    }
+
+    private func item(_ file: URL, type: String) -> [String: String] {
+        ["title": file.lastPathComponent, "description": "", "type": type, "url": file.absoluteString]
     }
 
     private func send() {
