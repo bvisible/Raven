@@ -3,8 +3,10 @@ import frappe.sessions
 
 # Origins the bundled app runs from: WKWebView on iOS, the Android WebView.
 APP_ORIGINS = ("capacitor://localhost", "https://localhost")
-# Sent by the app on every request. A browser page at https://localhost shares that origin but
-# cannot add a header of its own without a preflight, which is answered by the same rule.
+# Sent by the app on every request. It marks the request as the app's. It is not a security
+# check: a page at https://localhost could add the same header, and its preflight would be
+# answered by the same rule. The origin allowlist is the real boundary, and those origins only
+# exist on the user's own device.
 APP_HEADER = "X-Raven-App"
 
 
