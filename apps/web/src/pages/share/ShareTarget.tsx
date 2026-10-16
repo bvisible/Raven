@@ -7,7 +7,7 @@ import { PageHeader } from "@components/layout/PageHeader"
 import { Input } from "@components/ui/input"
 import { loadDraft, saveDraft } from "@components/features/ChatInput/draft"
 import { FileSummary } from "@components/features/ChatInput/InputFiles"
-import { peekSharedFiles } from "@components/features/ChatInput/sharedFiles"
+import { stashSharedFiles } from "@components/features/ChatInput/sharedFiles"
 import { getAttachmentKind } from "@utils/attachmentPreview"
 import { useWorkspaces } from "@hooks/useWorkspaces"
 import type { ChannelListItem, DMChannelListItem } from "@raven/types/common/ChannelListItem"
@@ -35,7 +35,8 @@ import { escapeHtml } from "@utils/htmlUtils"
 const ShareTarget = () => {
     const [params] = useSearchParams()
     const navigate = useNavigate()
-    // Native shares arrive as a stashed payload, not GET params: read it once, files queued for the composer.
+    // Native shares arrive as a stashed payload, not GET params: read it once. The files stay on this
+    // page until a conversation is picked, so a share backed out of never reaches another chat.
     const [nativeParams, setNativeParams] = useState<URLSearchParams | null>(null)
     const [sharedFiles, setSharedFiles] = useState<File[]>([])
     const isNativeShare = !!import.meta.env.VITE_NATIVE && params.get("native") === "1"
@@ -47,11 +48,11 @@ const ShareTarget = () => {
         setNativeParams(null)
         import("../../native/shareIn")
             .then((m) => m.loadNativeShare())
-            .catch(() => new URLSearchParams())
+            .catch(() => ({ params: new URLSearchParams(), files: [] as File[] }))
             .then((loaded) => {
                 if (disposed) return
-                setNativeParams(loaded)
-                setSharedFiles(peekSharedFiles())
+                setNativeParams(loaded.params)
+                setSharedFiles(loaded.files)
             })
         return () => { disposed = true }
     }, [isNativeShare, locationKey])
@@ -115,6 +116,8 @@ const ShareTarget = () => {
         // Append — never clobber a draft the user already has in that channel.
         const existing = loadDraft(channel.name)
         saveDraft(channel.name, existing ? existing + html : html)
+        // The files go to this channel's composer, which takes them on mount.
+        stashSharedFiles(channel.name, sharedFiles)
 
         const target = channel.is_direct_message
             ? `/dm-channel/${encodeURIComponent(channel.name)}`

@@ -107,9 +107,9 @@ const ChatInput = forwardRef<HTMLFormElement, ChatInputProps>(({ channelID, isDi
         setLinkSignal((n) => n + 1)
     }
     const onAddFile = useAttachFile(channelID)
-    // Files from an OS share, queued by ShareTarget for the channel the user picked.
+    // Files from an OS share, held by ShareTarget for the channel the user picked: this one only.
     useEffect(() => {
-        const files = consumeSharedFiles()
+        const files = consumeSharedFiles(channelID)
         if (files.length) onAddFile(files)
     }, [channelID])
     const filesRef = useRef<(files: File[]) => void>(() => { })

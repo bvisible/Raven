@@ -1,6 +1,5 @@
 // OS share-in on the page: reading a share from the plugins and turning it into what
 // the ShareTarget page and the composer consume.
-import { stashSharedFiles } from "@components/features/ChatInput/sharedFiles"
 import { intentToPendingShare, PENDING_SHARE_KEY, type PendingShare, type ShareIntent } from "./shareIntent"
 import { listenNative, nativePlatform, withPrefs } from "./platform"
 import { ravenShell } from "./shell"
@@ -74,12 +73,11 @@ export const pendingShareToParams = (share: PendingShare): URLSearchParams => {
     return p
 }
 
-/** The stashed share as the page's params, its files queued for the composer; empty when none. */
-export const loadNativeShare = async (): Promise<URLSearchParams> => {
+/** The stashed share as the page's params plus its files read into memory; empty when none. */
+export const loadNativeShare = async (): Promise<{ params: URLSearchParams; files: File[] }> => {
     const share = await takePendingShare()
-    if (!share) return new URLSearchParams()
-    stashSharedFiles(await readNativeFiles(share.files ?? []))
-    return pendingShareToParams(share)
+    if (!share) return { params: new URLSearchParams(), files: [] }
+    return { params: pendingShareToParams(share), files: await readNativeFiles(share.files ?? []) }
 }
 
 /** Reads and clears the share the shell stashed for us. */

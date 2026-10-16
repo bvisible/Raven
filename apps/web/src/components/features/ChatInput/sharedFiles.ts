@@ -1,16 +1,15 @@
-// Files from an OS share: ShareTarget stashes them, the composer of the chosen channel takes them
-// on mount. Plain module state, emptied on read; no Capacitor involved.
-let sharedFiles: File[] = []
+// Files from an OS share, held for one channel: ShareTarget stashes them for the channel the user
+// picks, and that channel's composer takes them on mount. Plain module state; no Capacitor involved.
+let stash: { channelID: string; files: File[] } | null = null
 
-export const stashSharedFiles = (files: File[]) => {
-    sharedFiles = files
+export const stashSharedFiles = (channelID: string, files: File[]) => {
+    stash = files.length ? { channelID, files } : null
 }
 
-/** The stash without emptying it: ShareTarget previews what the composer will take. */
-export const peekSharedFiles = (): File[] => sharedFiles
-
-export const consumeSharedFiles = (): File[] => {
-    const files = sharedFiles
-    sharedFiles = []
+/** The files held for this channel, emptied on read. Any other channel gets none. */
+export const consumeSharedFiles = (channelID: string): File[] => {
+    if (stash?.channelID !== channelID) return []
+    const { files } = stash
+    stash = null
     return files
 }
