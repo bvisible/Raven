@@ -49,7 +49,9 @@ const WorkspaceForm = ({ saved, onDone, onSave, onPreview }: SetupStepBodyProps 
         const suggested = company?.message
         // Only into a form the admin hasn't filled in.
         if (!suggested || saved || form.getValues("workspace_name")) return
-        form.reset({ workspace_name: suggested.name, logo: suggested.logo ?? "", description: "" })
+        // setValue, not reset: reset unregisters fields that don't re-render, and they stop taking input.
+        form.setValue("workspace_name", suggested.name)
+        if (suggested.logo) form.setValue("logo", suggested.logo)
     }, [company]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const onSubmit = ({ workspace_name: typed, logo, description: typedDescription }: WorkspaceForm) => {
