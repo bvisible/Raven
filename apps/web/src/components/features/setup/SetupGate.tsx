@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react"
-import { isSetupPending, SETUP_DONE_STORAGE_KEY } from "@utils/setup"
+import { isSetupPending, setupDoneStorageKey } from "@utils/setup"
 import { getSetupMode, type SetupMode } from "./setupMode"
 
 const SetupPage = lazy(() => import("./SetupPage"))
@@ -16,7 +16,7 @@ export const SetupGate = () => {
     useEffect(() => {
         if (mode !== "admin") return
         const onStorage = (event: StorageEvent) => {
-            if (event.key === SETUP_DONE_STORAGE_KEY && event.newValue === "1") setMode(null)
+            if (event.key === setupDoneStorageKey() && event.newValue === "1") setMode(null)
         }
         window.addEventListener("storage", onStorage)
         return () => window.removeEventListener("storage", onStorage)

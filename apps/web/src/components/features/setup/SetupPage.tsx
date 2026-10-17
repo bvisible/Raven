@@ -10,6 +10,7 @@ import { useWorkspaces } from "@hooks/useWorkspaces"
 import { channelStore } from "@stores/channels/store"
 import useCurrentRavenUser from "@raven/lib/hooks/useCurrentRavenUser"
 import { isHRInstalled } from "@lib/apps"
+import { siteKey } from "@lib/site"
 import { hasRole } from "@lib/permissions"
 import _ from "@lib/translate"
 import { cn } from "@lib/utils"
@@ -46,8 +47,9 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
     const siteUsers = data?.message ?? NO_SITE_USERS
 
     // Kept across reloads, so a refresh mid-setup doesn't offer to make a second workspace or channel.
-    // Per user, so another admin on the same browser starts their own; per mode, so a profile never ends the admin's.
-    const progressKey = `${mode === "admin" ? "raven_setup_progress" : "raven_profile_progress"}:${window.frappe?.boot?.user?.name}`
+    // Per user, so another admin on the same browser starts their own; per mode, so a profile never ends the admin's;
+    // per site in the app, so one site's workspace never leaks into another's setup.
+    const progressKey = siteKey(`${mode === "admin" ? "raven_setup_progress" : "raven_profile_progress"}:${window.frappe?.boot?.user?.name}`)
     const [saved, setSaved, clearSaved] = useLocalStorage<{ setup: SetupState; statuses: StepStatuses }>(progressKey, {
         setup: { invited: [], addedSiteUsers: [] },
         statuses: {},

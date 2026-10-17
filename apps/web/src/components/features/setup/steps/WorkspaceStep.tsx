@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import { useFrappeGetCall } from "frappe-react-sdk"
 import { useCreateWorkspace } from "@components/features/workspaces/useCreateWorkspace"
@@ -19,11 +19,16 @@ type WorkspaceForm = { workspace_name: string; logo: string; description: string
 /** Mandatory. Created Public and open to join, so the team lands in it. Back here, it edits the same workspace. */
 export const WorkspaceStep = (props: SetupStepBodyProps) => {
     const { workspaces, isLoading } = useWorkspaces()
+    const found = props.setup.workspace ? workspaces.find((workspace) => workspace.name === props.setup.workspace) : undefined
+    // A rename is recorded before the list refetches, so for a moment the new name isn't in it.
+    // Keep showing the workspace as last listed; the form must stay mounted with its values and errors.
+    const lastFound = useRef<WorkspaceFields>(undefined)
+    if (found) lastFound.current = found
+    const saved = found ?? (props.setup.workspace ? lastFound.current : undefined)
     // Made already but the list isn't in yet: wait, or the form would offer to make another.
-    if (props.setup.workspace && isLoading) return null
-    const saved = props.setup.workspace ? workspaces.find((workspace) => workspace.name === props.setup.workspace) : undefined
-    // Keyed by the saved name, so a rename (or the list arriving) starts the form from what's saved.
-    return <WorkspaceForm key={saved?.name ?? "new"} {...props} saved={saved} />
+    if (props.setup.workspace && !saved && isLoading) return null
+    // Remounts only when the list first delivers the saved workspace, so the form starts from it.
+    return <WorkspaceForm key={saved ? "saved" : "new"} {...props} saved={saved} />
 }
 
 const WorkspaceForm = ({ saved, onDone, onSave, onPreview, onBusyChange }: SetupStepBodyProps & { saved?: WorkspaceFields }) => {
@@ -31,11 +36,22 @@ const WorkspaceForm = ({ saved, onDone, onSave, onPreview, onBusyChange }: Setup
         defaultValues: { workspace_name: saved?.workspace_name ?? "", logo: saved?.logo ?? "", description: saved?.description ?? "" },
     })
     // The company from Frappe's setup wizard (ERPNext's slide) is the site's default; a new workspace starts from it.
-    const { data: company } = useFrappeGetCall<{ message: { name: string; logo: string | null } | null }>(
+    useFrappeGetCall<{ message: { name: string; logo: string | null } | null }>(
         "raven.api.setup.get_company",
         undefined,
         saved ? null : undefined,
-        { revalidateOnFocus: false, revalidateIfStale: false },
+        {
+            revalidateOnFocus: false,
+            // Fetched on each mount, so a return to an empty form is prefilled again.
+            revalidateOnMount: true,
+            onSuccess: ({ message: suggested }) => {
+                // Only into a form the admin hasn't filled in.
+                if (!suggested || form.getValues("workspace_name")) return
+                // setValue, not reset: reset unregisters fields that don't re-render, and they stop taking input.
+                form.setValue("workspace_name", suggested.name)
+                if (suggested.logo) form.setValue("logo", suggested.logo)
+            },
+        },
     )
     const typedName = useWatch({ control: form.control, name: "workspace_name" })
     const typedLogo = useWatch({ control: form.control, name: "logo" })
@@ -46,15 +62,6 @@ const WorkspaceForm = ({ saved, onDone, onSave, onPreview, onBusyChange }: Setup
     const [uploadingLogo, setUploadingLogo] = useState(false)
     useReportBusy(loading || uploadingLogo, onBusyChange)
     const isMobile = useIsMobile()
-
-    useEffect(() => {
-        const suggested = company?.message
-        // Only into a form the admin hasn't filled in.
-        if (!suggested || saved || form.getValues("workspace_name")) return
-        // setValue, not reset: reset unregisters fields that don't re-render, and they stop taking input.
-        form.setValue("workspace_name", suggested.name)
-        if (suggested.logo) form.setValue("logo", suggested.logo)
-    }, [company]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const onSubmit = ({ workspace_name: typed, logo, description: typedDescription }: WorkspaceForm) => {
         // Trimmed, so "Acme " isn't a different name (and a rename) from "Acme".
