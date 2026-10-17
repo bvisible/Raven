@@ -78,14 +78,22 @@ def _system_users_not_in_raven() -> list[dict]:
 def _site_users() -> list[dict]:
 	"""
 	Everyone setup could put in the workspace: people in Raven but in no workspace, and system
-	users not in Raven yet. `addable` is off for a user whose single role profile can't take Raven's.
+	users not in Raven yet. Giving someone access saves their User, which a Raven Admin without
+	System Manager can't do, so those rows are offered but not addable for them; the same for a
+	user whose single role profile can't take Raven's.
 	"""
 	stack = profiles_can_stack()
+	can_edit_users = frappe.has_permission("User", ptype="write")
 	users = [{**row, "in_raven": True, "addable": True} for row in _raven_users_without_workspace()]
 	for row in _system_users_not_in_raven():
 		profile = row.pop("role_profile_name")
 		users.append(
-			{**row, "in_raven": False, "addable": stack or not profile, "role_profile": profile or None}
+			{
+				**row,
+				"in_raven": False,
+				"addable": can_edit_users and (stack or not profile),
+				"role_profile": profile or None,
+			}
 		)
 	return sorted(users, key=lambda row: (row["full_name"] or row["user"]).lower())
 

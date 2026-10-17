@@ -184,8 +184,9 @@ const SiteUserRow = ({ user, selected, onToggle }: { user: SiteUser; selected: b
                 <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-medium leading-tight">{user.full_name || user.user}</div>
                     <div className="truncate text-xs leading-tight text-ink-gray-4">
-                        {/* Frappe 15: one role profile per user, so Raven's can't go next to theirs. */}
-                        {disabled && user.role_profile ? _("Add the Raven User role to the {0} profile first", [user.role_profile]) : user.user}
+                        {/* Not addable: a Raven Admin can't give access (that saves the User), or, on Frappe 15,
+                            the person's one role profile can't take Raven's. */}
+                        {!disabled ? user.user : user.role_profile ? _("Add the Raven User role to the {0} profile first", [user.role_profile]) : _("A System Manager can add them")}
                     </div>
                 </div>
                 {/* Visual state only; the row is the control. Mirrors ui/checkbox's checked look. */}

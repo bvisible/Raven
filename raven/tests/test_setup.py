@@ -18,6 +18,8 @@ EXTRA_TEST_RECORD_DEPENDENCIES = ["User", "Raven User"]
 
 MEMBER = "setup-member@example.com"
 LONER = "setup-loner@example.com"
+# Runs setup, but can't write User records.
+RAVEN_ADMIN = "setup-raven-admin@example.com"
 # On the site, not in Raven: a plain system user, and one whose roles come from a role profile.
 OUTSIDER = "setup-outsider@example.com"
 PROFILED = "setup-profiled@example.com"
@@ -254,6 +256,24 @@ class TestSiteUsers(IntegrationTestCase):
 		self.assertEqual(
 			frappe.db.get_value("Raven User", OUTSIDER, "user_image"), "/files/outsider.png"
 		)
+
+	def test_a_raven_admin_without_system_manager_can_add_only_people_already_in_raven(self):
+		_make_user(RAVEN_ADMIN, "Raven Admin", roles=("Raven User", "Raven Admin"))
+		frappe.get_doc(
+			{
+				"doctype": "Raven Workspace Member",
+				"workspace": self.workspace.name,
+				"user": RAVEN_ADMIN,
+				"is_admin": 1,
+			}
+		).insert()
+		frappe.set_user(RAVEN_ADMIN)
+		listed = self._listed()
+		self.assertTrue(listed[LONER]["addable"])
+		self.assertFalse(listed[OUTSIDER]["addable"])
+		# The outsider is dropped rather than failing everyone.
+		self.assertEqual(add_site_users([LONER, OUTSIDER], self.workspace.name), 1)
+		self.assertFalse(frappe.db.exists("Raven User", OUTSIDER))
 
 	def test_add_takes_only_people_from_the_offered_list(self):
 		# The caller, a made-up name and a workspace member are not on the list.
