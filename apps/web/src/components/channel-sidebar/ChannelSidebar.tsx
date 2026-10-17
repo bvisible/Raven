@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { useSetAtom } from "jotai"
 import { NavLink, useMatch, useNavigate, useParams } from "react-router-dom"
 import { useHotkeys } from "react-hotkeys-hook"
-import { Check, ChevronDown, ChevronRight, Hash, PencilLine, Star } from "lucide-react"
+import { Check, ChevronDown, ChevronRight, Hash, PencilLine, PlusIcon, Star } from "lucide-react"
 import { Virtuoso, type VirtuosoHandle } from "react-virtuoso"
 import { useLocalStorage } from "usehooks-ts"
 import { useChannelUnread, useGroupUnreadCount, useWorkspaceUnread } from "@stores/unread/useChannelUnread"
@@ -26,6 +26,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar"
 import { ChannelIcon } from "@components/common/ChannelIcon/ChannelIcon"
 import { CustomizeSidebarButton } from "@components/features/channel/CustomizeSidebar/CustomizeSidebarButton"
+import { CreateChannelDialog } from "@components/features/channel/CreateChannel/CreateChannelButton"
 import { MobileSearchButton } from "@components/features/header/QuickSearch/SearchButton"
 import { useMyWorkspaces, useWorkspaces, type WorkspaceFields } from "@hooks/useWorkspaces"
 import { workspacesDrawerAtom } from "@components/features/header/HomeWorkspacesDrawer"
@@ -195,18 +196,29 @@ export const ChannelSidebarSkeleton = ({ count = 18 }: { count?: number }) => (
     </div>
 )
 
+/** A workspace with no channels: sized for the narrow column and held near the top, with the one thing to do. */
 const EmptyChannels = () => {
+    const [createOpen, setCreateOpen] = useState(false)
 
     return (
-        <Empty>
-            <EmptyMedia>
-                <Hash />
-            </EmptyMedia>
-            <EmptyHeader>
-                <EmptyTitle>{_("No channels yet")}</EmptyTitle>
-                <EmptyDescription>{_("Create one from the menu above.")}</EmptyDescription>
-            </EmptyHeader>
-        </Empty>
+        <>
+            <CreateChannelDialog open={createOpen} onOpenChange={setCreateOpen} />
+            <Empty className="min-h-0 flex-none justify-start gap-2 px-4 pt-12 pb-6">
+                <EmptyMedia className="size-6 [&_svg:not([class*='size-'])]:size-6">
+                    <Hash />
+                </EmptyMedia>
+                <EmptyHeader>
+                    <EmptyTitle className="text-base-medium">{_("No channels yet")}</EmptyTitle>
+                    <EmptyDescription className="text-p-sm">{_("Channels are where your team talks.")}</EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent className="mt-1">
+                    <Button variant="outline" size="sm" onClick={() => setCreateOpen(true)}>
+                        <PlusIcon />
+                        {_("Create a channel")}
+                    </Button>
+                </EmptyContent>
+            </Empty>
+        </>
     )
 }
 

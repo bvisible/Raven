@@ -3,7 +3,7 @@ import { useOnlineStatus } from "@stores/connectionState"
 import { OfflineState } from "@components/common/OfflineState"
 import { useSearchParams } from "react-router-dom"
 import { useAtom, useAtomValue } from "jotai"
-import { ArrowDown, LoaderCircle } from "lucide-react"
+import { ArrowDown, LoaderCircle, MessageCircle } from "lucide-react"
 import DateSeparator from "./renderers/DateSeparator"
 import UnreadSeparator from "./renderers/UnreadSeparator"
 import SystemMessage from "./renderers/SystemMessage"
@@ -11,7 +11,7 @@ import { MessageItem } from "./renderers/MessageItem"
 import { BatchMessageItem } from "./renderers/BatchMessageItem"
 import { MessageListSkeleton } from "@components/features/dm-channel/DirectMessagePageSkeleton"
 import { Button } from "@components/ui/button"
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@components/ui/empty"
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle, EmptyMedia } from "@components/ui/empty"
 import { useChannelMessages } from "@stores/messages/useChannelMessages"
 import { channelMessagesStore } from "@stores/messages/store"
 import { claimWindowForTarget, releaseWindowClaim } from "@stores/messages/loaders"
@@ -383,6 +383,9 @@ export default function ChatStream({ channelID, pinnedMessagesString, initialMes
 
 const StreamEmpty = () => (
     <Empty>
+        <EmptyMedia>
+            <MessageCircle />
+        </EmptyMedia>
         <EmptyHeader>
             <EmptyTitle>{_("No messages yet")}</EmptyTitle>
             <EmptyDescription>{_("Start the conversation by sending a message.")}</EmptyDescription>
