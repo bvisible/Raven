@@ -1,7 +1,6 @@
 import click
 import frappe
-from frappe.desk.page.setup_wizard.setup_wizard import add_all_roles_to, make_records
-from frappe.utils import cint
+from frappe.desk.page.setup_wizard.setup_wizard import add_all_roles_to
 
 
 def after_install():
@@ -9,11 +8,9 @@ def after_install():
 		print("Setting up Raven...")
 		add_all_roles_to("Administrator")
 		create_raven_user_for_administrator()
-		create_default_workspace = should_create_default_workspace()
-		init_settings(setup_pending=not create_default_workspace)
+		# The first admin makes the first workspace and channel in the setup flow.
+		init_settings()
 		import_existing_system_users()
-		if create_default_workspace:
-			create_default_workspace_and_channel()
 		create_native_oauth_client()
 
 		click.secho("Thank you for installing Raven!", fg="green")
@@ -42,14 +39,14 @@ def create_raven_user_for_administrator():
 		).insert(ignore_permissions=True)
 
 
-def init_settings(setup_pending: bool):
+def init_settings():
 	"""
-	Stores Raven Settings with its defaults. Frappe fills a single's defaults only after
-	after_install, and only if nothing is stored yet, so writing just the setup flag would
-	leave every other setting (auto-add system users, …) reading as unset.
+	Stores Raven Settings with its defaults and the setup flag on. Frappe fills a single's
+	defaults only after after_install, and only if nothing is stored yet, so writing just the
+	flag would leave every other setting (auto-add system users, …) reading as unset.
 	"""
 	settings = frappe.get_single("Raven Settings")
-	settings.setup_pending = 1 if setup_pending else 0
+	settings.setup_pending = 1
 	settings.flags.ignore_mandatory = True
 	settings.flags.ignore_validate = True
 	settings.save(ignore_permissions=True)
@@ -90,12 +87,6 @@ def import_existing_system_users():
 			frappe.log_error(title=f"Raven: could not add {name} on install")
 
 
-def should_create_default_workspace() -> bool:
-	"""From v16 the first admin creates the first workspace in the setup flow.
-	An unreadable version reads as 0, keeping the pre-v16 install."""
-	return cint(frappe.__version__.split(".")[0]) < 16
-
-
 def create_native_oauth_client():
 	"""The OAuth client the native app signs in with, so a new site works with the app at once."""
 	from raven.api.raven_mobile import create_oauth_client
@@ -108,41 +99,3 @@ def create_native_oauth_client():
 		click.secho(
 			"Could not create the OAuth client for the Raven app; see the Error Log.", fg="yellow"
 		)
-
-
-def create_default_workspace_and_channel():
-	default_workspace = frappe.get_doc(
-		{
-			"doctype": "Raven Workspace",
-			"workspace_name": "Raven",
-			"type": "Public",
-		}
-	)
-	default_workspace.insert(ignore_permissions=True)
-
-	# Make all users a member of this workspace and set them as admins
-	users = frappe.get_all("Raven User")
-	for user in users:
-		try:
-			frappe.get_doc(
-				{
-					"doctype": "Raven Workspace Member",
-					"workspace": default_workspace.name,
-					"user": user.name,
-					"is_admin": True,
-				}
-			).insert(ignore_permissions=True)
-		except Exception as e:
-			pass  # nosemgrep
-
-	channel = [
-		{
-			"doctype": "Raven Channel",
-			"name": "general",
-			"type": "Open",
-			"channel_name": "General",
-			"workspace": default_workspace.name,
-		}
-	]
-
-	make_records(channel)

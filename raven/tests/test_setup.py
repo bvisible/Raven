@@ -10,7 +10,7 @@ from raven.api.setup import (
 	get_users_without_workspace,
 )
 from raven.boot import boot_session
-from raven.install import after_install, should_create_default_workspace
+from raven.install import after_install
 
 EXTRA_TEST_RECORD_DEPENDENCIES = ["User", "Raven User"]
 
@@ -102,23 +102,12 @@ class TestSetup(IntegrationTestCase):
 
 		self.assertEqual(_known_steps(["profile", "workspace", "bogus"]), ["profile", "workspace"])
 
-	def test_install_defaults_only_below_v16(self):
-		for version, expected in (
-			("15.42.1", True),
-			("16.0.0", False),
-			("17.0.0-dev", False),
-			("custom", True),
-		):
-			with patch("frappe.__version__", version):
-				self.assertEqual(should_create_default_workspace(), expected)
-
-	def test_install_on_v16_flags_setup_instead_of_creating_workspace(self):
+	def test_install_flags_setup_instead_of_creating_workspace(self):
 		frappe.db.set_single_value("Raven Settings", "setup_pending", 0)
 		workspaces = frappe.db.count("Raven Workspace")
 		channels = frappe.db.count("Raven Channel")
 
-		with patch("frappe.__version__", "16.0.0"):
-			after_install()
+		after_install()
 
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 1)
 		self.assertEqual(frappe.db.count("Raven Workspace"), workspaces)
@@ -132,21 +121,10 @@ class TestSetup(IntegrationTestCase):
 
 	def test_install_stores_settings_defaults(self):
 		self._forget_settings()
-		with patch("frappe.__version__", "16.0.0"):
-			after_install()
+		after_install()
 		# Frappe only fills defaults for singles with nothing stored, and the flag above stores one.
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "auto_add_system_users"), 1)
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 1)
-
-	def test_install_below_v16_stores_defaults_without_setup(self):
-		self._forget_settings()
-		with (
-			patch("frappe.__version__", "15.42.1"),
-			patch("raven.install.create_default_workspace_and_channel"),
-		):
-			after_install()
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "auto_add_system_users"), 1)
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
 
 
 class TestUsersWithoutWorkspace(IntegrationTestCase):
