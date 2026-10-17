@@ -25,9 +25,22 @@ type ProfileStepProps = SetupStepBodyProps & {
 
 /** Name and photo, so the team knows who this is. Continue also marks the user onboarded. */
 export const ProfileStep = (props: ProfileStepProps) => {
-    const { myProfile, mutate } = useCurrentRavenUser()
-    // The form starts from the saved profile; wait for it.
-    if (!myProfile) return null
+    const { myProfile, error, mutate } = useCurrentRavenUser()
+    // The form starts from the saved profile; wait for it. A failed request would otherwise leave
+    // the step blank with no way on, as the hook doesn't retry by itself.
+    if (!myProfile) {
+        if (!error) return null
+        return (
+            <div className="flex flex-col gap-4">
+                <ErrorBanner error={error} />
+                <StepFooter>
+                    <Button variant="outline" size="md" onClick={() => mutate()}>
+                        {_("Retry")}
+                    </Button>
+                </StepFooter>
+            </div>
+        )
+    }
     return <ProfileFormBody key={myProfile.name} {...props} profile={myProfile} onSaved={() => mutate()} />
 }
 
