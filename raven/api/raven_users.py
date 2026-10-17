@@ -7,6 +7,7 @@ from frappe.utils.caching import redis_cache
 from raven.api.raven_channel_member import add_channel_members
 from raven.api.workspaces import add_workspace_members
 from raven.api.workspaces import get_list as get_workspace_list
+from raven.install import RAVEN_USER_PROFILE
 
 
 @frappe.whitelist(methods=["GET"])
@@ -128,19 +129,38 @@ def enable_user(user: str):
 	runs the normal permission checks (writing a User needs System Manager).
 	"""
 	user_doc = frappe.get_doc("User", user)
-	if has_role_profile(user_doc):
-		frappe.throw(
-			_("{0} gets their roles from a role profile. Add the Raven User role there.").format(user)
-		)
 	user_doc.enabled = 1
-	if "Raven User" not in [role.role for role in user_doc.roles]:
-		user_doc.append("roles", {"role": "Raven User"})
-	user_doc.save()
+	give_raven_access(user_doc)
 
 
 def has_role_profile(user_doc) -> bool:
 	"""Roles from a role profile are reapplied on every save, so one added by hand is lost."""
 	return bool(user_doc.role_profile_name or user_doc.get("role_profiles"))
+
+
+def profiles_can_stack() -> bool:
+	"""From Frappe 16 a user holds several role profiles; on 15 there is one, so a second can't be added."""
+	return frappe.get_meta("User").has_field("role_profiles")
+
+
+def give_raven_access(user_doc):
+	"""
+	Makes the user a Raven User and saves; the User's save hook creates the Raven User record.
+	A user whose roles come from role profiles gets Raven's own profile alongside them, since a
+	role added by hand would be dropped on their next save. On Frappe 15 that can't be done.
+	"""
+	if has_role_profile(user_doc):
+		if not profiles_can_stack():
+			frappe.throw(
+				_("{0} gets their roles from a role profile. Add the Raven User role there.").format(
+					user_doc.name
+				)
+			)
+		if RAVEN_USER_PROFILE not in [row.role_profile for row in user_doc.role_profiles]:
+			user_doc.append("role_profiles", {"role_profile": RAVEN_USER_PROFILE})
+	elif "Raven User" not in [role.role for role in user_doc.roles]:
+		user_doc.append("roles", {"role": "Raven User"})
+	user_doc.save()
 
 
 @frappe.whitelist(methods=["POST"])
@@ -154,16 +174,12 @@ def add_users_to_raven(users: list[str] | str):
 
 	for user in users:
 		user_doc = frappe.get_doc("User", user)
-
-		if user_doc.role_profile_name:
+		# Only a Frappe 15 user on a role profile can't be given access.
+		if has_role_profile(user_doc) and not profiles_can_stack():
 			failed_users.append(user_doc)
-
-		elif hasattr(user_doc, "role_profiles") and len(user_doc.role_profiles) > 0:
-			failed_users.append(user_doc)
-		else:
-			user_doc.append("roles", {"role": "Raven User"})
-			user_doc.save()
-			success_users.append(user_doc)
+			continue
+		give_raven_access(user_doc)
+		success_users.append(user_doc)
 
 	return {"success_users": success_users, "failed_users": failed_users}
 
@@ -194,16 +210,8 @@ def invite_user(
 	existing_user = frappe.db.exists("User", {"email": email})
 
 	if existing_user:
-		user_doc = frappe.get_doc("User", existing_user)
-		if user_doc.role_profile_name:
-			frappe.throw(_("User has a role profile set. Please set the role to Raven User manually."))
-
-		elif hasattr(user_doc, "role_profiles") and len(user_doc.role_profiles) > 0:
-			frappe.throw(_("User has a role profile set. Please set the role to Raven User manually."))
-
-		user_doc.append("roles", {"role": "Raven User"})
-		user_doc.save()
-		add_user_to_workspaces_and_channels(user_doc.name, workspaces, channels)
+		give_raven_access(frappe.get_doc("User", existing_user))
+		add_user_to_workspaces_and_channels(existing_user, workspaces, channels)
 		return {"success": True, "message": "User added to Raven"}
 	else:
 		user_doc = frappe.new_doc("User")
@@ -220,12 +228,15 @@ def invite_user(
 def add_user_to_workspaces_and_channels(user: str, workspaces: list[str], channels: list[str]):
 	"""
 	Workspaces first, since channel membership needs workspace membership.
-	Both calls run under the caller's own permissions.
+	Both calls run under the caller's own permissions. Existing memberships are
+	skipped, so inviting someone again (or someone already there) doesn't fail.
 	"""
 	for workspace in workspaces:
-		add_workspace_members(workspace, [user])
+		if not frappe.db.exists("Raven Workspace Member", {"workspace": workspace, "user": user}):
+			add_workspace_members(workspace, [user])
 	for channel in channels:
-		add_channel_members(channel, [user])
+		if not frappe.db.exists("Raven Channel Member", {"channel_id": channel, "user_id": user}):
+			add_channel_members(channel, [user])
 
 
 def get_employee_details(user: str):

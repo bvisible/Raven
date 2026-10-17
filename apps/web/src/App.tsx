@@ -28,6 +28,8 @@ import { lastChannelAtom, lastWorkspaceAtom } from "@utils/lastVisitedAtoms"
 import { useIsMobile } from "@hooks/use-mobile"
 import { useWorkspaces } from "@hooks/useWorkspaces"
 import WorkspaceLayout from "@pages/workspace/WorkspaceLayout"
+import NoWorkspace from "@components/features/workspaces/NoWorkspace"
+import { getIndexTarget } from "@utils/indexTarget"
 
 // Code-split the rarely-visited pages out of the main bundle. React.lazy +
 // Suspense (not the data router's route.lazy) on purpose: route.lazy blocks
@@ -54,31 +56,14 @@ const IndexRedirect = () => {
   const lastWorkspace = useAtomValue(lastWorkspaceAtom)
   const lastChannel = useAtomValue(lastChannelAtom)
   const isMobile = useIsMobile()
-  const { workspaces, isLoading } = useWorkspaces()
+  const { workspaces, isLoading, error } = useWorkspaces()
 
-  // Decide only once the workspace list is known — otherwise a deleted
-  // lastWorkspace can't be told apart from one that just hasn't loaded yet.
-  if (isLoading) return null
+  // Decide only on a list the fetch proved: a failed fetch also leaves it empty,
+  // and that must not read as "in no workspace".
+  if (isLoading || (error && workspaces.length === 0)) return null
 
-  // Reopen the remembered workspace only if it STILL EXISTS — it may have been
-  // deleted (here or by another admin) or the user removed from it, leaving the
-  // atom stale. Desktop reopens the exact channel; mobile lands on the
-  // workspace's channel list (the channel pair is written together).
-  const lastExists = lastWorkspace && workspaces.some((w) => w.name === lastWorkspace)
-  if (lastExists) {
-    if (lastChannel && !isMobile) {
-      return <Navigate to={`/${encodeURIComponent(lastWorkspace)}/${encodeURIComponent(lastChannel)}`} replace />
-    }
-    return <Navigate to={`/${encodeURIComponent(lastWorkspace)}`} replace />
-  }
-
-  // No valid remembered workspace — fresh install, an installed PWA's isolated
-  // storage on first launch, or a stale/deleted one. Fall back to the first
-  // workspace the user belongs to instead of rendering nothing: a blank index
-  // has no desktop sidebar to mask it on mobile, so `return null` shows black.
-  const fallback = workspaces.find((w) => w.workspace_member_name) ?? workspaces[0]
-  if (!fallback) return null
-  return <Navigate to={`/${encodeURIComponent(fallback.name)}`} replace />
+  const target = getIndexTarget({ lastWorkspace, lastChannel, workspaces, isMobile })
+  return target ? <Navigate to={target} replace /> : <NoWorkspace />
 }
 
 

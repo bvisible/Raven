@@ -20,11 +20,11 @@ interface UserAvatarProps {
     avatarClassName?: string,
 }
 
-const getInitials = (name: string): string => {
+export const getInitials = (name: string): string => {
     return name.charAt(0).toLocaleUpperCase()
 }
 
-const generateAvatarColor = (name: string): string => {
+export const generateAvatarColor = (name: string): string => {
 
     const sampleColors = [
         "bg-surface-green-2 text-ink-green-8",

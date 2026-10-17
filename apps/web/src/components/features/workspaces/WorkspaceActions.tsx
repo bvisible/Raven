@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { WorkspaceFields } from '@hooks/useWorkspaces'
+import { isJoinable } from '@hooks/useWorkspaceMembership'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@components/ui/dropdown-menu'
 import { Button } from '@components/ui/button'
 import { EllipsisVertical, Settings } from 'lucide-react'
@@ -17,6 +18,8 @@ type Props = {
 
 const WorkspaceActions = ({ workspace, onManage }: Props) => {
     const [confirmLeave, setConfirmLeave] = useState(false)
+    // Invite-only and not yours to manage: nothing to offer, so no empty menu.
+    if (!workspace.workspace_member_name && !isJoinable(workspace) && !(workspace.is_admin && onManage)) return null
     return (
         <div className='flex items-center gap-2 justify-center h-full'>
             <DropdownMenu>
@@ -32,7 +35,9 @@ const WorkspaceActions = ({ workspace, onManage }: Props) => {
                             {_("Manage")}
                         </DropdownMenuItem>
                     ) : null}
-                    {workspace.workspace_member_name ? <LeaveWorkspaceButton onSelect={() => setConfirmLeave(true)} /> : <JoinWorkspaceButton workspace={workspace} />}
+                    {workspace.workspace_member_name
+                        ? <LeaveWorkspaceButton onSelect={() => setConfirmLeave(true)} />
+                        : isJoinable(workspace) && <JoinWorkspaceButton workspace={workspace} />}
                 </DropdownMenuContent>
             </DropdownMenu>
             <LeaveWorkspaceDialog workspace={confirmLeave ? workspace : null} onClose={() => setConfirmLeave(false)} />

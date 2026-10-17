@@ -3,7 +3,7 @@ import { useOnlineStatus } from "@stores/connectionState"
 import { OfflineState } from "@components/common/OfflineState"
 import { useSearchParams } from "react-router-dom"
 import { useAtom, useAtomValue } from "jotai"
-import { ArrowDown, LoaderCircle } from "lucide-react"
+import { ArrowDown, LoaderCircle, MessageCircle } from "lucide-react"
 import DateSeparator from "./renderers/DateSeparator"
 import UnreadSeparator from "./renderers/UnreadSeparator"
 import SystemMessage from "./renderers/SystemMessage"
@@ -11,7 +11,7 @@ import { MessageItem } from "./renderers/MessageItem"
 import { BatchMessageItem } from "./renderers/BatchMessageItem"
 import { MessageListSkeleton } from "@components/features/dm-channel/DirectMessagePageSkeleton"
 import { Button } from "@components/ui/button"
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@components/ui/empty"
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle, EmptyMedia } from "@components/ui/empty"
 import { useChannelMessages } from "@stores/messages/useChannelMessages"
 import { channelMessagesStore } from "@stores/messages/store"
 import { claimWindowForTarget, releaseWindowClaim } from "@stores/messages/loaders"
@@ -257,7 +257,8 @@ export default function ChatStream({ channelID, pinnedMessagesString, initialMes
                             // so the smaller the region the less an image visibly dissolves on scroll.
                             className="dark:scroll-fade [--scroll-fade-t-size:2rem] [--scroll-fade-b-size:2rem] flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto [overflow-anchor:none]"
                         >
-                            <div className="flex min-w-0 w-full flex-col md:px-3 pb-6">
+                            {/* flex-1: fills the scroll area, so the empty and error states centre in it. */}
+                            <div className="flex min-w-0 w-full flex-1 flex-col md:px-3 pb-6">
                                 {isLoading ? (
                                     <MessageListSkeleton followsChatStyle />
                                 ) : error && import.meta.env.VITE_NATIVE && !online ? (
@@ -382,6 +383,9 @@ export default function ChatStream({ channelID, pinnedMessagesString, initialMes
 
 const StreamEmpty = () => (
     <Empty>
+        <EmptyMedia>
+            <MessageCircle />
+        </EmptyMedia>
         <EmptyHeader>
             <EmptyTitle>{_("No messages yet")}</EmptyTitle>
             <EmptyDescription>{_("Start the conversation by sending a message.")}</EmptyDescription>

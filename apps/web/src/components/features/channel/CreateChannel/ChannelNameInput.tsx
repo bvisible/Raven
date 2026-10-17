@@ -33,7 +33,7 @@ interface ChannelNameInputProps extends Omit<React.ComponentProps<typeof Input>,
  * → the label/description/error wiring). Without the spread, those props died
  * on this wrapper and the field showed the error text but never highlighted.
  */
-export const ChannelNameInput = ({ value, onChange, channelType, 'aria-describedby': ariaDescribedBy, ...inputProps }: ChannelNameInputProps) => {
+export const ChannelNameInput = ({ value, onChange, channelType, placeholder, 'aria-describedby': ariaDescribedBy, ...inputProps }: ChannelNameInputProps) => {
     const handleChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             // Convert to lowercase and replace spaces with hyphens
@@ -53,7 +53,7 @@ export const ChannelNameInput = ({ value, onChange, channelType, 'aria-described
                 value={value}
                 onChange={handleChange}
                 maxLength={50}
-                placeholder={_('e.g. marketing, design-team, project-alpha')}
+                placeholder={placeholder ?? _('e.g. marketing, design-team, project-alpha')}
                 className="pl-9 pr-12"
                 // No autoFocus attribute — the form is lazy-loaded, so the attribute
                 // fires too late on a cold open; CreateChannelForm focuses via ref

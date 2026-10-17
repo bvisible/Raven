@@ -49,7 +49,8 @@
   "config",
   "vapid_public_key",
   "frappe_integrations_tab",
-  "frappe_meet_hosted_urls"
+  "frappe_meet_hosted_urls",
+  "setup_completed"
  ],
  "fields": [
   {
@@ -329,13 +330,20 @@
    "fieldname": "working_hours_end",
    "fieldtype": "Time",
    "label": "Working Hours End"
+  },
+  {
+   "description": "Set once the first admin finishes or skips the setup flow",
+   "fieldname": "setup_completed",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Setup Completed"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-16 18:00:00.000000",
+ "modified": "2026-10-17 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Raven",
  "name": "Raven Settings",

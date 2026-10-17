@@ -322,6 +322,17 @@ class TestPermissions(IntegrationTestCase):
 			3, frappe.db.count("Raven Workspace Member", {"workspace": test_workspace.name})
 		)
 
+	def test_member_create_for_missing_workspace_is_refused_not_crashed(self):
+		frappe.set_user("test1@example.com")
+		member = frappe.get_doc(
+			{
+				"doctype": "Raven Workspace Member",
+				"user": "test1@example.com",
+				"workspace": "does-not-exist",
+			}
+		)
+		self.assertFalse(member.has_permission("create"))
+
 	def test_cannot_join_a_public_workspace_as_admin(self):
 		frappe.set_user("test@example.com")
 		test_workspace = self.create_test_workspace(workspace_type="Public")
