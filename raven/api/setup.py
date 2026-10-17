@@ -90,7 +90,7 @@ def complete_setup(
 	frappe.only_for(SETUP_ADMIN_ROLES)
 
 	finish_frappe_setup()
-	frappe.db.set_single_value("Raven Settings", "setup_pending", 0)
+	frappe.db.set_single_value("Raven Settings", "setup_completed", 1)
 	# Boot is cached per user and carries the flag; every admin's copy is now stale.
 	frappe.cache.delete_key("bootinfo")
 

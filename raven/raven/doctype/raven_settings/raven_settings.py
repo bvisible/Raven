@@ -46,7 +46,7 @@ class RavenSettings(Document):
 		push_notification_api_secret: DF.Password | None
 		push_notification_server_url: DF.Data | None
 		push_notification_service: DF.Literal["Frappe Cloud", "Raven"]
-		setup_pending: DF.Check
+		setup_completed: DF.Check
 		show_if_a_user_is_on_leave: DF.Check
 		tenor_api_key: DF.Data | None
 		use_website_favicon: DF.Check

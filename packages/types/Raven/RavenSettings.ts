@@ -83,5 +83,5 @@ export interface RavenSettings{
 	/**	Working Hours End : Time	*/
 	working_hours_end?: string
 	/**	Setup Pending : Check - Set on install. Cleared once the first admin finishes or skips the setup flow	*/
-	setup_pending?: 0 | 1
+	setup_completed?: 0 | 1
 }

@@ -8,8 +8,6 @@ def after_install():
 		print("Setting up Raven...")
 		add_all_roles_to("Administrator")
 		create_raven_user_for_administrator()
-		# The first admin makes the first workspace and channel in the setup flow.
-		init_settings()
 		import_existing_system_users()
 		create_native_oauth_client()
 
@@ -37,19 +35,6 @@ def create_raven_user_for_administrator():
 				"type": "User",
 			}
 		).insert(ignore_permissions=True)
-
-
-def init_settings():
-	"""
-	Stores Raven Settings with its defaults and the setup flag on. Frappe fills a single's
-	defaults only after after_install, and only if nothing is stored yet, so writing just the
-	flag would leave every other setting (auto-add system users, …) reading as unset.
-	"""
-	settings = frappe.get_single("Raven Settings")
-	settings.setup_pending = 1
-	settings.flags.ignore_mandatory = True
-	settings.flags.ignore_validate = True
-	settings.save(ignore_permissions=True)
 
 
 def import_existing_system_users():

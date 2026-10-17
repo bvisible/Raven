@@ -47,7 +47,7 @@ class TestSetup(IntegrationTestCase):
 	def setUp(self):
 		frappe.set_user("Administrator")
 		_make_raven_user(MEMBER, "Setup Member")
-		frappe.db.set_single_value("Raven Settings", "setup_pending", 1)
+		frappe.db.set_single_value("Raven Settings", "setup_completed", 0)
 
 	def tearDown(self):
 		frappe.set_user("Administrator")
@@ -61,8 +61,8 @@ class TestSetup(IntegrationTestCase):
 	def test_boot_flags_pending_for_admin(self):
 		self.assertEqual(self._boot_flag(), 1)
 
-	def test_boot_not_pending_once_cleared(self):
-		frappe.db.set_single_value("Raven Settings", "setup_pending", 0)
+	def test_boot_not_pending_once_completed(self):
+		frappe.db.set_single_value("Raven Settings", "setup_completed", 1)
 		self.assertEqual(self._boot_flag(), 0)
 
 	def test_boot_not_pending_for_member(self):
@@ -71,9 +71,9 @@ class TestSetup(IntegrationTestCase):
 
 	def test_complete_setup_clears_flag_and_is_idempotent(self):
 		complete_setup(["workspace", "team"], ["channel"])
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 1)
 		complete_setup('["workspace"]', "[]")
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 1)
 
 	def test_complete_setup_finishes_frappe_wizard_for_a_cloud_signup(self):
 		with (
@@ -88,7 +88,7 @@ class TestSetup(IntegrationTestCase):
 		self.assertEqual(
 			wizard.call_args.args[0]["timezone"], frappe.get_single("System Settings").time_zone
 		)
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 1)
 
 	def test_complete_setup_leaves_frappe_wizard_to_erpnext(self):
 		with (
@@ -104,7 +104,7 @@ class TestSetup(IntegrationTestCase):
 
 	def test_complete_setup_survives_malformed_steps(self):
 		complete_setup("not json", '["hr", "<script>"]')
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 1)
 
 	def test_complete_setup_refuses_guest(self):
 		frappe.set_user("Guest")
@@ -122,36 +122,22 @@ class TestSetup(IntegrationTestCase):
 		with self.assertRaises(frappe.PermissionError):
 			complete_setup([], [])
 		frappe.set_user("Administrator")
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 1)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 0)
 
 	def test_complete_setup_keeps_profile_step(self):
 		from raven.api.setup import _known_steps
 
 		self.assertEqual(_known_steps(["profile", "workspace", "bogus"]), ["profile", "workspace"])
 
-	def test_install_flags_setup_instead_of_creating_workspace(self):
-		frappe.db.set_single_value("Raven Settings", "setup_pending", 0)
+	def test_install_creates_no_workspace(self):
 		workspaces = frappe.db.count("Raven Workspace")
 		channels = frappe.db.count("Raven Channel")
 
 		after_install()
 
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 1)
 		self.assertEqual(frappe.db.count("Raven Workspace"), workspaces)
 		self.assertEqual(frappe.db.count("Raven Channel"), channels)
-
-	def _forget_settings(self):
-		# A fresh install has no stored Raven Settings yet.
-		frappe.db.delete("Singles", {"doctype": "Raven Settings"})
-		frappe.clear_document_cache("Raven Settings", "Raven Settings")
-		frappe.local.db.value_cache.pop("Raven Settings", None)
-
-	def test_install_stores_settings_defaults(self):
-		self._forget_settings()
-		after_install()
-		# Frappe only fills defaults for singles with nothing stored, and the flag above stores one.
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "auto_add_system_users"), 1)
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 1)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 0)
 
 
 class TestUsersWithoutWorkspace(IntegrationTestCase):

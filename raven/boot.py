@@ -19,7 +19,7 @@ def boot_session(bootinfo):
 	bootinfo.server_script_enabled = is_safe_exec_enabled()
 
 	# Opens the first-admin setup flow in the web app.
-	bootinfo.raven_setup_pending = 1 if raven_settings.setup_pending and is_setup_admin() else 0
+	bootinfo.raven_setup_pending = 1 if not raven_settings.setup_completed and is_setup_admin() else 0
 
 	if raven_settings.frappe_meet_hosted_urls:
 		bootinfo.frappe_meet_hosted_urls = raven_settings.frappe_meet_hosted_urls
