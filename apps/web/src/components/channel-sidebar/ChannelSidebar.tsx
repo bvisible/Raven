@@ -124,11 +124,15 @@ export function ChannelSidebar() {
 
     const loading = isLoading || !myProfile
     const isEmpty = groupedChannels.length === 0 && ungroupedChannels.length === 0
+    // Hosted here, not in the empty state: creating the first channel fills the list, which would
+    // unmount the empty state and the dialog with it before its add-members step.
+    const [createOpen, setCreateOpen] = useState(false)
 
     return (
         // Mobile: the sidebar is a full page, so it sits on the page surface;
         // the panel tint only makes sense beside content (desktop)
         <nav className="flex h-full w-full flex-col bg-surface-base md:bg-surface-sidebar">
+            <CreateChannelDialog open={createOpen} onOpenChange={setCreateOpen} />
             {/* Border on mobile (full-page list needs the separator); none on
                 desktop (the content island carries its own bordered header) */}
             <div className="flex h-11 md:h-auto shrink-0 items-center justify-between gap-1 border-b md:border-b-transparent px-1 md:py-2">
@@ -144,7 +148,7 @@ export function ChannelSidebar() {
             {loading ? (
                 <ChannelSidebarSkeleton />
             ) : isEmpty ? (
-                <EmptyChannels />
+                <EmptyChannels onCreate={() => setCreateOpen(true)} />
             ) : (
                 // Mobile: the in-flow AppMobileFooter below reserves the tab-bar + home-
                 // indicator space, so the list only needs a small breathing pad of its own.
@@ -197,12 +201,9 @@ export const ChannelSidebarSkeleton = ({ count = 18 }: { count?: number }) => (
 )
 
 /** A workspace with no channels: sized for the narrow column and held near the top, with the one thing to do. */
-const EmptyChannels = () => {
-    const [createOpen, setCreateOpen] = useState(false)
-
+const EmptyChannels = ({ onCreate }: { onCreate: () => void }) => {
     return (
         <>
-            <CreateChannelDialog open={createOpen} onOpenChange={setCreateOpen} />
             <Empty className="min-h-0 flex-none justify-start gap-2 px-4 pt-12 pb-6">
                 <EmptyMedia className="size-6 [&_svg:not([class*='size-'])]:size-6">
                     <Hash />
@@ -212,7 +213,7 @@ const EmptyChannels = () => {
                     <EmptyDescription className="text-p-sm">{_("Channels are where your team talks.")}</EmptyDescription>
                 </EmptyHeader>
                 <EmptyContent className="mt-1">
-                    <Button variant="outline" size="sm" onClick={() => setCreateOpen(true)}>
+                    <Button variant="outline" size="sm" onClick={onCreate}>
                         <PlusIcon />
                         {_("Create a channel")}
                     </Button>
