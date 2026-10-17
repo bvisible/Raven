@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useMemo, useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import { FrappeContext, type FrappeConfig, type FrappeError } from "frappe-react-sdk"
 import { Button } from "@components/ui/button"
@@ -34,7 +34,9 @@ export const TeamStep = ({ setup, isLast, finishing, onDone, onSkip, onSave, onP
     const where = setup.channel ? _("{0} and #{1}", [workspaceName, setup.channel.name]) : workspaceName
     const added = addedUsers.length > 0
     const shownSiteUsers = added ? addedUsers : siteUsers
-    const chosenSiteUsers = siteUsers.filter((user) => selected.has(user.user))
+    // Memoized: the preview effect below keys on it, and a fresh array each render would fire the
+    // effect, set state in the page, re-render this step, and go round again.
+    const chosenSiteUsers = useMemo(() => siteUsers.filter((user) => selected.has(user.user)), [siteUsers, selected])
     const pendingSiteUsers = chosenSiteUsers.length > 0 && !added
     const hasFilledRow = rows.some((row) => row.email.trim())
     const somethingToSend = hasFilledRow || pendingSiteUsers
