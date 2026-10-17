@@ -291,10 +291,17 @@ def add_user_to_workspaces_and_channels(user: str, workspaces: list[str], channe
 	Workspaces first, since channel membership needs workspace membership.
 	Both calls run under the caller's own permissions.
 	"""
+	# //// Neoffice — a new person of the messaging already joins every open workspace when the account is made
+	# //// (open_workspaces.join_open_workspaces_on_insert, maintenance#1553): adding them to such a workspace again
+	# //// raised « User is already a member of the workspace » and the whole invitation failed. Only the workspaces
+	# //// and channels they are not in yet.
 	for workspace in workspaces:
-		add_workspace_members(workspace, [user])
+		if not frappe.db.exists("Raven Workspace Member", {"workspace": workspace, "user": user}):
+			add_workspace_members(workspace, [user])
+	# //// Neoffice — the same for the channels: an invitation adds a person only where they are not yet.
 	for channel in channels:
-		add_channel_members(channel, [user])
+		if not frappe.db.exists("Raven Channel Member", {"channel_id": channel, "user_id": user}):
+			add_channel_members(channel, [user])
 
 
 def get_employee_details(user: str):

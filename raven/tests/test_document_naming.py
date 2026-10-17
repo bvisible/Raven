@@ -15,9 +15,14 @@ class TestDocumentNaming(FrappeTestCase):
 		frappe.set_user("Administrator")
 
 	def test_the_type_is_named_in_the_readers_language(self):
+		# The reader's language comes from a translation of the site, made here: the CI's site compiles no catalogue,
+		# and the label came back as « ToDo » there whatever the code did.
+		translation = frappe.get_doc(
+			{"doctype": "Translation", "language": "fr", "source_text": "ToDo", "translated_text": "Tâche"}
+		).insert(ignore_permissions=True)
+		self.addCleanup(translation.delete, ignore_permissions=True)
 		frappe.local.lang = "fr"
-		self.assertEqual(get_doctype_naming("ToDo")["label"], frappe._("ToDo"))
-		self.assertNotEqual(get_doctype_naming("ToDo")["label"], "ToDo")
+		self.assertEqual(get_doctype_naming("ToDo")["label"], "Tâche")
 
 	def test_a_hashed_id_is_said_random(self):
 		self.assertTrue(get_doctype_naming("Raven Message")["random_id"])
