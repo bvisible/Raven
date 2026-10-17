@@ -42,7 +42,9 @@ def import_existing_system_users():
 	System users made before Raven was installed are otherwise only added the next time
 	their User is saved. "Automatically add system users" means now.
 	"""
-	if not frappe.db.get_single_value("Raven Settings", "auto_add_system_users"):
+	# On a fresh install nothing is stored yet, and Frappe stores a single's defaults only after
+	# after_install. get_single_value would read the setting as off; the doc applies its default.
+	if not frappe.get_single("Raven Settings").auto_add_system_users:
 		return
 
 	users = frappe.get_all(

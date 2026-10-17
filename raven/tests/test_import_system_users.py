@@ -64,6 +64,14 @@ class TestImportSystemUsers(IntegrationTestCase):
 		for email in (WEBSITE_USER, DISABLED_USER, PROFILE_USER):
 			self.assertFalse(frappe.db.exists("Raven User", email), email)
 
+	def test_adds_users_on_a_fresh_install_with_nothing_stored(self):
+		# Before Frappe stores the single's defaults, the setting must still read as on.
+		frappe.db.delete("Singles", {"doctype": "Raven Settings"})
+		frappe.clear_document_cache("Raven Settings", "Raven Settings")
+		frappe.local.db.value_cache.pop("Raven Settings", None)
+		import_existing_system_users()
+		self.assertTrue(frappe.db.exists("Raven User", SYSTEM_USER))
+
 	def test_does_nothing_when_auto_add_is_off(self):
 		frappe.db.set_single_value("Raven Settings", "auto_add_system_users", 0)
 		import_existing_system_users()
