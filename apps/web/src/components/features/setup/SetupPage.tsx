@@ -254,7 +254,7 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
                                 {getSetupStepTitle(shown)}
                             </h1>
                             {shown === "profile" ? (
-                                <ProfileStep {...shownProps} />
+                                <ProfileStep {...shownProps} askPassword={mode === "admin" && !!window.frappe?.boot?.is_fc_site && !window.frappe?.boot?.setup_complete} />
                             ) : shown === "workspace" ? (
                                 <WorkspaceStep {...shownProps} />
                             ) : shown === "channel" ? (

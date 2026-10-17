@@ -75,6 +75,33 @@ class TestSetup(IntegrationTestCase):
 		complete_setup('["workspace"]', "[]")
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
 
+	def test_complete_setup_finishes_frappe_wizard_for_a_cloud_signup(self):
+		with (
+			patch("frappe.integrations.frappe_providers.frappecloud_billing.is_fc_site", return_value=True),
+			patch("frappe.is_setup_complete", return_value=False),
+			patch("frappe.get_hooks", return_value=[]),
+			patch(
+				"frappe.desk.page.setup_wizard.setup_wizard.setup_complete", return_value={"status": "ok"}
+			) as wizard,
+		):
+			complete_setup([], [])
+		self.assertEqual(
+			wizard.call_args.args[0]["timezone"], frappe.get_single("System Settings").time_zone
+		)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)
+
+	def test_complete_setup_leaves_frappe_wizard_to_erpnext(self):
+		with (
+			patch("frappe.integrations.frappe_providers.frappecloud_billing.is_fc_site", return_value=True),
+			patch("frappe.is_setup_complete", return_value=False),
+			patch(
+				"frappe.get_hooks", return_value=["erpnext.setup.setup_wizard.setup_wizard.get_setup_stages"]
+			),
+			patch("frappe.desk.page.setup_wizard.setup_wizard.setup_complete") as wizard,
+		):
+			complete_setup([], [])
+		wizard.assert_not_called()
+
 	def test_complete_setup_survives_malformed_steps(self):
 		complete_setup("not json", '["hr", "<script>"]')
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_pending"), 0)

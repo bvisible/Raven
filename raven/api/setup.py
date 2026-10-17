@@ -89,6 +89,7 @@ def complete_setup(
 	"""Ends the setup flow. A second admin finishing later is a no-op."""
 	frappe.only_for(SETUP_ADMIN_ROLES)
 
+	finish_frappe_setup()
 	frappe.db.set_single_value("Raven Settings", "setup_pending", 0)
 	# Boot is cached per user and carries the flag; every admin's copy is now stale.
 	frappe.cache.delete_key("bootinfo")
@@ -103,6 +104,39 @@ def complete_setup(
 				"skipped_steps": _known_steps(skipped_steps),
 			},
 		)
+
+
+def finish_frappe_setup():
+	"""
+	A Frappe Cloud signup opens Raven before the Framework's setup wizard. Frappe Cloud already
+	stored the region and made the first user, so the wizard is finished here with those values.
+	Apps with wizard stages of their own, like ERPNext, still need the real wizard.
+	"""
+	from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
+	from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
+
+	if frappe.is_setup_complete() or not is_fc_site() or frappe.get_hooks("setup_wizard_stages"):
+		return
+	result = setup_complete(frappe_setup_args())
+	if result.get("status") != "ok":
+		# Raven's setup still ends; the Framework wizard stays available in Desk.
+		frappe.log_error(
+			title="Raven: could not finish the Framework setup wizard", message=result.get("fail")
+		)
+
+
+def frappe_setup_args() -> dict:
+	"""What the wizard's first slide would have sent, from the values Frappe Cloud stored."""
+	settings = frappe.get_single("System Settings")
+	language = frappe.db.get_value("Language", settings.language, "language_name") or "English"
+	return {
+		"language": language,
+		"lang": language,
+		"country": settings.country,
+		"timezone": settings.time_zone,
+		"currency": settings.currency,
+		"enable_telemetry": settings.enable_telemetry,
+	}
 
 
 def _known_steps(value) -> list[str]:

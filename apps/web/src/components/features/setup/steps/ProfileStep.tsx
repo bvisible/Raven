@@ -16,20 +16,27 @@ import { StepFooter } from "./StepFooter"
 import { useReportBusy } from "./useReportBusy"
 import type { SetupStepBodyProps } from "../types"
 
-type ProfileForm = { full_name: string; user_image: string }
+type ProfileForm = { full_name: string; user_image: string; password: string }
+
+type ProfileStepProps = SetupStepBodyProps & {
+    /** A Frappe Cloud signup lands here before any wizard asked for a password; the mobile app needs one. */
+    askPassword?: boolean
+}
 
 /** Name and photo, so the team knows who this is. Continue also marks the user onboarded. */
-export const ProfileStep = (props: SetupStepBodyProps) => {
+export const ProfileStep = (props: ProfileStepProps) => {
     const { myProfile, mutate } = useCurrentRavenUser()
     // The form starts from the saved profile; wait for it.
     if (!myProfile) return null
     return <ProfileFormBody key={myProfile.name} {...props} profile={myProfile} onSaved={() => mutate()} />
 }
 
-const ProfileFormBody = ({ isLast, finishing, onDone, onPreview, onBusyChange, profile, onSaved }: SetupStepBodyProps & { profile: RavenUser; onSaved: () => void }) => {
-    const form = useForm<ProfileForm>({ defaultValues: { full_name: profile.full_name ?? "", user_image: profile.user_image ?? "" } })
+const ProfileFormBody = ({ isLast, finishing, onDone, onPreview, onBusyChange, profile, onSaved, askPassword = false }: ProfileStepProps & { profile: RavenUser; onSaved: () => void }) => {
+    // The name comes from the User record, which Frappe Cloud fills in at signup.
+    const form = useForm<ProfileForm>({ defaultValues: { full_name: profile.full_name ?? "", user_image: profile.user_image ?? "", password: "" } })
     const typedName = useWatch({ control: form.control, name: "full_name" })
     const typedImage = useWatch({ control: form.control, name: "user_image" })
+    const typedPassword = useWatch({ control: form.control, name: "password" })
     const { updateDoc, loading, error } = useFrappeUpdateDoc()
     const [uploadingPhoto, setUploadingPhoto] = useState(false)
     useReportBusy(loading || uploadingPhoto, onBusyChange)
@@ -43,6 +50,9 @@ const ProfileFormBody = ({ isLast, finishing, onDone, onPreview, onBusyChange, p
         // Mid-upload, the save would go out without the photo.
         if (loading || finishing || uploadingPhoto) return
         updateDoc("Raven User", profile.name, buildProfileUpdate(profile, values))
+            // A Raven User is named after its User. Saving new_password there is how Desk's "My Settings"
+            // sets it. The profile, and the onboarded flag, live on the Raven User, so that's a second write.
+            .then(() => (askPassword ? updateDoc("User", profile.name, { new_password: values.password, logout_all_sessions: 0 }) : undefined))
             .then(() => {
                 if (window.frappe?.boot) window.frappe.boot.raven_onboarded = 1
                 markOnboardedInBootCache()
@@ -74,8 +84,18 @@ const ProfileFormBody = ({ isLast, finishing, onDone, onPreview, onBusyChange, p
                     }}
                     inputProps={{ autoFocus: !isMobile }}
                 />
+                {askPassword && (
+                    <DataField
+                        name="password"
+                        label={_("Password")}
+                        isRequired
+                        formDescription={_("You'll need it to sign in to this site.")}
+                        rules={{ validate: (value) => !!value || _("Password is required") }}
+                        inputProps={{ type: "password", autoComplete: "new-password" }}
+                    />
+                )}
                 <StepFooter>
-                    <Button type="submit" variant="solid" size="md" loading={loading || finishing} disabled={!typedName?.trim() || uploadingPhoto}>
+                    <Button type="submit" variant="solid" size="md" loading={loading || finishing} disabled={!typedName?.trim() || (askPassword && !typedPassword) || uploadingPhoto}>
                         {isLast ? _("Finish") : _("Continue")}
                     </Button>
                 </StepFooter>

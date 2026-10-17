@@ -23,7 +23,9 @@ export const SetupGate = () => {
     }, [mode])
 
     if (!mode) return null
-    if (mode === "admin" && !window.frappe?.boot?.setup_complete) return <FrappeSetupRedirect />
+    // A Frappe Cloud signup opens Raven before the Framework wizard; finishing Raven's setup completes it too.
+    const needsFrappeWizard = !window.frappe?.boot?.setup_complete && !window.frappe?.boot?.is_fc_site
+    if (mode === "admin" && needsFrappeWizard) return <FrappeSetupRedirect />
     return (
         <Suspense fallback={null}>
             {/* Either flow starts with the profile step, which onboards the user, so finishing closes it for good. */}
