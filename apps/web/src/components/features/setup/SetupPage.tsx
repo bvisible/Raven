@@ -118,20 +118,23 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
                     const workspace = `/${encodeURIComponent(finalSetup.workspace)}`
                     navigate(finalSetup.channel ? `${workspace}/${encodeURIComponent(finalSetup.channel.id)}` : workspace)
                 }
-                const previewShown = window.matchMedia("(min-width: 1024px)").matches
                 // Saved progress feeds the preview, so it's cleared only once the preview has handed over to the app.
-                const close = () => {
+                playFinale(() => {
                     clearSaved()
                     onFinished()
-                }
-                finaleTimers.current = finaleSchedule({ reducedMotion: prefersReducedMotion(), previewShown }).map(({ at, phase }) =>
-                    window.setTimeout(() => {
-                        if (phase === "closed") return close()
-                        if (phase === "expand") setExpanded(true)
-                        setFinale(phase)
-                    }, at),
-                )
+                })
             })
+    }
+
+    const playFinale = (close: () => void) => {
+        const previewShown = window.matchMedia("(min-width: 1024px)").matches
+        finaleTimers.current = finaleSchedule({ reducedMotion: prefersReducedMotion(), previewShown }).map(({ at, phase }) =>
+            window.setTimeout(() => {
+                if (phase === "closed") return close()
+                if (phase === "expand") setExpanded(true)
+                setFinale(phase)
+            }, at),
+        )
     }
 
     const settle = (status: StepStatus, patch?: Partial<SetupState>) => {

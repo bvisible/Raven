@@ -23,7 +23,7 @@ add_to_apps_screen = [
 		"name": "raven",
 		"logo": "/assets/raven/raven_logo.svg",
 		"title": "Raven",
-		"setup_wizard_text": "Your team's conversations in one place.",
+		"setup_wizard_text": "Welcome to Raven. Let's set up your team's space.",
 		"route": "/raven",
 		"has_permission": "raven.permissions.check_app_permission",
 	}

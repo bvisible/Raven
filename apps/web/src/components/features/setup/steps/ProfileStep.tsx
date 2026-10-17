@@ -78,7 +78,7 @@ const ProfileFormBody = ({ isLast, finishing, onDone, onPreview, onBusyChange, p
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
-                <p className="text-p-base text-ink-gray-7">{_("So your team knows it's you.")}</p>
+                <p className="text-p-base text-ink-gray-7">{_("This is how you’ll appear to your team.")}</p>
                 {error && <ErrorBanner error={error as FrappeError} />}
                 <ImageUploadField
                     name="user_image"

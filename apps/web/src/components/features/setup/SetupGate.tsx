@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react"
+import { createPortal } from "react-dom"
 import { isFrappeSetupComplete, isSetupPending, setupDoneStorageKey } from "@utils/setup"
 import { getSetupMode, type SetupMode } from "./setupMode"
 
@@ -27,12 +28,15 @@ export const SetupGate = () => {
     const needsFrappeWizard = !isFrappeSetupComplete() && !window.frappe?.boot?.is_fc_site
     if (mode === "admin" && needsFrappeWizard) return <FrappeSetupRedirect />
     return (
-        <Suspense fallback={null}>
+        <Suspense fallback={<SetupCover />}>
             {/* Either flow starts with the profile step, which onboards the user, so finishing closes it for good. */}
             <SetupPage mode={mode} onFinished={() => setMode(null)} />
         </Suspense>
     )
 }
+
+/** Hides the app while the setup page's chunk loads; otherwise it shows through for a moment on a reload. */
+const SetupCover = () => createPortal(<div aria-hidden className="fixed inset-0 z-50 bg-surface-base" />, document.body)
 
 /** Desk sends the user on to Frappe's setup wizard while that's incomplete. */
 const FrappeSetupRedirect = () => {

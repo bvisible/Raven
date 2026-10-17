@@ -82,7 +82,7 @@ const WorkspaceForm = ({ saved, onDone, onSave, onPreview, onBusyChange }: Setup
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
-                <p className="text-p-base text-ink-gray-7">{_("This is how your workspace will appear across Raven.")}</p>
+                <p className="text-p-base text-ink-gray-7">{_("Workspaces group channels and people. Start with one for your company. You can add more later.")}</p>
                 {error && <ErrorBanner error={error} />}
                 <ImageUploadField
                     name="logo"
