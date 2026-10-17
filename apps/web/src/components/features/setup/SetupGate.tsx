@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react"
-import { isSetupPending, setupDoneStorageKey } from "@utils/setup"
+import { isFrappeSetupComplete, isSetupPending, setupDoneStorageKey } from "@utils/setup"
 import { getSetupMode, type SetupMode } from "./setupMode"
 
 const SetupPage = lazy(() => import("./SetupPage"))
@@ -24,7 +24,7 @@ export const SetupGate = () => {
 
     if (!mode) return null
     // A Frappe Cloud signup opens Raven before the Framework wizard; finishing Raven's setup completes it too.
-    const needsFrappeWizard = !window.frappe?.boot?.setup_complete && !window.frappe?.boot?.is_fc_site
+    const needsFrappeWizard = !isFrappeSetupComplete() && !window.frappe?.boot?.is_fc_site
     if (mode === "admin" && needsFrappeWizard) return <FrappeSetupRedirect />
     return (
         <Suspense fallback={null}>

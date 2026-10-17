@@ -14,7 +14,7 @@ import { siteKey } from "@lib/site"
 import { hasRole } from "@lib/permissions"
 import _ from "@lib/translate"
 import { cn } from "@lib/utils"
-import { markSetupDoneLocally } from "@utils/setup"
+import { isFrappeSetupComplete, markSetupDoneLocally } from "@utils/setup"
 import { getSetupSteps, getSetupStepTitle, type SetupStepName, type StepStatus, type StepStatuses } from "./steps"
 import { ChannelStep } from "./steps/ChannelStep"
 import { HRStep } from "./steps/HRStep"
@@ -256,7 +256,7 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
                                 {getSetupStepTitle(shown)}
                             </h1>
                             {shown === "profile" ? (
-                                <ProfileStep {...shownProps} askPassword={mode === "admin" && !!window.frappe?.boot?.is_fc_site && !window.frappe?.boot?.setup_complete} />
+                                <ProfileStep {...shownProps} askPassword={mode === "admin" && !!window.frappe?.boot?.is_fc_site && !isFrappeSetupComplete()} />
                             ) : shown === "workspace" ? (
                                 <WorkspaceStep {...shownProps} />
                             ) : shown === "channel" ? (

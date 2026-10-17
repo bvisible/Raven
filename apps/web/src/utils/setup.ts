@@ -3,6 +3,10 @@ import { siteKey } from "@lib/site"
 /** Set when the admin finishes or skips setup, so a failed save can't bring the flow back. Per site in the app. */
 export const setupDoneStorageKey = () => siteKey("raven_setup_completed")
 
+/** The Framework's setup wizard is done. Desk's boot has it at the top level too; the app's slim boot only here. */
+export const isFrappeSetupComplete = (): boolean =>
+    !!(window.frappe?.boot?.sysdefaults?.setup_complete ?? window.frappe?.boot?.setup_complete)
+
 /** Boot flags it only for admins on a site that isn't set up. */
 export const isSetupPending = (): boolean => {
     if (!window.frappe?.boot?.raven_setup_pending) return false
