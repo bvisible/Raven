@@ -164,13 +164,19 @@ class RavenUser(Document):
 
 	def update_photo_from_user(self):
 		"""
-		We need to create a new File record for the user image and attach it to the Raven User record.
-		Why not just copy the URL from the User record? Because the URL is not accessible to the Raven User,
-		and Frappe creates a duplicate file in the system (that is public) but does not update the URL in the field.
+		A public photo on the User is used as it is: everyone can load it. A private one is only
+		readable by those who can read the User, so a copy is attached to the Raven User instead,
+		which every Raven user can read. Frappe makes that copy by fetching the file's full URL.
 		"""
 		user_image = frappe.db.get_value("User", self.user, "user_image")
+		if self.user_image or not isinstance(user_image, str):
+			return
 
-		if isinstance(user_image, str) and user_image.startswith("/"):
+		if user_image.startswith("/files/"):
+			self.user_image = user_image
+			return
+
+		if user_image.startswith("/"):
 			user_image = get_url(user_image)
 
 		try:

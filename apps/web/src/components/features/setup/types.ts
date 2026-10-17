@@ -1,7 +1,15 @@
 import type { PreviewDraft } from "./preview/model"
 
-/** Someone in Raven but in no workspace yet (imported from the site's users on install). */
-export type SiteUser = { user: string; full_name: string; user_image?: string }
+/** Someone on the site setup could add: in Raven but in no workspace, or a system user not in Raven yet. */
+export type SiteUser = {
+    user: string
+    full_name: string
+    user_image?: string
+    in_raven?: boolean
+    /** Off when their single role profile can't take Raven's (Frappe 15). */
+    addable?: boolean
+    role_profile?: string | null
+}
 
 export type Invitee = { email: string; first_name: string }
 

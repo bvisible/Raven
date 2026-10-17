@@ -3,11 +3,13 @@ from unittest.mock import patch
 import frappe
 from frappe.tests import IntegrationTestCase
 
+from raven.api.raven_users import profiles_can_stack
 from raven.api.setup import (
-	add_users_without_workspace,
+	add_site_users,
 	complete_setup,
 	get_company,
-	get_users_without_workspace,
+	get_site_users,
+	record_setup_event,
 )
 from raven.boot import boot_session
 from raven.install import after_install
@@ -16,19 +18,33 @@ EXTRA_TEST_RECORD_DEPENDENCIES = ["User", "Raven User"]
 
 MEMBER = "setup-member@example.com"
 LONER = "setup-loner@example.com"
+# On the site, not in Raven: a plain system user, and one whose roles come from a role profile.
+OUTSIDER = "setup-outsider@example.com"
+PROFILED = "setup-profiled@example.com"
+ROLE_PROFILE = "Setup Test Profile"
+
+
+def _make_user(
+	email: str, first_name: str, roles=("Raven User",), role_profile: str | None = None
+):
+	if frappe.db.exists("User", email):
+		return
+	user = frappe.get_doc(
+		{
+			"doctype": "User",
+			"email": email,
+			"first_name": first_name,
+			"send_welcome_email": 0,
+			"roles": [{"role": role} for role in roles],
+		}
+	)
+	if role_profile:
+		user.role_profile_name = role_profile
+	user.insert(ignore_permissions=True)
 
 
 def _make_raven_user(email: str, first_name: str):
-	if not frappe.db.exists("User", email):
-		frappe.get_doc(
-			{
-				"doctype": "User",
-				"email": email,
-				"first_name": first_name,
-				"send_welcome_email": 0,
-				"roles": [{"role": "Raven User"}],
-			}
-		).insert(ignore_permissions=True)
+	_make_user(email, first_name)
 
 
 def _make_workspace(name: str):
@@ -124,10 +140,39 @@ class TestSetup(IntegrationTestCase):
 		frappe.set_user("Administrator")
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 0)
 
+	def test_setup_event_passes_known_properties_only(self):
+		with patch("raven.api.setup.capture") as capture:
+			record_setup_event(
+				"completed_setup_step",
+				{
+					"step": "workspace",
+					"step_number": "2",
+					"total_steps": 4,
+					"duration_seconds": 12.6,
+					"junk": 1,
+				},
+			)
+		capture.assert_called_once_with(
+			"completed_setup_step",
+			"raven",
+			properties={"step": "workspace", "step_number": 2, "total_steps": 4, "duration_seconds": 12},
+		)
+		with patch("raven.api.setup.capture") as capture:
+			record_setup_event("went_back_in_setup", {"from_step": "bogus", "to_step": "profile"})
+		capture.assert_called_once_with("went_back_in_setup", "raven", properties={"to_step": "profile"})
+		with self.assertRaises(frappe.ValidationError):
+			record_setup_event("some_event", {})
+
 	def test_complete_setup_keeps_profile_step(self):
 		from raven.api.setup import _known_steps
 
 		self.assertEqual(_known_steps(["profile", "workspace", "bogus"]), ["profile", "workspace"])
+
+	def test_install_creates_the_role_profiles(self):
+		frappe.delete_doc("Role Profile", "Raven Admin", force=True)
+		after_install()
+		roles = frappe.get_all("Has Role", filters={"parent": "Raven Admin"}, pluck="role")
+		self.assertEqual(sorted(roles), ["Raven Admin", "Raven User"])
 
 	def test_install_creates_no_workspace(self):
 		workspaces = frappe.db.count("Raven Workspace")
@@ -140,11 +185,23 @@ class TestSetup(IntegrationTestCase):
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 0)
 
 
-class TestUsersWithoutWorkspace(IntegrationTestCase):
+class TestSiteUsers(IntegrationTestCase):
 	def setUp(self):
 		frappe.set_user("Administrator")
+		# Users made "before Raven": the save hook must not put them in on its own.
+		frappe.db.set_single_value("Raven Settings", "auto_add_system_users", 0)
+		if not frappe.db.exists("Role Profile", ROLE_PROFILE):
+			frappe.get_doc(
+				{
+					"doctype": "Role Profile",
+					"role_profile": ROLE_PROFILE,
+					"roles": [{"role": "System Manager"}],
+				}
+			).insert(ignore_permissions=True)
 		_make_raven_user(LONER, "Loner")
 		frappe.db.delete("Raven Workspace Member", {"user": LONER})
+		_make_user(OUTSIDER, "Outsider", roles=("System Manager",))
+		_make_user(PROFILED, "Profiled", roles=(), role_profile=ROLE_PROFILE)
 		self.workspace = _make_workspace("Setup Test Workspace")
 		self.channel = _make_channel(self.workspace.name, "setup-test")
 
@@ -153,62 +210,92 @@ class TestUsersWithoutWorkspace(IntegrationTestCase):
 		frappe.db.rollback()
 
 	def _listed(self):
-		return [row["user"] for row in get_users_without_workspace()]
+		return {row["user"]: row for row in get_site_users()}
 
-	def test_lists_people_in_no_workspace(self):
-		self.assertIn(LONER, self._listed())
+	def test_lists_people_in_no_workspace_and_system_users_not_in_raven(self):
+		listed = self._listed()
+		self.assertTrue(listed[LONER]["in_raven"])
+		self.assertFalse(listed[OUTSIDER]["in_raven"])
+		self.assertNotIn("Administrator", listed)
 
-	def test_leaves_out_workspace_members_and_the_caller(self):
+	def test_leaves_out_workspace_members_and_disabled_people(self):
 		frappe.get_doc(
 			{"doctype": "Raven Workspace Member", "workspace": self.workspace.name, "user": LONER}
 		).insert()
+		frappe.db.set_value("User", OUTSIDER, "enabled", 0)
 		listed = self._listed()
 		self.assertNotIn(LONER, listed)
-		self.assertNotIn("Administrator", listed)
+		self.assertNotIn(OUTSIDER, listed)
 
-	def test_leaves_out_disabled_people(self):
-		frappe.db.set_value("Raven User", {"user": LONER}, "enabled", 0)
-		self.assertNotIn(LONER, self._listed())
+	def test_someone_whose_raven_access_was_taken_away_is_offered_again(self):
+		# Their Raven User is disabled when the role goes; adding them in setup gives it back.
+		user = frappe.get_doc("User", LONER)
+		user.remove_roles("Raven User")
+		self.assertEqual(frappe.db.get_value("Raven User", LONER, "enabled"), 0)
+		self.assertFalse(self._listed()[LONER]["in_raven"])
+		add_site_users([LONER], self.workspace.name)
+		self.assertEqual(frappe.db.get_value("Raven User", LONER, "enabled"), 1)
 
-	def test_add_puts_them_in_the_workspace_and_channel(self):
-		self.assertGreaterEqual(add_users_without_workspace(self.workspace.name, self.channel.name), 1)
-		self.assertTrue(
-			frappe.db.exists("Raven Workspace Member", {"workspace": self.workspace.name, "user": LONER})
-		)
-		self.assertTrue(
-			frappe.db.exists("Raven Channel Member", {"channel_id": self.channel.name, "user_id": LONER})
-		)
-		# Everyone is in a workspace now, so a second call has no one to add.
-		self.assertEqual(add_users_without_workspace(self.workspace.name, self.channel.name), 0)
+	def test_add_gives_raven_access_and_puts_them_in_the_workspace_and_channel(self):
+		self.assertEqual(add_site_users([LONER, OUTSIDER], self.workspace.name, self.channel.name), 2)
+		self.assertTrue(frappe.db.exists("Raven User", OUTSIDER))
+		for user in (LONER, OUTSIDER):
+			self.assertTrue(
+				frappe.db.exists("Raven Workspace Member", {"workspace": self.workspace.name, "user": user})
+			)
+			self.assertTrue(
+				frappe.db.exists("Raven Channel Member", {"channel_id": self.channel.name, "user_id": user})
+			)
 
-	def test_add_without_a_channel(self):
-		add_users_without_workspace(self.workspace.name)
-		self.assertTrue(
-			frappe.db.exists("Raven Workspace Member", {"workspace": self.workspace.name, "user": LONER})
+	def test_a_public_photo_on_the_user_is_shown_and_carried_onto_the_raven_user(self):
+		frappe.db.set_value("User", OUTSIDER, "user_image", "/files/outsider.png")
+		self.assertEqual(self._listed()[OUTSIDER]["user_image"], "/files/outsider.png")
+		add_site_users([OUTSIDER], self.workspace.name)
+		self.assertEqual(
+			frappe.db.get_value("Raven User", OUTSIDER, "user_image"), "/files/outsider.png"
 		)
-		self.assertFalse(frappe.db.exists("Raven Channel Member", {"user_id": LONER}))
+
+	def test_add_takes_only_people_from_the_offered_list(self):
+		# The caller, a made-up name and a workspace member are not on the list.
+		self.assertEqual(
+			add_site_users(["Administrator", "nobody@example.com", LONER], self.workspace.name), 1
+		)
+		self.assertFalse(
+			frappe.db.exists(
+				"Raven Workspace Member", {"workspace": self.workspace.name, "user": "Administrator"}
+			)
+		)
+
+	def test_role_profile_user_gets_ravens_profile_where_profiles_stack(self):
+		listed = self._listed()
+		self.assertEqual(listed[PROFILED]["role_profile"], ROLE_PROFILE)
+		self.assertEqual(listed[PROFILED]["addable"], profiles_can_stack())
+		added = add_site_users([PROFILED], self.workspace.name)
+		if profiles_can_stack():
+			self.assertEqual(added, 1)
+			self.assertTrue(frappe.db.exists("Raven User", PROFILED))
+			self.assertIn("Raven User", frappe.get_roles(PROFILED))
+		else:
+			self.assertEqual(added, 0)
 
 	def test_add_to_an_open_channel_adds_no_member_rows(self):
 		# Everyone in the workspace is in an Open channel; rows are made on first visit.
 		general = _make_channel(self.workspace.name, "setup-general", type="Open")
-		add_users_without_workspace(self.workspace.name, general.name)
-		self.assertTrue(
-			frappe.db.exists("Raven Workspace Member", {"workspace": self.workspace.name, "user": LONER})
-		)
+		add_site_users([LONER], self.workspace.name, general.name)
 		self.assertFalse(frappe.db.exists("Raven Channel Member", {"user_id": LONER}))
 
 	def test_add_refuses_a_channel_from_another_workspace(self):
 		other = _make_workspace("Setup Other Workspace")
 		elsewhere = _make_channel(other.name, "setup-elsewhere")
 		with self.assertRaises(frappe.ValidationError):
-			add_users_without_workspace(self.workspace.name, elsewhere.name)
+			add_site_users([LONER], self.workspace.name, elsewhere.name)
 
 	def test_members_cannot_list_or_add(self):
 		frappe.set_user(LONER)
 		with self.assertRaises(frappe.PermissionError):
-			get_users_without_workspace()
+			get_site_users()
 		with self.assertRaises(frappe.PermissionError):
-			add_users_without_workspace(self.workspace.name)
+			add_site_users([OUTSIDER], self.workspace.name)
 
 
 class TestCompanyDefaults(IntegrationTestCase):

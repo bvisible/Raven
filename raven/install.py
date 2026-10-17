@@ -8,7 +8,7 @@ def after_install():
 		print("Setting up Raven...")
 		add_all_roles_to("Administrator")
 		create_raven_user_for_administrator()
-		import_existing_system_users()
+		create_role_profiles()
 		create_native_oauth_client()
 
 		click.secho("Thank you for installing Raven!", fg="green")
@@ -37,41 +37,26 @@ def create_raven_user_for_administrator():
 		).insert(ignore_permissions=True)
 
 
-def import_existing_system_users():
-	"""
-	System users made before Raven was installed are otherwise only added the next time
-	their User is saved. "Automatically add system users" means now.
-	"""
-	# On a fresh install nothing is stored yet, and Frappe stores a single's defaults only after
-	# after_install. get_single_value would read the setting as off; the doc applies its default.
-	if not frappe.get_single("Raven Settings").auto_add_system_users:
-		return
+RAVEN_USER_PROFILE = "Raven User"
+RAVEN_ADMIN_PROFILE = "Raven Admin"
+ROLE_PROFILES = {
+	RAVEN_USER_PROFILE: ["Raven User"],
+	RAVEN_ADMIN_PROFILE: ["Raven User", "Raven Admin"],
+}
 
-	users = frappe.get_all(
-		"User",
-		filters={
-			"user_type": "System User",
-			"enabled": 1,
-			"name": ["not in", ["Administrator", "Guest"]],
-		},
-		pluck="name",
-	)
-	already_in_raven = set(frappe.get_all("Raven User", filters={"type": "User"}, pluck="user"))
-	for name in users:
-		if name in already_in_raven:
+
+def create_role_profiles():
+	"""
+	Role profiles that put someone on Raven. A user whose roles come from a profile loses any
+	role added directly on their next save, so Raven access is given through a profile of its
+	own, next to the ones their other apps gave them. Profiles that already exist are left alone.
+	"""
+	for name, roles in ROLE_PROFILES.items():
+		if frappe.db.exists("Role Profile", name):
 			continue
-		user = frappe.get_doc("User", name)
-		# Their roles come from a role profile; it would drop a role added here.
-		if user.role_profile_name or getattr(user, "role_profiles", None):
-			continue
-		# The role's save-time hook creates the Raven User. One user that fails to save must
-		# not fail the install; they're added the next time their User is saved.
-		frappe.db.savepoint("raven_import_user")
-		try:
-			user.add_roles("Raven User")
-		except Exception:
-			frappe.db.rollback(save_point="raven_import_user")
-			frappe.log_error(title=f"Raven: could not add {name} on install")
+		frappe.get_doc(
+			{"doctype": "Role Profile", "role_profile": name, "roles": [{"role": role} for role in roles]}
+		).insert(ignore_permissions=True)
 
 
 def create_native_oauth_client():

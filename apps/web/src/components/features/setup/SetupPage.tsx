@@ -28,6 +28,7 @@ import { teamPreviewPeople } from "./steps/teamPreview"
 import { SetupPreview } from "./preview/SetupPreview"
 import type { SetupState, SetupStepBodyProps, SiteUser } from "./types"
 import { prefersReducedMotion, useStepTransition } from "./useStepTransition"
+import { useSetupTelemetry } from "./useSetupTelemetry"
 
 const ALL_STEPS: SetupStepName[] = ["profile", "workspace", "channel", "team", "hr"]
 // One empty list, so a failed people request doesn't hand the team step a new array every render.
@@ -40,7 +41,7 @@ const NO_SITE_USERS: SiteUser[] = []
 const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished: () => void }) => {
     const navigate = useNavigate()
     // Only the admin flow adds people.
-    const { data, isLoading } = useFrappeGetCall<{ message: SiteUser[] }>("raven.api.setup.get_users_without_workspace", undefined, mode === "admin" ? undefined : null, {
+    const { data, isLoading } = useFrappeGetCall<{ message: SiteUser[] }>("raven.api.setup.get_site_users", undefined, mode === "admin" ? undefined : null, {
         revalidateOnFocus: false,
         revalidateIfStale: false,
     })
@@ -73,14 +74,22 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
     const index = steps.indexOf(step)
     const isLast = index === steps.length - 1
 
-    // No saved progress here (another device, cleared storage) but setup already made the
-    // workspace: on a fresh site the one workspace this admin runs is setup's. Checked once.
-    const { workspaces, isLoading: workspacesLoading } = useWorkspaces()
+    // Saved progress is checked against the server once the workspace list is in. Progress whose
+    // workspace no longer exists is from an earlier install on this origin (a reinstalled site, the
+    // same user): it's dropped, or the flow would skip to the team step over records that are gone.
+    // No saved progress (another device, cleared storage) but setup already made the workspace:
+    // on a fresh site the one workspace this admin runs is setup's.
+    const { workspaces, isLoading: workspacesLoading, error: workspacesError } = useWorkspaces()
     const checkedWorkspaces = useRef(false)
     useEffect(() => {
-        if (mode !== "admin" || workspacesLoading || checkedWorkspaces.current) return
+        if (mode !== "admin" || workspacesLoading || workspacesError || checkedWorkspaces.current) return
         checkedWorkspaces.current = true
-        if (saved.setup.workspace) return
+        if (saved.setup.workspace) {
+            if (workspaces.some((workspace) => workspace.name === saved.setup.workspace)) return
+            clearSaved()
+            setCurrent("profile")
+            return
+        }
         const administered = workspaces.filter((workspace) => workspace.workspace_member_name && workspace.is_admin)
         if (administered.length !== 1) return
         setSaved({ setup: { ...saved.setup, workspace: administered[0].name }, statuses: { ...saved.statuses, workspace: "completed" } })
@@ -102,8 +111,11 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
         }
     }, [])
 
+    const telemetry = useSetupTelemetry({ mode, step, steps })
+
     const finish = (finalSetup: SetupState, finalStatuses: StepStatuses) => {
         setFinishing(true)
+        telemetry.finishing()
         const withStatus = (status: StepStatus) => steps.filter((name) => finalStatuses[name] === status)
         // Members only set up their profile; completing the site is the admin flow's.
         const completesSite = mode === "admin"
@@ -142,6 +154,7 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
         // A step finished before stays finished when skipped on a revisit.
         const nextStatuses = statuses[step] === "completed" ? statuses : { ...statuses, [step]: status }
         setSaved({ setup: nextSetup, statuses: nextStatuses })
+        telemetry.settled(step, status)
         if (isLast) finish(nextSetup, nextStatuses)
         else setCurrent(steps[index + 1])
     }
@@ -177,7 +190,12 @@ const SetupPage = ({ mode, onFinished }: { mode: "admin" | "profile"; onFinished
         setup,
         isLast,
         finishing,
-        onBack: index > 0 ? () => setCurrent(steps[index - 1]) : undefined,
+        onBack: index > 0
+            ? () => {
+                telemetry.wentBack(step, steps[index - 1])
+                setCurrent(steps[index - 1])
+            }
+            : undefined,
         onDone: (patch) => settle("completed", patch),
         onSkip: () => settle("skipped"),
         onSave: (patch) => setSaved((current) => ({ ...current, setup: { ...current.setup, ...patch } })),

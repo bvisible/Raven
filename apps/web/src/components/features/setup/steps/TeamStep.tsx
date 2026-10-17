@@ -17,12 +17,13 @@ import type { SetupStepBodyProps, SiteUser } from "../types"
 
 type TeamStepProps = SetupStepBodyProps & { siteUsers: SiteUser[]; canInvite: boolean }
 
-/** Adds people already in Raven and invites others by email, into the workspace and channel made earlier. */
+/** Adds people already on the site and invites others by email, into the workspace and channel made earlier. */
 export const TeamStep = ({ setup, isLast, finishing, onDone, onSkip, onSave, onPreview, onBusyChange, siteUsers, canInvite }: TeamStepProps) => {
     const form = useForm<InviteForm>({ defaultValues: { rows: [EMPTY_INVITE] } })
     const rows = useWatch({ control: form.control, name: "rows" })
     const { invited, addedSiteUsers: addedUsers } = setup
-    const [addSiteUsers, setAddSiteUsers] = useState(true)
+    // Everyone who can be added starts ticked; the admin unticks who shouldn't be.
+    const [selected, setSelected] = useState(() => new Set(siteUsers.filter((user) => user.addable !== false).map((user) => user.user)))
     const [sending, setSending] = useState(false)
     useReportBusy(sending, onBusyChange)
     const [addError, setAddError] = useState<FrappeError | null>(null)
@@ -33,24 +34,27 @@ export const TeamStep = ({ setup, isLast, finishing, onDone, onSkip, onSave, onP
     const where = setup.channel ? _("{0} and #{1}", [workspaceName, setup.channel.name]) : workspaceName
     const added = addedUsers.length > 0
     const shownSiteUsers = added ? addedUsers : siteUsers
-    const pendingSiteUsers = siteUsers.length > 0 && addSiteUsers && !added
+    const chosenSiteUsers = siteUsers.filter((user) => selected.has(user.user))
+    const pendingSiteUsers = chosenSiteUsers.length > 0 && !added
     const hasFilledRow = rows.some((row) => row.email.trim())
     const somethingToSend = hasFilledRow || pendingSiteUsers
 
+    // The preview shows who's coming in: the ticked people, or everyone added.
+    const previewUsers = added ? addedUsers : chosenSiteUsers
     useEffect(() => {
-        onPreview({ people: teamPreviewPeople(rows, invited, shownSiteUsers) })
-    }, [rows, shownSiteUsers, invited]) // eslint-disable-line react-hooks/exhaustive-deps
+        onPreview({ people: teamPreviewPeople(rows, invited, previewUsers) })
+    }, [rows, previewUsers, invited]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const label = hasFilledRow && pendingSiteUsers ? _("Add and invite")
-        : pendingSiteUsers ? siteUsers.length === 1 ? _("Add 1 person") : _("Add {0} people", [String(siteUsers.length)])
+        : pendingSiteUsers ? chosenSiteUsers.length === 1 ? _("Add 1 person") : _("Add {0} people", [String(chosenSiteUsers.length)])
             : hasFilledRow ? _("Send invites")
                 : isLast ? _("Finish") : _("Continue")
 
     const description = !shownSiteUsers.length
         ? _("They'll get an email to sign in, and are added to {0}.", [where])
         : canInvite
-            ? _("Add people already on this site to {0}, and invite others by email.", [where])
-            : _("Add people already on this site to {0}.", [where])
+            ? _("Add people already on this site, and invite others by email.")
+            : _("Add people already on this site.")
 
     const onSubmit = async ({ rows }: InviteForm) => {
         // A second Enter mid-send would send the same invites again.
@@ -62,9 +66,9 @@ export const TeamStep = ({ setup, isLast, finishing, onDone, onSkip, onSave, onP
         let nowAdded = addedUsers
         if (pendingSiteUsers) {
             try {
-                await call.post("raven.api.setup.add_users_without_workspace", { workspace: setup.workspace, channel: setup.channel?.id })
-                nowAdded = siteUsers
-                onSave({ addedSiteUsers: siteUsers })
+                await call.post("raven.api.setup.add_site_users", { users: chosenSiteUsers.map((user) => user.user), workspace: setup.workspace, channel: setup.channel?.id })
+                nowAdded = chosenSiteUsers
+                onSave({ addedSiteUsers: chosenSiteUsers })
             } catch (error) {
                 setAddError(error as FrappeError)
                 setSending(false)
@@ -115,7 +119,7 @@ export const TeamStep = ({ setup, isLast, finishing, onDone, onSkip, onSave, onP
                 {/* Locked while sending: a failed invite resets the table to the rows that were sent. */}
                 <fieldset disabled={sending} className="contents">
                     {shownSiteUsers.length > 0 && (
-                        <SiteUsersBox users={shownSiteUsers} added={added} where={where} checked={addSiteUsers} onCheckedChange={setAddSiteUsers} />
+                        <SiteUsersBox users={shownSiteUsers} added={added} where={where} selected={selected} onSelectedChange={setSelected} />
                     )}
                     {canInvite && (
                         <InviteTable invited={invited} label={shownSiteUsers.length ? _("Invite others by email") : _("Invite by email")} />
