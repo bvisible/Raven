@@ -91,10 +91,13 @@
 }
 
 /* Setup page motion. Off under reduced motion: the page switches instantly. */
+/* Animations that end on the resting look fill backwards, not both. Safari keeps an element
+   composited for as long as an animation holds its last frame, and leaves blurred-in text
+   soft until something repaints (WebKit bug 257023). Only the ones that end hidden hold. */
 /* Steps blur out, leave a short gap, then blur back in sharp. */
 @utility animate-setup-step-in {
   @media (prefers-reduced-motion: no-preference) {
-    animation: setup-blur-in 250ms ease-out 100ms both;
+    animation: setup-blur-in 250ms ease-out 100ms backwards;
   }
 }
 
@@ -106,26 +109,26 @@
 
 @utility animate-setup-blur-in {
   @media (prefers-reduced-motion: no-preference) {
-    animation: setup-blur-in 300ms ease-out both;
+    animation: setup-blur-in 300ms ease-out backwards;
   }
 }
 
 
 @utility animate-setup-open {
   @media (prefers-reduced-motion: no-preference) {
-    animation: setup-open 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: setup-open 400ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
 }
 
 @utility animate-setup-open-late {
   @media (prefers-reduced-motion: no-preference) {
-    animation: setup-open 400ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
+    animation: setup-open 400ms cubic-bezier(0.16, 1, 0.3, 1) 80ms backwards;
   }
 }
 
 @utility animate-setup-item-in {
   @media (prefers-reduced-motion: no-preference) {
-    animation: setup-item-in 250ms ease-out both;
+    animation: setup-item-in 250ms ease-out backwards;
   }
 }
 
@@ -139,7 +142,7 @@
 @utility animate-setup-check {
   @media (prefers-reduced-motion: no-preference) {
     stroke-dasharray: 32;
-    animation: setup-check 400ms cubic-bezier(0.33, 1, 0.68, 1) 150ms both;
+    animation: setup-check 400ms cubic-bezier(0.33, 1, 0.68, 1) 150ms backwards;
   }
 }
 
@@ -155,29 +158,30 @@
 /* HR step: two app logos come together from either side once the step has faded in, the × growing between them. */
 @utility animate-setup-join-left {
   @media (prefers-reduced-motion: no-preference) {
-    animation: setup-join-left 900ms cubic-bezier(0.33, 1, 0.68, 1) 350ms both;
+    animation: setup-join-left 900ms cubic-bezier(0.33, 1, 0.68, 1) 350ms backwards;
   }
 }
 
 @utility animate-setup-join-right {
   @media (prefers-reduced-motion: no-preference) {
-    animation: setup-join-right 900ms cubic-bezier(0.33, 1, 0.68, 1) 350ms both;
+    animation: setup-join-right 900ms cubic-bezier(0.33, 1, 0.68, 1) 350ms backwards;
   }
 }
 
 @utility animate-setup-join-mark {
   @media (prefers-reduced-motion: no-preference) {
-    animation: setup-join-mark 900ms cubic-bezier(0.33, 1, 0.68, 1) 350ms both;
+    animation: setup-join-mark 900ms cubic-bezier(0.33, 1, 0.68, 1) 350ms backwards;
   }
 }
 
+/* The sharp end is `none`, not `blur(0)`, so no filter is left on the element afterwards. */
 @keyframes setup-blur-in {
   from { opacity: 0; filter: blur(6px); }
-  to { opacity: 1; filter: blur(0); }
+  to { opacity: 1; filter: none; }
 }
 
 @keyframes setup-blur-out {
-  from { opacity: 1; filter: blur(0); }
+  from { opacity: 1; filter: none; }
   to { opacity: 0; filter: blur(6px); }
 }
 
