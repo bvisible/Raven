@@ -16,29 +16,46 @@
 
 </div>
 
+<picture>
+	<source media="(prefers-color-scheme: dark)" srcset=".github/readme/raven-dark.png">
+	<img src=".github/readme/raven-light.png" alt="Raven in the browser, showing a channel with shared photos" width="100%">
+</picture>
+
+<picture>
+	<source media="(prefers-color-scheme: dark)" srcset=".github/readme/threads-documents-dark.png">
+	<img src=".github/readme/threads-documents-light.png" alt="A thread beside the channel, and a document from a Frappe app shown as a card in the chat" width="100%">
+</picture>
+<p align="center"><sub>Threads for side discussions &nbsp;&middot;&nbsp; Documents from any Frappe app, in the chat</sub></p>
+
+<picture>
+	<source media="(prefers-color-scheme: dark)" srcset=".github/readme/files-search-dark.png">
+	<img src=".github/readme/files-search-light.png" alt="The files drawer listing every photo shared in a channel, and search results across channels" width="100%">
+</picture>
+<p align="center"><sub>Every file shared in a channel &nbsp;&middot;&nbsp; Search across channels</sub></p>
+
 ## Raven
 
-Raven is open-source chat for teams. Channels, direct messages, threads, files and reactions, with nothing surprising in between. It runs on your own Frappe site, so your conversations stay in your database and there is no per-user pricing.
+Raven is an open-source chat app for teams, built on the [Frappe Framework](https://frappe.io/framework). It runs on your own Frappe site, so your messages stay in your database and nobody charges you per user.
 
-Raven is built on the [Frappe Framework](https://frappe.io/framework) and works alongside ERPNext, HR, CRM and Helpdesk.
+It lives alongside ERPNext, HR, CRM and Helpdesk, and any document from any Frappe app can be part of the conversation.
 
 ### Key features
 
-- **Channels and direct messages:** Open, private and public channels, plus one-to-one messages. Group channels into workspaces.
-- **Threads and replies:** Reply inline, or start a thread when a discussion needs its own space.
-- **Rich messages:** Formatting, mentions, links, code blocks, emoji and custom reactions.
-- **Files and previews:** Drag in images and documents. Links and shared documents show a preview card.
-- **Search:** Find messages, files and people across every channel you belong to.
-- **Notifications:** Web push, quiet hours and per-channel preferences. Reminders and scheduled messages.
-- **Mobile:** Works in the browser and as an installable web app on phones.
+- **Channels and direct messages:** Public and private channels for teams, projects and topics, grouped into workspaces. Direct messages for everything else.
+- **Threads:** Reply in the channel, or take a side discussion into a thread so it does not drown out everyone else.
+- **Rich messages:** Formatting, mentions, code blocks, polls, emoji and custom reactions.
+- **Files and previews:** Drop in photos, videos and documents. Links show a preview, and every file is listed per channel.
+- **Search:** Find messages, files, links and people across every channel you are in.
+- **Notifications:** Push notifications on the web and on your phone, with quiet hours and per-channel settings. Reminders bring a message back later, and scheduled messages go out at a set time.
+- **Mobile:** iOS and Android apps, plus an installable web app, all on the same site.
 
 ### Works with your Frappe apps
 
-- **Share a document:** Paste a link to any document on the site and Raven shows it with its status and key fields.
-- **Document notifications:** Post to a channel when a document is created, changed or submitted. Conditions and templates are configurable without code.
-- **Workflows from the chat:** Approve, reject or send back a document without leaving the conversation.
-- **Know who is on leave:** Frappe HR leave shows up next to a person's name.
-- **Bots, webhooks and AI agents:** Build bots that post and reply, send incoming webhooks into channels, and set up agents backed by your own OpenAI or compatible provider.
+- **Share a document:** Paste a link to any document on the site and Raven shows a card with its status and key fields.
+- **Document notifications:** Post to a channel when a document is created, changed or submitted. Set the conditions and the message template without writing code.
+- **Approve from the chat:** Approve, reject or send back a document without leaving the conversation.
+- **Who is on leave:** Leave from Frappe HR shows next to a person's name.
+- **Bots, webhooks and AI agents:** Bots that post and reply, incoming webhooks that post into channels, and agents backed by your own OpenAI or compatible provider.
 
 ### Under the hood
 
@@ -47,9 +64,10 @@ Raven is built on the [Frappe Framework](https://frappe.io/framework) and works 
 
 ### Compatibility
 
-| Raven branch | Frappe branch |
-| :----------- | :------------ |
-| develop      | version-15 (15.111 or later), version-16, develop |
+| Raven branch | Frappe branch | Notes |
+| :----------- | :------------ | :---- |
+| main         | version-15 (15.111 or later), version-16 | Stable |
+| develop      | version-15 (15.111 or later), version-16, develop | Development |
 
 ## Getting started
 
@@ -99,6 +117,20 @@ If you already have a bench, install Raven the usual way:
 bench get-app https://github.com/frappe/raven
 bench --site your-site install-app raven
 ```
+
+### Mobile apps
+
+The iOS and Android apps connect to any site running Raven v3 or later. Enter the site address, sign in, and every channel is there, in sync with the web app.
+
+<div>
+	<a href="https://apps.apple.com/app/raven-mobile/id6741682327" target="_blank">
+		<img src=".github/readme/app-store-badge.svg" alt="Download on the App Store" height="40" />
+	</a>
+	&nbsp;
+	<a href="https://play.google.com/store/apps/details?id=raven.thecommit.company&hl=en_IN" target="_blank">
+		<img src=".github/readme/google-play-badge.png" alt="Get it on Google Play" height="40" />
+	</a>
+</div>
 
 ## Development
 
