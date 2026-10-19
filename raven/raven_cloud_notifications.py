@@ -62,6 +62,19 @@ def sync_users_tokens_to_raven_cloud():
 	Sync all the tokens available on this site to Raven Cloud
 	"""
 	raven_settings = frappe.get_single("Raven Settings")
+
+	# //// Neoffice — only a site that uses Raven Cloud's relay has tokens to hand to it. On a site with another push
+	# //// service, or none, no secret is set: get_password raised and this daily job failed every night, in a
+	# //// Scheduled Job Log row that no check reads. Same guard as sync_invalid_tokens (#410).
+	if (
+		raven_settings.push_notification_service != "Raven"
+		or not raven_settings.push_notification_api_key
+	):
+		return
+	api_secret = raven_settings.get_password("push_notification_api_secret", raise_exception=False)
+	if not api_secret:
+		return
+
 	tokens = frappe.db.get_all("Raven Push Token", fields=["user", "fcm_token"], order_by="user")
 
 	url = f"{raven_settings.push_notification_server_url}/api/method/raven_cloud.api.notification.import_user_tokens"
@@ -69,7 +82,7 @@ def sync_users_tokens_to_raven_cloud():
 	response = make_api_call(
 		url=url,
 		api_key=raven_settings.push_notification_api_key,
-		api_secret=raven_settings.get_password("push_notification_api_secret"),
+		api_secret=api_secret,  # //// Neoffice — read once above, without raising
 		method="POST",
 		params={"site_name": get_site_name(), "tokens": json.dumps(tokens)},
 	)
