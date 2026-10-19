@@ -19,6 +19,12 @@ class RavenBridgeViewController: CAPBridgeViewController {
         return configuration
     }
 
+    // Capacitor builds this from the iPhone list in Info.plist and ignores the iPad one,
+    // which pins the iPad to portrait. The iPad rotates; the iPhone stays portrait.
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        UIDevice.current.userInterfaceIdiom == .pad ? .all : .portrait
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Installed PWAs get iOS's edge back-swipe; a WKWebView has to opt in.

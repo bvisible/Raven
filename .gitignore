@@ -15,3 +15,6 @@ raven/www/raven.html
 
 
 apps/web/.env.local
+# Store screenshots and the demo site seed: local tooling, not part of the app
+screenshots/
+raven/demo/

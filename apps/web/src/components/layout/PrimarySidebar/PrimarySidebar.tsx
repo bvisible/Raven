@@ -50,7 +50,8 @@ const RavenLogo = () => {
 const PrimarySidebar = () => {
     return (
         <TooltipProvider delayDuration={0}>
-            <div className="flex flex-col h-full gap-2 shrink-0 justify-between items-center border-r border-outline-gray-2 bg-surface-sidebar w-(--primary-sidebar-width) pb-4 pt-2.5">
+            {/* The rail sits beside <main>, so it pads the status bar inset itself (iPad). */}
+            <div className="flex flex-col h-full gap-2 shrink-0 justify-between items-center border-r border-outline-gray-2 bg-surface-sidebar w-(--primary-sidebar-width) pb-4 pt-2.5 standalone:pt-[calc(var(--inset-top)+0.625rem)]">
                 {/* min-h-0 lets this group shrink below its content, which is what
                     hands the workspace list inside it a bounded height to scroll in.
                     The nav icons above and the saved/profile block below stay put —

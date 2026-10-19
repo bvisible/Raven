@@ -20,7 +20,8 @@
     "native:clean": "cd apps/native && yarn clean",
     "native:ios": "cd apps/native && yarn ios",
     "native:android": "cd apps/native && yarn android",
-    "native:testflight": "cd apps/native && yarn testflight"
+    "native:testflight": "cd apps/native && yarn testflight",
+    "native:playstore": "cd apps/native && yarn playstore"
   },
   "keywords": [],
   "author": "",

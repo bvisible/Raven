@@ -1,6 +1,6 @@
 <div align="center" markdown="1">
 
-<a href="https://frappe.io/raven">
+<a href="https://frappe.io/product/raven">
     <img src="raven/public/raven_logo.svg" height="80" alt="Raven logo">
 </a>
 
@@ -12,7 +12,7 @@
 [![CI](https://github.com/frappe/raven/actions/workflows/ci.yml/badge.svg)](https://github.com/frappe/raven/actions/workflows/ci.yml)
 [![License: AGPL v3](https://img.shields.io/badge/license-AGPLv3-blue)](LICENSE)
 
-[Website](https://frappe.io/raven) - [Discussions](https://github.com/frappe/raven/discussions) - [Issues](https://github.com/frappe/raven/issues)
+[Website](https://frappe.io/product/raven) - [Issues](https://github.com/frappe/raven/issues)
 
 </div>
 
@@ -128,9 +128,8 @@ yarn dev
 
 The app runs at `http://raven.localhost:8080` and proxies API calls to your site. Run `yarn` from the repository root only, not from `apps/web`.
 
-## Community
+## Contributing
 
-- [GitHub Discussions](https://github.com/frappe/raven/discussions): Questions, ideas and help.
 - [GitHub Issues](https://github.com/frappe/raven/issues): Bug reports. Include steps to reproduce, screenshots and any console or server errors.
 - [Report security vulnerabilities](https://frappe.io/security)
 - [Translations](https://crowdin.com/project/frappe)
