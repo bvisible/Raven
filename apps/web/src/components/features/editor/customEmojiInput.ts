@@ -2,6 +2,7 @@ import type { EditorState, Transaction } from "@tiptap/pm/state"
 import { Mapping } from "@tiptap/pm/transform"
 import { getDefaultStore } from "jotai"
 import { customEmojiShortcodesAtom, splitCustomEmojiShortcodes } from "@lib/customEmojiShortcodes"
+import { sitePath } from "@hooks/useFileSrc"
 
 // From the state, not @tiptap/pm/model: two prosemirror-model copies are installed.
 type PMNode = EditorState["doc"]
@@ -105,7 +106,7 @@ export const customEmojiInputTransaction = (
     const type = state.schema.nodes.customEmoji
     for (const { pos, swap } of edits) {
         // The emoji keeps the replaced text's marks, so a spoilered `:name:` stays hidden.
-        if (swap) tr.replaceWith(swap.from, swap.to, type.create({ src: swap.src, alt: swap.shortcode }, null, swap.marks))
+        if (swap) tr.replaceWith(swap.from, swap.to, type.create({ src: sitePath(swap.src), alt: swap.shortcode }, null, swap.marks))
         else tr.delete(pos, pos + 1)
     }
     return tr

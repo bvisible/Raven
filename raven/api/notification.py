@@ -58,7 +58,7 @@ def register_site_on_raven_cloud() -> None:
 			api_key=raven_settings.push_notification_api_key,
 			api_secret=raven_settings.get_password("push_notification_api_secret"),
 			method="POST",
-			params={"site_name": urlparse(frappe.utils.get_url()).hostname},
+			params={"site_name": urlparse(frappe.utils.get_url(allow_header_override=False)).hostname},
 		)
 		message = response.get("message")
 

@@ -1,3 +1,4 @@
+import { siteUrl } from "@lib/site"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { DownloadIcon, PrinterIcon } from "lucide-react"
 import { Button } from "@components/ui/button"
@@ -77,9 +78,9 @@ export const DocumentPrintDialog = ({
 
     const previewUrl = `/printview?${buildParams("_lang", { trigger_print: "0" })}`
 
-    const onPrint = () => window.open(`/printview?${buildParams("_lang", { trigger_print: "1" })}`, "_blank")
+    const onPrint = () => window.open(siteUrl(`/printview?${buildParams("_lang", { trigger_print: "1" })}`), "_blank")
     const onDownloadPdf = () =>
-        window.open(`/api/method/frappe.utils.print_format.download_pdf?${buildParams("language")}`, "_blank")
+        window.open(siteUrl(`/api/method/frappe.utils.print_format.download_pdf?${buildParams("language")}`), "_blank")
 
     const isMobile = useIsMobile()
 
@@ -142,7 +143,7 @@ export const DocumentPrintDialog = ({
         return (
             <Drawer open={open} onOpenChange={onOpenChange}>
                 <DrawerContent>
-                    <div className="flex h-[88dvh] flex-col gap-3 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-1">
+                    <div className="flex h-[88dvh] flex-col gap-3 px-4 pb-[calc(var(--inset-bottom)+0.75rem)] pt-1">
                         <DrawerTitle className="text-left">{_("Print {0}", [docname])}</DrawerTitle>
                         {/* sr-only: the title already carries the document name on
                             screen; screen readers get the full purpose. */}

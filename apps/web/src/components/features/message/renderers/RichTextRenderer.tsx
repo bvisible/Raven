@@ -1,3 +1,4 @@
+import { fileSrc, sitePath } from "@hooks/useFileSrc"
 import { useMemo, useState } from "react"
 import { Element, Text, domToReact, htmlToDOM, type DOMNode, type HTMLReactParserOptions } from "html-react-parser"
 import { UserMention, ChannelMention } from "./MessageMention"
@@ -30,6 +31,10 @@ const SAFE_HREF = /^(https?:|mailto:|tel:|\/|#)/i
 
 /** Custom-emoji image src: same-origin (relative) or http(s) only — never data:/js:. */
 const SAFE_IMG_SRC = /^(https?:|\/)/i
+
+/** Tags no message needs: they load another document, run script, or reach the whole page.
+ *  Stored HTML is not sanitized server-side, so a sender can put any of them in. */
+const DROPPED_TAGS = new Set(["script", "iframe", "frame", "frameset", "object", "embed", "base", "meta", "link", "style", "form", "svg", "math"])
 
 /** Visible text of a node, minus a leading @/# — the fallback mention label. */
 const mentionLabel = (node: Element): string =>
@@ -152,6 +157,8 @@ const options: HTMLReactParserOptions = {
 
         if (!(node instanceof Element)) return
 
+        if (DROPPED_TAGS.has(node.name)) return <></>
+
         // Strip author classes. v2 Raven baked presentational utilities (e.g.
         // `text-sm`) into the stored HTML; because those classes also exist in
         // THIS app's compiled CSS, they apply and fight the .tiptap stylesheet
@@ -191,12 +198,13 @@ const options: HTMLReactParserOptions = {
         // Custom emoji: an inline <img data-type="customEmoji">. Render it sized like an
         // emoji (the author class is stripped above), src-sanitized to a safe scheme.
         if (node.name === "img" && node.attribs?.["data-type"] === "customEmoji") {
-            const src = (node.attribs.src ?? "").trim()
+            // Checked after unwrapping: an address the app saved carries the real one inside.
+            const src = sitePath((node.attribs.src ?? "").trim())
             if (!SAFE_IMG_SRC.test(src)) return <></>
             const alt = node.attribs.alt ?? ""
             // `emoji` class → sized by `.tiptap .emoji` (same rule as the composer),
             // which beats `.tiptap img` on specificity. Consistent inline emoji size.
-            return <img src={src} alt={alt} title={alt} loading="lazy" className="emoji" />
+            return <img src={fileSrc(src)} alt={alt} title={alt} loading="lazy" className="emoji" />
         }
 
         // Code blocks: <pre><code class="language-xxx">…</code></pre>. Returning

@@ -1,3 +1,4 @@
+import { siteUrl } from "@lib/site"
 import { commandMenuOpenAtom } from "@components/features/cmdk/atoms"
 import NavUserMenu from "@components/features/header/NavUserMenu/NavUserMenu"
 import { Avatar, AvatarFallback, AvatarImage } from "@components/ui/avatar"
@@ -39,7 +40,7 @@ const suppressNextClick = () => {
 }
 
 const RavenLogo = () => {
-    return <img src="/assets/raven/raven_logo.svg" alt="Raven Logo" className="w-8 h-8" />
+    return <img src={siteUrl("/assets/raven/raven_logo.svg")} alt="Raven Logo" className="w-8 h-8" />
 }
 
 /**
@@ -49,7 +50,8 @@ const RavenLogo = () => {
 const PrimarySidebar = () => {
     return (
         <TooltipProvider delayDuration={0}>
-            <div className="flex flex-col h-full gap-2 shrink-0 justify-between items-center border-r border-outline-gray-2 bg-surface-sidebar w-(--primary-sidebar-width) pb-4 pt-2.5">
+            {/* The rail sits beside <main>, so it pads the status bar inset itself (iPad). */}
+            <div className="flex flex-col h-full gap-2 shrink-0 justify-between items-center border-r border-outline-gray-2 bg-surface-sidebar w-(--primary-sidebar-width) pb-4 pt-2.5 standalone:pt-[calc(var(--inset-top)+0.625rem)]">
                 {/* min-h-0 lets this group shrink below its content, which is what
                     hands the workspace list inside it a bounded height to scroll in.
                     The nav icons above and the saved/profile block below stay put —
@@ -314,7 +316,7 @@ const WorkspaceItem = ({ workspace }: { workspace: WorkspaceFields }) => {
                         {/* Badge anchors to the avatar, not the full-width rail cell */}
                         <div className="relative">
                             <Avatar className="w-8 h-8 rounded">
-                                <AvatarImage src={workspace.logo} alt={workspace.workspace_name} draggable={false} />
+                                <AvatarImage src={workspace.logo && siteUrl(workspace.logo)} alt={workspace.workspace_name} draggable={false} />
                                 {/* rounded (not the fallback's default rounded-full) to
                                     match the square-ish Avatar root and loaded logo */}
                                 <AvatarFallback className="rounded text-xs bg-surface-gray-2 text-ink-gray-7">

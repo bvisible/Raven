@@ -1,3 +1,4 @@
+import { fileSrc, sitePath } from "@hooks/useFileSrc"
 import { Extension } from "@tiptap/core"
 import { Suggestion } from "@tiptap/suggestion"
 import { Data, SearchIndex } from "emoji-mart"
@@ -244,7 +245,7 @@ export const EmojiSuggestion = Extension.create<EmojiSuggestionOptions>({
                             .chain()
                             .focus()
                             .insertContentAt(range, [
-                                { type: "customEmoji", attrs: { src, alt: `:${props.id}:` }, marks },
+                                { type: "customEmoji", attrs: { src: sitePath(src), alt: `:${props.id}:` }, marks },
                                 { type: "text", text: " ", marks },
                             ])
                             .run()
@@ -256,7 +257,7 @@ export const EmojiSuggestion = Extension.create<EmojiSuggestionOptions>({
                     renderItem: (emoji) =>
                         srcOf(emoji) ? (
                             <>
-                                <img src={srcOf(emoji)} alt={emoji.id} loading="lazy" className="h-5 w-5 object-contain" />
+                                <img src={fileSrc(srcOf(emoji))} alt={emoji.id} loading="lazy" className="h-5 w-5 object-contain" />
                                 <span className="truncate text-ink-gray-6">:{emoji.id}:</span>
                             </>
                         ) : (

@@ -12,7 +12,8 @@ export const cloudSettingsOpenAtom = atom(false)
  * all. Reading boot means no request is ever made on a site that cannot show it.
  */
 export const isCloudSettingsAvailable = (): boolean =>
-    window.frappe?.boot?.cloud_settings?.enabled === true
+    // The SDK calls the site by relative URL with cookies; the native app's page is not on the site.
+    !import.meta.env.VITE_NATIVE && window.frappe?.boot?.cloud_settings?.enabled === true
 
 /** Opens the Cloud Settings dialog on the billing panel. Rejects with the SDK's message. */
 export const openBillingDialog = async (): Promise<void> => {

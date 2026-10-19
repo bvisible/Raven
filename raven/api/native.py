@@ -3,8 +3,10 @@ import frappe.sessions
 
 # Origins the bundled app runs from: WKWebView on iOS, the Android WebView.
 APP_ORIGINS = ("capacitor://localhost", "https://localhost")
-# Sent by the app on every request. A browser page at https://localhost shares that origin but
-# cannot add a header of its own without a preflight, which is answered by the same rule.
+# Sent by the app on every request. It marks the request as the app's. It is not a security
+# check: a page at https://localhost could add the same header, and its preflight would be
+# answered by the same rule. The origin allowlist is the real boundary, and those origins only
+# exist on the user's own device.
 APP_HEADER = "X-Raven-App"
 
 
@@ -30,6 +32,7 @@ def app_boot():
 			load_translations,
 			set_time_zone,
 		)
+		from frappe.integrations.frappe_providers.frappecloud_billing import is_fc_site
 	except ImportError:
 		# A Frappe without one of these helpers still boots the app, only as slowly as Desk.
 		return frappe.sessions.get()
@@ -41,6 +44,8 @@ def app_boot():
 	set_time_zone(bootinfo)
 	bootinfo.sysdefaults = frappe.defaults.get_defaults()
 	bootinfo.sysdefaults["setup_complete"] = frappe.is_setup_complete()
+	# The setup flow reads it to tell a Frappe Cloud signup from a site needing the Desk wizard.
+	bootinfo.is_fc_site = is_fc_site()
 	load_translations(bootinfo)
 	bootinfo.lang = str(bootinfo.lang)
 	load_conf_settings(bootinfo)
