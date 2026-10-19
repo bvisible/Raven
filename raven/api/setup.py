@@ -36,7 +36,10 @@ def is_setup_admin() -> bool:
 
 
 def _raven_users_without_workspace() -> list[dict]:
-	"""Enabled people in Raven who belong to no workspace, except whoever is asking."""
+	"""
+	Enabled people in Raven who belong to no workspace, except whoever is asking and the
+	Administrator account, which install puts in Raven but is nobody's teammate.
+	"""
 	raven_user = frappe.qb.DocType("Raven User")
 	user = frappe.qb.DocType("User")
 	member = frappe.qb.DocType("Raven Workspace Member")
@@ -53,7 +56,7 @@ def _raven_users_without_workspace() -> list[dict]:
 		)
 		.where(raven_user.type == "User")
 		.where(raven_user.enabled == 1)
-		.where(raven_user.user != frappe.session.user)
+		.where(raven_user.user.notin(["Administrator", frappe.session.user]))
 		.where(raven_user.user.notin(in_a_workspace))
 	).run(as_dict=True)
 

@@ -13,9 +13,9 @@ import { siteUrl } from "@lib/site"
 import ravenLogo from "@raven/public/raven_logo.svg"
 
 const LINKS = [
+    { label: _("Documentation"), href: "https://docs.frappe.io/raven" },
     { label: _("GitHub"), href: "https://github.com/frappe/raven" },
     { label: _("Website"), href: "https://ravenchat.ai" },
-    // { label: _("Documentation"), href: "https://docs.ravenapp.cloud" },
 ]
 
 /** Version of every installed app, plus links. Same footer as the mobile profile page. */
