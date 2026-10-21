@@ -1,10 +1,13 @@
-import { Navigate, Outlet, useMatch, useParams } from 'react-router'
+//// Neoffice - useLocation: the query that asks for the whole channel list (showsAllOf, below).
+import { Navigate, Outlet, useLocation, useMatch, useParams } from 'react-router'
 import { ChannelSidebar } from '@components/channel-sidebar/ChannelSidebar'
 import AppMobileFooter from '@components/features/header/AppMobileFooter'
 import { useIsMobile } from '@hooks/use-mobile'
 import { useLayerInAnimation } from '@hooks/useLayerInAnimation'
 import { useWorkspaces } from '@hooks/useWorkspaces'
 import { cn } from '@lib/utils'
+//// Neoffice - with Synk's lists in the desk's menu, an open channel takes the whole width (embeddedInDesk.ts).
+import { LISTS_IN_DESK_MENU, showsAllOf } from '@utils/embeddedInDesk'
 
 /**
  * Slack-style columns: a full-height channel sidebar beside the content
@@ -30,6 +33,11 @@ const WorkspaceLayout = () => {
     const hasChannelOpen = Boolean(channelMatch)
     // No slide when the chat layer is already open on a BACK arrival — see the hook.
     const layerAnimation = useLayerInAnimation(hasChannelOpen)
+    //// Neoffice - with Synk's lists in the desk's menu (LISTS_IN_DESK_MENU), an open channel takes the whole width; where
+    //// the menu asked for all of them (showsAllOf), the channel list shows alone, as on a phone.
+    const { search } = useLocation()
+    const listInMenu = LISTS_IN_DESK_MENU && hasChannelOpen
+    const listAlone = !hasChannelOpen && showsAllOf(search)
 
     // The workspace no longer exists (deleted here or by another admin, or the
     // user was removed) — bounce to the index, which lands on a valid workspace.
@@ -51,7 +59,8 @@ const WorkspaceLayout = () => {
         <div className='relative flex flex-col h-full min-h-0 w-full'>
             <div className='flex min-h-0 flex-1'>
                 <div
-                    className='md:w-(--sidebar-width) w-full shrink-0 min-h-0'
+                    //// Neoffice - hidden beside a channel, or alone the whole width, with Synk's lists in the desk's menu
+                    className={cn('md:w-(--sidebar-width) w-full shrink-0 min-h-0', listInMenu && 'md:hidden', listAlone && 'md:flex-1')}
                     // While covered by the channel layer on mobile, keep the sidebar out
                     // of the focus order / accessibility tree.
                     inert={isMobile && hasChannelOpen ? true : undefined}
@@ -70,6 +79,8 @@ const WorkspaceLayout = () => {
                         layerAnimation,
                         !hasChannelOpen && 'max-md:hidden',
                         'md:flex-1',
+                        //// Neoffice - no channel beside the list alone (showsAllOf)
+                        listAlone && 'md:hidden',
                     )}
                 >
                     <Outlet />

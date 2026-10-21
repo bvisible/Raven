@@ -70,3 +70,85 @@ describe("signInWindow", () => {
         expect(signInWindow()).toBe(own)
     })
 })
+
+describe("LISTS_IN_DESK_MENU", () => {
+    it("is true framed by the desk with chrome=menu on the first address", async () => {
+        const { LISTS_IN_DESK_MENU } = await startedIn(windowAt("/raven?embed=desk&chrome=menu", deskPage()))
+        expect(LISTS_IN_DESK_MENU).toBe(true)
+    })
+
+    it("is false without it, and never outside the desk's frame", async () => {
+        expect((await startedIn(windowAt("/raven?embed=desk", deskPage()))).LISTS_IN_DESK_MENU).toBe(false)
+        expect((await startedIn(windowAt("/raven?chrome=menu", deskPage()))).LISTS_IN_DESK_MENU).toBe(false)
+        expect((await startedIn(windowAt("/raven?embed=desk&chrome=menu"))).LISTS_IN_DESK_MENU).toBe(false)
+    })
+})
+
+describe("showsAllOf", () => {
+    it("shows a whole list where the desk's menu asked for all of it", async () => {
+        const { showsAllOf } = await startedIn(windowAt("/raven?embed=desk&chrome=menu", deskPage()))
+        expect(showsAllOf("?all")).toBe(true)
+        expect(showsAllOf("?all=1&x=2")).toBe(true)
+        expect(showsAllOf("")).toBe(false)
+    })
+
+    it("never does where the desk's menu does not show the lists", async () => {
+        const { showsAllOf } = await startedIn(windowAt("/raven?embed=desk", deskPage()))
+        expect(showsAllOf("?all")).toBe(false)
+    })
+})
+
+describe("tellDeskWhere", () => {
+    it("tells the desk's page the path, to its origin only", async () => {
+        const desk = { ...deskPage(), postMessage: vi.fn() }
+        const { tellDeskWhere } = await startedIn(windowAt("/raven?embed=desk", desk))
+        tellDeskWhere("/raven/Synk/synk-general")
+        expect(desk.postMessage).toHaveBeenCalledWith({ type: "raven:route", path: "/raven/Synk/synk-general" }, SITE)
+    })
+
+    it("tells nobody outside the desk's frame", async () => {
+        const opener = { ...deskPage(), postMessage: vi.fn() }
+        const { tellDeskWhere } = await startedIn(windowAt("/raven", opener))
+        tellDeskWhere("/raven/Synk/synk-general")
+        expect(opener.postMessage).not.toHaveBeenCalled()
+    })
+})
+
+describe("deskCommandOf", () => {
+    const command = (data: unknown, source: unknown, origin = SITE) => ({ data, source, origin })
+
+    it("takes the settings and the scheduled messages from the desk's page", async () => {
+        const desk = deskPage()
+        const { deskCommandOf } = await startedIn(windowAt("/raven?embed=desk&chrome=menu", desk))
+        expect(deskCommandOf(command({ type: "raven:command", name: "settings.open" }, desk))).toEqual({
+            name: "settings.open",
+            tab: "profile",
+        })
+        expect(deskCommandOf(command({ type: "raven:command", name: "settings.open", tab: "channels" }, desk))).toEqual({
+            name: "settings.open",
+            tab: "channels",
+        })
+        // A tab it does not know opens the profile
+        expect(deskCommandOf(command({ type: "raven:command", name: "settings.open", tab: "<x>" }, desk))).toEqual({
+            name: "settings.open",
+            tab: "profile",
+        })
+        expect(deskCommandOf(command({ type: "raven:command", name: "scheduled.open" }, desk))).toEqual({
+            name: "scheduled.open",
+        })
+    })
+
+    it("takes nothing else, from nobody else", async () => {
+        const desk = deskPage()
+        const { deskCommandOf } = await startedIn(windowAt("/raven?embed=desk&chrome=menu", desk))
+        expect(deskCommandOf(command({ type: "raven:command", name: "logout" }, desk))).toBeNull()
+        expect(deskCommandOf(command({ type: "other", name: "settings.open" }, desk))).toBeNull()
+        expect(deskCommandOf(command("settings.open", desk))).toBeNull()
+        expect(deskCommandOf(command({ type: "raven:command", name: "settings.open" }, {}))).toBeNull()
+        expect(deskCommandOf(command({ type: "raven:command", name: "settings.open" }, desk, "https://other.example.org"))).toBeNull()
+        // Framed by the desk without the lists in its menu: Raven's rail is there, nothing to take
+        const plain = deskPage()
+        const without = await startedIn(windowAt("/raven?embed=desk", plain))
+        expect(without.deskCommandOf(command({ type: "raven:command", name: "settings.open" }, plain))).toBeNull()
+    })
+})

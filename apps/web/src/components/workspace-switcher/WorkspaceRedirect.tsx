@@ -1,4 +1,6 @@
-import { Navigate, useParams } from "react-router-dom"
+import { Navigate, useLocation, useParams } from "react-router-dom"
+//// Neoffice - the desk's menu may ask for a workspace's whole list (embeddedInDesk.ts, showsAllOf).
+import { showsAllOf } from "@utils/embeddedInDesk"
 import { useMemo } from "react"
 import { useAtomValue } from "jotai"
 import { useIsMobile } from "@hooks/use-mobile"
@@ -22,6 +24,8 @@ export const WorkspaceRedirect = () => {
     const { channels } = useChannels()
     const { myProfile } = useCurrentRavenUser()
     const { groupedChannels, ungroupedChannels } = useGroupedChannels(channels, myProfile, workspaceID)
+    //// Neoffice - asked by the desk's menu for all the channels: the list, not a channel
+    const { search } = useLocation()
 
     // First channel in the same display order the sidebar uses.
     const firstChannel = useMemo(
@@ -35,7 +39,8 @@ export const WorkspaceRedirect = () => {
 
     // On mobile the channel sidebar IS the workspace index page — don't
     // auto-open a channel over it (same as DirectMessagesIndex)
-    if (isMobile) {
+    //// Neoffice - or the desk's menu asked for all the channels (showsAllOf)
+    if (isMobile || showsAllOf(search)) {
         return null
     }
 

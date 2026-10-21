@@ -1,4 +1,6 @@
-import { Outlet, Navigate, useMatch } from "react-router-dom"
+import { Outlet, Navigate, useLocation, useMatch } from "react-router-dom"
+//// Neoffice - with Synk's lists in the desk's menu, an open conversation takes the whole width (embeddedInDesk.ts).
+import { LISTS_IN_DESK_MENU, showsAllOf } from "@utils/embeddedInDesk"
 import { DMSidebar } from "@components/dm-sidebar/DMSidebar"
 import { useDMChannels } from "@stores/channels/useChannelList"
 import { useIsMobile } from "@hooks/use-mobile"
@@ -25,8 +27,10 @@ export function DirectMessagesEmptyState() {
 export function DirectMessagesIndex() {
     const { dmChannels, isLoading } = useDMChannels()
     const isMobile = useIsMobile()
+    //// Neoffice - the desk's menu asked for all the direct messages: the list, not the first conversation
+    const { search } = useLocation()
 
-    if (isMobile) return null
+    if (isMobile || showsAllOf(search)) return null
 
     if (isLoading) return null
 
@@ -48,6 +52,11 @@ export default function DirectMessages() {
     const id = useMatch({ path: "/dm-channel/:id", end: false })?.params.id
     // No slide when the chat layer is already open on a BACK arrival — see the hook.
     const layerAnimation = useLayerInAnimation(!!id)
+    //// Neoffice - with Synk's lists in the desk's menu (LISTS_IN_DESK_MENU), an open conversation takes the whole width;
+    //// where the menu asked for all of them (showsAllOf), the list shows alone, as on a phone.
+    const { search } = useLocation()
+    const listInMenu = LISTS_IN_DESK_MENU && !!id
+    const listAlone = !id && showsAllOf(search)
 
     // Mobile is STACKED navigation (same as WorkspaceLayout): the DM list is the page,
     // and an open DM renders as a full-screen layer on top of it. The list stays mounted
@@ -59,7 +68,8 @@ export default function DirectMessages() {
     return <div className="relative flex flex-col h-full min-h-0 w-full">
         <div className="flex min-h-0 flex-1">
             <div
-                className="md:w-(--dm-sidebar-width) w-full shrink-0 min-h-0"
+                //// Neoffice - hidden beside a conversation, or alone the whole width, with Synk's lists in the desk's menu
+                className={cn("md:w-(--dm-sidebar-width) w-full shrink-0 min-h-0", listInMenu && "md:hidden", listAlone && "md:flex-1")}
                 // While covered on mobile, keep the list out of focus / accessibility order.
                 inert={isMobile && !!id ? true : undefined}
             >
@@ -74,6 +84,8 @@ export default function DirectMessages() {
                 layerAnimation,
                 !id && "max-md:hidden",
                 "md:flex-1",
+                //// Neoffice - no conversation beside the list alone (showsAllOf)
+                listAlone && "md:hidden",
             )}>
                 <Outlet />
             </div>

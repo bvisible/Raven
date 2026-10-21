@@ -7,7 +7,8 @@ import { useIsMobile } from "@hooks/use-mobile"
 import { useLoadUsers } from "@hooks/useLoadUsers"
 import _ from "@lib/translate"
 import { AlertCircle, WifiOffIcon } from "lucide-react"
-import { Outlet } from "react-router"
+//// Neoffice - useLocation: the path Raven shows, told to the desk's page (useTellDeskWhere, below).
+import { Outlet, useLocation } from "react-router"
 import PrimarySidebar from "./PrimarySidebar/PrimarySidebar"
 import CommandMenu from "@components/features/cmdk/CommandMenu"
 import { AttachmentPreviewModal } from "@components/features/message/renderers/AttachmentPreviewModal"
@@ -43,7 +44,12 @@ import RavenSettingsDialog from "@components/features/settings/SettingsDialog"
 import { NeoCockpitShell, FRAPPE_INTEGRATION } from "./NeoCockpitShell"
 //// Neoffice - Synk framed by the desk's NeoMail page: no Neoffice chrome inside, the desk's theme followed.
 import { useFrappeThemeBridge } from "./useFrappeThemeBridge"
-import { EMBEDDED_IN_DESK } from "@utils/embeddedInDesk"
+//// Neoffice - framed by the desk with Synk's lists in the desk's menu: no rail of Raven's, and the menu told where Raven is.
+import { EMBEDDED_IN_DESK, LISTS_IN_DESK_MENU, deskCommandOf, tellDeskWhere } from "@utils/embeddedInDesk"
+import { useAtom, useSetAtom } from "jotai"
+import { settingsDialogOpenTab } from "@components/features/settings/settingsDialogAtom"
+import ScheduledMessagesDialog from "@components/features/schedule-send/ScheduledMessagesDialog"
+import { scheduledMessagesDialogOpenAtom } from "@components/features/schedule-send/useScheduledMessages"
 import { MessageActionDialogs } from "@components/features/message/actions/MessageActionDialogs"
 
 /**
@@ -210,6 +216,10 @@ const AppListeners = ({ children }: { children: React.ReactNode }) => {
     // Focus-and-route when a push notification is clicked while a window exists
     // (sw.js posts the target URL instead of opening a duplicate tab)
     usePushNotificationNavigation()
+    //// Neoffice - framed by the desk's NeoMail page, its menu lights the conversation Raven shows
+    useTellDeskWhere()
+    //// Neoffice - and its menu opens what Raven's rail would (settings, scheduled messages)
+    useDeskCommands()
     // Mirrors the unread total onto the PWA's app-icon badge (Badging API)
     useAppBadge()
     // Sweeps tray notifications for channels/threads that are no longer unread
@@ -234,6 +244,43 @@ const AppListeners = ({ children }: { children: React.ReactNode }) => {
     </>
 }
 
+//// Neoffice - framed by the desk (EMBEDDED_IN_DESK), the page around the frame is told the path Raven shows at each move:
+//// its menu, which shows Synk's lists, lights that conversation.
+const useTellDeskWhere = () => {
+    const { pathname } = useLocation()
+    useEffect(() => {
+        tellDeskWhere(window.location.pathname)
+    }, [pathname])
+}
+
+//// Neoffice - with Synk's lists in the desk's menu (LISTS_IN_DESK_MENU), Raven's rail is not drawn: what only the rail
+//// opened, the menu asks for (deskCommandOf): the settings at a tab, the scheduled messages.
+const useDeskCommands = () => {
+    const setSettingsTab = useSetAtom(settingsDialogOpenTab)
+    const setScheduledOpen = useSetAtom(scheduledMessagesDialogOpenAtom)
+    useEffect(() => {
+        if (!LISTS_IN_DESK_MENU) return
+        const heard = (event: MessageEvent) => {
+            const command = deskCommandOf(event)
+            if (!command) return
+            if (command.name === "settings.open") {
+                setSettingsTab(command.tab)
+            } else {
+                setScheduledOpen(true)
+            }
+        }
+        window.addEventListener("message", heard)
+        return () => window.removeEventListener("message", heard)
+    }, [setSettingsTab, setScheduledOpen])
+}
+
+//// Neoffice - the scheduled messages' dialog lives in Raven's rail (its button), which the composer's banner opens too:
+//// without the rail (LISTS_IN_DESK_MENU), it is mounted here.
+const DeskScheduledMessagesDialog = () => {
+    const [open, setOpen] = useAtom(scheduledMessagesDialogOpenAtom)
+    return <ScheduledMessagesDialog open={open} onOpenChange={setOpen} />
+}
+
 /** If opened on a desktop, show the primary sidebar at all times. If on mobile, don't show the sidebar at all - bottom bars will be controlled by the respective page */
 const AppShellLayout = ({ children }: { children: React.ReactNode }) => {
 
@@ -254,8 +301,10 @@ const AppShellLayout = ({ children }: { children: React.ReactNode }) => {
     //// navigates BETWEEN Neoffice apps, Raven's rail navigates WITHIN Raven — they are not
     //// duplicates. Served standalone (dev server, PWA), the cockpit is skipped and upstream's
     //// layout renders untouched.
+    //// Neoffice - the desk's menu shows Synk's lists and pages (LISTS_IN_DESK_MENU): no rail of Raven's beside them.
     const layout = <div className="flex h-dvh overflow-hidden bg-surface-elevation-1">
-        <PrimarySidebar />
+        {!LISTS_IN_DESK_MENU && <PrimarySidebar />}
+        {LISTS_IN_DESK_MENU && <DeskScheduledMessagesDialog />}
         <RavenSettingsDialog />
         <main className="flex min-w-0 flex-1 flex-col">
             {children}
