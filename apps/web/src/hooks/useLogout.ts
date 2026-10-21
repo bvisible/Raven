@@ -5,6 +5,8 @@ import { errorResponseToast } from "@components/ui/error-banner"
 import { disablePush } from "@lib/push"
 import { db } from "@db"
 import _ from "@lib/translate"
+//// Neoffice - framed by the desk's NeoMail page, signing out takes the desk's page to the sign-in.
+import { signInWindow } from "@utils/embeddedInDesk"
 
 /**
  * localStorage prefixes that hold app data and must not survive a logout
@@ -137,7 +139,10 @@ export function useLogout(): { logout: () => Promise<void>; isLoggingOut: boolea
 
         const base = import.meta.env.VITE_BASE_NAME
         const appPath = base ? `/${base}` : "/"
-        window.location.replace(`/login?redirect-to=${encodeURIComponent(appPath)}`)
+        //// Neoffice - framed by the desk's NeoMail page: the desk's page goes to the sign-in, and comes back to itself.
+        const away = signInWindow()
+        const back = away === window ? appPath : away.location.pathname
+        away.location.replace(`/login?redirect-to=${encodeURIComponent(back)}`)
     }, [frappeLogout])
 
     return { logout, isLoggingOut }

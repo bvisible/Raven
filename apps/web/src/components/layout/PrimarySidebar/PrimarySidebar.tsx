@@ -16,6 +16,8 @@ import { useAtom, useSetAtom } from "jotai"
 import { BellIcon, BookmarkIcon, CalendarClockIcon, MessageSquareTextIcon, MoreHorizontalIcon, SearchIcon, UsersIcon } from "lucide-react"
 //// Neoffice - the cockpit rail carries the search field; see below.
 import { FRAPPE_INTEGRATION } from "../NeoCockpitShell"
+//// Neoffice - framed by the desk's NeoMail page there is no cockpit rail inside Raven: its own magnifier comes back.
+import { EMBEDDED_IN_DESK } from "@utils/embeddedInDesk"
 import { NavLink } from "react-router"
 import { settingsDialogOpenTab } from "@components/features/settings/settingsDialogAtom"
 import { useMemo } from "react"
@@ -70,8 +72,10 @@ const PrimarySidebar = () => {
                         cockpit rail already shows a search field, and NeoCockpitShell wires its
                         onSearch to this very command palette — so this magnifier would be a second
                         button opening the same overlay, one rail apart. Served standalone (dev
-                        server, PWA) there is no cockpit, so it stays. */}
-                    {!FRAPPE_INTEGRATION && <SearchButton />}
+                        server, PWA) there is no cockpit, so it stays.
+                        //// Neoffice - framed by the desk's NeoMail page (EMBEDDED_IN_DESK) there is no
+                        cockpit inside either, so it stays too. */}
+                    {(!FRAPPE_INTEGRATION || EMBEDDED_IN_DESK) && <SearchButton />}
                     <NotificationsLink />
                     <DirectMessagesLink />
                     <ThreadsLink />

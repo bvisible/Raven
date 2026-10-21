@@ -1,4 +1,6 @@
 import Cookies from "js-cookie"
+//// Neoffice - framed by the desk's NeoMail page, the sign-in replaces the desk's page, not the frame.
+import { signInWindow } from "@utils/embeddedInDesk"
 
 /**
  * Runtime recovery from a DEAD SESSION. The boot-time login check in App.tsx
@@ -18,7 +20,9 @@ import Cookies from "js-cookie"
 
 /** Same login redirect App.tsx does at boot — returns here after login. */
 export const redirectToLogin = () => {
-    window.location.href = `/login?redirect-to=${window.location.pathname}`
+    //// Neoffice - framed by the desk's NeoMail page: the desk's page signs in, and comes back to itself.
+    const away = signInWindow()
+    away.location.href = `/login?redirect-to=${away.location.pathname}`
 }
 
 /** Global SWR onError: side-effect only — SWR's own retry behavior is untouched. */

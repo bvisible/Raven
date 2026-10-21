@@ -41,6 +41,9 @@ import { SessionBroadcast } from "./SessionBroadcast"
 import RavenSettingsDialog from "@components/features/settings/SettingsDialog"
 //// Neoffice - the Neoffice chrome around /raven (see NeoCockpitShell).
 import { NeoCockpitShell, FRAPPE_INTEGRATION } from "./NeoCockpitShell"
+//// Neoffice - Synk framed by the desk's NeoMail page: no Neoffice chrome inside, the desk's theme followed.
+import { useFrappeThemeBridge } from "./useFrappeThemeBridge"
+import { EMBEDDED_IN_DESK } from "@utils/embeddedInDesk"
 import { MessageActionDialogs } from "@components/features/message/actions/MessageActionDialogs"
 
 /**
@@ -236,6 +239,10 @@ const AppShellLayout = ({ children }: { children: React.ReactNode }) => {
 
     const isMobile = useIsMobile()
 
+    //// Neoffice - framed by the desk's NeoMail page (EMBEDDED_IN_DESK), no NeoCockpitShell is drawn, and it is the
+    //// shell that follows the desk's theme: the frame follows it here, whatever its width.
+    useFrappeThemeBridge(EMBEDDED_IN_DESK)
+
     if (isMobile) {
         return <div className="flex h-dvh flex-col overflow-hidden">
             {children}
@@ -258,7 +265,8 @@ const AppShellLayout = ({ children }: { children: React.ReactNode }) => {
     //// Neoffice - inside Frappe (/raven), the shared NeoCockpit chrome wraps the app, as it did in
     //// v2 ("feat(cockpit): put the Neoffice chrome back around /raven in v3"): the same menu as the
     //// desk, instead of Raven's own sidebar alone.
-    if (FRAPPE_INTEGRATION) {
+    //// Neoffice - framed by the desk's NeoMail page, the desk's own menu is already around the frame: not a second one.
+    if (FRAPPE_INTEGRATION && !EMBEDDED_IN_DESK) {
         return <NeoCockpitShell>{layout}</NeoCockpitShell>
     }
 

@@ -24,6 +24,8 @@ import { lazy, Suspense, useEffect } from "react"
 import AppShell from "@components/layout/AppShell"
 import { useAtomValue } from "jotai"
 import { lastChannelAtom, lastWorkspaceAtom } from "@utils/lastVisitedAtoms"
+//// Neoffice - framed by the desk's NeoMail page, the sign-in replaces the desk's page, not the frame.
+import { signInWindow } from "@utils/embeddedInDesk"
 import { useIsMobile } from "@hooks/use-mobile"
 import { useWorkspaces } from "@hooks/useWorkspaces"
 import WorkspaceLayout from "@pages/workspace/WorkspaceLayout"
@@ -169,7 +171,9 @@ function App() {
 
   useEffect(() => {
     if (shouldRedirectToLogin) {
-      window.location.href = `/login?redirect-to=${window.location.pathname}`
+      //// Neoffice - framed by the desk's NeoMail page: the desk's page signs in, and comes back to itself.
+      const away = signInWindow()
+      away.location.href = `/login?redirect-to=${away.location.pathname}`
     }
   }, [shouldRedirectToLogin])
 
