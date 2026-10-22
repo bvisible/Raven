@@ -1,7 +1,9 @@
+from unittest.mock import patch
+
 import frappe
 from frappe.tests import IntegrationTestCase
 
-from raven.notification import site_tag, split_for_app, with_site
+from raven.notification import shown_workspace, site_tag, split_for_app, with_site
 from raven.raven_cloud_notifications import get_site_name
 
 
@@ -18,6 +20,16 @@ class TestNotificationLabels(IntegrationTestCase):
 		tag = site_tag("abc123")
 		self.assertTrue(tag.startswith(f"{host}:"))
 		self.assertEqual(tag[len(host) + 1 :], "abc123")
+
+	def test_workspace_is_named_only_when_the_site_has_several(self):
+		with patch("raven.notification.get_workspace_names", return_value={"north": "North"}):
+			self.assertEqual(shown_workspace("north"), "")
+		with patch(
+			"raven.notification.get_workspace_names",
+			return_value={"north": "North", "south": "South"},
+		):
+			self.assertEqual(shown_workspace("north"), "North")
+			self.assertEqual(shown_workspace("deleted-workspace"), "")
 
 
 class TestAppPushSplit(IntegrationTestCase):
