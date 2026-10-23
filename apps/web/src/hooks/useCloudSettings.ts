@@ -1,4 +1,4 @@
-import { closeCloudSettings, openCloudSettings } from "@frappe-dev/cloud-sdk"
+import { closeCloudSettings, openCloudSettings } from "@frappe/cloud-sdk"
 import { atom, getDefaultStore } from "jotai"
 import { useEffect, useState } from "react"
 
@@ -21,7 +21,7 @@ export const openBillingDialog = async (): Promise<void> => {
     store.set(cloudSettingsOpenAtom, true)
     try {
         await openCloudSettings({
-            panels: ["billing", "domains", "advanced"],
+            panels: ["billing", "marketplace", "domains", "advanced"],
             tab: "billing",
             // Follows the `dark` class Raven's ThemeProvider puts on <html>.
             theme: "auto",
