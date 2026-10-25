@@ -9020,3 +9020,699 @@ msgstr "Lecteur Apple Podcasts"
 # //// Neoffice — label held in a constant list and shown through _(option.label) (search filters / command palette): the catalogue had no entry.
 msgid "PDFs"
 msgstr "PDF"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:134
+msgid "1 person selected"
+msgstr "1 personne sélectionnée"
+
+#: apps/web/src/components/features/setup/steps/HRStep.tsx:61
+msgid "A badge on their profile, and a heads-up when you mention them."
+msgstr "Un badge sur leur profil, et une alerte lorsque vous les mentionnez."
+
+#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:288
+msgid "A direct message can only be between two users."
+msgstr "Un message direct ne peut être échangé qu'entre deux utilisateurs."
+
+#: apps/web/src/native/NativeBridge.tsx:37
+msgid "A newer Raven app is available for this site."
+msgstr "Une version plus récente de Synk est disponible pour ce site."
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:189
+msgid "A System Manager can add them"
+msgstr "Un gestionnaire système peut les ajouter"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersBox.tsx:57
+msgid "A System Manager can add them."
+msgstr "Un gestionnaire système peut les ajouter."
+
+#. Label of a JSON field in DocType 'Raven AI Pending Action'
+#: raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json:96
+msgid "Action Data"
+msgstr "Données de l'action"
+
+#. Label of a Section Break field in DocType 'Raven AI Pending Action'
+#: raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json:91
+msgid "Action Details"
+msgstr "Détails de l'action"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:85
+#: apps/web/src/components/features/setup/steps/TeamStep.tsx:51
+msgid "Add 1 person"
+msgstr "Ajouter 1 personne"
+
+#: apps/web/src/components/features/setup/steps/TeamStep.tsx:50
+msgid "Add and invite"
+msgstr "Ajouter et inviter"
+
+#: apps/web/src/components/features/setup/steps/TeamStep.tsx:58
+msgid "Add people already on this site, and invite others by email."
+msgstr "Ajoutez des personnes déjà présentes sur ce site, et invitez d'autres personnes par e-mail."
+
+#: apps/web/src/components/features/setup/steps/TeamStep.tsx:59
+msgid "Add people already on this site."
+msgstr "Ajoutez des personnes déjà présentes sur ce site."
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:45
+msgid "Add people from this site"
+msgstr "Ajouter des personnes de ce site"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:189
+#, python-brace-format
+msgid "Add the Raven User role to the {0} profile first"
+msgstr "Ajoutez d'abord le rôle Raven User au profil {0}"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersBox.tsx:57
+#, python-brace-format
+msgid "Add the Raven User role to the {0} profile first."
+msgstr "Ajoutez d'abord le rôle Raven User au profil {0}."
+
+#: apps/web/src/components/features/setup/steps.ts:33
+msgid "Add your team"
+msgstr "Ajoutez votre équipe"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:85
+#: apps/web/src/components/features/setup/steps/TeamStep.tsx:51
+#, python-brace-format
+msgid "Add {0} people"
+msgstr "Ajouter {0} personnes"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersBox.tsx:51
+#, python-brace-format
+msgid "Add {0} to {1}"
+msgstr "Ajouter {0} à {1}"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersBox.tsx:37
+#, python-brace-format
+msgid "Added to {0}"
+msgstr "Ajouté à {0}"
+
+#: apps/web/src/components/features/setup/FinaleMessage.tsx:32
+msgid "All done"
+msgstr "Tout est prêt"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersBox.tsx:21
+msgid "All selected"
+msgstr "Tout sélectionné"
+
+#. Label of a Check field in DocType 'Raven Channel Member'
+#: raven/raven_channel_management/doctype/raven_channel_member/raven_channel_member.json:67
+msgid "Allow notifications"
+msgstr "Autoriser les notifications"
+
+#: apps/web/src/components/features/setup/steps/InviteTable.tsx:26
+msgid "Already on the list"
+msgstr "Déjà dans la liste"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersBox.tsx:31
+msgid "Already on this site"
+msgstr "Déjà sur ce site"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:61
+msgid "Ask a System Manager to switch."
+msgstr "Demandez à un gestionnaire système de le modifier."
+
+#: apps/web/src/components/features/workspaces/NoWorkspace.tsx:32
+msgid "Ask an admin to add you to a workspace."
+msgstr "Demandez à un administrateur de vous ajouter à un espace de travail."
+
+#. Label of a Check field in DocType 'Raven Settings'
+#: raven/raven/doctype/raven_settings/raven_settings.json:61
+msgid "Automatically add system users to Synk"
+msgstr "Ajouter automatiquement les utilisateurs système à Synk"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersBox.tsx:21
+msgid "Both selected"
+msgstr "Les deux sont sélectionnés"
+
+#: apps/web/src/pages/workspace/Channel.tsx:62
+msgid "Channel not found"
+msgstr "Canal introuvable"
+
+#: raven/public/js/timeline_button.js:78
+msgid "Channel or Person"
+msgstr "Canal ou personne"
+
+#: apps/web/src/components/channel-sidebar/ChannelSidebar.tsx:213
+msgid "Channels are where your team talks."
+msgstr "Les canaux sont l'endroit où votre équipe discute."
+
+#: apps/web/src/native/BootErrorScreen.tsx:34
+msgid "Check your connection. Raven will retry when the network is back."
+msgstr "Vérifiez votre connexion. Synk réessaiera dès que le réseau sera rétabli."
+
+#: apps/web/src/native/SitePicker.tsx:191
+msgid "Choose a site"
+msgstr "Choisissez un site"
+
+#: apps/web/src/components/features/setup/steps/InviteTable.tsx:94
+msgid "Clear row"
+msgstr "Vider la ligne"
+
+#. Label of a Text field in DocType 'Raven AI Pending Action'
+#: raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json:106
+msgid "Confirmation Message"
+msgstr "Message de confirmation"
+
+#. Option for the 'Status' (Select) field in DocType 'Raven AI Pending Action'
+#: raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json:41
+msgid "confirmed"
+msgstr "confirmé"
+
+#. Label of a Datetime field in DocType 'Raven AI Pending Action'
+#: raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json:79
+msgid "Confirmed At"
+msgstr "Confirmé le"
+
+#: apps/web/src/native/BootErrorScreen.tsx:26
+#, python-brace-format
+msgid "Connecting to {0}"
+msgstr "Connexion à {0}"
+
+#: apps/web/src/components/features/settings/panels/Users/Users.tsx:58
+msgid "Could not enable user"
+msgstr "Impossible d'activer l'utilisateur"
+
+#: apps/web/src/hooks/useWorkspaceMembership.ts:39
+#, python-brace-format
+msgid "Could not join {0}."
+msgstr "Impossible de rejoindre {0}."
+
+#: apps/web/src/hooks/useWorkspaceMembership.ts:46
+#, python-brace-format
+msgid "Could not leave {0}."
+msgstr "Impossible de quitter {0}."
+
+#: apps/web/src/components/features/header/NavUserMenu/NavUserMenu.tsx:58
+msgid "Could not open Cloud Settings"
+msgstr "Impossible d'ouvrir les paramètres Cloud"
+
+#: apps/web/src/native/SitePicker.tsx:226
+msgid "Could not reach this site."
+msgstr "Impossible de joindre ce site."
+
+#: apps/web/src/native/SitePicker.tsx:222
+msgid "Couldn't add site"
+msgstr "Impossible d'ajouter le site"
+
+#: apps/web/src/native/SitePicker.tsx:222
+msgid "Couldn't open site"
+msgstr "Impossible d'ouvrir le site"
+
+#: apps/web/src/components/features/setup/steps/TeamStep.tsx:96
+msgid "Couldn't send this invite"
+msgstr "Impossible d'envoyer cette invitation"
+
+#: apps/web/src/pages/workspace/Channel.tsx:48
+msgid "Couldn’t load this channel"
+msgstr "Impossible de charger ce canal"
+
+#: apps/web/src/pages/dm-channel/DirectMessage.tsx:37
+msgid "Couldn’t load this conversation"
+msgstr "Impossible de charger cette conversation"
+
+#: apps/web/src/components/channel-sidebar/ChannelSidebar.tsx:218
+msgid "Create a channel"
+msgstr "Créer un canal"
+
+#: apps/web/src/components/features/threads/ThreadsList.tsx:269
+msgid "Create a thread by right-clicking a message and selecting 'Create thread'."
+msgstr "Créez un fil de discussion par un clic droit sur un message, puis en choisissant « Créer un fil de discussion »."
+
+#: apps/web/src/components/features/workspaces/NoWorkspace.tsx:40
+msgid "Create a workspace"
+msgstr "Créer un espace de travail"
+
+#: apps/web/src/components/features/setup/steps/ChannelStep.tsx:62
+msgid "Create and finish"
+msgstr "Créer et terminer"
+
+#: apps/web/src/components/features/setup/steps.ts:31
+msgid "Create your first channel"
+msgstr "Créez votre premier canal"
+
+#: apps/web/src/components/features/settings/panels/Appearance.tsx:440
+msgid "Decide how a group of images should appear in the chat stream. 5 or more images always use the carousel."
+msgstr "Choisissez comment un groupe d'images doit apparaître dans le flux de discussion. À partir de 5 images, le carrousel est toujours utilisé."
+
+#: apps/web/src/components/features/setup/steps/WorkspaceStep.tsx:103
+msgid "Description (optional)"
+msgstr "Description (facultative)"
+
+#: apps/web/src/components/features/settings/panels/Users/DisableUserDialog.tsx:39
+#, python-brace-format
+msgid "Disable {0}?"
+msgstr "Désactiver {0} ?"
+
+#: apps/web/src/components/features/settings/panels/Users/DisableUserDialog.tsx:47
+msgid "Disabling"
+msgstr "Désactivation en cours"
+
+#: apps/web/src/components/features/setup/steps/WorkspaceStep.tsx:99
+msgid "e.g. Acme"
+msgstr "par ex. Acme"
+
+#: apps/web/src/native/SitePicker.tsx:225
+msgid "Enter a site address."
+msgstr "Saisissez l'adresse d'un site."
+
+#: apps/web/src/components/features/setup/steps/InviteTable.tsx:22
+msgid "Enter a valid email address"
+msgstr "Saisissez une adresse e-mail valide"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:46
+msgid "Everyone on this site who isn't in a workspace yet."
+msgstr "Toutes les personnes de ce site qui ne sont pas encore dans un espace de travail."
+
+#. Option for the 'Status' (Select) field in DocType 'Raven AI Pending Action'
+#: raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json:41
+msgid "executing"
+msgstr "en cours d'exécution"
+
+#. Label of a JSON field in DocType 'Raven AI Pending Action'
+#: raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json:121
+msgid "Execution Result"
+msgstr "Résultat d'exécution"
+
+#: apps/web/src/components/features/setup/steps.ts:35
+msgid "First Frappe HR, now Raven. You're on a roll."
+msgstr "D'abord Frappe HR, maintenant Synk. Vous êtes sur une bonne lancée."
+
+#. Label of a Data field in DocType 'Raven AI Pending Action'
+#: raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json:116
+msgid "Handler Path"
+msgstr "Chemin du gestionnaire"
+
+#. Label of a Image field in DocType 'Raven Link Preview'
+#: raven/raven_messaging/doctype/raven_link_preview/raven_link_preview.json:107
+msgid "image_preview"
+msgstr "Aperçu de l'image"
+
+#: raven/api/search.py:268
+#, python-brace-format
+msgid "Invalid search filter: {0}"
+msgstr "Filtre de recherche non valide : {0}"
+
+#: apps/web/src/components/features/setup/steps/TeamStep.tsx:127
+msgid "Invite others by email"
+msgstr "Inviter d'autres personnes par e-mail"
+
+#: apps/web/src/components/features/ChatInput/QuietHoursBanner.tsx:133
+#, python-brace-format
+msgid "It's outside working hours - send silently to let people rest ({0})."
+msgstr "Hors des heures de travail : envoi silencieux, pour laisser les autres se reposer ({0})."
+
+#: apps/web/src/components/features/header/HomeWorkspacesDrawer.tsx:261
+#: apps/web/src/components/features/workspaces/JoinWorkspaceSheet.tsx:23
+msgid "Join a workspace"
+msgstr "Rejoindre un espace de travail"
+
+#: apps/web/src/components/features/workspaces/NoWorkspace.tsx:32
+msgid "Join one below, or ask an admin to add you."
+msgstr "Rejoignez-en un ci-dessous, ou demandez à un administrateur de vous ajouter."
+
+#: apps/web/src/hooks/useWorkspaceMembership.ts:37
+#, python-brace-format
+msgid "Joining {0}…"
+msgstr "Arrivée dans {0}…"
+
+#: apps/web/src/components/features/header/WorkspaceTile.tsx:92
+#, python-brace-format
+msgid "Leave {0}"
+msgstr "Quitter {0}"
+
+#: apps/web/src/hooks/useWorkspaceMembership.ts:44
+#, python-brace-format
+msgid "Leaving {0}…"
+msgstr "Sortie de {0}…"
+
+#: apps/web/src/components/features/workspaces/LeaveWorkspaceDialog.tsx:61
+msgid "Leaving…"
+msgstr "Sortie en cours…"
+
+#: apps/web/src/components/features/setup/steps/HRStep.tsx:56
+msgid "Let the two talk: Raven can show who's on leave, so no one chases a teammate who's away."
+msgstr "Faites communiquer les deux : Synk peut afficher qui est en congé, afin que personne ne relance un collègue absent."
+
+#: apps/web/src/components/features/header/NavUserMenu/NavUserMenu.tsx:118
+msgid "Manage Billing"
+msgstr "Gérer la facturation"
+
+#: apps/web/src/components/features/message/ChatStream.tsx:347
+msgid "Newer messages load when you're back online."
+msgstr "Les messages plus récents se chargeront dès que vous serez de nouveau en ligne."
+
+#: apps/web/src/components/features/settings/panels/KeyboardShortcuts.tsx:89
+msgid "Next workspace"
+msgstr "Espace de travail suivant"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:147
+msgid "No one found"
+msgstr "Aucune personne trouvée"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:134
+msgid "No one selected"
+msgstr "Aucune personne sélectionnée"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersBox.tsx:21
+msgid "None selected"
+msgstr "Aucune sélection"
+
+#: apps/web/src/components/features/setup/FinaleMessage.tsx:35
+msgid "Now,"
+msgstr "Maintenant,"
+
+#: apps/web/src/components/features/message/ChatStream.tsx:279
+msgid "Older messages load when you're back online."
+msgstr "Les messages plus anciens se chargeront dès que vous serez de nouveau en ligne."
+
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:19
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:72
+msgid "Only a System Manager can change these settings."
+msgstr "Seul un gestionnaire système peut modifier ces réglages."
+
+#: apps/web/src/components/features/message/renderers/LinkPreview.tsx:226
+msgid "Open in YouTube"
+msgstr "Ouvrir dans YouTube"
+
+#. Description of the 'Model Provider' (Select) field in DocType 'Raven Bot'
+#: raven/raven_bot/doctype/raven_bot/raven_bot.json:110
+msgid "OpenAI: Use OpenAI API, Local LLM: Use local LLM (Ollama/LM Studio), Nora: Use NORA AI engine (RAG, code execution, ERP tools)"
+msgstr "OpenAI : utiliser l'API OpenAI ; LLM local : utiliser un LLM local (Ollama / LM Studio) ; Nora : utiliser le moteur d'IA NORA (RAG, exécution de code, outils ERP)"
+
+#: apps/web/src/components/features/settings/panels/PushNotifications.tsx:122
+msgid "Please add your Push Notification API Key"
+msgstr "Veuillez ajouter votre clé API de notifications push"
+
+#: apps/web/src/components/features/message/renderers/DocumentPrintDialog.tsx:151
+#, python-brace-format
+msgid "Preview this {0} with a print format, letterhead and language, and download it as a PDF."
+msgstr "Prévisualisez ce {0} avec un format d'impression, un papier à en-tête et une langue, puis téléchargez-le en PDF."
+
+#: apps/web/src/components/features/message/renderers/DocumentPrintDialog.tsx:172
+#, python-brace-format
+msgid "Preview this {0} with a print format, letterhead and language, then print it or download it as a PDF."
+msgstr "Prévisualisez ce {0} avec un format d'impression, un papier à en-tête et une langue, puis imprimez-le ou téléchargez-le en PDF."
+
+#: apps/web/src/components/features/settings/panels/KeyboardShortcuts.tsx:94
+msgid "Previous workspace"
+msgstr "Espace de travail précédent"
+
+#: apps/web/src/components/features/setup/steps/ProfileStep.tsx:85
+msgid "Profile picture"
+msgstr "Photo de profil"
+
+#: apps/web/src/components/features/workspaces/JoinWorkspaceSheet.tsx:25
+msgid "Public workspaces you can join"
+msgstr "Espaces de travail publics que vous pouvez rejoindre"
+
+#: apps/web/src/components/features/channel/ChannelHeader/ChannelHeader.tsx:91
+msgid "Remove from Favorites"
+msgstr "Retirer des favoris"
+
+#: apps/web/src/native/SitePicker.tsx:240
+msgid "Remove site?"
+msgstr "Retirer le site ?"
+
+#: apps/web/src/native/SitePicker.tsx:241
+#, python-brace-format
+msgid "Removing {0} site will log you out of it on this device."
+msgstr "Retirer {0} vous déconnectera de ce site sur cet appareil."
+
+#: apps/web/src/components/features/setup/steps/ImageUploadField.tsx:47
+msgid "Reupload"
+msgstr "Recharger"
+
+#: apps/web/src/components/features/setup/steps/ChannelStep.tsx:63
+#: apps/web/src/components/features/setup/steps/HRStep.tsx:65
+#: apps/web/src/components/features/setup/steps/WorkspaceStep.tsx:108
+msgid "Save and continue"
+msgstr "Enregistrer et continuer"
+
+#: apps/web/src/components/features/setup/steps/ChannelStep.tsx:63
+msgid "Save and finish"
+msgstr "Enregistrer et terminer"
+
+#: apps/web/src/components/features/setup/FinaleMessage.tsx:38
+msgid "send a raven."
+msgstr "envoyez votre premier message."
+
+#. Description of the 'Setup Completed' (Check) field in DocType 'Raven
+#. Settings'
+#: raven/raven/doctype/raven_settings/raven_settings.json:344
+msgid "Set once the first admin finishes or skips the setup flow"
+msgstr "Défini une fois que le premier administrateur a terminé ou passé la configuration."
+
+#. Description of the 'Onboarded' (Check) field in DocType 'Raven User'
+#: raven/raven/doctype/raven_user/raven_user.json:233
+msgid "Set once the user finishes the profile step in the web app"
+msgstr "Défini une fois que l'utilisateur a terminé l'étape du profil dans l'application web."
+
+#: apps/web/src/components/features/setup/steps.ts:27
+msgid "Set up your profile"
+msgstr "Configurez votre profil"
+
+#. Label of a Check field in DocType 'Raven Settings'
+#: raven/raven/doctype/raven_settings/raven_settings.json:348
+msgid "Setup Completed"
+msgstr "Configuration terminée"
+
+#: apps/web/src/components/features/setup/SetupPage.tsx:261
+msgid "Setup progress"
+msgstr "Progression de la configuration"
+
+#: apps/web/src/components/features/message/actions/fileActions.ts:116
+#, python-brace-format
+msgid "Share all ({0})"
+msgstr "Tout partager ({0})"
+
+#: apps/web/src/native/SitePicker.tsx:191
+msgid "Share to"
+msgstr "Partager vers"
+
+#. Label of a Check field in DocType 'Raven Settings'
+#: raven/raven/doctype/raven_settings/raven_settings.json:68
+msgid "Show Synk on Desk"
+msgstr "Afficher Synk dans le Desk"
+
+#: apps/web/src/components/features/setup/steps/HRStep.tsx:60
+msgid "Show who's on leave"
+msgstr "Afficher les personnes en congé"
+
+#: apps/web/src/native/SitePicker.tsx:193
+msgid "Sign in to your team's site."
+msgstr "Connectez-vous au site de votre équipe."
+
+#: apps/web/src/native/SitePicker.tsx:213
+msgid "Site address"
+msgstr "Adresse du site"
+
+#: apps/web/src/native/pick.ts:60
+msgid "Some of the selected files could not be attached."
+msgstr "Certains fichiers sélectionnés n'ont pas pu être joints."
+
+#: apps/web/src/native/BootErrorScreen.tsx:42
+#: apps/web/src/pages/profile/Profile.tsx:180
+msgid "Switch site"
+msgstr "Changer de site"
+
+#: apps/web/src/components/features/settings/panels/KeyboardShortcuts.tsx:90
+msgid "Switch to the next workspace, in your workspace order."
+msgstr "Passez à l'espace de travail suivant, selon l'ordre de vos espaces de travail."
+
+#: apps/web/src/components/features/settings/panels/KeyboardShortcuts.tsx:95
+msgid "Switch to the previous workspace."
+msgstr "Passez à l'espace de travail précédent."
+
+#: apps/web/src/components/features/setup/steps/InviteTable.tsx:24
+msgid "That's you, no invite needed"
+msgstr "C'est vous, aucune invitation nécessaire"
+
+#: apps/web/src/native/pick.ts:52 apps/web/src/native/pick.ts:59
+msgid "The selected files could not be attached."
+msgstr "Les fichiers sélectionnés n'ont pas pu être joints."
+
+#: apps/web/src/native/BootErrorScreen.tsx:37
+msgid "The site answered with an error. Try again in a moment."
+msgstr "Le site a répondu par une erreur. Réessayez dans un instant."
+
+#: apps/web/src/native/BootErrorScreen.tsx:36
+msgid "The site is in maintenance mode. Try again in a few minutes."
+msgstr "Le site est en mode maintenance. Réessayez dans quelques minutes."
+
+#: apps/web/src/native/BootErrorScreen.tsx:35
+msgid "The site may be down or its address may have changed."
+msgstr "Le site est peut-être indisponible, ou son adresse a peut-être changé."
+
+#: apps/web/src/components/features/setup/steps/SiteUsersBox.tsx:66
+#, python-brace-format
+msgid "They'll be added to {0}."
+msgstr "Elles seront ajoutées à {0}."
+
+#: apps/web/src/components/features/setup/steps/TeamStep.tsx:56
+#, python-brace-format
+msgid "They'll get an email to sign in, and are added to {0}."
+msgstr "Elles recevront un e-mail pour se connecter, et seront ajoutées à {0}."
+
+#: apps/web/src/components/features/settings/panels/Agents/AgentGeneralTab.tsx:41
+msgid "This agent answers with an AI model."
+msgstr "Cet agent répond avec un modèle d'IA."
+
+#: raven/api/setup.py:142
+msgid "This channel is not in the workspace."
+msgstr "Ce canal ne fait pas partie de l'espace de travail."
+
+#: apps/web/src/pages/workspace/Channel.tsx:63
+msgid "This channel may have been deleted or you don’t have access."
+msgstr "Ce canal a peut-être été supprimé, ou vous n'y avez pas accès."
+
+#: apps/web/src/components/features/settings/panels/Users/DisableUserDialog.tsx:41
+msgid "This disables their account on this site. They will be logged out everywhere and cannot log in until the account is enabled again."
+msgstr "Cela désactive leur compte sur ce site. Ils seront déconnectés partout et ne pourront pas se connecter tant que le compte ne sera pas de nouveau activé."
+
+#: apps/web/src/native/SitePicker.tsx:227
+msgid "This does not look like a Raven site."
+msgstr "Ceci ne ressemble pas à un site Synk."
+
+#: apps/web/src/components/features/setup/steps/ProfileStep.tsx:81
+msgid "This is how you’ll appear to your team."
+msgstr "Voici comment vous apparaîtrez à votre équipe."
+
+#: apps/web/src/native/BootErrorScreen.tsx:33
+msgid "This is taking longer than usual."
+msgstr "Cela prend plus de temps que d'habitude."
+
+#: apps/web/src/native/SitePicker.tsx:229
+msgid "This site has no OAuth client for the app. Ask its admin to set one up in Raven Settings."
+msgstr "Ce site n'a pas de client OAuth pour cette application. Demandez à son administrateur d'en configurer un dans Raven Settings."
+
+#: apps/web/src/native/SitePicker.tsx:228
+msgid "This site runs an older Raven. Ask its admin to update."
+msgstr "Ce site utilise une version plus ancienne de Synk. Demandez à son administrateur de la mettre à jour."
+
+#: apps/web/src/native/NativeBridge.tsx:36
+#, python-brace-format
+msgid "This site runs Raven {0}; the app is built for {1}. Some features may not work."
+msgstr "Ce site utilise Synk {0} ; l'application est conçue pour {1}. Certaines fonctionnalités peuvent ne pas fonctionner."
+
+#: apps/web/src/components/features/ChatInput/composerGate.tsx:134
+msgid "This user has been deactivated. You can't send them messages."
+msgstr "Cet utilisateur a été désactivé. Vous ne pouvez plus lui envoyer de messages."
+
+#: apps/web/src/components/common/OfflineState.tsx:13
+msgid "This will load when you're back online."
+msgstr "Ceci se chargera dès que vous serez de nouveau en ligne."
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:148
+msgid "Try another name or email."
+msgstr "Essayez un autre nom ou une autre adresse e-mail."
+
+#: raven/api/setup.py:223
+#, python-brace-format
+msgid "Unknown setup event: {0}"
+msgstr "Événement de configuration inconnu : {0}"
+
+#: apps/web/src/native/SitePicker.tsx:191
+msgid "Welcome to Raven"
+msgstr "Bienvenue sur Synk"
+
+#: apps/web/src/components/features/setup/steps/WorkspaceStep.tsx:104
+msgid "What does your team do?"
+msgstr "Que fait votre équipe ?"
+
+#: apps/web/src/components/features/setup/steps/ChannelStep.tsx:94
+#, python-brace-format
+msgid "Where your team talks in {0}. Add more anytime from the sidebar."
+msgstr "Là où votre équipe discute dans {0}. Vous pourrez en ajouter d'autres à tout moment depuis la barre latérale."
+
+#: apps/web/src/components/features/setup/steps/WorkspaceStep.tsx:85
+msgid "Workspaces group channels and people. Start with one for your company. You can add more later."
+msgstr "Les espaces de travail regroupent des canaux et des personnes. Commencez par un espace pour votre entreprise. Vous pourrez en ajouter d'autres plus tard."
+
+#: apps/web/src/components/features/settings/panels/Users/WorkspaceAccessPicker.tsx:91
+msgid "You are not an admin of this workspace, so you cannot manage its members."
+msgstr "Vous n'êtes pas administrateur de cet espace de travail, vous ne pouvez donc pas en gérer les membres."
+
+#: raven/api/raven_message.py:195
+msgid "You can only send files that you uploaded."
+msgstr "Vous ne pouvez envoyer que les fichiers que vous avez téléversés."
+
+#: apps/web/src/hooks/useWorkspaceMembership.ts:38
+#, python-brace-format
+msgid "You joined {0}."
+msgstr "Vous avez rejoint {0}."
+
+#: apps/web/src/hooks/useWorkspaceMembership.ts:45
+#, python-brace-format
+msgid "You left {0}."
+msgstr "Vous avez quitté {0}."
+
+#: apps/web/src/components/features/workspaces/LeaveWorkspaceDialog.tsx:55
+msgid "You'll lose access to its channels, and someone will need to add you back to rejoin."
+msgstr "Vous perdrez l'accès à ses canaux, et quelqu'un devra vous rajouter pour que vous puissiez revenir."
+
+#: apps/web/src/components/features/workspaces/LeaveWorkspaceDialog.tsx:54
+msgid "You'll lose access to its channels. You can join it again any time."
+msgstr "Vous perdrez l'accès à ses canaux. Vous pourrez le rejoindre à nouveau à tout moment."
+
+#: apps/web/src/components/features/setup/steps/ProfileStep.tsx:105
+msgid "You'll need it to sign in to this site."
+msgstr "Vous en aurez besoin pour vous connecter à ce site."
+
+#: apps/web/src/components/features/workspaces/NoWorkspace.tsx:30
+msgid "You're not in a workspace yet"
+msgstr "Vous ne faites encore partie d'aucun espace de travail"
+
+#: apps/web/src/components/features/setup/steps/ChannelStep.tsx:144
+#, python-brace-format
+msgid "{0} already has #general, so setup uses it."
+msgstr "{0} possède déjà #general : la configuration l'utilisera donc."
+
+#: apps/web/src/components/features/setup/steps/TeamStep.tsx:34
+#, python-brace-format
+msgid "{0} and #{1}"
+msgstr "{0} et #{1}"
+
+#: apps/web/src/components/features/setup/steps/siteUsersSummary.ts:10
+#, python-brace-format
+msgid "{0} and {1} are already on this site"
+msgstr "{0} et {1} sont déjà sur ce site"
+
+#: raven/api/raven_users.py:215
+#, python-brace-format
+msgid "{0} gets their roles from a role profile. Add the Raven User role there."
+msgstr "{0} reçoit ses rôles d'un profil de rôles. Ajoutez-y le rôle Raven User."
+
+#: apps/web/src/components/features/settings/panels/Users/DisableUserDialog.tsx:29
+#, python-brace-format
+msgid "{0} has been disabled"
+msgstr "{0} a été désactivé"
+
+#: apps/web/src/components/features/settings/panels/Users/Users.tsx:57
+#, python-brace-format
+msgid "{0} has been enabled"
+msgstr "{0} a été activé"
+
+#: apps/web/src/native/BootErrorScreen.tsx:29
+#, python-brace-format
+msgid "{0} is under maintenance"
+msgstr "{0} est en maintenance"
+
+#: apps/web/src/native/BootErrorScreen.tsx:28
+#, python-brace-format
+msgid "{0} isn't responding"
+msgstr "{0} ne répond pas"
+
+#: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:134
+#, python-brace-format
+msgid "{0} people selected"
+msgstr "{0} personnes sélectionnées"
+
+#: apps/web/src/components/features/setup/steps/siteUsersSummary.ts:12
+#, python-brace-format
+msgid "{0}, {1} and {2} are already on this site"
+msgstr "{0}, {1} et {2} sont déjà sur ce site"
+
+#: apps/web/src/components/features/setup/steps/siteUsersSummary.ts:13
+#, python-brace-format
+msgid "{0}, {1} and {2} others are already on this site"
+msgstr "{0}, {1} et {2} autres sont déjà sur ce site"
