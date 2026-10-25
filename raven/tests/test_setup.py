@@ -285,14 +285,11 @@ class TestSiteUsers(IntegrationTestCase):
 
 	def test_a_raven_admin_without_system_manager_can_add_only_people_already_in_raven(self):
 		_make_user(RAVEN_ADMIN, "Raven Admin", roles=("Raven User", "Raven Admin"))
-		frappe.get_doc(
-			{
-				"doctype": "Raven Workspace Member",
-				"workspace": self.workspace.name,
-				"user": RAVEN_ADMIN,
-				"is_admin": 1,
-			}
-		).insert()
+		# //// Neoffice - the new Raven User joined the open workspace on the spot (open_workspaces): made admin
+		# //// where they are, instead of a second membership the workspace refuses.
+		frappe.db.set_value(
+			"Raven Workspace Member", {"workspace": self.workspace.name, "user": RAVEN_ADMIN}, "is_admin", 1
+		)
 		frappe.set_user(RAVEN_ADMIN)
 		listed = self._listed()
 		self.assertTrue(listed[LONER]["addable"])
