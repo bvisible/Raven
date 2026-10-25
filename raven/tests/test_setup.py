@@ -23,6 +23,8 @@ RAVEN_ADMIN = "setup-raven-admin@example.com"
 # On the site, not in Raven: a plain system user, and one whose roles come from a role profile.
 OUTSIDER = "setup-outsider@example.com"
 PROFILED = "setup-profiled@example.com"
+# //// Neoffice - the one admin the test workspaces keep (see TestSiteUsers.setUp).
+WORKSPACE_ADMIN = "setup-workspace-admin@example.com"
 ROLE_PROFILE = "Setup Test Profile"
 
 
@@ -206,15 +208,27 @@ class TestSiteUsers(IntegrationTestCase):
 				}
 			).insert(ignore_permissions=True)
 		_make_raven_user(LONER, "Loner")
+		# //// Neoffice - see the workspace below.
+		_make_raven_user(WORKSPACE_ADMIN, "Workspace Admin")
 		frappe.db.delete("Raven Workspace Member", {"user": LONER})
 		_make_user(OUTSIDER, "Outsider", roles=("System Manager",))
 		_make_user(PROFILED, "Profiled", roles=(), role_profile=ROLE_PROFILE)
 		self.workspace = _make_workspace("Setup Test Workspace")
 		self.channel = _make_channel(self.workspace.name, "setup-test")
 		# //// Neoffice - a new open workspace takes in everyone already in the messaging (open_workspaces,
-		# //// maintenance#1553), upstream's tests start from an empty one: the members are taken out again.
+		# //// maintenance#1553), and its owner is a member: upstream's tests start from a workspace with
+		# //// nobody in it but one admin (a workspace refuses a member while it has none). The members are
+		# //// taken out again, and a dedicated admin stays.
 		frappe.db.delete("Raven Workspace Member", {"workspace": self.workspace.name})
 		frappe.db.delete("Raven Channel Member", {"channel_id": self.channel.name})
+		frappe.get_doc(
+			{
+				"doctype": "Raven Workspace Member",
+				"workspace": self.workspace.name,
+				"user": WORKSPACE_ADMIN,
+				"is_admin": 1,
+			}
+		).insert(ignore_permissions=True)
 
 	def tearDown(self):
 		frappe.set_user("Administrator")

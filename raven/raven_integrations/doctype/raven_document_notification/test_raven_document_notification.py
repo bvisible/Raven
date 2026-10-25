@@ -78,9 +78,9 @@ class IntegrationTestRavenDocumentNotification(IntegrationTestCase):
 		with self.assertRaises(frappe.ValidationError):
 			notification.save()
 
-		notification.enabled = 0
 		# //// Neoffice - Frappe 15 keeps the timestamp of the refused save in memory, then refuses the next.
 		notification.reload()
+		notification.enabled = 0
 		notification.save()
 		self.assertEqual(
 			frappe.db.get_value("Raven Document Notification", notification.name, "enabled"), 0
