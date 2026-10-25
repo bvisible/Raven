@@ -148,11 +148,27 @@ def add_site_users(users: list[str] | str, workspace: str, channel: str | None =
 	for user in chosen:
 		if not offered[user]["in_raven"]:
 			give_raven_access(frappe.get_doc("User", user))
-	add_workspace_members(workspace, chosen)
+	# //// Neoffice - a person who gets the messaging joins every open workspace on the spot
+	# //// (open_workspaces.join_open_workspaces_on_insert, maintenance#1553), and a workspace refuses a
+	# //// member twice: only those not yet in the workspace, and not yet in the channel, are added.
+	in_workspace = set(
+		frappe.get_all(
+			"Raven Workspace Member", filters={"workspace": workspace, "user": ["in", chosen]}, pluck="user"
+		)
+	)
+	add_workspace_members(workspace, [user for user in chosen if user not in in_workspace])
 	# Everyone in the workspace is in an Open channel; its rows are made on first visit.
 	# Otherwise one batch, so the channel gets one "added" message, not one per person.
 	if channel and channel_type != "Open":
-		add_channel_members(channel, chosen)
+		# //// Neoffice - the same for the channel (see above).
+		in_channel = set(
+			frappe.get_all(
+				"Raven Channel Member", filters={"channel_id": channel, "user_id": ["in", chosen]}, pluck="user_id"
+			)
+		)
+		new_in_channel = [user for user in chosen if user not in in_channel]
+		if new_in_channel:
+			add_channel_members(channel, new_in_channel)
 	return len(chosen)
 
 

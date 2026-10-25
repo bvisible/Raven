@@ -257,6 +257,9 @@ class TestSiteUsers(IntegrationTestCase):
 		user = frappe.get_doc("User", LONER)
 		user.remove_roles("Raven User")
 		self.assertEqual(frappe.db.get_value("Raven User", LONER, "enabled"), 0)
+		# //// Neoffice - without a desk role the save made them a Website User, whom the list leaves out
+		# //// (a portal account is never offered Raven, WI-00353): the case is a colleague on the desk.
+		frappe.db.set_value("User", LONER, "user_type", "System User")
 		self.assertFalse(self._listed()[LONER]["in_raven"])
 		add_site_users([LONER], self.workspace.name)
 		self.assertEqual(frappe.db.get_value("Raven User", LONER, "enabled"), 1)
