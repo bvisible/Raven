@@ -291,11 +291,21 @@ class TestSiteUsers(IntegrationTestCase):
 			"Raven Workspace Member", {"workspace": self.workspace.name, "user": RAVEN_ADMIN}, "is_admin", 1
 		)
 		frappe.set_user(RAVEN_ADMIN)
-		listed = self._listed()
-		self.assertTrue(listed[LONER]["addable"])
-		self.assertFalse(listed[OUTSIDER]["addable"])
-		# The outsider is dropped rather than failing everyone.
-		self.assertEqual(add_site_users([LONER, OUTSIDER], self.workspace.name), 1)
+		# //// Neoffice - on our sites a user with a desk role can already write User (a role of another
+		# //// app grants it), which is not the case the test is about: whoever cannot write User is made so.
+		real_has_permission = frappe.has_permission
+
+		def cannot_write_user(doctype=None, ptype="read", *args, **kwargs):
+			if doctype == "User" and ptype == "write":
+				return False
+			return real_has_permission(doctype, ptype, *args, **kwargs)
+
+		with patch("frappe.has_permission", side_effect=cannot_write_user):
+			listed = self._listed()
+			self.assertTrue(listed[LONER]["addable"])
+			self.assertFalse(listed[OUTSIDER]["addable"])
+			# The outsider is dropped rather than failing everyone.
+			self.assertEqual(add_site_users([LONER, OUTSIDER], self.workspace.name), 1)
 		self.assertFalse(frappe.db.exists("Raven User", OUTSIDER))
 
 	def test_add_takes_only_people_from_the_offered_list(self):
