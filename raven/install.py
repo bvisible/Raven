@@ -1,6 +1,9 @@
 import click
 import frappe
-from frappe.desk.page.setup_wizard.setup_wizard import add_all_roles_to, make_records
+from frappe.desk.page.setup_wizard.setup_wizard import add_all_roles_to
+
+# //// Neoffice - make_records: used by create_general_channel below (the default workspace and its channel).
+from frappe.desk.page.setup_wizard.setup_wizard import make_records
 
 
 def after_install():
@@ -9,13 +12,21 @@ def after_install():
 		print("Setting up Synk...")
 		add_all_roles_to("Administrator")
 		create_raven_user_for_administrator()
+		# //// Neoffice - upstream leaves the workspace and the "general" channel to its first-admin setup
+		# //// flow; we never show that flow (setup_completed is 1 from here on, see mark_setup_completed),
+		# //// so the default workspace "Synk" and its channel are made here, as before the 3.1 merge.
 		create_general_channel()
+		create_role_profiles()
+		# //// Neoffice - create_native_oauth_client() is not called: the OAuth client of our instances is
+		# //// the "Neoffice Mobile" one made by neoffice_theme.mobile.ensure_all_oauth_clients; upstream's
+		# //// would add a second client ("Raven Mobile") that its own native app signs in with.
+		mark_setup_completed()
 
 		# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): install output.
 		click.secho("Thank you for installing Synk!", fg="green")
 
 	except Exception as e:
-		BUG_REPORT_URL = "https://github.com/frappe/Raven/issues/new"
+		BUG_REPORT_URL = "https://github.com/frappe/raven/issues/new"
 		click.secho(
 			# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): install output. TO REVIEW: the BUG_REPORT_URL just
 			# //// above still points at The-Commit-Company/Raven, so a Neoffice install failure is reported
@@ -39,6 +50,13 @@ def create_raven_user_for_administrator():
 				"type": "User",
 			}
 		).insert(ignore_permissions=True)
+
+
+# //// Neoffice - added with the default workspace below (see after_install): the first-admin setup
+# //// screen of upstream is never shown. Raven Settings.setup_completed and Raven User.onboarded also
+# //// default to 1 in their DocType, for a site whose settings row does not exist yet.
+def mark_setup_completed():
+	frappe.db.set_single_value("Raven Settings", "setup_completed", 1)
 
 
 def create_general_channel():
@@ -80,3 +98,39 @@ def create_general_channel():
 	]
 
 	make_records(channel)
+
+
+RAVEN_USER_PROFILE = "Raven User"
+RAVEN_ADMIN_PROFILE = "Raven Admin"
+ROLE_PROFILES = {
+	RAVEN_USER_PROFILE: ["Raven User"],
+	RAVEN_ADMIN_PROFILE: ["Raven User", "Raven Admin"],
+}
+
+
+def create_role_profiles():
+	"""
+	Role profiles that put someone on Raven. A user whose roles come from a profile loses any
+	role added directly on their next save, so Raven access is given through a profile of its
+	own, next to the ones their other apps gave them. Profiles that already exist are left alone.
+	"""
+	for name, roles in ROLE_PROFILES.items():
+		if frappe.db.exists("Role Profile", name):
+			continue
+		frappe.get_doc(
+			{"doctype": "Role Profile", "role_profile": name, "roles": [{"role": role} for role in roles]}
+		).insert(ignore_permissions=True)
+
+
+def create_native_oauth_client():
+	"""The OAuth client the native app signs in with, so a new site works with the app at once."""
+	from raven.api.raven_mobile import create_oauth_client
+
+	try:
+		create_oauth_client()
+	except Exception:
+		# The install still succeeds: `bench execute raven.api.raven_mobile.create_oauth_client` repairs it.
+		frappe.log_error(title="Raven: could not create the native app's OAuth client")
+		click.secho(
+			"Could not create the OAuth client for the Raven app; see the Error Log.", fg="yellow"
+		)

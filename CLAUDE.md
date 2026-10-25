@@ -44,25 +44,19 @@ yarn install
 # Start development server with hot reload (http://localhost:8080)
 yarn dev
 # Or from frontend directory:
-cd frontend && yarn dev
+cd apps/web && yarn dev
 
 # Build for production (skips if assets exist)
 yarn build
 
 # Force rebuild (ignores existing assets)
-cd frontend && yarn build:force
+cd apps/web && yarn build:force
 ```
 
 **Build output**: Assets are compiled to `raven/public/raven/` and `raven/www/raven.html`
 
-### Mobile App (React Native/Expo)
-```bash
-# From apps/mobile directory
-yarn start           # Start Expo dev server
-yarn ios             # Run on iOS simulator
-yarn android         # Run on Android emulator
-yarn nuke            # Clean all build artifacts
-```
+### Mobile app
+The mobile app is **`neoffice-mobile`** (a separate repository, Expo). `apps/mobile/` was removed from this fork in the merge of upstream 3.1 (2026-10-25); `apps/native/` (upstream's Capacitor app) is kept as upstream ships it and nothing here builds it.
 
 ### Linting and Pre-commit
 ```bash
@@ -91,14 +85,15 @@ semgrep ci --config ./frappe-semgrep-rules/rules
   - `hooks.py` - Frappe hooks (doc_events, scheduler, permissions)
   - `permissions.py` - Permission query conditions and has_permission checks
 
-- **`frontend/`** - Web app (React + Vite + TailwindCSS)
+- **`apps/web/`** - Web app (React + Vite + TailwindCSS)
   - `src/components/feature/` - Feature-specific components (chat, channels, ai, etc.)
   - `src/pages/` - Route pages
   - `src/hooks/` - Custom React hooks
   - Uses RadixUI for UI components, TipTap for rich text editing
 
-- **`apps/mobile/`** - Mobile app (React Native + Expo)
-  - Uses NativeWind (TailwindCSS), React Native Reanimated
+- **`apps/native/`** - Upstream's Capacitor app (kept as is, never built here); the mobile app is `neoffice-mobile`
+
+- **`raven/public/js/raven_chat/`** - The desk chat widget (React, built by `bench build --app raven`), anchored to the Synk icon of the cockpit's rail. Upstream removed it in 3.1 (#2311); we keep it (`hooks.py` `app_include_css`, `boot.py` `show_raven_chat_on_desk`, `Raven Settings.show_raven_on_desk`, `raven_message.get_messages_with_dates`).
 
 - **`packages/`** - Shared packages
   - `lib/` - Shared React hooks and utilities (`@raven/lib`)
@@ -118,7 +113,7 @@ semgrep ci --config ./frappe-semgrep-rules/rules
 **Permissions**: Custom permission logic in `raven/permissions.py` controls access to channels, messages, and workspaces based on membership.
 
 ### Frontend Environment
-Create `frontend/.env.local` for local development:
+Create `apps/web/.env.local` for local development:
 ```
 VITE_BASE_NAME=''
 VITE_SOCKET_PORT=9000
@@ -149,13 +144,13 @@ Workflows in `.github/workflows/`:
 
 ### Comment ça marche
 
-1. Modif d'un fichier source (`frontend/...`) en local → `git commit` → `git push origin version-15`. **Ne pas builder localement.**
+1. Modif d'un fichier source (`apps/web/...`) en local → `git commit` → `git push origin version-15`. **Ne pas builder localement.**
 2. Le workflow `.github/workflows/build-frontend.yml` détecte le push, lance `yarn build` sur ubuntu-latest (~1-2 min) et commit les artefacts back avec un commit `[skip-build] frontend artifacts for <SHA>` (par `github-actions[bot]`).
 3. Sur les instances clients, le pipeline d'update fait `git pull` (ramène ton commit + le commit du bot). Quand `bench build --app Raven` tourne, il appelle `yarn build` à la racine — **le `package.json` voit les artefacts déjà présents et skip vite** (gate). Plus d'OOM-kill.
 
 ### Paths spécifiques
 
-- **Source frontend** : `frontend/`
+- **Source frontend** : `apps/web/`
 - **Artefacts vite (commités)** : `raven/public/raven/`
 - **SPA HTML(s) (commités)** : `raven/www/raven.html`
 - **Build script root** : `yarn workspace (root → frontend, `--base=/assets/raven/raven/`)`
@@ -174,7 +169,7 @@ FORCE_REBUILD=1 yarn build
 
 ### Edge cases spécifiques à Raven
 
-- ⚠️ Path atypique : artefacts dans `raven/public/raven/` (pas `public/frontend/`).
+- ⚠️ Path atypique : artefacts dans `raven/public/raven/` (pas `public/apps/web/`).
 - ⚠️ `bvisible/Raven` avait tous les workflows GH Actions `disabled_manually`. Réactiver avec `gh workflow enable build-frontend -R bvisible/Raven` si besoin.
 - ⚠️ **Le workflow CI doit passer `FORCE_REBUILD=1`** (`env: FORCE_REBUILD: '1'` dans le step Build de `.github/workflows/build-frontend.yml`). Sinon le guard `package.json` (qui protège les instances 4 GB d'OOM-kill) SKIPpe le build CI parce que `raven/public/raven/assets` est déjà présent dans le checkout. Symptôme dans les logs : `[skip-build] pre-built artifacts present` au lieu de `vite v6 building for production`. Bug rencontré 2026-05-11 lors de l'intégration Frappe Shell Native (commits `0d9040e` + `d483fb0`).
 - `raven_v3` reste dans `.gitignore` : pas de build pour cette variante aujourd'hui.
@@ -188,18 +183,18 @@ Depuis 2026-05-11, `/raven` rend le **même chrome que `/app/home`** (sidebar Fr
 1. `raven/hooks.py` déclare `required_apps = ["neoffice_theme"]` (sprite Lucide + `neoffice-theme.css` + DocType `App Customization`).
 2. `raven/api/boot.py` expose un **mini-boot curaté** (`get_navbar_boot()`, ~28 keys) qui inclut `docs`, `sidebar_pages`, `app_data`, et bake les UI translations dans `__messages` (sinon menu en EN forcé).
 3. `raven/www/raven.py` sert ce mini-boot au lieu du `frappe.sessions.get()` complet et expose `desk_css_url` + `neoffice_theme_css_url` via `bundled_asset()`.
-4. `frontend/index.html` (la SOURCE Vite, copiée vers `raven/www/raven.html` post-build via `yarn copy-html-entry`) charge `desk.bundle.css` + `neoffice-theme.css`, installe le shim `window['__']` (i18n minimaliste), pose `window['__FRAPPE_INTEGRATION__'] = true`, et inline 3 sprites SVG (timeless + espresso + lucide).
-5. `frontend/src/components/layout/frappe/{FrappeSidebar,FrappeNavbar,FrappeLayout,i18n}.tsx` reproduisent le DOM exact de `frappe/public/js/frappe/ui/{sidebar,navbar,apps_switcher}.html`. Toutes les strings hardcoded sont wrappées dans `t()`.
-6. `frontend/src/utils/auth/ProtectedRoute.tsx` wrappe l'`<Outlet />` authentifié dans `<FrappeLayout>` quand `__FRAPPE_INTEGRATION__` est true. Les routes `/login`, `/signup`, `/forgot-password` restent en plein écran.
-7. `frontend/src/components/layout/Sidebar/Sidebar.tsx` retire conditionnellement `<FrappeSidebar fixed={false}>` du package npm `@neoffice/frappe-sidebar-react` quand l'integration est ON (sinon doublon visuel 100px à gauche).
+4. `apps/web/index.html` (la SOURCE Vite, copiée vers `raven/www/raven.html` post-build via `yarn copy-html-entry`) charge `desk.bundle.css` + `neoffice-theme.css`, installe le shim `window['__']` (i18n minimaliste), pose `window['__FRAPPE_INTEGRATION__'] = true`, et inline 3 sprites SVG (timeless + espresso + lucide).
+5. `apps/web/src/components/layout/frappe/{FrappeSidebar,FrappeNavbar,FrappeLayout,i18n}.tsx` reproduisent le DOM exact de `frappe/public/js/frappe/ui/{sidebar,navbar,apps_switcher}.html`. Toutes les strings hardcoded sont wrappées dans `t()`.
+6. `apps/web/src/utils/auth/ProtectedRoute.tsx` wrappe l'`<Outlet />` authentifié dans `<FrappeLayout>` quand `__FRAPPE_INTEGRATION__` est true. Les routes `/login`, `/signup`, `/forgot-password` restent en plein écran.
+7. `apps/web/src/components/layout/Sidebar/Sidebar.tsx` retire conditionnellement `<FrappeSidebar fixed={false}>` du package npm `@neoffice/frappe-sidebar-react` quand l'integration est ON (sinon doublon visuel 100px à gauche).
 
 ### Pièges importants
 
-- **Bracket notation OBLIGATOIRE** dans `frontend/index.html` pour tout ce qui contient `__` : `window['__']`, `window['__FRAPPE_INTEGRATION__']`, `window['__FRAPPE_BASENAME__']`. Frappe `safe_render` Jinja rejette tout substring `.__` (anti-SSTI), commentaires JS inclus → HTTP 417 Illegal Template, page entière cassée.
+- **Bracket notation OBLIGATOIRE** dans `apps/web/index.html` pour tout ce qui contient `__` : `window['__']`, `window['__FRAPPE_INTEGRATION__']`, `window['__FRAPPE_BASENAME__']`. Frappe `safe_render` Jinja rejette tout substring `.__` (anti-SSTI), commentaires JS inclus → HTTP 417 Illegal Template, page entière cassée.
 - **`docs` doit être dans `NAVBAR_BOOT_KEYS`** sinon le `safeSyncDocs()` no-op et certains scripts third-party plantent en lisant `frappe.boot.docs.<x>`.
 - **Workflow CI = `FORCE_REBUILD=1`** (cf. edge case ci-dessus).
 - **`.page-content` a `padding: 0`** (différent de Mint qui utilise `24px 36px`). Le chat Raven prend tout le viewport, l'overflow est géré par les composants Raven internes.
-- **Toute modif HTML doit aller dans `frontend/index.html`**, pas dans `raven/www/raven.html` (sinon écrasée au prochain build par `copy-html-entry`).
+- **Toute modif HTML doit aller dans `apps/web/index.html`**, pas dans `raven/www/raven.html` (sinon écrasée au prochain build par `copy-html-entry`).
 
 ### Documentation complète
 

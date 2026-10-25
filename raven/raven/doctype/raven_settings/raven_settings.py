@@ -48,7 +48,9 @@ class RavenSettings(Document):
 		# //// Neoffice - Firebase push (47b8b2243, 2026-01-04 "feat(push): Add Firebase option for direct push notifications"): mirrors the Select option added to
 		# //// raven_settings.json. This block is Frappe's generated type stub, so it must follow the JSON.
 		push_notification_service: DF.Literal["Frappe Cloud", "Firebase", "Raven"]
+		setup_completed: DF.Check
 		show_if_a_user_is_on_leave: DF.Check
+		# //// Neoffice - the desk chat widget's switch (field kept in raven_settings.json): the stub follows the JSON.
 		show_raven_on_desk: DF.Check
 		tenor_api_key: DF.Data | None
 		use_website_favicon: DF.Check
@@ -74,7 +76,13 @@ class RavenSettings(Document):
 				if not frappe.db.exists("Company", row.company):
 					frappe.throw(f"Company {row.company} does not exist.")
 
-		if self.push_notification_service == "Raven":
+		# "Raven" is the field's DEFAULT, so an unconfigured site must still be able
+		# to save settings. Only a partially filled config is an error.
+		if self.push_notification_service == "Raven" and (
+			self.push_notification_server_url
+			or self.push_notification_api_key
+			or self.push_notification_api_secret
+		):
 			if not self.push_notification_server_url:
 				frappe.throw(_("Please enter the Push Notification Server URL"))
 			if not self.push_notification_api_key:

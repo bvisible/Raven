@@ -11,6 +11,14 @@ branch. Before that merge the base was `dfde9b1e4a8e1da526a63891e78b5d31404b38d7
 tagged **v2.7.1**). Everything on `origin/version-15` that is not in upstream `main` is Neoffice
 work; `fork_markers.py check --base e890308e96` maps it.
 
+**Merged again on 2026-10-25:** upstream `main` at `0de8cea54` (3.1.0, 200 commits) went into
+`version-15`; the common base is now `0de8cea54` and `fork_markers.py check --base 0de8cea54` maps
+the divergence. What the merge dropped on purpose: `apps/mobile/` (the mobile app lives in
+`neoffice-mobile`; upstream deleted its own, #2309), `frontend/`, the root `app.json` and `ios/`
+(dead remains of before v3), and the module onboarding of the desk workspace (upstream removed
+it). What it kept on purpose: the desk chat widget (below), `apps/native/` as upstream ships it
+(nothing builds it here), and no first-admin setup screen (`install.py`, `raven_settings.json`).
+
 This file is the **manifest**: it carries the entries for files that cannot hold a comment —
 JSON, binaries, symlinks, bundled assets — plus the notes that belong to a whole directory.
 
@@ -31,8 +39,13 @@ JSON, binaries, symlinks, bundled assets — plus the notes that belong to a who
   `frontend/src/components/layout/frappe/*`, and rewrites `raven/www/raven.py`.
 - **AI.** `raven/ai/` gains local-LLM support (LM Studio / Ollama, `7cdc45189`), a NORA model
   provider (`6375b651f`) and a pending-action confirmation workflow. Upstream supports OpenAI only.
-- **Mobile.** `apps/mobile/` is translated (FR + EN, react-i18next), rebranded to Synk, and its
-  push tokens go to `neoffice_theme`'s Mobile Device registry instead of Raven Cloud.
+- **Mobile.** The mobile app is `neoffice-mobile` (a separate repository); its OAuth client is
+  made by `neoffice_theme.mobile.ensure_all_oauth_clients`, which is why `get_client_id` hands out
+  the configured client and the 3.1 patch `add_native_oauth_redirect` is skipped (marked in code).
+  Its push tokens go to `neoffice_theme`'s Mobile Device registry instead of Raven Cloud.
+- **No setup screen.** Upstream 3.1 opens a first-admin setup flow on a new site. We provision the
+  space ourselves, so `after_install` sets `Raven Settings.setup_completed` and the DocType
+  defaults of `setup_completed` and `Raven User.onboarded` are `1`.
 
 ### Built assets — `raven/public/raven/**` (committed build output)
 
@@ -66,8 +79,9 @@ or change only when this manifest names it, or when a pattern of this table matc
 |---|---|
 | `apps/web/public/splash_screens/*` | The Neoffice splash screens of the PWA, replacing upstream's (`040d0b8a9`, 2024-10-07). **No longer referenced since 2026-10-08**: `apps/web/index.html` names the launch images neoffice_theme renders from the brand's chat bubble, under the same names and sizes (`/assets/neoffice_theme/icons/synk/splash/`, maintenance#1316). Their names and sizes are still the list those renders follow; at the next upstream merge, take upstream's files. |
 | `raven/public/raven/splash_screens/*` | Their copies, made by `vite build` (commit-the-build, above). Never edit them: rebuild. |
+| `raven/public/raven-logo.png` | Synk wordmark. |
 | `raven/public/manifest/*` | The Neoffice favicons and PWA icons, same commit as the splash screens. |
-| `apps/mobile/assets/*` | The Synk icon, adaptive icon and splash of the mobile app, replacing upstream's (`32a2c1201`, 2026-01-04). |
+| `raven/public/fonts/*` | The fonts of the desk chat widget's stylesheet (`CalSans`, `NewsreaderVariable`), **kept** with the widget that upstream removed (decision of 2026-10-25). |
 | `raven/public/icons/*` | The `apps_v2` Synk tile rendered as PNG (2026-10-08 morning, maintenance#1316), replacing upstream's black Raven mark. **No longer referenced since 2026-10-08 evening**: the manifest and `www/raven.py` name the renders of the brand's chat bubble that neoffice_theme hosts (`/assets/neoffice_theme/icons/synk/`; Streamline's licence keeps them out of this repository). At the next upstream merge, take upstream's files. |
 | `raven/public/favicon.ico` | The same `apps_v2` tile at 128 px (PNG data, as upstream's was). No longer the `favicon_ico` fallback of `www/raven.py` since 2026-10-08 (the theme's `icon-48.png` is). `raven/public/raven_logo.svg` carries the same tile and its own marker; the rail shows the theme's `chat-bubble-text.svg` instead (the About panel, which shows `raven_logo.svg`, is hidden in Neoffice). |
 
@@ -86,27 +100,14 @@ is marked in `raven/public/js/raven_chat/**` and `raven/public/scss/raven.bundle
 | File | Neoffice change |
 |---|---|
 | `apps/web/public/manifest.webmanifest` | The PWA's manifest (JSON, no comment syntax): name and short name **Synk**, a French description, `lang` `fr`, the cream paper `#FAF3EA` for the background and theme colours, and the icons of neoffice_theme, `/assets/neoffice_theme/icons/synk/icon-*.png` and the two maskable ones (2026-10-08, maintenance#1316). The v3 merge had brought back upstream's "Raven" name and black colours. `src/installIdentity.test.ts` keeps it so. |
-| `raven/raven/doctype/raven_user/raven_user.json` | `time_format` default `12-hour` → `24-hour`, the reason in the field's own `description`: our customers are in Suisse romande, where nobody reads a 12-hour clock. |
-| `raven/raven/doctype/raven_settings/raven_settings.json` | `push_notification_service` options `Frappe Cloud\nRaven` → `Frappe Cloud\nFirebase\nRaven` (`47b8b2243`): we self-host and push through our own Firebase project, not Raven Cloud. Labels rebranded to Synk. |
+| `raven/raven/doctype/raven_user/raven_user.json` | `time_format` default `12-hour` → `24-hour`, the reason in the field's own `description`: our customers are in Suisse romande, where nobody reads a 12-hour clock. `onboarded` (upstream 3.1) defaults to `1` instead of `0`: nobody meets the profile step of the setup flow we never show (decision of 2026-10-25). |
+| `raven/raven/doctype/raven_settings/raven_settings.json` | `push_notification_service` options `Frappe Cloud\nRaven` → `Frappe Cloud\nFirebase\nRaven` (`47b8b2243`): we self-host and push through our own Firebase project, not Raven Cloud. Labels rebranded to Synk. `show_raven_on_desk` (Check, default 1, in `field_order`) is kept although upstream removed it with the desk widget: `boot.py` hands it to the desk as `show_raven_chat_on_desk`, which shows the Synk icon in the cockpit's rail. `setup_completed` (upstream 3.1) defaults to `1` instead of unset (no setup screen, decision of 2026-10-25). |
 | `raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json` | **New doctype** (`7cdc45189`), no upstream equivalent. Fieldnames: `action_type`, `status`, `channel_id`, `message_id`, `bot`, `priority`, `expires_at`, `confirmed_at`, `executed_at`, `action_data`, `preview_message`, `confirmation_message`, `handler_path`, `execution_result`, `error_message`. Backs the confirmation workflow of `raven/ai/pending_action_manager.py`: a local model is far likelier to propose a wrong write, so a create/update/delete is parked until the user confirms. |
 | `raven/raven_bot/doctype/raven_bot/raven_bot.json` | `model_provider` options gain `Nora` + a `description` (`6375b651f`): a bot can delegate the whole turn to NORA (prompt, RAG, ERP tools). `modified` was hand-edited to `2026-01-04 10:00:00.000000` so the change reimports. |
-| `raven/raven/workspace/raven/raven.json` | Desk workspace label/title/content rebranded Raven → Synk (`1d6dea095`, `49ee6e172`). |
-| `raven/raven/module_onboarding/raven/raven.json` | Onboarding title, success message and the three step names rebranded to Synk (`1d6dea095`). |
-| `raven/raven/onboarding_step/introduction_to_raven/introduction_to_raven.json` | Rebranded to Synk (`1d6dea095`, `49ee6e172`, `93a79031c`). The rebrand damage was repaired on 2026-09-04: `action` was `Go to synk`, which is not one of the Select options of `Onboarding Step` (the onboarding widget looks the action up in a map, so clicking the step threw a TypeError), and `\n\nRaven helps` had become the literal `\synk helps`. `modified` bumped to 2026-09-04, otherwise `import_file` skips a file older than the record already in the database. |
-| `raven/raven/onboarding_step/access_the_web_app/access_the_web_app.json` | Rebranded to Synk (`49ee6e172`, `93a79031c`). Repaired on 2026-09-04: same mangled escape, and the text announced the app at `/synk` while the route is still `/raven` (`raven/www/raven.py`, `website_route_rules`). `modified` bumped for the same reason as the step above. |
-| `raven/raven/onboarding_step/adding_users_to_raven/adding_users_to_raven.json` | Labels, name and description rebranded to Synk (`1d6dea095`). The **role** stays `Raven User` — roles are not renamed. |
-| `raven/raven/onboarding_step/review_raven_settings/review_raven_settings.json` | Labels, name and description rebranded to Synk (`1d6dea095`). |
-| `apps/mobile/locales/en.json`, `apps/mobile/locales/fr.json` | **New** (`e9ee1845e`, 2026-01-04): the react-i18next catalogues (~520 keys each). Upstream ships no translation catalogue for the mobile app. FR is the fallback language, because the customer base is Suisse romande. |
-| `apps/mobile/app.json`, `apps/mobile/eas.json` | Expo config: bundle id `io.synk.app`, Synk name and icons, EAS build profiles (`1d6dea095`, `0bcf6d763`, `fec6f6958`). |
-| `apps/mobile/google-services.json`, `apps/mobile/GoogleService-Info.plist` | Firebase client configuration for the **Neoffice** Firebase project and the `io.synk.app` bundle id (`0bcf6d763`). Public client identifiers, no secret. |
-| `apps/mobile/assets/sync_ios.icon/icon.json` | iOS 18 layered app icon for Synk (`1d6dea095`). |
-| `apps/mobile/package.json` | Expo/RN deps for i18n (`i18next`, `react-i18next`, `expo-localization`) and the `react-native-css-interop` pin. |
-| `apps/mobile/tsconfig.tsbuildinfo` | ⚠️ Build cache committed by accident. Should be gitignored and deleted. |
+| `raven/raven/workspace/raven/raven.json` | Desk workspace label/title/content rebranded Raven → Synk (`1d6dea095`, `49ee6e172`). The header reads `synk`; the onboarding block of the content is gone because upstream 3.1 removed the module onboarding. |
 | `apps/web/package.json` | Adds `@neoffice/frappe-sidebar-react` (the NeoCockpit chrome), pinned to a commit SHA and re-pinned on every cockpit release (`scripts/cockpit-release.sh` in neoffice-devops). Was `frontend/package.json` before v3 moved the SPA to `apps/web` (2026-09-30). |
-| `package.json` (root) | `build` gated on the presence of `raven/public/raven/assets` (commit-the-build; `FORCE_REBUILD=1` forces it), `build:force` added, and `resolutions.react-native-css-interop = 0.1.22` because 0.1.23+ requires `react-native-worklets`, incompatible with the RN 0.76 of `apps/mobile`. |
-| `app.json` (root) | Empty Expo stub (`{"expo": {}}`), so the Expo CLI walking up from `apps/mobile` finds a workspace root. **TO REVIEW: origin unknown** — it rides along in `0b0db7095`, whose subject is about `react-native-worklets`. |
-| `ios/raven.xcodeproj/project.xcworkspace/contents.xcworkspacedata` | Xcode workspace stub committed with the iOS rebrand. **TO REVIEW: origin unknown** — no commit message mentions it. |
-| `ios/raven.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist` | Xcode workspace check stub, same commit. **TO REVIEW: origin unknown.** |
+| `package.json` (root) | `build` gated on the presence of `raven/public/raven/assets` (commit-the-build; `FORCE_REBUILD=1` forces it), `build:force` added, and `postinstall` also installs the desk widget's own dependencies (`install-desk`, in `raven/`). |
+| `raven/package.json`, `raven/yarn.lock` | The desk chat widget's build (`bench build --app raven`): its dependencies (the bundles are `raven.bundle.js`, `raven.bundle.scss` and `raven_chat.bundle.jsx`; upstream's `build.json`, which fed a `raven.min.js` that nothing loads, is gone as upstream deleted it). **Kept** although upstream removed the widget (#2311, 2026-10-16): the Synk icon of the cockpit's rail opens it (decision of 2026-10-25). Goes away with the widget. |
 
 ### Symlink
 
@@ -122,12 +123,8 @@ All of them are the Neoffice/Synk artwork replacing upstream's Raven artwork
 
 | Path | Note |
 |---|---|
-| `raven_logo.png`, `raven/public/raven-logo.png` | Synk wordmark. |
 | `raven/public/icon-intern-chat.jpg` | **Added.** Apps-screen tile icon, referenced by `add_to_apps_screen` in `raven/hooks.py`. |
 | `raven/public/manifest/*.png`, `favicon.ico` | Neoffice favicons / PWA icons. |
-| `frontend/public/splash_screens/*.png` | Neoffice iOS splash screens; the iPhone 16 / iPad Pro M4 sizes are **added** (upstream stops at iPhone 14). |
-| `apps/mobile/assets/{icon,adaptive-icon,splash}.png` | Synk app icon and splash. |
-| `apps/mobile/assets/sync_ios.icon/Assets/logo-sync.svg` | **Added**, Synk wordmark for the iOS 18 layered icon (marked inline). |
 
 ### Deleted / renamed
 

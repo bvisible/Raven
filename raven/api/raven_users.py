@@ -7,6 +7,7 @@ from frappe.utils.caching import redis_cache
 from raven.api.raven_channel_member import add_channel_members
 from raven.api.workspaces import add_workspace_members
 from raven.api.workspaces import get_list as get_workspace_list
+from raven.install import RAVEN_USER_PROFILE
 
 
 @frappe.whitelist(methods=["GET"])
@@ -123,35 +124,6 @@ def get_users():
 	return users
 
 
-@frappe.whitelist()
-def is_user_on_leave(user: str):
-	"""
-	If the user is on leave, return True
-	"""
-	# Check if FrappeHR is installed
-	if not "hrms" in frappe.get_installed_apps():
-		return False
-
-	employee = frappe.db.exists("Employee", {"user_id": user})
-
-	if employee:
-		# Check if attendance today is marked as "On Leave"
-		attendance = frappe.db.exists(
-			"Attendance",
-			{
-				"employee": employee,
-				"status": "On Leave",
-				"attendance_date": frappe.utils.today(),
-				"docstatus": 1,
-			},
-		)
-
-		if attendance:
-			return True
-
-	return False
-
-
 @frappe.whitelist(methods=["GET"])
 def get_all_users_on_leave():
 
@@ -193,6 +165,65 @@ def get_all_users_on_leave():
 
 
 @frappe.whitelist(methods=["POST"])
+def enable_user(user: str):
+	"""Give a user their Raven access back.
+
+	A Raven User is disabled when the site account is disabled, or when the
+	Raven User role was taken away. This restores both, in one save that
+	runs the normal permission checks (writing a User needs System Manager).
+	"""
+	user_doc = frappe.get_doc("User", user)
+	user_doc.enabled = 1
+	give_raven_access(user_doc)
+
+
+def has_role_profile(user_doc) -> bool:
+	"""Roles from a role profile are reapplied on every save, so one added by hand is lost."""
+	return bool(user_doc.role_profile_name or user_doc.get("role_profiles"))
+
+
+def profiles_can_stack() -> bool:
+	"""From Frappe 16 a user holds several role profiles; on 15 there is one, so a second can't be added."""
+	return frappe.get_meta("User").has_field("role_profiles")
+
+
+# //// Neoffice — refuse portal accounts (WI-00353). "Raven User" is created with desk_access=1, so
+# //// frappe's User.set_system_user() silently flips a Website User into a System User on save, which
+# //// consumes a paid licence seat: clients ended up counted as staff on several instances. The guard
+# //// lives here, in the one function every way of giving access goes through (upstream 3.1 made it
+# //// shared by add_users_to_raven, invite_user, enable_user and the setup flow's add_site_users).
+def is_portal_account(user_doc) -> bool:
+	return user_doc.user_type == "Website User"
+
+
+def give_raven_access(user_doc):
+	"""
+	Makes the user a Raven User and saves; the User's save hook creates the Raven User record.
+	A user whose roles come from role profiles gets Raven's own profile alongside them, since a
+	role added by hand would be dropped on their next save. On Frappe 15 that can't be done.
+	"""
+	# //// Neoffice — see is_portal_account.
+	if is_portal_account(user_doc):
+		frappe.throw(
+			_(
+				"{0} is a portal user. Adding them to Raven would turn them into a desk user and use up a licence seat."
+			).format(user_doc.name)
+		)
+	if has_role_profile(user_doc):
+		if not profiles_can_stack():
+			frappe.throw(
+				_("{0} gets their roles from a role profile. Add the Raven User role there.").format(
+					user_doc.name
+				)
+			)
+		if RAVEN_USER_PROFILE not in [row.role_profile for row in user_doc.role_profiles]:
+			user_doc.append("role_profiles", {"role_profile": RAVEN_USER_PROFILE})
+	elif "Raven User" not in [role.role for role in user_doc.roles]:
+		user_doc.append("roles", {"role": "Raven User"})
+	user_doc.save()
+
+
+@frappe.whitelist(methods=["POST"])
 def add_users_to_raven(users: list[str] | str):
 
 	if isinstance(users, str):
@@ -203,25 +234,14 @@ def add_users_to_raven(users: list[str] | str):
 
 	for user in users:
 		user_doc = frappe.get_doc("User", user)
-
-		# //// Neoffice — refuse portal accounts. Upstream appends the role and saves the
-		# //// User right away; "Raven User" is auto-created with desk_access=1, so
-		# //// frappe's User.set_system_user() silently flips a Website User into a
-		# //// System User — which consumes a paid licence seat (WI-00353). Clients ended
-		# //// up counted as staff on several instances. Report them as failed rather
-		# //// than promoting them; the dialog already renders that list.
-		if user_doc.user_type == "Website User":
+		# //// Neoffice — a portal account is reported as failed rather than thrown at (give_raven_access
+		# //// refuses it too, for every other caller); the dialog renders this list (WI-00353).
+		# Only a Frappe 15 user on a role profile can't be given access.
+		if is_portal_account(user_doc) or (has_role_profile(user_doc) and not profiles_can_stack()):
 			failed_users.append(user_doc)
-
-		elif user_doc.role_profile_name:
-			failed_users.append(user_doc)
-
-		elif hasattr(user_doc, "role_profiles") and len(user_doc.role_profiles) > 0:
-			failed_users.append(user_doc)
-		else:
-			user_doc.append("roles", {"role": "Raven User"})
-			user_doc.save()
-			success_users.append(user_doc)
+			continue
+		give_raven_access(user_doc)
+		success_users.append(user_doc)
 
 	return {"success_users": success_users, "failed_users": failed_users}
 
@@ -252,27 +272,8 @@ def invite_user(
 	existing_user = frappe.db.exists("User", {"email": email})
 
 	if existing_user:
-		user_doc = frappe.get_doc("User", existing_user)
-
-		# //// Neoffice — same guard as add_users_to_raven: granting "Raven User"
-		# //// (desk_access=1) to a portal account promotes it to System User on save and
-		# //// bills a licence seat (WI-00353). Refuse loudly instead of billing silently.
-		if user_doc.user_type == "Website User":
-			frappe.throw(
-				_(
-					"{0} is a portal user. Adding them to Raven would turn them into a desk user and use up a licence seat."
-				).format(existing_user)
-			)
-
-		if user_doc.role_profile_name:
-			frappe.throw(_("User has a role profile set. Please set the role to Raven User manually."))
-
-		elif hasattr(user_doc, "role_profiles") and len(user_doc.role_profiles) > 0:
-			frappe.throw(_("User has a role profile set. Please set the role to Raven User manually."))
-
-		user_doc.append("roles", {"role": "Raven User"})
-		user_doc.save()
-		add_user_to_workspaces_and_channels(user_doc.name, workspaces, channels)
+		give_raven_access(frappe.get_doc("User", existing_user))
+		add_user_to_workspaces_and_channels(existing_user, workspaces, channels)
 		return {"success": True, "message": "User added to Raven"}
 	else:
 		user_doc = frappe.new_doc("User")
@@ -289,7 +290,8 @@ def invite_user(
 def add_user_to_workspaces_and_channels(user: str, workspaces: list[str], channels: list[str]):
 	"""
 	Workspaces first, since channel membership needs workspace membership.
-	Both calls run under the caller's own permissions.
+	Both calls run under the caller's own permissions. Existing memberships are
+	skipped, so inviting someone again (or someone already there) doesn't fail.
 	"""
 	# //// Neoffice — a new person of the messaging already joins every open workspace when the account is made
 	# //// (open_workspaces.join_open_workspaces_on_insert, maintenance#1553): adding them to such a workspace again
@@ -298,7 +300,6 @@ def add_user_to_workspaces_and_channels(user: str, workspaces: list[str], channe
 	for workspace in workspaces:
 		if not frappe.db.exists("Raven Workspace Member", {"workspace": workspace, "user": user}):
 			add_workspace_members(workspace, [user])
-	# //// Neoffice — the same for the channels: an invitation adds a person only where they are not yet.
 	for channel in channels:
 		if not frappe.db.exists("Raven Channel Member", {"channel_id": channel, "user_id": user}):
 			add_channel_members(channel, [user])

@@ -162,8 +162,8 @@ def get_channels(hide_archived: bool | str = False):
 				continue
 		channel["peer_user_id"] = peer_user_id
 		if peer_user_id:
-			user_full_name = frappe.get_cached_value("User", peer_user_id, "full_name")
-			channel["full_name"] = user_full_name
+			# Raven User covers bots too. A bot has no User row.
+			channel["full_name"] = frappe.get_cached_value("Raven User", peer_user_id, "full_name")
 		# //// Neoffice - returns the filtered list (190d3e7fd + f4b14babc + b21d8d6f9, 2026-01-05 "Hide Administrator from Raven completely").
 		result.append(channel)
 	return result
@@ -346,12 +346,11 @@ def mark_all_messages_as_read(channel_ids: list):
 	return "Ok"
 
 
-@frappe.whitelist()
-def create_channel(
-	channel_name: str, channel_description: str, type: str, workspace: str, members: list = None
-):
+@frappe.whitelist(methods=["POST"])
+def create_channel(channel_name: str, channel_description: str, type: str, workspace: str):
 	"""
-	Create a new channel
+	Create a new channel. Members are added afterwards with add_channel_members,
+	which checks permissions for each member.
 	"""
 	channel = frappe.get_doc(
 		{
@@ -362,9 +361,6 @@ def create_channel(
 			"workspace": workspace,
 		}
 	).insert()
-
-	if members:
-		channel.add_members(members)
 
 	return channel.as_dict()
 
