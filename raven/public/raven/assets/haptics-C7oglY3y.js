@@ -1,0 +1,1 @@
+var e=()=>{try{var e,t;if((e=(t=navigator).vibrate)!=null&&e.call(t,10))return;let n=document.createElement(`label`);n.ariaHidden=`true`,n.style.display=`none`;let r=document.createElement(`input`);r.type=`checkbox`,r.setAttribute(`switch`,``),n.appendChild(r),document.body.appendChild(n),n.click(),n.remove()}catch(e){}};export{e as t};

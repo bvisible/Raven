@@ -1,0 +1,1 @@
+import{n as e}from"./sessionUser-XvFyVUz5.js";var t=()=>{let{name:t,fullName:n,image:r}=e();return{name:t,full_name:n,user_image:r}};export{t};

@@ -1,0 +1,1 @@
+import{t as e}from"./vanilla-CkNQ_Qr6.js";var t=e(``);export{t};
