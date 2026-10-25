@@ -33,6 +33,10 @@ class TestEnableUser(IntegrationTestCase):
 		self.user.remove_roles("Raven User")
 		self.user.save()
 		self.assertEqual(self.raven_enabled(), 0)
+		# //// Neoffice - without a desk role the save made test1 a Website User, and give_raven_access
+		# //// refuses a portal account (it would become a desk user and take a licence seat, WI-00353).
+		# //// The case this test covers is a colleague already on the desk.
+		frappe.db.set_value("User", "test1@example.com", "user_type", "System User")
 
 		enable_user("test1@example.com")
 

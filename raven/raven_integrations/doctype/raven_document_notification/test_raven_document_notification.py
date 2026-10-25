@@ -79,6 +79,8 @@ class IntegrationTestRavenDocumentNotification(IntegrationTestCase):
 			notification.save()
 
 		notification.enabled = 0
+		# //// Neoffice - Frappe 15 keeps the timestamp of the refused save in memory, then refuses the next.
+		notification.reload()
 		notification.save()
 		self.assertEqual(
 			frappe.db.get_value("Raven Document Notification", notification.name, "enabled"), 0
@@ -93,7 +95,8 @@ class IntegrationTestRavenDocumentNotification(IntegrationTestCase):
 		frappe.cache().hset(
 			"raven_doc_notifications",
 			"Error Log",
-			[{"name": "on-error", "send_alert_on": "New Document", "condition": None}],
+			# //// Neoffice - frappe._dict, as the cache's own loader returns: Frappe 15 gives back the plain dict.
+			[frappe._dict(name="on-error", send_alert_on="New Document", condition=None)],
 		)
 
 	def test_error_log_notification_still_fires_for_real_errors(self):

@@ -1,3 +1,5 @@
+import importlib.util
+import unittest  # //// Neoffice - see TestRegisterWithRavenCloud
 from unittest.mock import MagicMock, patch
 
 import frappe
@@ -187,6 +189,12 @@ class TestSetupPush(IntegrationTestCase):
 			frappe.is_whitelisted(get_push_notification_config)
 
 
+# //// Neoffice - Frappe 15 has no frappe.integrations.frappe_providers.cloud_settings (Frappe 16): the test
+# //// patches a class of it, and our sites never register with Raven Cloud.
+@unittest.skipUnless(
+	importlib.util.find_spec("frappe.integrations.frappe_providers.cloud_settings"),
+	"Frappe 15 has no cloud_settings",
+)
 class TestRegisterWithRavenCloud(IntegrationTestCase):
 	def test_the_token_and_hostname_go_to_the_relay_the_token_is_for(self):
 		client = MagicMock()

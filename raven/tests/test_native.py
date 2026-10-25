@@ -189,7 +189,8 @@ class TestNative(IntegrationTestCase):
 		self.assertIsInstance(data["lang"], str)
 		self.assertIn("system", data["time_zone"])
 		self.assertIn("raven", data["versions"])
-		self.assertIn({"app_name": "raven", "app_title": "Raven"}, data["app_data"])
+		# //// Neoffice - the app is called Synk (hooks.py app_title).
+		self.assertIn({"app_name": "raven", "app_title": "Synk"}, data["app_data"])
 		self.assertIn("chat_style", data)
 		self.assertIn("server_script_enabled", data)
 		self.assertFalse(data["read_only"])
@@ -222,6 +223,12 @@ class TestNative(IntegrationTestCase):
 		app = app_boot()
 		for field in APP_READS:
 			with self.subTest(field=field):
+				# //// Neoffice - sysdefaults: Desk's boot also runs the other apps' hooks, ERPNext's adds
+				# //// its own defaults (quotation_valid_till); what the app builds must be in Desk's, no more.
+				if field == "sysdefaults":
+					for key, value in (read(app, field) or {}).items():
+						self.assertEqual(frappe.as_json(value), frappe.as_json((read(desk, field) or {}).get(key)))
+					continue
 				self.assertEqual(frappe.as_json(read(app, field)), frappe.as_json(read(desk, field)))
 		titles = {entry["app_name"]: entry.get("app_title") for entry in desk.get("app_data") or []}
 		for entry in app["app_data"]:

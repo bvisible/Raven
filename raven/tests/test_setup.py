@@ -176,15 +176,20 @@ class TestSetup(IntegrationTestCase):
 		roles = frappe.get_all("Has Role", filters={"parent": "Raven Admin"}, pluck="role")
 		self.assertEqual(sorted(roles), ["Raven Admin", "Raven User"])
 
-	def test_install_creates_no_workspace(self):
-		workspaces = frappe.db.count("Raven Workspace")
-		channels = frappe.db.count("Raven Channel")
+	# //// Neoffice - upstream's install leaves the workspace to its setup flow and leaves setup_completed
+	# //// at 0. We never show that flow: install makes the default workspace "Synk" and its "general"
+	# //// channel, and marks the setup completed (decision of 25.10.2026). Running it twice is harmless.
+	def test_install_creates_the_synk_workspace_and_skips_the_setup(self):
+		frappe.db.set_single_value("Raven Settings", "setup_completed", 0)
 
 		after_install()
+		# //// Neoffice - the second run finds the workspace there and still succeeds.
+		after_install()
 
-		self.assertEqual(frappe.db.count("Raven Workspace"), workspaces)
-		self.assertEqual(frappe.db.count("Raven Channel"), channels)
-		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 0)
+		# //// Neoffice - one workspace "Synk", and the setup is over.
+		self.assertTrue(frappe.db.exists("Raven Workspace", "Synk"))
+		self.assertEqual(frappe.db.count("Raven Workspace", {"name": "Synk"}), 1)
+		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 1)
 
 
 class TestSiteUsers(IntegrationTestCase):
@@ -206,6 +211,10 @@ class TestSiteUsers(IntegrationTestCase):
 		_make_user(PROFILED, "Profiled", roles=(), role_profile=ROLE_PROFILE)
 		self.workspace = _make_workspace("Setup Test Workspace")
 		self.channel = _make_channel(self.workspace.name, "setup-test")
+		# //// Neoffice - a new open workspace takes in everyone already in the messaging (open_workspaces,
+		# //// maintenance#1553), upstream's tests start from an empty one: the members are taken out again.
+		frappe.db.delete("Raven Workspace Member", {"workspace": self.workspace.name})
+		frappe.db.delete("Raven Channel Member", {"channel_id": self.channel.name})
 
 	def tearDown(self):
 		frappe.set_user("Administrator")

@@ -41,7 +41,9 @@ class TestSendAttachments(IntegrationTestCase):
 					"file_name": "salary-slip.txt",
 					"content": "private",
 					"is_private": 1,
-					"attached_to_doctype": "Raven Message",
+					# //// Neoffice - upstream's File also names "Raven Message" here, with no document: Frappe
+					# //// 15 refuses an attachment without its name, and send_message_with_attachments only
+					# //// reads the owner and the url of the file.
 				}
 			)
 			.insert(ignore_permissions=True)

@@ -60,6 +60,10 @@ def mark_setup_completed():
 
 
 def create_general_channel():
+	# //// Neoffice - idempotent: a second run of after_install (a re-install, the test of it) found the
+	# //// workspace "Synk" there and died on its duplicate name, which failed the whole install.
+	if frappe.db.exists("Raven Workspace", "Synk"):
+		return
 	default_workspace = frappe.get_doc(
 		{
 			"doctype": "Raven Workspace",
