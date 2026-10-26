@@ -1837,10 +1837,10 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.11.tgz#a269e055e40e2f45873bae9d1a2fdccbd314ea3f"
   integrity sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==
 
-"@frappe/cloud-sdk@0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@frappe/cloud-sdk/-/cloud-sdk-0.4.2.tgz#fa2de73707a0acdce89946eb9ba38d2b9118aa12"
-  integrity sha512-sh84mNzx7ZZmNgIyJRGelzY4opMxisgo0CVfOykm1G75hqNP3sNkaVEhrnxepfYM5/wmNL9qbduFyvCVJpQMmg==
+"@frappe/cloud-sdk@0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@frappe/cloud-sdk/-/cloud-sdk-0.4.3.tgz#e34d24597a34a654211dcec91d25ecb03b091ffc"
+  integrity sha512-WfyqoSJjYd1fXebt+ECslFKjd37Kfp2j5OEspImVpQ9bz2A/p+RF3yRhsC3ibD1s/fsKb+i6UdBwl63/KiMR9Q==
 
 "@grpc/grpc-js@~1.9.0":
   version "1.9.16"
