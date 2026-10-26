@@ -56,7 +56,10 @@ class TestSetupPush(IntegrationTestCase):
 		settings.save()
 
 		self.register = self.enterContext(
-			patch("raven.frappe_cloud_push.register_with_raven_cloud", return_value=dict(REGISTRATION))
+			patch(
+				"raven.frappe_cloud_push.register_with_raven_cloud",
+				side_effect=lambda server_url, site_name: (site_name, dict(REGISTRATION)),
+			)
 		)
 		self.sync_tokens = self.enterContext(
 			patch("raven.raven_cloud_notifications.sync_users_tokens_to_raven_cloud")
@@ -96,6 +99,16 @@ class TestSetupPush(IntegrationTestCase):
 		self.register.assert_called_with(SERVER_URL, RENAMED_SITE)
 		self.assertEqual(self.sync_tokens.call_count, 2)
 
+	def test_a_pre_rename_registration_syncs_tokens_for_the_registered_hostname(self):
+		"""The sync right after registration must ask about the hostname that was actually
+		registered, not a fresh get_site_name() that may still be the pre-rename placeholder."""
+		self.register.side_effect = lambda server_url, site_name: (RENAMED_SITE, dict(REGISTRATION))
+
+		setup_push()
+
+		self.sync_tokens.assert_called_once_with(RENAMED_SITE)
+		self.assertEqual(frappe.db.get_default(REGISTERED_HOST_KEY), RENAMED_SITE)
+
 	def test_refused_keys_are_fetched_again_at_most_once_an_hour(self):
 		setup_push()
 		with patch("raven.frappe_cloud_push.frappe.enqueue") as enqueue:
@@ -106,7 +119,8 @@ class TestSetupPush(IntegrationTestCase):
 			retry_after_refusal()
 			enqueue.assert_called_once()
 
-		self.register.return_value = dict(REGISTRATION, api_secret="rotated-secret")
+		rotated = dict(REGISTRATION, api_secret="rotated-secret")
+		self.register.side_effect = lambda server_url, site_name: (site_name, rotated)
 		setup_push()
 		settings = frappe.get_single("Raven Settings")
 		self.assertEqual(settings.get_password("push_notification_api_secret"), "rotated-secret")
@@ -166,7 +180,7 @@ class TestSetupPush(IntegrationTestCase):
 		self.register.side_effect = requests.ConnectionError("Unavailable")
 		with self.assertRaises(requests.ConnectionError):
 			setup_push()
-		self.register.side_effect = None
+		self.register.side_effect = lambda server_url, site_name: (site_name, dict(REGISTRATION))
 
 		register_site_on_raven_cloud()
 
@@ -200,8 +214,9 @@ class TestRegisterWithRavenCloud(IntegrationTestCase):
 			patch("frappe.integrations.frappe_providers.cloud_settings.PilotClient", return_value=client),
 			patch("raven.frappe_cloud_push.requests.post", return_value=response) as post,
 		):
-			registration = register_with_raven_cloud(SERVER_URL, SITE)
+			registered_name, registration = register_with_raven_cloud(SERVER_URL, SITE)
 
+		self.assertEqual(registered_name, SITE)
 		self.assertEqual(registration, REGISTRATION)
 		self.assertEqual(client.post.call_args.args[1], {"audience": SERVER_URL})
 		post.assert_called_once_with(
