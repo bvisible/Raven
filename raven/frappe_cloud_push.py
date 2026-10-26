@@ -1,5 +1,9 @@
+from random import choice
+
 import frappe
+import jwt
 import requests
+from frappe.utils import get_sites
 from redis.exceptions import ConnectionError as RedisConnectionError
 
 from raven.raven_cloud_notifications import get_site_name
@@ -114,6 +118,7 @@ def register_with_raven_cloud(server_url: str, site_name: str) -> dict:
 	identity = client.post(
 		client.site_path("central/central.api.pilot.get_team_identity_token"), {"audience": server_url}
 	)
+	site_name = get_registration_site_name(identity["token"], site_name)
 	response = requests.post(
 		f"{server_url}/api/method/raven_cloud.api.frappe_cloud.exchange_frappe_cloud_token",
 		json={"token": identity["token"], "site_name": site_name},
@@ -122,3 +127,16 @@ def register_with_raven_cloud(server_url: str, site_name: str) -> dict:
 	)
 	response.raise_for_status()
 	return response.json()["message"]
+
+
+def get_registration_site_name(token: str, site_name: str) -> str:
+	if len(get_sites()) != 1:
+		return site_name
+
+	# Raven Cloud verifies the token; locally we only need the hosts for a lazy rename.
+	hosts = jwt.decode(token, options={"verify_signature": False}).get("hosts", [])
+	if not hosts or site_name in hosts:
+		return site_name
+
+	preferred_hosts = [host for host in hosts if not host.startswith("site-")]
+	return choice(preferred_hosts or hosts)

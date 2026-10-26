@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import frappe
+import jwt
 import requests
 from frappe.tests import IntegrationTestCase
 from redis.exceptions import ConnectionError as RedisConnectionError
@@ -190,7 +191,8 @@ class TestSetupPush(IntegrationTestCase):
 class TestRegisterWithRavenCloud(IntegrationTestCase):
 	def test_the_token_and_hostname_go_to_the_relay_the_token_is_for(self):
 		client = MagicMock()
-		client.post.return_value = {"token": "signed-token"}
+		token = jwt.encode({"hosts": [SITE]}, "", algorithm="none")
+		client.post.return_value = {"token": token}
 		response = MagicMock()
 		response.json.return_value = {"message": REGISTRATION}
 
@@ -204,7 +206,7 @@ class TestRegisterWithRavenCloud(IntegrationTestCase):
 		self.assertEqual(client.post.call_args.args[1], {"audience": SERVER_URL})
 		post.assert_called_once_with(
 			f"{SERVER_URL}/api/method/raven_cloud.api.frappe_cloud.exchange_frappe_cloud_token",
-			json={"token": "signed-token", "site_name": SITE},
+			json={"token": token, "site_name": SITE},
 			timeout=15,
 			allow_redirects=False,
 		)
