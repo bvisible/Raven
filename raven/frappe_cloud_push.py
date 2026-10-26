@@ -88,7 +88,7 @@ def setup_push() -> None:
 def register_site(settings, site_name: str) -> None:
 	"""Save the team's keys and the push settings, and send the device tokens for a new hostname."""
 	server_url = frappe.conf.get(SERVER_URL_CONFIG_KEY).rstrip("/")
-	registration = register_with_raven_cloud(server_url, site_name)
+	registered_name, registration = register_with_raven_cloud(server_url, site_name)
 	settings.update(
 		{
 			"push_notification_service": "Raven",
@@ -102,16 +102,20 @@ def register_site(settings, site_name: str) -> None:
 	# A background job runs as whoever queued it, which may be any user of the site.
 	settings.save(ignore_permissions=True)
 
-	if frappe.db.get_default(REGISTERED_HOST_KEY) != site_name:
+	if frappe.db.get_default(REGISTERED_HOST_KEY) != registered_name:
 		from raven.raven_cloud_notifications import sync_users_tokens_to_raven_cloud
 
-		# Raven Cloud keeps device tokens by hostname, so a new hostname sends them again.
-		sync_users_tokens_to_raven_cloud()
-		frappe.db.set_default(REGISTERED_HOST_KEY, site_name)
+		# Raven Cloud keeps device tokens by hostname, so a new hostname sends them again. Use
+		# registered_name, not a fresh get_site_name(): on a brand new site the two can differ.
+		sync_users_tokens_to_raven_cloud(registered_name)
+		frappe.db.set_default(REGISTERED_HOST_KEY, registered_name)
 
 
-def register_with_raven_cloud(server_url: str, site_name: str) -> dict:
-	"""Exchange a Frappe Cloud team token for the team's keys and the push settings."""
+def register_with_raven_cloud(server_url: str, site_name: str) -> tuple[str, dict]:
+	"""Exchange a Frappe Cloud team token for the team's keys and the push settings.
+
+	Returns the hostname Raven Cloud actually registered alongside them —
+	get_registration_site_name can resolve a different (real) hostname than the one passed in."""
 	from frappe.integrations.frappe_providers.cloud_settings import PilotClient
 
 	client = PilotClient()
@@ -126,7 +130,7 @@ def register_with_raven_cloud(server_url: str, site_name: str) -> dict:
 		allow_redirects=False,
 	)
 	response.raise_for_status()
-	return response.json()["message"]
+	return site_name, response.json()["message"]
 
 
 def get_registration_site_name(token: str, site_name: str) -> str:
