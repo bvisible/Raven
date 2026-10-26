@@ -35,7 +35,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@emoji-mart/react": "^1.1.1",
     "@floating-ui/dom": "^1.7.6",
-    "@frappe/cloud-sdk": "0.4.1",
+    "@frappe/cloud-sdk": "0.4.2",
     "@raven/lib": "*",
     "@rolldown/plugin-babel": "^0.2.3",
     "@tailwindcss/vite": "^4.3.0",
