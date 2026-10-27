@@ -41,3 +41,8 @@ apps/web/.env.local
 # Store screenshots and the demo site seed: local tooling, not part of the app
 screenshots/
 raven/demo/
+
+# //// Neoffice - a checkout made before the mobile app was removed (#2309) keeps its generated apps/mobile folders
+# //// (Expo cache, ios/, android/): untracked and no longer ignored, the cockpit release's `git add` took 91 of them
+# //// into a commit (2026-10-27). The mobile app lives in neoffice-mobile; nothing here belongs in this repository.
+apps/mobile/
