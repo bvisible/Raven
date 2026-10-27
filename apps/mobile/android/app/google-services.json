@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "654951732242",
+    "project_id": "neoffice-ee024",
+    "storage_bucket": "neoffice-ee024.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:654951732242:android:c67c6c9062edb46269f4cb",
+        "android_client_info": {
+          "package_name": "io.synk.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlEP5zUMpdllXB-M75-YS4ymt_wLl8dXk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
