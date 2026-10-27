@@ -5,6 +5,10 @@ import useGetUser from "../../hooks/useGetUser";
 //// Neoffice - import order only, no behaviour change.
 import Avatar from "../common/Avatar";
 import ChannelIcon from "../common/ChannelIcon";
+
+//// Neoffice - the brand's hand-drawn chat bubble, the icon the cockpit shows for this app (served by neoffice_theme:
+//// Streamline's licence keeps the drawing out of this public repository). The desk's dark theme inverts it.
+const BRAND_ICON = "/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg"
 /**
  * Header will have the following:
  * - Logo
@@ -34,9 +38,12 @@ const Header = ({
                 alignItems: 'center',
                 gap: '0.2rem',
             }}>
-            {/* //// Neoffice - rebrand (49ee6e172, 2025-04-05 "change name to synk" / f5dd1d497, 2025-06-27 "change logo and name"): the desk widget wordmark. */}
-
-                <span role='button' className="raven-logo cal-sans" onClick={toggle}>synk</span>
+            {/* //// Neoffice - the app's icon and name as the cockpit's menu shows them (« Messagerie d'entreprise »), in
+                //// place of upstream's Raven wordmark (it read "synk" from 49ee6e172 to 2026-10-27). */}
+                <span role='button' className="raven-logo" onClick={toggle}>
+                    <img className="raven-logo-icon" src={BRAND_ICON} alt="" />
+                    {__("Business messaging")}
+                </span>
 
                 <a href='/raven' target='_blank' className='btn btn-xs open-raven-button' style={{
                     lineHeight: '1.4rem',
@@ -46,8 +53,8 @@ const Header = ({
                     justifyContent: 'center',
                     // height: "24px",
                     // marginTop: '0.2rem',
-                //// Neoffice - rebrand (49ee6e172, 2025-04-05 "change name to synk" / f5dd1d497, 2025-06-27 "change logo and name"): tooltip. TO REVIEW: lower-case "synk".
-                }} title='Open synk'>
+                //// Neoffice - tooltip in the app's name (upstream: "Open Raven").
+                }} title={__("Open the business messaging")}>
                     <svg
                         width="18"
                         height="18"
@@ -70,7 +77,8 @@ const Header = ({
 
         }
         <div>
-            {unreadMessageCount ? <span className="raven-unread-count">{unreadMessageCount} unread</span> : null}
+            {/* //// Neoffice - translated: the count read "N unread" in English on a French desk. */}
+            {unreadMessageCount ? <span className="raven-unread-count">{__("{0} unread", [unreadMessageCount])}</span> : null}
             <button className="btn btn-md back-button" onClick={toggleRaven}>
                 {isOpen ?
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="m16.192 6.344-4.243 4.242-4.242-4.242-1.414 1.414L10.535 12l-4.242 4.242 1.414 1.414 4.242-4.242 4.243 4.242 1.414-1.414L13.364 12l4.242-4.242z"></path></svg>
@@ -95,9 +103,9 @@ const ChannelHeader = ({ channelID, onBackClick }) => {
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"></path></svg>
         </button>
 
-        {/* //// Neoffice — the tooltip read "Open channel in Raven"; the product ships as Synk. */}
+        {/* //// Neoffice — the tooltip read "Open channel in Raven"; it names the app as the cockpit's menu does. */}
         {channel?.is_direct_message ? <DMChannelHeader channel={channel} /> :
-            <a href={`/raven/channel/${channelID}`} target="_blank" title="Open channel in Synk">
+            <a href={`/raven/channel/${channelID}`} target="_blank" title={__("Open the channel in the business messaging")}>
                 <ChannelIcon channelType={channel?.channel_type} />
                 <span className="raven-channel-header-name cal-sans">{channel?.channel_name ?? channelID}</span>
             </a>
@@ -109,8 +117,8 @@ const ChannelHeader = ({ channelID, onBackClick }) => {
 const DMChannelHeader = ({ channel }) => {
 
     const user = useGetUser(channel.peer_user_id)
-    //// Neoffice — the tooltip read "Open channel in Raven"; the product ships as Synk.
-    return <a title="Open channel in Synk" className="raven-dm-channel-header" href={`/raven/channel/${channel.name}`} target="_blank">
+    //// Neoffice — the tooltip read "Open channel in Raven"; it names the app as the cockpit's menu does.
+    return <a title={__("Open the channel in the business messaging")} className="raven-dm-channel-header" href={`/raven/channel/${channel.name}`} target="_blank">
         <Avatar user={user} fallback={channel.peer_user_id} />
         <span className="raven-channel-header-name cal-sans">{user?.full_name ?? user?.name}</span>
     </a>

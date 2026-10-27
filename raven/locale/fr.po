@@ -26,12 +26,7 @@ msgid ""
 "To access Raven, users need to have the **Raven User** role.\n"
 "\n"
 "Go to the \"Users\" list and add the role to the users you want on Raven."
-msgstr ""
-"## Ajout d'utilisateurs\n"
-"\n"
-"Pour accéder à Synk, les utilisateurs doivent avoir le rôle **Raven User**.\n"
-"\n"
-"Allez dans la liste \"Utilisateurs\" et ajoutez le rôle aux utilisateurs que vous souhaitez voir sur Synk."
+msgstr "## Ajout d'utilisateurs\n\nPour accéder à la messagerie d'entreprise, les utilisateurs doivent avoir le rôle **Raven User**.\n\nAllez dans la liste \"Utilisateurs\" et ajoutez le rôle aux utilisateurs que vous souhaitez voir dans la messagerie d'entreprise."
 
 #: raven/raven/onboarding_step/introduction_to_raven/introduction_to_raven.json
 msgid ""
@@ -50,22 +45,7 @@ msgid ""
 "You could also send messages to other users privately via **Direct messages** - including yourself!\n"
 "\n"
 "A user could create as many channels and add as many users as they want to in them. "
-msgstr ""
-"## Canaux\n"
-"\n"
-"Synk vous aide, vous et votre équipe, à communiquer entre vous.\n"
-"\n"
-"Les échanges se déroulent dans des **canaux**. \n"
-"\n"
-"Tous les utilisateurs ayant accès à Synk peuvent voir et envoyer des messages dans les canaux **Ouverts**. \n"
-"\n"
-"Les canaux **Publics** sont visibles par tous, mais seuls les membres peuvent y envoyer des messages. Tout utilisateur peut rejoindre un canal public. \n"
-"\n"
-"Les canaux **Privés** ne sont visibles que par leurs membres, et seul l'administrateur du canal - c'est-à-dire son créateur - peut y ajouter de nouveaux membres. \n"
-"\n"
-"Vous pouvez aussi envoyer des messages en privé à d'autres utilisateurs via les **Messages directs** - y compris à vous-même !\n"
-"\n"
-"Un utilisateur peut créer autant de canaux qu'il le souhaite et y ajouter autant d'utilisateurs qu'il le souhaite. "
+msgstr "## Canaux\n\nLa messagerie d'entreprise vous aide, vous et votre équipe, à communiquer entre vous.\n\nLes échanges se déroulent dans des **canaux**. \n\nTous les utilisateurs ayant accès à la messagerie d'entreprise peuvent voir et envoyer des messages dans les canaux **Ouverts**. \n\nLes canaux **Publics** sont visibles par tous, mais seuls les membres peuvent y envoyer des messages. Tout utilisateur peut rejoindre un canal public. \n\nLes canaux **Privés** ne sont visibles que par leurs membres, et seul l'administrateur du canal - c'est-à-dire son créateur - peut y ajouter de nouveaux membres. \n\nVous pouvez aussi envoyer des messages en privé à d'autres utilisateurs via les **Messages directs** - y compris à vous-même !\n\nUn utilisateur peut créer autant de canaux qu'il le souhaite et y ajouter autant d'utilisateurs qu'il le souhaite. "
 
 #: raven/raven/onboarding_step/review_raven_settings/review_raven_settings.json
 msgid ""
@@ -75,13 +55,7 @@ msgid ""
 "<em>**Automatically adding users to Raven**</em>\n"
 "\n"
 "To make it easy for you, the Raven User role is assigned to any user who has access to Desk. If you wish to turn this off, please head to Raven Settings."
-msgstr ""
-"## Raven Settings\n"
-"\n"
-"\n"
-"<em>**Ajout automatique d'utilisateurs à Synk**</em>\n"
-"\n"
-"Pour vous simplifier la tâche, le rôle Raven User est attribué à tout utilisateur ayant accès au Desk. Si vous souhaitez désactiver cette fonction, rendez-vous dans Raven Settings."
+msgstr "## Raven Settings\n\n\n<em>**Ajout automatique d'utilisateurs à la messagerie d'entreprise**</em>\n\nPour vous simplifier la tâche, le rôle Raven User est attribué à tout utilisateur ayant accès au Desk. Si vous souhaitez désactiver cette fonction, rendez-vous dans Raven Settings."
 
 #: raven/raven/onboarding_step/access_the_web_app/access_the_web_app.json
 msgid ""
@@ -89,11 +63,7 @@ msgid ""
 "\n"
 "\n"
 "Raven is available at <a href=\"/raven\">**/raven**</a> for both web and mobile. On mobile, Raven can be installed as a PWA."
-msgstr ""
-"### Accéder aux applications web et mobile\n"
-"\n"
-"\n"
-"Synk est disponible à l'adresse <a href=\"/raven\">**/raven**</a> sur le web comme sur mobile. Sur mobile, Synk peut être installé comme PWA."
+msgstr "### Accéder aux applications web et mobile\n\n\nLa messagerie d'entreprise est disponible à l'adresse <a href=\"/raven\">**/raven**</a> sur le web comme sur mobile. Sur mobile, la messagerie d'entreprise peut être installée comme PWA."
 
 #: apps/web/src/components/features/settings/panels/Agents/AgentAITab.tsx:207
 msgid "(Default: 1)"
@@ -183,13 +153,11 @@ msgstr ""
 msgid ""
 "<p>To disable the user from accessing Raven, go to \"Users\" and remove the "
 "\"Raven User\" role.</p>"
-msgstr ""
-"<p>Pour empêcher un utilisateur d'accéder à Synk, allez dans "
-"\"Utilisateurs\" et retirez-lui le rôle \"Raven User\".</p>"
+msgstr "<p>Pour empêcher un utilisateur d'accéder à la messagerie d'entreprise, allez dans \"Utilisateurs\" et retirez-lui le rôle \"Raven User\".</p>"
 
 #: raven/raven/workspace/raven/raven.json
 msgid "<span class=\"h4\"><a href=\"/raven\">Raven</a></span>"
-msgstr "<span class=\"h4\"><a href=\"/raven\">Synk</a></span>"
+msgstr "<span class=\"h4\"><a href=\"/raven\">Messagerie d'entreprise</a></span>"
 
 #: apps/web/src/components/features/settings/panels/Agents/AgentGeneralTab.tsx:35
 msgid "A bot to handle accounts"
@@ -360,7 +328,7 @@ msgstr "Ajouter un destinataire"
 
 #: raven/raven/onboarding_step/adding_users_to_raven/adding_users_to_raven.json
 msgid "Add Users to Raven"
-msgstr "Ajouter des utilisateurs à Synk"
+msgstr "Ajouter des utilisateurs à la messagerie d'entreprise"
 
 #: apps/web/src/components/features/settings/panels/Functions/DoctypeVariableBuilder.tsx:155
 #: apps/web/src/components/features/settings/panels/Functions/VariableBuilder.tsx:215
@@ -373,11 +341,7 @@ msgid ""
 "Add a Webhook Secret so Raven can sign requests. An X-Frappe-Webhook-"
 "Signature header (a base64 HMAC-SHA256 of the payload) is added before the "
 "request is sent. Do not share the secret publicly."
-msgstr ""
-"Ajoutez un secret de webhook pour permettre à Synk de signer les requêtes. "
-"Un en-tête X-Frappe-Webhook-Signature (un HMAC-SHA256 en base64 de la charge"
-" utile) est ajouté avant l'envoi de la requête. Ne partagez pas ce secret "
-"publiquement."
+msgstr "Ajoutez un secret de webhook pour permettre à la messagerie d'entreprise de signer les requêtes. Un en-tête X-Frappe-Webhook-Signature (un HMAC-SHA256 en base64 de la charge utile) est ajouté avant l'envoi de la requête. Ne partagez pas ce secret publiquement."
 
 #: apps/web/src/components/features/settings/panels/Emojis/AddEmojiDialog.tsx:47
 msgid "Add a custom emoji to use in your chats and reactions."
@@ -810,7 +774,7 @@ msgstr "Créer automatiquement un canal pour chaque département"
 
 #: raven/raven/doctype/raven_settings/raven_settings.json
 msgid "Automatically add system users to Raven"
-msgstr "Ajouter automatiquement les utilisateurs système à Synk"
+msgstr "Ajouter automatiquement les utilisateurs système à la messagerie d'entreprise"
 
 #: apps/web/src/components/features/profile/EditProfileDrawer.tsx:100
 #: apps/web/src/components/features/settings/panels/Profile.tsx:139
@@ -1137,7 +1101,7 @@ msgstr "Canal {0} supprimé"
 
 #: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:97
 msgid "Channel {0} does not exist in Raven."
-msgstr "Le canal {0} n'existe pas dans Synk."
+msgstr "Le canal {0} n'existe pas dans la messagerie d'entreprise."
 
 #: apps/web/src/components/features/cmdk/ChannelList.tsx:80
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:131
@@ -1263,10 +1227,7 @@ msgstr "Choisissez comment vous apparaissez aux autres"
 msgid ""
 "Choose what Raven should do when you message someone outside working hours "
 "({0}). Silent messages don't ping anyone - they'll see it when they're back."
-msgstr ""
-"Choisissez ce que Synk doit faire lorsque vous envoyez un message à "
-"quelqu'un en dehors des heures de travail ({0}). Les messages silencieux ne "
-"notifient personne - la personne les verra à son retour."
+msgstr "Choisissez ce que la messagerie d'entreprise doit faire lorsque vous envoyez un message à quelqu'un en dehors des heures de travail ({0}). Les messages silencieux ne notifient personne - la personne les verra à son retour."
 
 #: apps/web/src/components/features/message/actions/dialogs/ForwardMessageDialog.tsx:421
 msgid "Choose where to forward this message."
@@ -1413,9 +1374,7 @@ msgstr "Conditions sur"
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:240
 #: apps/web/src/components/features/settings/panels/AISettings.tsx:178
 msgid "Configure AI providers to use AI features in Raven."
-msgstr ""
-"Configurez les fournisseurs d'IA pour utiliser les fonctionnalités d'IA dans"
-" Synk."
+msgstr "Configurez les fournisseurs d'IA pour utiliser les fonctionnalités d'IA dans la messagerie d'entreprise."
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:160
 #: apps/web/src/components/features/settings/panels/DocumentNotifications/DocumentNotificationListView.tsx:83
@@ -1434,7 +1393,7 @@ msgstr "Configurez le comportement et les préférences."
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:92
 #: apps/web/src/components/features/settings/panels/Appearance.tsx:20
 msgid "Configure how you want Raven to look."
-msgstr "Configurez l'apparence de Synk."
+msgstr "Configurez l'apparence de la messagerie d'entreprise."
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:248
 #: apps/web/src/components/features/settings/panels/PushNotifications.tsx:184
@@ -1450,9 +1409,7 @@ msgstr "Configurer {0}"
 msgid ""
 "Connect your HR system to Raven to sync employee data and send "
 "notifications."
-msgstr ""
-"Connectez votre système RH à Synk pour synchroniser les données des employés"
-" et envoyer des notifications."
+msgstr "Connectez votre système RH à la messagerie d'entreprise pour synchroniser les données des employés et envoyer des notifications."
 
 #: apps/web/src/components/features/settings/panels/AISettings.tsx:50
 msgid "Connection successful!"
@@ -1737,7 +1694,7 @@ msgstr "Impossible de mettre à jour le format de l'heure"
 
 #: apps/web/src/components/layout/AppShell.tsx:137
 msgid "Couldn't load Raven"
-msgstr "Impossible de charger Synk"
+msgstr "Impossible de charger la messagerie d'entreprise"
 
 #: apps/web/src/pages/notifications/Notifications.tsx:224
 msgid "Couldn't load notifications"
@@ -1845,7 +1802,7 @@ msgstr ""
 
 #: apps/web/src/components/features/settings/panels/Agents/AgentListView.tsx:94
 msgid "Create agents to run automations on Raven."
-msgstr "Créez des agents pour exécuter des automatisations sur Synk."
+msgstr "Créez des agents pour exécuter des automatisations dans la messagerie d'entreprise."
 
 #: apps/web/src/components/features/settings/panels/Agents/AgentEditorView.tsx:24
 msgid "Create an Agent"
@@ -2306,9 +2263,7 @@ msgstr "Processeurs de documents"
 msgid ""
 "Document Processors require Google Cloud APIs to be enabled in your Raven "
 "settings."
-msgstr ""
-"Les processeurs de documents nécessitent que les API Google Cloud soient "
-"activées dans vos réglages Synk."
+msgstr "Les processeurs de documents nécessitent que les API Google Cloud soient activées dans vos réglages de la messagerie d'entreprise."
 
 #: raven/raven_integrations/doctype/raven_message_action/raven_message_action.py:44
 msgid "Document Type is required."
@@ -3079,7 +3034,7 @@ msgstr "Obtenir la valeur"
 
 #: apps/web/src/components/features/settings/panels/KeyboardShortcuts.tsx:197
 msgid "Get around Raven quickly with keyboard shortcuts."
-msgstr "Déplacez-vous rapidement dans Synk grâce aux raccourcis clavier."
+msgstr "Déplacez-vous rapidement dans la messagerie d'entreprise grâce aux raccourcis clavier."
 
 #: apps/web/src/components/features/settings/panels/Agents/AgentListView.tsx:92
 msgid "Get started with agents"
@@ -3104,7 +3059,7 @@ msgstr "Aller à"
 #: raven/raven/onboarding_step/access_the_web_app/access_the_web_app.json
 #: raven/raven/onboarding_step/introduction_to_raven/introduction_to_raven.json
 msgid "Go to Raven"
-msgstr "Aller à Synk"
+msgstr "Aller à la messagerie d'entreprise"
 
 #: apps/web/src/components/features/message/ThreadHeader.tsx:101
 msgid "Go to channel"
@@ -3270,9 +3225,7 @@ msgstr ""
 msgid ""
 "If checked, a channel will be created in Raven for each department and "
 "employees will be synced with Raven Users."
-msgstr ""
-"Si cette option est cochée, un canal sera créé dans Synk pour chaque "
-"département, et les employés seront synchronisés avec les Raven Users."
+msgstr "Si cette option est cochée, un canal sera créé dans la messagerie d'entreprise pour chaque département, et les employés seront synchronisés avec les Raven Users."
 
 #: raven/raven_channel_management/doctype/raven_channel_member/raven_channel_member.json
 msgid "If checked, new messages will not show up in unread count"
@@ -3299,9 +3252,7 @@ msgstr ""
 
 #: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json
 msgid "If checked, this prompt will be available to all users on Raven"
-msgstr ""
-"Si cette option est cochée, ce prompt sera disponible pour tous les "
-"utilisateurs sur Synk"
+msgstr "Si cette option est cochée, ce prompt sera disponible pour tous les utilisateurs dans la messagerie d'entreprise"
 
 #: raven/raven_bot/doctype/raven_bot/raven_bot.json
 msgid ""
@@ -3422,9 +3373,7 @@ msgstr "Notifications dans l'application"
 msgid ""
 "Install Frappe HR on this site to sync employees, departments and leaves "
 "with Raven."
-msgstr ""
-"Installez Frappe HR sur ce site pour synchroniser les employés, départements"
-" et congés avec Synk."
+msgstr "Installez Frappe HR sur ce site pour synchroniser les employés, départements et congés avec la messagerie d'entreprise."
 
 #: apps/web/src/components/features/settings/panels/About.tsx:71
 msgid "Installed apps"
@@ -3478,7 +3427,7 @@ msgstr "Invisible"
 
 #: apps/web/src/components/features/settings/panels/Users/AddUserDialog.tsx:65
 msgid "Invite a new user to Raven."
-msgstr "Invitez un nouvel utilisateur sur Synk."
+msgstr "Invitez un nouvel utilisateur dans la messagerie d'entreprise."
 
 #: apps/web/src/components/features/settings/panels/Users/AddUserDialog.tsx:132
 msgid "Invite sent"
@@ -3593,7 +3542,7 @@ msgstr ""
 
 #: raven/raven/onboarding_step/access_the_web_app/access_the_web_app.json
 msgid "It's time. Send a Raven."
-msgstr "Il est temps. Envoyez un Synk."
+msgstr "Il est temps. Envoyez un message."
 
 #: apps/web/src/components/features/ChatInput/composerGate.tsx:129
 #: apps/web/src/components/features/message/renderers/LinkPreview.tsx:592
@@ -3728,7 +3677,7 @@ msgstr "Gauche-droite"
 
 #: raven/raven/module_onboarding/raven/raven.json
 msgid "Let's setup Raven"
-msgstr "Configurons Synk"
+msgstr "Configurons la messagerie d'entreprise"
 
 #: apps/web/src/components/features/message/renderers/DocumentPrintDialog.tsx:113
 msgid "Letterhead"
@@ -3911,12 +3860,12 @@ msgstr "Gérer l'accès"
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:118
 #: apps/web/src/components/features/settings/panels/Users/Users.tsx:65
 msgid "Manage users added to Raven."
-msgstr "Gérer les utilisateurs ajoutés à Synk."
+msgstr "Gérer les utilisateurs ajoutés à la messagerie d'entreprise."
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:84
 #: apps/web/src/components/features/settings/panels/Profile.tsx:115
 msgid "Manage your Raven profile"
-msgstr "Gérez votre profil Synk"
+msgstr "Gérez votre profil dans la messagerie d'entreprise"
 
 #: raven/raven/doctype/raven_blocked_links/raven_blocked_links.json
 msgid "Match Exact"
@@ -5280,7 +5229,7 @@ msgstr "Citer"
 #: raven/raven/doctype/raven_settings/raven_settings.json
 #: raven/raven/workspace/raven/raven.json
 msgid "Raven"
-msgstr "Synk"
+msgstr "Messagerie d'entreprise"
 
 #: raven/raven_ai/doctype/raven_ai_bot_files/raven_ai_bot_files.json
 msgid "Raven AI Bot Files"
@@ -5300,7 +5249,7 @@ msgstr "Raven AI Function Params"
 
 #: apps/web/src/components/features/settings/panels/ai/AINotEnabledCallout.tsx:25
 msgid "Raven AI is not enabled. Please enable it in"
-msgstr "L'IA de Synk n'est pas activée. Veuillez l'activer dans"
+msgstr "L'IA de la messagerie d'entreprise n'est pas activée. Veuillez l'activer dans"
 
 #: raven/raven/doctype/raven_settings/raven_settings.json
 #: raven/raven/doctype/raven_workspace/raven_workspace.json
@@ -5502,21 +5451,19 @@ msgstr "Raven Workspace Member"
 
 #: apps/web/src/components/features/settings/panels/QuietHoursAdminSection.tsx:198
 msgid "Raven can nudge users to send messages silently outside work hours."
-msgstr ""
-"Synk peut inciter les utilisateurs à envoyer leurs messages en mode "
-"silencieux en dehors des heures de travail."
+msgstr "La messagerie d'entreprise peut inciter les utilisateurs à envoyer leurs messages en mode silencieux en dehors des heures de travail."
 
 #: raven/raven/module_onboarding/raven/raven.json
 msgid "Raven is setup!"
-msgstr "Synk est configuré !"
+msgstr "La messagerie d'entreprise est configurée !"
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:264
 msgid "Raven version, installed apps, and resource links."
-msgstr "Version de Synk, applications installées et liens utiles."
+msgstr "Version de la messagerie d'entreprise, applications installées et liens utiles."
 
 #: apps/web/src/components/layout/AppUpdateAlert.tsx:80
 msgid "Raven was updated"
-msgstr "Synk a été mis à jour"
+msgstr "La messagerie d'entreprise a été mise à jour"
 
 #: apps/web/src/components/features/settings/panels/PushNotifications.tsx:156
 msgid "Re-Register Site on Raven Cloud"
@@ -5929,7 +5876,7 @@ msgstr "ID de l'événement du planificateur"
 
 #: apps/web/src/pages/search/Search.tsx:320
 msgid "Search Raven"
-msgstr "Rechercher dans Synk"
+msgstr "Rechercher dans la messagerie d'entreprise"
 
 #: apps/web/src/components/common/LinkFieldComboBox/LinkFieldCombobox.tsx:428
 msgid "Search and pick a document"
@@ -6234,7 +6181,7 @@ msgstr "Envoyer le message"
 #: raven/public/js/timeline_button.js:224
 #: raven/public/js/timeline_button.js:324
 msgid "Send a Raven"
-msgstr "Envoyer un Synk"
+msgstr "Envoyer un message"
 
 #: apps/web/src/components/features/ChatInput/SendButton.tsx:141
 #: apps/web/src/components/features/ChatInput/SendButton.tsx:169
@@ -6421,10 +6368,7 @@ msgstr "Définir le statut sur {0}"
 msgid ""
 "Set working hours for your organization, so Raven can nudge users to send "
 "messages silently during off-work hours."
-msgstr ""
-"Définissez les heures de travail de votre organisation afin que Synk puisse "
-"inciter les utilisateurs à envoyer leurs messages en mode silencieux en "
-"dehors de ces heures."
+msgstr "Définissez les heures de travail de votre organisation afin que la messagerie d'entreprise puisse inciter les utilisateurs à envoyer leurs messages en mode silencieux en dehors de ces heures."
 
 #: apps/web/src/components/features/settings/panels/Preferences.tsx:278
 msgid "Set your favorite emojis for quick reactions."
@@ -6453,7 +6397,7 @@ msgstr "A partagé {0}"
 
 #: raven/raven/doctype/raven_settings/raven_settings.json
 msgid "Show Raven on Desk"
-msgstr "Afficher Synk dans le Desk"
+msgstr "Afficher la messagerie d'entreprise dans le Desk"
 
 #: apps/web/src/components/features/settings/panels/Appearance.tsx:367
 msgid ""
@@ -6911,10 +6855,7 @@ msgstr ""
 msgid ""
 "The new Raven web app only supports Raven Cloud. Switch to Raven Cloud and "
 "add your credentials to keep push notifications working."
-msgstr ""
-"La nouvelle application web Synk ne prend en charge que Raven Cloud. "
-"Basculez vers Raven Cloud et ajoutez vos identifiants pour continuer à "
-"recevoir les notifications push."
+msgstr "La nouvelle application web de la messagerie d'entreprise ne prend en charge que Raven Cloud. Basculez vers Raven Cloud et ajoutez vos identifiants pour continuer à recevoir les notifications push."
 
 #: apps/web/src/components/features/settings/panels/Webhooks/WebhookForm.tsx:77
 msgid "The number of seconds until the request expires."
@@ -7108,9 +7049,7 @@ msgstr "Ceci doit être unique et ne peut pas contenir d'espaces."
 #: apps/web/src/pages/ErrorPage.tsx:40
 msgid ""
 "This one leads to a better Raven - help us climb by reporting the error on"
-msgstr ""
-"Celle-ci mène vers un Synk encore meilleur - aidez-nous à progresser en "
-"signalant l'erreur sur"
+msgstr "Celle-ci mène vers une messagerie encore meilleure - aidez-nous à progresser en signalant l'erreur sur"
 
 #: raven/api/raven_poll.py:264
 msgid "This poll is already closed"
@@ -7180,11 +7119,11 @@ msgstr ""
 
 #: apps/web/src/components/features/settings/panels/Users/AddUserDialog.tsx:221
 msgid "This user already exists in Frappe. Add them to Raven?"
-msgstr "Cet utilisateur existe déjà dans Frappe. L'ajouter à Synk ?"
+msgstr "Cet utilisateur existe déjà dans Frappe. L'ajouter à la messagerie d'entreprise ?"
 
 #: apps/web/src/components/features/settings/panels/Users/AddUserDialog.tsx:167
 msgid "This user is already on Raven."
-msgstr "Cet utilisateur est déjà sur Synk."
+msgstr "Cet utilisateur est déjà dans la messagerie d'entreprise."
 
 #: apps/web/src/components/features/message/actions/dialogs/DeleteMessageDialog.tsx:96
 msgid ""
@@ -7381,7 +7320,7 @@ msgstr "Mar"
 
 #: apps/web/src/components/features/settings/panels/AISettings.tsx:65
 msgid "Turn on AI features across Raven."
-msgstr "Activez les fonctionnalités d'IA dans tout Synk."
+msgstr "Activez les fonctionnalités d'IA dans toute la messagerie d'entreprise."
 
 #: apps/web/src/components/features/settings/panels/KeyboardShortcuts.tsx:143
 msgid "Turn the current block into a bullet list."
@@ -7620,7 +7559,7 @@ msgstr "Actions utilisateur"
 
 #: apps/web/src/components/features/settings/panels/Users/AddUserDialog.tsx:132
 msgid "User added to Raven"
-msgstr "Utilisateur ajouté à Synk"
+msgstr "Utilisateur ajouté à la messagerie d'entreprise"
 
 #: apps/web/src/components/layout/SessionBroadcast.tsx:88
 msgid "User changed"
@@ -7647,11 +7586,11 @@ msgstr "L'utilisateur n'est pas membre de ce canal"
 
 #: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:91
 msgid "User {0} does not exist in Raven."
-msgstr "L'utilisateur {0} n'existe pas dans Synk."
+msgstr "L'utilisateur {0} n'existe pas dans la messagerie d'entreprise."
 
 #: apps/web/src/components/features/settings/panels/Users/Users.tsx:98
 msgid "Users added to Raven will show up here."
-msgstr "Les utilisateurs ajoutés à Synk apparaîtront ici."
+msgstr "Les utilisateurs ajoutés à la messagerie d'entreprise apparaîtront ici."
 
 #: raven/raven/doctype/raven_settings/raven_settings.json
 msgid "VAPID Public Key"
@@ -7884,20 +7823,14 @@ msgstr "Quand"
 msgid ""
 "When images or PDFs are uploaded to the agent, Raven will automatically call"
 " Google Cloud APIs to parse the document and send it's results to the agent."
-msgstr ""
-"Lorsque des images ou des PDF sont envoyés à l'agent, Synk appelle "
-"automatiquement les API Google Cloud pour analyser le document et "
-"transmettre les résultats à l'agent."
+msgstr "Lorsque des images ou des PDF sont envoyés à l'agent, la messagerie d'entreprise appelle automatiquement les API Google Cloud pour analyser le document et transmettre les résultats à l'agent."
 
 #: apps/web/src/components/features/settings/panels/Agents/AgentDocumentProcessorsTab.tsx:79
 msgid ""
 "When images or PDFs are uploaded to the agent, Raven will automatically call"
 " Google Cloud APIs to process the document and send its results to the agent"
 " for better context."
-msgstr ""
-"Lorsque des images ou des PDF sont envoyés à l'agent, Synk appelle "
-"automatiquement les API Google Cloud pour traiter le document et transmettre"
-" les résultats à l'agent afin d'enrichir le contexte."
+msgstr "Lorsque des images ou des PDF sont envoyés à l'agent, la messagerie d'entreprise appelle automatiquement les API Google Cloud pour traiter le document et transmettre les résultats à l'agent afin d'enrichir le contexte."
 
 #: apps/web/src/components/features/settings/panels/Preferences.tsx:88
 msgid ""
@@ -8072,9 +8005,7 @@ msgstr "Vous"
 #: apps/web/src/components/layout/AppShell.tsx:141
 msgid ""
 "You appear to be offline. Raven will load as soon as you're back online."
-msgstr ""
-"Vous semblez être hors ligne. Synk se chargera dès que vous serez de nouveau"
-" en ligne."
+msgstr "Vous semblez être hors ligne. La messagerie d'entreprise se chargera dès que vous serez de nouveau en ligne."
 
 #: raven/raven_channel_management/doctype/raven_channel_member/raven_channel_member.py:68
 msgid "You are already a member of this channel"
@@ -8225,7 +8156,7 @@ msgstr ""
 
 #: apps/web/src/components/layout/AppShell.tsx:108
 msgid "You cannot access Raven."
-msgstr "Vous ne pouvez pas accéder à Synk."
+msgstr "Vous ne pouvez pas accéder à la messagerie d'entreprise."
 
 #: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:202
 msgid "You cannot change the name of a direct message channel"
@@ -8265,7 +8196,7 @@ msgstr ""
 
 #: raven/api/workspaces.py:20
 msgid "You do not have access to Raven."
-msgstr "Vous n'avez pas accès à Synk."
+msgstr "Vous n'avez pas accès à la messagerie d'entreprise."
 
 #: raven/api/reminders.py:35
 #: raven/raven/doctype/raven_reminder/raven_reminder.py:73
@@ -8495,9 +8426,7 @@ msgstr ""
 msgid ""
 "Your browser provides these. Raven keeps every channel and page in the "
 "history, so they work as you would expect."
-msgstr ""
-"Votre navigateur les fournit. Synk conserve chaque canal et chaque page dans"
-" l'historique, afin qu'ils fonctionnent comme vous vous y attendez."
+msgstr "Votre navigateur les fournit. La messagerie d'entreprise conserve chaque canal et chaque page dans l'historique, afin qu'ils fonctionnent comme vous vous y attendez."
 
 #: apps/web/src/components/features/message/renderers/LinkPreview.tsx:701
 msgid "Zoom meeting"
@@ -8844,10 +8773,10 @@ msgid "⏰ Reminder"
 msgstr "⏰ Rappel"
 
 msgid "Send a Synk"
-msgstr "Envoyer un message Synk"
+msgstr "Envoyer un message"
 
 msgid "Open channel in Synk"
-msgstr "Ouvrir le canal dans Synk"
+msgstr "Ouvrir le canal dans la messagerie d'entreprise"
 
 # //// Neoffice — message actions menu showed « Pin » in English: wrapped in _() (useMessageActions.tsx) but never translated.
 msgid "Pin"
@@ -9035,7 +8964,7 @@ msgstr "Un message direct ne peut être échangé qu'entre deux utilisateurs."
 
 #: apps/web/src/native/NativeBridge.tsx:37
 msgid "A newer Raven app is available for this site."
-msgstr "Une version plus récente de Synk est disponible pour ce site."
+msgstr "Une version plus récente de la messagerie d'entreprise est disponible pour ce site."
 
 #: apps/web/src/components/features/setup/steps/SiteUsersDialog.tsx:189
 msgid "A System Manager can add them"
@@ -9138,7 +9067,7 @@ msgstr "Demandez à un administrateur de vous ajouter à un espace de travail."
 #. Label of a Check field in DocType 'Raven Settings'
 #: raven/raven/doctype/raven_settings/raven_settings.json:61
 msgid "Automatically add system users to Synk"
-msgstr "Ajouter automatiquement les utilisateurs système à Synk"
+msgstr "Ajouter automatiquement les utilisateurs système à la messagerie d'entreprise"
 
 #: apps/web/src/components/features/setup/steps/SiteUsersBox.tsx:21
 msgid "Both selected"
@@ -9158,7 +9087,7 @@ msgstr "Les canaux sont l'endroit où votre équipe discute."
 
 #: apps/web/src/native/BootErrorScreen.tsx:34
 msgid "Check your connection. Raven will retry when the network is back."
-msgstr "Vérifiez votre connexion. Synk réessaiera dès que le réseau sera rétabli."
+msgstr "Vérifiez votre connexion. La messagerie d'entreprise réessaiera dès que le réseau sera rétabli."
 
 #: apps/web/src/native/SitePicker.tsx:191
 msgid "Choose a site"
@@ -9295,7 +9224,7 @@ msgstr "Résultat d'exécution"
 
 #: apps/web/src/components/features/setup/steps.ts:35
 msgid "First Frappe HR, now Raven. You're on a roll."
-msgstr "D'abord Frappe HR, maintenant Synk. Vous êtes sur une bonne lancée."
+msgstr "D'abord Frappe HR, maintenant la messagerie d'entreprise. Vous êtes sur une bonne lancée."
 
 #. Label of a Data field in DocType 'Raven AI Pending Action'
 #: raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json:116
@@ -9351,7 +9280,7 @@ msgstr "Sortie en cours…"
 
 #: apps/web/src/components/features/setup/steps/HRStep.tsx:56
 msgid "Let the two talk: Raven can show who's on leave, so no one chases a teammate who's away."
-msgstr "Faites communiquer les deux : Synk peut afficher qui est en congé, afin que personne ne relance un collègue absent."
+msgstr "Faites communiquer les deux : la messagerie d'entreprise peut afficher qui est en congé, afin que personne ne relance un collègue absent."
 
 #: apps/web/src/components/features/header/NavUserMenu/NavUserMenu.tsx:118
 msgid "Manage Billing"
@@ -9492,7 +9421,7 @@ msgstr "Partager vers"
 #. Label of a Check field in DocType 'Raven Settings'
 #: raven/raven/doctype/raven_settings/raven_settings.json:68
 msgid "Show Synk on Desk"
-msgstr "Afficher Synk dans le Desk"
+msgstr "Afficher la messagerie d'entreprise dans le Desk"
 
 #: apps/web/src/components/features/setup/steps/HRStep.tsx:60
 msgid "Show who's on leave"
@@ -9571,7 +9500,7 @@ msgstr "Cela désactive leur compte sur ce site. Ils seront déconnectés partou
 
 #: apps/web/src/native/SitePicker.tsx:227
 msgid "This does not look like a Raven site."
-msgstr "Ceci ne ressemble pas à un site Synk."
+msgstr "Ceci ne ressemble pas à un site avec la messagerie d'entreprise."
 
 #: apps/web/src/components/features/setup/steps/ProfileStep.tsx:81
 msgid "This is how you’ll appear to your team."
@@ -9587,12 +9516,12 @@ msgstr "Ce site n'a pas de client OAuth pour cette application. Demandez à son 
 
 #: apps/web/src/native/SitePicker.tsx:228
 msgid "This site runs an older Raven. Ask its admin to update."
-msgstr "Ce site utilise une version plus ancienne de Synk. Demandez à son administrateur de la mettre à jour."
+msgstr "Ce site utilise une version plus ancienne de la messagerie d'entreprise. Demandez à son administrateur de la mettre à jour."
 
 #: apps/web/src/native/NativeBridge.tsx:36
 #, python-brace-format
 msgid "This site runs Raven {0}; the app is built for {1}. Some features may not work."
-msgstr "Ce site utilise Synk {0} ; l'application est conçue pour {1}. Certaines fonctionnalités peuvent ne pas fonctionner."
+msgstr "Ce site utilise la version {0} de la messagerie d'entreprise ; l'application est conçue pour {1}. Certaines fonctionnalités peuvent ne pas fonctionner."
 
 #: apps/web/src/components/features/ChatInput/composerGate.tsx:134
 msgid "This user has been deactivated. You can't send them messages."
@@ -9613,7 +9542,7 @@ msgstr "Événement de configuration inconnu : {0}"
 
 #: apps/web/src/native/SitePicker.tsx:191
 msgid "Welcome to Raven"
-msgstr "Bienvenue sur Synk"
+msgstr "Bienvenue dans la messagerie d'entreprise"
 
 #: apps/web/src/components/features/setup/steps/WorkspaceStep.tsx:104
 msgid "What does your team do?"
@@ -9716,3 +9645,39 @@ msgstr "{0}, {1} et {2} sont déjà sur ce site"
 #, python-brace-format
 msgid "{0}, {1} and {2} others are already on this site"
 msgstr "{0}, {1} et {2} autres sont déjà sur ce site"
+
+#: raven/hooks.py:6
+msgid "Business messaging"
+msgstr "Messagerie d'entreprise"
+
+#: raven/public/js/raven_chat/components/layout/Header.jsx:57
+msgid "Open the business messaging"
+msgstr "Ouvrir la messagerie d'entreprise"
+
+#: raven/public/js/raven_chat/components/layout/Header.jsx:107
+msgid "Open the channel in the business messaging"
+msgstr "Ouvrir le canal dans la messagerie d'entreprise"
+
+#: raven/public/js/timeline_button.js:43
+msgid "Send to the business messaging"
+msgstr "Envoyer dans la messagerie d'entreprise"
+
+#: raven/raven/doctype/raven_settings/raven_settings.json
+msgid "Automatically add system users to the business messaging"
+msgstr "Ajouter automatiquement les utilisateurs système à la messagerie d'entreprise"
+
+#: raven/raven/doctype/raven_settings/raven_settings.json
+msgid "Show the business messaging on the desk"
+msgstr "Afficher la messagerie d'entreprise dans le bureau"
+
+#: raven/raven/doctype/raven_settings/raven_settings.json
+msgid "Mobile app"
+msgstr "Application mobile"
+
+#: raven/public/js/raven_chat/components/layout/Header.jsx:80
+msgid "{0} unread"
+msgstr "{0} non lu(s)"
+
+#: raven/hooks.py:46
+msgid "Welcome to your business messaging. Let's set up your team's space."
+msgstr "Bienvenue dans votre messagerie d'entreprise. Configurons l'espace de votre équipe."

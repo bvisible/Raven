@@ -58,14 +58,14 @@
    "default": "1",
    "fieldname": "auto_add_system_users",
    "fieldtype": "Check",
-   "label": "Automatically add system users to Synk",
+   "label": "Automatically add system users to the business messaging",
    "permlevel": 1
   },
   {
    "default": "1",
    "fieldname": "show_raven_on_desk",
    "fieldtype": "Check",
-   "label": "Show Synk on Desk",
+   "label": "Show the business messaging on the desk",
    "permlevel": 1
   },
   {
@@ -194,7 +194,7 @@
   {
    "fieldname": "raven_mobile_tab",
    "fieldtype": "Tab Break",
-   "label": "Synk Mobile"
+   "label": "Mobile app"
   },
   {
    "fieldname": "oauth_client",
@@ -352,7 +352,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-20 14:12:54.000000",
+ "modified": "2026-10-27 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Raven",
  "name": "Raven Settings",

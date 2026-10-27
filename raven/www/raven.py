@@ -100,12 +100,14 @@ def get_context(context):
 
 	app_name = frappe.get_website_settings("app_name") or frappe.get_system_settings("app_name")
 
+	# //// Neoffice - the page title names the app as the cockpit's menu does, « Messagerie d'entreprise » (Jérémy,
+	# //// 27.10; it read "Synk" from 1d6dea095, 2026-01-03). Upstream: "Raven".
 	if app_name and app_name != "Frappe":
-		# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): page title.
-		context["app_name"] = app_name + " | " + "Synk"
+		context["app_name"] = app_name + " | " + _("Business messaging")
 	else:
-		# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): page title fallback.
-		context["app_name"] = "Synk"
+		context["app_name"] = _("Business messaging")
+	# //// Neoffice - the name under the icon of the app installed on an iPhone: short, iOS cuts a long one.
+	context["home_screen_title"] = _("Messaging")
 
 	favicon = get_favicon()
 

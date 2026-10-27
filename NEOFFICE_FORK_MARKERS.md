@@ -26,7 +26,11 @@ JSON, binaries, symlinks, bundled assets — plus the notes that belong to a who
 
 ### Repository-level facts
 
-- **Product name.** Upstream's app is *Raven*; Neoffice ships it as **Synk**. The module names,
+- **Product name.** Upstream's app is *Raven*; Neoffice shows it as **Business messaging**
+  (« Messagerie d'entreprise »), the name the cockpit's menu gives it, with the brand's hand-drawn chat bubble
+  (`/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg`) as its icon everywhere: hooks, desk widget,
+  timeline button, the SPA, the PWA (Jérémy, 27.10; maintenance#1884). It was **Synk** from 2026-01-03 to
+  2026-10-27: comments and the theme's file names (`icons/synk/`) still say so. The module names,
   routes (`/raven`), doctype names (`Raven Message`, `Raven User`, …) and the `raven` app name are
   deliberately **unchanged** — only user-visible strings and the mobile bundle id move.
   Bundle id / OAuth redirect scheme: `io.synk.app` (upstream: `raven.thecommit.company`).
@@ -99,9 +103,9 @@ is marked in `raven/public/js/raven_chat/**` and `raven/public/scss/raven.bundle
 
 | File | Neoffice change |
 |---|---|
-| `apps/web/public/manifest.webmanifest` | The PWA's manifest (JSON, no comment syntax): name and short name **Synk**, a French description, `lang` `fr`, the cream paper `#FAF3EA` for the background and theme colours, and the icons of neoffice_theme, `/assets/neoffice_theme/icons/synk/icon-*.png` and the two maskable ones (2026-10-08, maintenance#1316). The v3 merge had brought back upstream's "Raven" name and black colours. `src/installIdentity.test.ts` keeps it so. |
+| `apps/web/public/manifest.webmanifest` | The PWA's manifest (JSON, no comment syntax): name « Messagerie d'entreprise » and short name « Messagerie » (**Synk** until 2026-10-27), a French description, `lang` `fr`, the cream paper `#FAF3EA` for the background and theme colours, and the icons of neoffice_theme, `/assets/neoffice_theme/icons/synk/icon-*.png` and the two maskable ones (2026-10-08, maintenance#1316). The v3 merge had brought back upstream's "Raven" name and black colours. `src/installIdentity.test.ts` keeps it so. |
 | `raven/raven/doctype/raven_user/raven_user.json` | `time_format` default `12-hour` → `24-hour`, the reason in the field's own `description`: our customers are in Suisse romande, where nobody reads a 12-hour clock. `onboarded` (upstream 3.1) defaults to `1` instead of `0`: nobody meets the profile step of the setup flow we never show (decision of 2026-10-25). |
-| `raven/raven/doctype/raven_settings/raven_settings.json` | `push_notification_service` options `Frappe Cloud\nRaven` → `Frappe Cloud\nFirebase\nRaven` (`47b8b2243`): we self-host and push through our own Firebase project, not Raven Cloud. Labels rebranded to Synk. `show_raven_on_desk` (Check, default 1, in `field_order`) is kept although upstream removed it with the desk widget: `boot.py` hands it to the desk as `show_raven_chat_on_desk`, which shows the Synk icon in the cockpit's rail. `setup_completed` (upstream 3.1) defaults to `1` instead of unset (no setup screen, decision of 2026-10-25). |
+| `raven/raven/doctype/raven_settings/raven_settings.json` | `push_notification_service` options `Frappe Cloud\nRaven` → `Frappe Cloud\nFirebase\nRaven` (`47b8b2243`): we self-host and push through our own Firebase project, not Raven Cloud. Labels name the app « the business messaging » (Synk until 2026-10-27; the tab « Synk Mobile » is « Mobile app »). `show_raven_on_desk` (Check, default 1, in `field_order`) is kept although upstream removed it with the desk widget: `boot.py` hands it to the desk as `show_raven_chat_on_desk`, which shows the Synk icon in the cockpit's rail. `setup_completed` (upstream 3.1) defaults to `1` instead of unset (no setup screen, decision of 2026-10-25). |
 | `raven/raven/doctype/raven_ai_pending_action/raven_ai_pending_action.json` | **New doctype** (`7cdc45189`), no upstream equivalent. Fieldnames: `action_type`, `status`, `channel_id`, `message_id`, `bot`, `priority`, `expires_at`, `confirmed_at`, `executed_at`, `action_data`, `preview_message`, `confirmation_message`, `handler_path`, `execution_result`, `error_message`. Backs the confirmation workflow of `raven/ai/pending_action_manager.py`: a local model is far likelier to propose a wrong write, so a create/update/delete is parked until the user confirms. |
 | `raven/raven_bot/doctype/raven_bot/raven_bot.json` | `model_provider` options gain `Nora` + a `description` (`6375b651f`): a bot can delegate the whole turn to NORA (prompt, RAG, ERP tools). `modified` was hand-edited to `2026-01-04 10:00:00.000000` so the change reimports. |
 | `raven/raven/workspace/raven/raven.json` | Desk workspace label/title/content rebranded Raven → Synk (`1d6dea095`, `49ee6e172`). The header reads `synk`; the onboarding block of the content is gone because upstream 3.1 removed the module onboarding. |
@@ -123,7 +127,7 @@ All of them are the Neoffice/Synk artwork replacing upstream's Raven artwork
 
 | Path | Note |
 |---|---|
-| `raven/public/icon-intern-chat.jpg` | **Added.** Apps-screen tile icon, referenced by `add_to_apps_screen` in `raven/hooks.py`. |
+| `raven/public/icon-intern-chat.jpg` | **Added.** Apps-screen tile icon until 2026-10-27; `add_to_apps_screen` names the brand's chat bubble of neoffice_theme since. No longer referenced. |
 | `raven/public/manifest/*.png`, `favicon.ico` | Neoffice favicons / PWA icons. |
 
 ### Deleted / renamed

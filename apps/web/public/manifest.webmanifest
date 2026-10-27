@@ -1,6 +1,6 @@
 {
-    "name": "Synk",
-    "short_name": "Synk",
+    "name": "Messagerie d'entreprise",
+    "short_name": "Messagerie",
     "description": "La messagerie d'équipe de Neoffice.",
     "start_url": "/raven",
     "scope": "/raven",

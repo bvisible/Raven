@@ -1,15 +1,18 @@
 from . import __version__ as app_version
 
 app_name = "raven"
-# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk"): the app is published as Synk.
-app_title = "Synk"
+# //// Neoffice - the app is shown as "Business messaging" (« Messagerie d'entreprise »), the name the cockpit's menu
+# //// gives it (Jérémy, 21.10 and 27.10). It was published as Synk from 1d6dea095 (2026-01-03) to 2026-10-27.
+app_title = "Business messaging"
 app_publisher = "Frappe"
 app_description = "Messaging Application"
 app_email = "support@frappe.io"
 app_license = "AGPLv3"
 source_link = "https://github.com/frappe/Raven"
-app_logo = "/assets/raven/raven_logo.svg"
-app_logo_url = "/assets/raven/raven_logo.svg"
+# //// Neoffice - the brand's hand-drawn chat bubble, the icon the cockpit shows for this app, instead of the Raven
+# //// mark. neoffice_theme serves it (Streamline's licence keeps the drawing out of this public repository).
+app_logo = "/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg"
+app_logo_url = "/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg"
 
 # Frappe Shell Native pattern — neoffice_theme provides the Lucide sprite,
 # the neoffice-theme.css used by FrappeSidebar/FrappeNavbar, and the
@@ -26,22 +29,24 @@ required_apps = ["bvisible/neoffice_theme"]
 # ------------------
 
 # include js, css files in header of desk.html
-# //// Neoffice - the desk chat widget (raven/public/js/raven_chat, anchored to the cockpit's Synk icon) is ours:
+# //// Neoffice - the desk chat widget (raven/public/js/raven_chat, anchored to the cockpit's messaging icon) is ours:
 # //// upstream removed it with its stylesheet (#2311, 2026-10-16), the widget needs the stylesheet back.
 app_include_css = "raven.bundle.css"
 app_include_js = "raven.bundle.js"
-# Raven's own desk icons, e.g. frappe.utils.icon("raven").
-app_include_icons = ["/assets/raven/icons/raven.svg"]
+# //// Neoffice - no app_include_icons: upstream loads raven/public/icons/raven.svg (the Raven mark) into the desk
+# //// sprite as "/assets/raven/icons/raven.svg", and frappe v15's app.html fetches `/assets/{{ path }}`, so the desk
+# //// asked for /assets//assets/… and got a 404 on every page (maintenance#1884). The Raven mark is not ours either:
+# //// the timeline button draws the brand's chat bubble (timeline_button.js). Restore the include, as
+# //// "raven/icons/raven.svg", only if a desk icon of Raven's own is wanted again.
 
 add_to_apps_screen = [
 	{
 		"name": "raven",
-		# //// Neoffice - rebrand (1d6dea095, 2026-01-03 "feat: Rebrand app from Raven to Synk" + 49ee6e172, 2025-04-05 "change name to synk" / f5dd1d497, 2025-06-27 "change logo and name"): apps-screen tile logo and title.
-		# //// Casing fixed at the v3 merge: it read "synk" while app_title says "Synk".
-		"logo": "/assets/raven/icon-intern-chat.jpg",
-		"title": "Synk",
-		# //// Neoffice - same wording as the tile: the product is Synk for our customers.
-		"setup_wizard_text": "Welcome to Synk. Let's set up your team's space.",
+		# //// Neoffice - apps-screen tile: the brand's chat bubble and the cockpit's name for the app (see app_title).
+		"logo": "/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg",
+		"title": "Business messaging",
+		# //// Neoffice - same wording as the tile.
+		"setup_wizard_text": "Welcome to your business messaging. Let's set up your team's space.",
 		"route": "/raven",
 		"has_permission": "raven.permissions.check_app_permission",
 	}

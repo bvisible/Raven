@@ -94,11 +94,24 @@
     }
 }
 
+/* //// Neoffice - the app's icon and name in the header (Header.jsx), not upstream's Cal Sans wordmark: the name is
+   //// longer, set in the desk's font, the icon beside it at the size of a menu icon. */
 .raven-logo {
-    font-weight: 700;
-    font-size: 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: var(--text-base);
     color: var(--heading-color);
     padding-right: 4px;
+    cursor: pointer;
+}
+
+/* //// Neoffice - the app's icon beside its name (Header.jsx). */
+.raven-logo-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
 }
 
 .raven-unread-count {

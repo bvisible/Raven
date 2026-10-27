@@ -9,8 +9,10 @@ import {
 import { Separator } from "@components/ui/separator"
 import _ from "@lib/translate"
 import { siteUrl } from "@lib/site"
-// Bundled, because the app is not served from the site that holds this file.
-import ravenLogo from "@raven/public/raven_logo.svg"
+
+//// Neoffice - the app's icon is the brand's hand-drawn chat bubble, served by the site's neoffice_theme (siteUrl
+//// reaches it from the native app too), the one the cockpit and the sidebar show. Upstream bundled the Raven mark.
+const BRAND_ICON = "/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg"
 
 const LINKS = [
     { label: _("Documentation"), href: "https://docs.frappe.io/raven" },
@@ -42,9 +44,11 @@ export const About = () => {
             </SettingsPanelHeader>
             <SettingsPanelContent className="min-h-0 gap-6">
                 <div className="flex items-center gap-3">
-                    <img src={ravenLogo} alt="Raven" className="h-10 w-10" />
+                    {/* //// Neoffice - the app's name and icon as the cockpit's menu shows them (« Messagerie
+                        //// d'entreprise »); the links below still credit upstream's Raven. */}
+                    <img src={siteUrl(BRAND_ICON)} alt="" className="h-10 w-10" />
                     <div className="flex flex-col">
-                        <span className="text-base font-semibold text-ink-gray-9">Raven</span>
+                        <span className="text-base font-semibold text-ink-gray-9">{_("Business messaging")}</span>
                         {versions[0]?.app === "raven" && (
                             <span className="font-numeric text-sm text-ink-gray-5">v{versions[0].version}</span>
                         )}

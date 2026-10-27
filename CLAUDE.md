@@ -8,9 +8,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Synk** (codebase: Raven) is an open-source enterprise messaging platform built on the Frappe Framework. It provides channels, direct messages, threads, reactions, AI agents, and deep integrations with ERPNext and FrappeHR.
+**Business messaging** (« Messagerie d'entreprise »; codebase: Raven) is an open-source enterprise messaging platform built on the Frappe Framework. It provides channels, direct messages, threads, reactions, AI agents, and deep integrations with ERPNext and FrappeHR.
 
-> **Branding**: The app is published as "Synk" but the codebase uses "raven" for module names, paths, and identifiers.
+> **Branding**: The app is shown as "Business messaging" (« Messagerie d'entreprise »), the cockpit's name for it, with the brand's hand-drawn chat bubble of neoffice_theme as its icon; it was "Synk" until 2026-10-27. The codebase uses "raven" for module names, paths, and identifiers.
 
 ## Development Commands
 

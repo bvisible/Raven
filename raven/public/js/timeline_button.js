@@ -29,22 +29,26 @@ $(document).on("app_ready", function () {
   });
 });
 
+// //// Neoffice - the brand's hand-drawn chat bubble, the icon the cockpit shows for this app (served by
+// //// neoffice_theme: Streamline's licence keeps the drawing out of this public repository).
+const BRAND_ICON = "/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg";
+
 /**
- * The timeline helper draws every button icon at 12px. That suits a line
- * icon, but the Raven logo is a filled square and reads too small, so it is
- * drawn here at 16px instead. The fallbacks are line icons and keep 12px.
+ * //// Neoffice - the button carries the brand's drawing, not the Raven mark: the timeline helper only draws
+ * //// sprite icons, so the button takes a line icon (or none) and the drawing replaces it, at 16px like the
+ * //// upstream mark. The desk's dark theme inverts every Streamline image (neoffice-theme.css).
  */
 const add_send_button = (timeline, frm) => {
-  // //// Neoffice - Synk is Raven's name for our users ("feat(synk): ban the Raven name where users read it"); upstream: "Send a Raven".
-  const label = __("Send a Synk");
+  // //// Neoffice - the app is « Messagerie d'entreprise » for our users (hooks.py app_title); upstream: "Send a Raven".
+  const label = __("Send to the business messaging");
   const open = () => open_send_dialog(frm);
   const classes = "btn-secondary send-raven-button";
-  if (!frappe.raven.icon_name("raven")) {
-    timeline.add_action_button(label, open, frappe.raven.icon_name("send", "share"), classes);
-    return;
-  }
-  const button = timeline.add_action_button(label, open, "raven", classes);
-  button.find("svg.icon").removeClass("icon-xs").addClass("icon-sm");
+  // //// Neoffice - a line icon first (the helper draws sprite icons only), then the brand's drawing in its place.
+  const button = timeline.add_action_button(label, open, frappe.raven.icon_name("send", "share"), classes);
+  const icon = `<img class="icon icon-sm send-raven-icon" src="${BRAND_ICON}" alt="">`;
+  const svg = button.find("svg.icon");
+  if (svg.length) svg.replaceWith(icon);
+  else button.prepend(icon);
 };
 
 const open_send_dialog = (frm) => {
@@ -52,8 +56,8 @@ const open_send_dialog = (frm) => {
     .xcall("raven.api.raven_channel.get_channels", { hide_archived: true })
     .then((channels) => {
       if (!channels?.length) {
-        // //// Neoffice - Synk is Raven's name for our users ("feat(synk): ban the Raven name where users read it"); upstream: "Send a Raven".
-        frappe.msgprint({ title: __("Send a Synk"), indicator: "blue", message: __("No channels found") });
+        // //// Neoffice - the app is « Messagerie d'entreprise » for our users (hooks.py app_title); upstream: "Send a Raven".
+        frappe.msgprint({ title: __("Send to the business messaging"), indicator: "blue", message: __("No channels found") });
         return;
       }
       show_send_dialog(frm, channels);
@@ -70,8 +74,8 @@ const channel_options = (channels) =>
 
 const show_send_dialog = (frm, channels) => {
   const dialog = new frappe.ui.Dialog({
-    // //// Neoffice - Synk is Raven's name for our users ("feat(synk): ban the Raven name where users read it"); upstream: "Send a Raven".
-    title: __("Send a Synk"),
+    // //// Neoffice - the app is « Messagerie d'entreprise » for our users (hooks.py app_title); upstream: "Send a Raven".
+    title: __("Send to the business messaging"),
     fields: [
       {
         fieldname: "channel",

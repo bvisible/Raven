@@ -189,8 +189,8 @@ class TestNative(IntegrationTestCase):
 		self.assertIsInstance(data["lang"], str)
 		self.assertIn("system", data["time_zone"])
 		self.assertIn("raven", data["versions"])
-		# //// Neoffice - the app is called Synk (hooks.py app_title).
-		self.assertIn({"app_name": "raven", "app_title": "Synk"}, data["app_data"])
+		# //// Neoffice - the app is called "Business messaging" (hooks.py app_title).
+		self.assertIn({"app_name": "raven", "app_title": "Business messaging"}, data["app_data"])
 		self.assertIn("chat_style", data)
 		self.assertIn("server_script_enabled", data)
 		self.assertFalse(data["read_only"])
