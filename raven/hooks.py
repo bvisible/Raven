@@ -305,3 +305,7 @@ raven_document_link_override = "raven.api.document_link.get_new_app_document_lin
 ignore_translatable_strings_from = ["frappe"]
 
 sqlite_search = ["raven.api.search.RavenSearch"]
+
+# Expose method source code through the API discovery endpoints. Safe for open
+# source apps and helps API clients understand what a method does.
+expose_discovery_source = True
