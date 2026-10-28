@@ -61,6 +61,9 @@ def get_preview_data(doctype: str, docname: str | int):
 	preview_fields.append(title_field)
 	preview_fields.append(image_field)
 	preview_fields.append("name")
+	# The card compares this with the message's creation to spot a record that was
+	# deleted and then created again under the same name.
+	preview_fields.append("creation")
 
 	currency_fields = _currency_source_fields(meta, preview_fields) - set(preview_fields)
 
@@ -79,12 +82,13 @@ def get_preview_data(doctype: str, docname: str | int):
 		"preview_image": preview_data.get(image_field),
 		"preview_title": preview_data.get(title_field),
 		"id": preview_data.get("name"),
+		"creation": preview_data.get("creation"),
 		"raven_document_link": get(doctype, docname),
 	}
 
 	for key in preview_fields:
 		val = preview_data.get(key)
-		if val and meta.has_field(key) and key not in [image_field, title_field, "name"]:
+		if val and meta.has_field(key) and key not in [image_field, title_field, "name", "creation"]:
 			df = meta.get_field(key)
 			formatted_preview_data[df.label] = frappe.format(val, df, doc=preview_data, translated=True)
 
