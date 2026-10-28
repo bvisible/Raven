@@ -13,6 +13,7 @@ import {
     FileBoxIcon,
     OctagonAlertIcon,
     CopyIcon,
+    ExternalLinkIcon,
     MinusIcon,
     PrinterIcon,
     WorkflowIcon,
@@ -361,6 +362,17 @@ const DocumentCard = ({
                 {/* Flat action row — every action is one click. The only dropdown
                     left is Workflow, whose options are per-document by nature. */}
                 <div className="flex shrink-0 items-center gap-1">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            {/* A real link, so middle-click and long-press work as for any link. */}
+                            <Button variant="ghost" size="sm" isIconButton asChild>
+                                <a href={route} target="_blank" rel="noreferrer" aria-label={_("Open")}>
+                                    <ExternalLinkIcon />
+                                </a>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>{_("Open")}</TooltipContent>
+                    </Tooltip>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button variant="ghost" size="sm" isIconButton aria-label={_("Copy link")} onClick={copyLink}>
