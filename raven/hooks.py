@@ -142,6 +142,7 @@ doc_events = {
 		"after_insert": "raven.raven.doctype.raven_user.raven_user.add_user_to_raven",
 		"on_update": "raven.raven.doctype.raven_user.raven_user.add_user_to_raven",
 		"on_trash": "raven.raven.doctype.raven_user.raven_user.remove_user_from_raven",
+		"after_rename": "raven.raven.doctype.raven_user.raven_user.rename_raven_user",
 	},
 	"Department": {
 		"after_insert": "raven.raven_integrations.controllers.department.after_insert",
