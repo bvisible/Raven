@@ -1,1 +1,0 @@
-import{n as e}from"./jsx-runtime-DqBZUH3a.js";import{t}from"./dist-CArmEPLy.js";var n=e(),r=e=>{let r=(0,n.c)(1),i;r[0]===Symbol.for(`react.memo_cache_sentinel`)?(i={enableOnFormTags:!0,preventDefault:!0},r[0]=i):i=r[0],t(`mod+s`,e,i)};export{r as t};
