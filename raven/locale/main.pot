@@ -1,14 +1,14 @@
-# Translations template for Synk.
+# Translations template for Business messaging.
 # Copyright (C) 2026 Frappe
-# This file is distributed under the same license as the Synk project.
+# This file is distributed under the same license as the Business messaging project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Synk VERSION\n"
+"Project-Id-Version: Business messaging VERSION\n"
 "Report-Msgid-Bugs-To: support@frappe.io\n"
-"POT-Creation-Date: 2026-10-25 10:10+0000\n"
-"PO-Revision-Date: 2026-10-25 10:10+0000\n"
+"POT-Creation-Date: 2026-10-29 11:17+0000\n"
+"PO-Revision-Date: 2026-10-29 11:17+0000\n"
 "Last-Translator: support@frappe.io\n"
 "Language-Team: support@frappe.io\n"
 "MIME-Version: 1.0\n"
@@ -33,7 +33,7 @@ msgstr ""
 msgid "(required)"
 msgstr ""
 
-#: raven/public/raven/assets/index-VoEjxExe.js:3780
+#: raven/public/raven/assets/index-DoovE4IT.js:3780
 msgid ",s=new RegExp(o,"
 msgstr ""
 
@@ -89,7 +89,7 @@ msgstr ""
 msgid "1 site"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:209
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:213
 #: apps/web/src/components/features/message/renderers/SingleChoicePollVoting.tsx:76
 #: apps/web/src/components/features/message/renderers/polls/PollOptionBar.tsx:66
 #: apps/web/src/components/features/message/renderers/polls/PollOptionBar.tsx:83
@@ -163,11 +163,11 @@ msgstr ""
 msgid "A channel with this name already exists in the target workspace"
 msgstr ""
 
-#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:274
+#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:275
 msgid "A channel with this name already exists in this workspace."
 msgstr ""
 
-#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:288
+#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:289
 msgid "A direct message can only be between two users."
 msgstr ""
 
@@ -188,7 +188,7 @@ msgstr ""
 msgid "A newer Raven app is available for this site."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/About.tsx:41
+#: apps/web/src/components/features/settings/panels/About.tsx:43
 msgid "A piece of craft by Frappe."
 msgstr ""
 
@@ -215,11 +215,11 @@ msgstr ""
 msgid "AI"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:168
+#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:170
 msgid "AI Agents can use files as data sources to get more context, read instructions and execute tasks."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/Instructions/InstructionListView.tsx:91
+#: apps/web/src/components/features/settings/panels/Instructions/InstructionListView.tsx:93
 msgid "AI Instruction Templates"
 msgstr ""
 
@@ -228,7 +228,7 @@ msgid "AI Integration is not enabled"
 msgstr ""
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:239
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:200
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:201
 #: apps/web/src/components/features/settings/panels/ai/AINotEnabledCallout.tsx:39
 msgid "AI Settings"
 msgstr ""
@@ -245,7 +245,7 @@ msgstr ""
 msgid "API Key cannot be more than 140 characters."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:153
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:154
 msgid "API URL"
 msgstr ""
 
@@ -288,7 +288,7 @@ msgstr ""
 msgid "Actions for this reminder"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:201
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:203
 #, python-brace-format
 msgid "Active Processors ({0})"
 msgstr ""
@@ -376,7 +376,7 @@ msgid "Add custom emojis to use for your reactions. PNG, SVG and GIFs supported.
 msgstr ""
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:218
-#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:145
+#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:147
 msgid "Add files that can be used by AI Agents."
 msgstr ""
 
@@ -533,7 +533,7 @@ msgstr ""
 msgid "Agent is required."
 msgstr ""
 
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:199
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:150
 #: apps/web/src/components/features/settings/panels/Agents/AgentListView.tsx:74
 msgid "Agents"
 msgstr ""
@@ -641,7 +641,7 @@ msgstr ""
 msgid "An invite will be sent on their email."
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:217
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:221
 msgid "Anonymous"
 msgstr ""
 
@@ -712,7 +712,7 @@ msgstr ""
 msgid "Archiving"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:213
+#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:215
 msgid "Are you sure you want to delete the file"
 msgstr ""
 
@@ -720,7 +720,7 @@ msgstr ""
 msgid "Are you sure you want to delete this workspace? If you proceed, all channels, threads and messages within the workspace will be deleted. This action cannot be undone."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:248
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:250
 #, python-brace-format
 msgid "Are you sure you want to delete {0}?"
 msgstr ""
@@ -764,7 +764,7 @@ msgid "Attach ({0})"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Attach File to Document"
 msgstr ""
 
@@ -825,7 +825,7 @@ msgstr ""
 
 #. Label of a Check field in DocType 'Raven Settings'
 #: raven/raven/doctype/raven_settings/raven_settings.json:61
-msgid "Automatically add system users to Synk"
+msgid "Automatically add system users to the business messaging"
 msgstr ""
 
 #: apps/web/src/components/features/profile/EditProfileDrawer.tsx:100
@@ -922,7 +922,7 @@ msgstr ""
 msgid "Bot Name"
 msgstr ""
 
-#: raven/raven/doctype/raven_user/raven_user.py:81
+#: raven/raven/doctype/raven_user/raven_user.py:87
 msgid "Bot is mandatory"
 msgstr ""
 
@@ -940,7 +940,7 @@ msgstr ""
 msgid "Bots"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:106
+#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:108
 msgid "Bots + Functions = AI Magic"
 msgstr ""
 
@@ -966,6 +966,12 @@ msgstr ""
 msgid "Bullet list"
 msgstr ""
 
+#: apps/web/src/components/features/settings/panels/About.tsx:51
+#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:50
+#: raven/www/raven.py:106 raven/www/raven.py:108
+msgid "Business messaging"
+msgstr ""
+
 #. Label of a Data field in DocType 'Raven Scheduler Event'
 #: raven/raven_integrations/doctype/raven_scheduler_event/raven_scheduler_event.json:46
 msgid "CRON Expression"
@@ -987,7 +993,7 @@ msgid "Can only join via invite?"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Cancel Document"
 msgstr ""
 
@@ -1139,7 +1145,7 @@ msgid "Channel description"
 msgstr ""
 
 #: apps/web/src/components/features/channel/CreateChannel/CreateChannelForm.tsx:231
-#: apps/web/src/components/features/message/ChatContentView.tsx:199
+#: apps/web/src/components/features/message/ChatContentView.tsx:201
 msgid "Channel details"
 msgstr ""
 
@@ -1148,7 +1154,7 @@ msgstr ""
 msgid "Channel in {0}"
 msgstr ""
 
-#: apps/web/src/components/features/message/ChatContentView.tsx:200
+#: apps/web/src/components/features/message/ChatContentView.tsx:202
 msgid "Channel information and settings"
 msgstr ""
 
@@ -1180,7 +1186,7 @@ msgstr ""
 msgid "Channel options"
 msgstr ""
 
-#: raven/public/js/timeline_button.js:78
+#: raven/public/js/timeline_button.js:82
 msgid "Channel or Person"
 msgstr ""
 
@@ -1219,7 +1225,7 @@ msgstr ""
 msgid "Channels and lists"
 msgstr ""
 
-#: apps/web/src/components/channel-sidebar/ChannelSidebar.tsx:213
+#: apps/web/src/components/channel-sidebar/ChannelSidebar.tsx:215
 msgid "Channels are where your team talks."
 msgstr ""
 
@@ -1313,6 +1319,19 @@ msgstr ""
 msgid "Choose a name and type for your channel, then add members."
 msgstr ""
 
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:45
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:62
+msgid "Choose a plan"
+msgstr ""
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:44
+msgid "Choose a plan to keep using your site."
+msgstr ""
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:61
+msgid "Choose a plan to keep your site after the trial."
+msgstr ""
+
 #: apps/web/src/native/SitePicker.tsx:191
 msgid "Choose a site"
 msgstr ""
@@ -1389,8 +1408,8 @@ msgstr ""
 msgid "Click to preview"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:173
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:341
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:175
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:347
 msgid "Close poll"
 msgstr ""
 
@@ -1406,7 +1425,7 @@ msgstr ""
 msgid "Close this poll automatically"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:333
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:339
 msgid "Close this poll?"
 msgstr ""
 
@@ -1414,7 +1433,7 @@ msgstr ""
 msgid "Close thread"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:340
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:346
 msgid "Closing..."
 msgstr ""
 
@@ -1433,7 +1452,7 @@ msgstr ""
 
 #: apps/web/src/components/features/cmdk/CommandMenu.tsx:90
 #: apps/web/src/components/features/header/QuickSearch/SearchButton.tsx:41
-#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:107
+#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:108
 msgid "Command Menu"
 msgstr ""
 
@@ -1489,11 +1508,11 @@ msgid "Configure"
 msgstr ""
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:242
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:201
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:202
 msgid "Configure AI providers to use AI features in Raven."
 msgstr ""
 
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:162
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:170
 #: apps/web/src/components/features/settings/panels/DocumentNotifications/DocumentNotificationListView.tsx:83
 msgid "Configure alerts to be sent to users or channels when documents are updated in the system."
 msgstr ""
@@ -1528,7 +1547,7 @@ msgstr ""
 msgid "Confirmed At"
 msgstr ""
 
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:154
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:162
 #: apps/web/src/components/features/settings/panels/FrappeHR.tsx:160
 msgid "Connect your HR system to Raven to sync employee data and send notifications."
 msgstr ""
@@ -1542,7 +1561,7 @@ msgstr ""
 msgid "Connecting…"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:58
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:59
 msgid "Connection successful!"
 msgstr ""
 
@@ -1573,7 +1592,7 @@ msgid "Copied meeting ID"
 msgstr ""
 
 #: apps/web/src/components/features/dm-channel/UserProfileDrawer.tsx:93
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:267
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:268
 msgid "Copied to clipboard"
 msgstr ""
 
@@ -1586,11 +1605,11 @@ msgstr ""
 msgid "Copied!"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:253
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:254
 msgid "Copy"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:344
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:386
 msgid "Copy ID"
 msgstr ""
 
@@ -1603,12 +1622,12 @@ msgstr ""
 msgid "Copy file link"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:366
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:370
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:419
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:423
 msgid "Copy link"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:279
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:280
 msgid "Copy message link"
 msgstr ""
 
@@ -1625,7 +1644,7 @@ msgstr ""
 msgid "Could not add function"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:680
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:733
 msgid "Could not apply workflow action"
 msgstr ""
 
@@ -1633,18 +1652,18 @@ msgstr ""
 msgid "Could not attach file"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:112
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:111
 msgid "Could not close the poll"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:321
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:363
 msgid "Could not copy ID"
 msgstr ""
 
 #: apps/web/src/components/features/message/actions/fileActions.ts:85
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:292
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:293
 #: apps/web/src/components/features/message/renderers/AttachmentPreviewModal.tsx:227
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:313
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:355
 #: apps/web/src/components/features/message/renderers/MessageFiles.tsx:50
 msgid "Could not copy link"
 msgstr ""
@@ -1657,7 +1676,7 @@ msgstr ""
 msgid "Could not create poll"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:225
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:226
 msgid "Could not create thread"
 msgstr ""
 
@@ -1726,7 +1745,7 @@ msgstr ""
 msgid "Could not load this action."
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:685
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:738
 msgid "Could not load workflow actions"
 msgstr ""
 
@@ -1734,11 +1753,12 @@ msgstr ""
 msgid "Could not log out"
 msgstr ""
 
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:128
 #: apps/web/src/components/features/header/NavUserMenu/NavUserMenu.tsx:58
 msgid "Could not open Cloud Settings"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:355
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:356
 msgid "Could not pin message"
 msgstr ""
 
@@ -1758,8 +1778,8 @@ msgstr ""
 msgid "Could not remove photo"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:487
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:106
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:493
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:105
 msgid "Could not retract your vote"
 msgstr ""
 
@@ -1767,7 +1787,7 @@ msgstr ""
 msgid "Could not run this action"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:375
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:376
 msgid "Could not save message"
 msgstr ""
 
@@ -1783,7 +1803,7 @@ msgstr ""
 msgid "Could not send your message"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:394
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:395
 #: apps/web/src/components/features/reminders/ReminderDialog.tsx:99
 msgid "Could not set the reminder"
 msgstr ""
@@ -1793,11 +1813,11 @@ msgid "Could not snooze the reminder"
 msgstr ""
 
 #: apps/web/src/components/features/channel/ChannelSettingsDrawer/ChannelPins.tsx:77
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:355
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:356
 msgid "Could not unpin message"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:375
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:376
 msgid "Could not unsave message"
 msgstr ""
 
@@ -1901,7 +1921,7 @@ msgstr ""
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
 #. Option for the 'Action' (Select) field in DocType 'Raven Message Action'
 #: apps/web/src/components/features/settings/panels/MessageActions/MessageActionForm.tsx:64
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 #: raven/raven_integrations/doctype/raven_message_action/raven_message_action.json:45
 msgid "Create Document"
 msgstr ""
@@ -1916,11 +1936,11 @@ msgid "Create Document Template"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Create Multiple Documents"
 msgstr ""
 
-#: apps/web/src/components/common/LinkFieldComboBox/LinkFieldCombobox.tsx:397
+#: apps/web/src/components/common/LinkFieldComboBox/LinkFieldCombobox.tsx:403
 #, python-brace-format
 msgid "Create New {0}"
 msgstr ""
@@ -1931,7 +1951,7 @@ msgstr ""
 msgid "Create Poll"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:133
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:135
 msgid "Create Processor"
 msgstr ""
 
@@ -1963,7 +1983,7 @@ msgstr ""
 msgid "Create a Webhook"
 msgstr ""
 
-#: apps/web/src/components/channel-sidebar/ChannelSidebar.tsx:218
+#: apps/web/src/components/channel-sidebar/ChannelSidebar.tsx:220
 msgid "Create a channel"
 msgstr ""
 
@@ -2029,7 +2049,7 @@ msgstr ""
 msgid "Create support ticket"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:195
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:196
 msgid "Create thread"
 msgstr ""
 
@@ -2049,7 +2069,7 @@ msgstr ""
 msgid "Create your first channel"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:112
+#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:114
 msgid "Create your first function"
 msgstr ""
 
@@ -2057,7 +2077,7 @@ msgstr ""
 msgid "Create your first notification"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/Instructions/InstructionListView.tsx:101
+#: apps/web/src/components/features/settings/panels/Instructions/InstructionListView.tsx:103
 msgid "Create your first template"
 msgstr ""
 
@@ -2065,7 +2085,7 @@ msgstr ""
 msgid "Create your first webhook"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:130
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:132
 #: apps/web/src/components/features/settings/panels/SettingsRecordEditor.tsx:100
 msgid "Creating"
 msgstr ""
@@ -2099,7 +2119,7 @@ msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
 #. Option for the 'Action' (Select) field in DocType 'Raven Message Action'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 #: raven/raven_integrations/doctype/raven_message_action/raven_message_action.json:45
 msgid "Custom Function"
 msgstr ""
@@ -2120,13 +2140,13 @@ msgstr ""
 msgid "Custom Status"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:408
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:409
 #: apps/web/src/components/features/schedule-send/ScheduleSendMenu.tsx:89
 #: apps/web/src/components/features/schedule-send/ScheduleSendSheet.tsx:138
 msgid "Custom date & time…"
 msgstr ""
 
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:170
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:178
 #: apps/web/src/components/features/settings/panels/DocumentPreviews.tsx:42
 msgid "Customise how document links are displayed in the chat. You can add/remove fields to be displayed in the preview."
 msgstr ""
@@ -2194,7 +2214,7 @@ msgid "Decide how a group of images should appear in the chat stream. 5 or more 
 msgstr ""
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:210
-#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:85
+#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:87
 msgid "Declare functions to be used by your AI bots."
 msgstr ""
 
@@ -2232,7 +2252,7 @@ msgid "Delete Agent?"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Delete Document"
 msgstr ""
 
@@ -2240,7 +2260,7 @@ msgstr ""
 msgid "Delete Document Notification?"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:211
+#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:213
 msgid "Delete File?"
 msgstr ""
 
@@ -2257,13 +2277,13 @@ msgid "Delete Message Action?"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Delete Multiple Documents"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:221
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:246
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:270
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:223
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:248
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:272
 msgid "Delete Processor"
 msgstr ""
 
@@ -2319,8 +2339,8 @@ msgid "Delete {0}?"
 msgstr ""
 
 #: apps/web/src/components/features/channel/ChannelSettingsDrawer/DeleteChannelButton.tsx:124
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:262
-#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:219
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:264
+#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:221
 #: apps/web/src/components/features/settings/panels/RecordActionsMenu.tsx:75
 #: apps/web/src/components/features/settings/panels/Workspaces/WorkspaceActionMenu.tsx:163
 msgid "Deleting"
@@ -2353,6 +2373,10 @@ msgstr ""
 msgid "Department channel type"
 msgstr ""
 
+#: apps/web/src/components/features/settings/panels/DeprecatedBadge.tsx:10
+msgid "Deprecated"
+msgstr ""
+
 #: apps/web/src/components/features/settings/panels/Functions/FunctionDetailsTab.tsx:97
 msgid "Describe what this function does."
 msgstr ""
@@ -2379,7 +2403,7 @@ msgstr ""
 #: apps/web/src/components/features/settings/panels/DocumentNotifications/DocumentNotificationRecipientsTab.tsx:83
 #: apps/web/src/components/features/settings/panels/Webhooks/WebhookConditionForm.tsx:125
 #: apps/web/src/components/layout/DocumentTitle.tsx:59
-#: raven/public/js/timeline_button.js:68
+#: raven/public/js/timeline_button.js:72
 msgid "Direct Message"
 msgstr ""
 
@@ -2389,7 +2413,7 @@ msgstr ""
 #: apps/web/src/components/features/message/actions/dialogs/ForwardMessageDialog.tsx:148
 #: apps/web/src/components/features/setup/preview/PreviewDMSidebar.tsx:63
 #: apps/web/src/components/layout/DocumentTitle.tsx:61
-#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:211
+#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:212
 msgid "Direct Messages"
 msgstr ""
 
@@ -2481,7 +2505,7 @@ msgid "Document Field"
 msgstr ""
 
 #. Label of a Link in the Synk Workspace
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:159
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:167
 #: apps/web/src/components/features/settings/panels/DocumentNotifications/DocumentNotificationListView.tsx:81
 #: raven/raven/workspace/raven/raven.json:176
 #: raven/raven/workspace/synk/synk.json:176
@@ -2493,7 +2517,7 @@ msgstr ""
 msgid "Document Parsing"
 msgstr ""
 
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:167
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:175
 #: apps/web/src/components/features/settings/panels/DocumentPreviews.tsx:40
 msgid "Document Previews"
 msgstr ""
@@ -2504,8 +2528,8 @@ msgstr ""
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:231
 #: apps/web/src/components/features/settings/panels/Agents/AgentForm.tsx:49
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:106
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:137
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:108
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:139
 msgid "Document Processors"
 msgstr ""
 
@@ -2573,7 +2597,7 @@ msgstr ""
 #. Label of a Check field in DocType 'Raven Bot'
 #: apps/web/src/components/features/settings/panels/Agents/AgentListView.tsx:168
 #: apps/web/src/components/features/settings/panels/ai/InstructionField.tsx:55
-#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:30
+#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:32
 #: raven/raven_bot/doctype/raven_bot/raven_bot.json:160
 msgid "Dynamic Instructions"
 msgstr ""
@@ -2582,7 +2606,7 @@ msgstr ""
 #. Bot Instruction Template'
 #. Description of the 'Dynamic Instructions' (Check) field in DocType 'Raven
 #. Bot'
-#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:25
+#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:27
 #: raven/raven_bot/doctype/raven_bot/raven_bot.json:157
 msgid "Dynamic Instructions allow you to embed Jinja tags in your instruction to the bot. Hence the instruction would be different based on the user who is calling the bot or the data in your system. These instructions are computed every time the bot is called. Check this if you want to embed things like Employee ID, Company Name etc in your instructions dynamically"
 msgstr ""
@@ -2684,7 +2708,7 @@ msgid "Emojis"
 msgstr ""
 
 #. Label of a Check field in DocType 'Raven Settings'
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:72
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:73
 #: raven/raven/doctype/raven_settings/raven_settings.json:127
 msgid "Enable AI Integration"
 msgstr ""
@@ -2711,7 +2735,7 @@ msgid "Enable Google APIs"
 msgstr ""
 
 #. Label of a Check field in DocType 'Raven Settings'
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:124
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:125
 #: raven/raven/doctype/raven_settings/raven_settings.json:169
 msgid "Enable Local LLM"
 msgstr ""
@@ -2721,7 +2745,7 @@ msgid "Enable Notifications"
 msgstr ""
 
 #. Label of a Check field in DocType 'Raven Settings'
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:83
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:84
 #: raven/raven/doctype/raven_settings/raven_settings.json:134
 msgid "Enable OpenAI Services"
 msgstr ""
@@ -2811,8 +2835,8 @@ msgstr ""
 msgid "Error formatting JSON. Please check your JSON."
 msgstr ""
 
-#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:290
-#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:303
+#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:292
+#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:305
 msgid "Error in Raven Notification"
 msgstr ""
 
@@ -2821,7 +2845,7 @@ msgstr ""
 msgid "Error loading processor types: {0}"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:194
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:196
 #, python-brace-format
 msgid "Error loading processors: {0}"
 msgstr ""
@@ -2836,7 +2860,7 @@ msgstr ""
 msgid "Error reacting to message {0}"
 msgstr ""
 
-#: raven/public/js/timeline_button.js:175
+#: raven/public/js/timeline_button.js:179
 msgid "Error sending message"
 msgstr ""
 
@@ -2844,7 +2868,7 @@ msgstr ""
 msgid "Error uploading file. Remove and try again."
 msgstr ""
 
-#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:287
+#: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.py:289
 #, python-brace-format
 msgid "Error while evaluating Raven Notification {0}. Please fix your template."
 msgstr ""
@@ -2918,7 +2942,7 @@ msgid "Execution Result"
 msgstr ""
 
 #: apps/web/src/components/features/message/ThreadRootMessage.tsx:116
-#: apps/web/src/components/features/message/ThreadRootMessage.tsx:152
+#: apps/web/src/components/features/message/ThreadRootMessage.tsx:153
 msgid "Expand message"
 msgstr ""
 
@@ -2948,7 +2972,7 @@ msgstr ""
 msgid "Failed to create document processor"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:86
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:88
 #: raven/ai/google_ai.py:275
 msgid "Failed to create processor"
 msgstr ""
@@ -2957,7 +2981,7 @@ msgstr ""
 msgid "Failed to delete document processor"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:99
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:101
 msgid "Failed to delete processor"
 msgstr ""
 
@@ -2978,8 +3002,8 @@ msgstr ""
 msgid "Failed to sync data to Raven Cloud"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:63
 #: apps/web/src/components/features/settings/panels/AISettings.tsx:64
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:65
 msgid "Failed to test connection"
 msgstr ""
 
@@ -2991,7 +3015,7 @@ msgstr ""
 msgid "Failed to update sidebar"
 msgstr ""
 
-#: apps/web/src/components/channel-sidebar/ChannelSidebar.tsx:422
+#: apps/web/src/components/channel-sidebar/ChannelSidebar.tsx:424
 #: apps/web/src/components/features/channel/CustomizeSidebar/ChannelGroupSelect.tsx:41
 msgid "Favorites"
 msgstr ""
@@ -3068,8 +3092,8 @@ msgstr ""
 
 #. Label of a Table field in DocType 'Raven Bot'
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:215
-#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:144
-#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:166
+#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:146
+#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:168
 #: raven/raven_bot/doctype/raven_bot/raven_bot.json:202
 msgid "File Sources"
 msgstr ""
@@ -3135,7 +3159,7 @@ msgstr ""
 msgid "Finish"
 msgstr ""
 
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:194
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:202
 #: apps/web/src/components/features/settings/panels/Webhooks/WebhookListView.tsx:86
 msgid "Fire webhooks on specific events like when a message is sent or channel is created."
 msgstr ""
@@ -3206,7 +3230,7 @@ msgid "Frappe Cloud"
 msgstr ""
 
 #. Label of a Tab Break field in DocType 'Raven Settings'
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:153
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:161
 #: apps/web/src/components/features/settings/panels/FrappeHR.tsx:159
 #: apps/web/src/components/features/setup/steps/HRStep.tsx:52
 #: raven/raven/doctype/raven_settings/raven_settings.json:90
@@ -3254,17 +3278,17 @@ msgid "Full name"
 msgstr ""
 
 #. Label of a JSON field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:68
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:70
 msgid "Function Definition"
 msgstr ""
 
 #. Label of a Data field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:43
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:45
 msgid "Function Name"
 msgstr ""
 
 #. Label of a Small Text field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:30
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:32
 msgid "Function Path"
 msgstr ""
 
@@ -3297,39 +3321,39 @@ msgstr ""
 #. Label of a Link in the Synk Workspace
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:207
 #: apps/web/src/components/features/settings/panels/Agents/AgentForm.tsx:46
-#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:84
+#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:86
 #: raven/raven/workspace/raven/raven.json:38
 #: raven/raven/workspace/synk/synk.json:38
 msgid "Functions"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Get Amended Document"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Get Document"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Get List"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Get Multiple Documents"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Get Report Result"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Get Value"
 msgstr ""
 
@@ -3429,12 +3453,12 @@ msgstr ""
 msgid "Group name is required"
 msgstr ""
 
-#: raven/raven/doctype/raven_user/raven_user.py:106
+#: raven/raven/doctype/raven_user/raven_user.py:112
 #, python-brace-format
 msgid "Group name {0} is already used."
 msgstr ""
 
-#: raven/raven/doctype/raven_user/raven_user.py:104
+#: raven/raven/doctype/raven_user/raven_user.py:110
 #, python-brace-format
 msgid "Group name {0} is reserved."
 msgstr ""
@@ -3527,17 +3551,17 @@ msgstr ""
 msgid "How often?"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:95
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:110
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:96
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:111
 msgid "ID cannot be more than 140 characters."
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:320
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:362
 msgid "ID copied"
 msgstr ""
 
 #. Description of the 'Raven Bot' (Link) field in DocType 'Raven Bot AI Prompt'
-#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:24
+#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:26
 msgid "If added, this prompt will only be shown when interacting with the bot"
 msgstr ""
 
@@ -3553,13 +3577,13 @@ msgstr ""
 #. Description of the 'Pass parameters as JSON' (Check) field in DocType 'Raven
 #. AI Function'
 #: apps/web/src/components/features/settings/panels/Functions/FunctionDetailsTab.tsx:241
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:35
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:37
 msgid "If checked, the params will be passed as a JSON object instead of named parameters"
 msgstr ""
 
 #. Description of the 'Is Global' (Check) field in DocType 'Raven Bot AI
 #. Prompt'
-#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:34
+#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:36
 msgid "If checked, this prompt will be available to all users on Raven"
 msgstr ""
 
@@ -3578,7 +3602,7 @@ msgstr ""
 msgid "If enabled, the message won't have a document preview"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:109
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:110
 msgid "If not set, the integration uses the default project."
 msgstr ""
 
@@ -3653,20 +3677,20 @@ msgstr ""
 msgid "Install Frappe HR on this site to sync employees, departments and leaves with Raven."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/About.tsx:74
+#: apps/web/src/components/features/settings/panels/About.tsx:78
 msgid "Installed apps"
 msgstr ""
 
 #. Label of a Long Text field in DocType 'Raven Bot Instruction Template'
 #. Label of a Long Text field in DocType 'Raven Bot'
 #: apps/web/src/components/features/settings/panels/ai/InstructionField.tsx:201
-#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:37
+#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:39
 #: raven/raven_bot/doctype/raven_bot/raven_bot.json:144
 msgid "Instruction"
 msgstr ""
 
 #. Label of a Link in the Synk Workspace
-#: apps/web/src/components/features/settings/panels/Instructions/InstructionListView.tsx:69
+#: apps/web/src/components/features/settings/panels/Instructions/InstructionListView.tsx:71
 #: raven/raven/workspace/raven/raven.json:48
 #: raven/raven/workspace/synk/synk.json:48
 msgid "Instruction Templates"
@@ -3931,7 +3955,7 @@ msgstr ""
 
 #. Option for the 'Local LLM Provider' (Select) field in DocType 'Raven
 #. Settings'
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:144
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:145
 #: raven/raven/doctype/raven_settings/raven_settings.json:176
 msgid "LM Studio"
 msgstr ""
@@ -3973,10 +3997,9 @@ msgstr ""
 msgid "Last name must be less than 140 characters"
 msgstr ""
 
-#: apps/web/src/App.tsx:115
-#: apps/web/src/components/layout/AppUpdateAlert.tsx:86
+#: apps/web/src/App.tsx:82 apps/web/src/components/layout/AppUpdateAlert.tsx:86
 #: apps/web/src/components/layout/DocumentTitle.tsx:53
-#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:238
+#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:239
 #: apps/web/src/pages/later/Later.tsx:108
 #: apps/web/src/pages/profile/Profile.tsx:139
 msgid "Later"
@@ -4062,9 +4085,9 @@ msgstr ""
 msgid "Link Previews"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:291
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:292
 #: apps/web/src/components/features/message/renderers/AttachmentPreviewModal.tsx:226
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:312
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:354
 #: apps/web/src/components/features/message/renderers/MessageFiles.tsx:49
 msgid "Link copied"
 msgstr ""
@@ -4152,7 +4175,7 @@ msgstr ""
 
 #. Option for the 'Local LLM Provider' (Select) field in DocType 'Raven
 #. Settings'
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:146
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:147
 #: raven/raven/doctype/raven_settings/raven_settings.json:176
 msgid "LocalAI"
 msgstr ""
@@ -4194,19 +4217,19 @@ msgstr ""
 msgid "Make admin"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:182
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:183
 msgid "Make sure LM Studio is running with the server enabled on the specified URL."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:184
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:185
 msgid "Make sure LocalAI is running on the specified URL."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:183
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:184
 msgid "Make sure Ollama is running. Default URL is usually http://localhost:11434/v1"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:185
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:186
 msgid "Make sure your OpenAI compatible service is running on the specified URL and that you have provided a valid API key."
 msgstr ""
 
@@ -4222,14 +4245,18 @@ msgstr ""
 msgid "Manage Channels"
 msgstr ""
 
-#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:293
-#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:298
+#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:294
+#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:299
 msgid "Manage Workspaces"
 msgstr ""
 
 #: apps/web/src/components/features/settings/panels/Users/ManageAccessDialog.tsx:25
 #: apps/web/src/components/features/settings/panels/Users/Users.tsx:227
 msgid "Manage access"
+msgstr ""
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:54
+msgid "Manage billing"
 msgstr ""
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:120
@@ -4331,7 +4358,7 @@ msgid "Message Action {0} is disabled"
 msgstr ""
 
 #. Label of a Link in the Synk Workspace
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:175
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:183
 #: apps/web/src/components/features/settings/panels/MessageActions/MessageActionListView.tsx:74
 #: raven/raven/workspace/raven/raven.json:166
 #: raven/raven/workspace/synk/synk.json:166
@@ -4435,7 +4462,7 @@ msgid "Message scheduled for {0}."
 msgstr ""
 
 #: apps/web/src/components/features/schedule-send/ScheduledMessagesList.tsx:103
-#: raven/public/js/timeline_button.js:172
+#: raven/public/js/timeline_button.js:176
 msgid "Message sent"
 msgstr ""
 
@@ -4444,6 +4471,7 @@ msgid "Messages you've scheduled to send later."
 msgstr ""
 
 #: apps/web/src/components/features/settings/panels/Preferences.tsx:82
+#: raven/www/raven.py:110
 msgid "Messaging"
 msgstr ""
 
@@ -4463,6 +4491,11 @@ msgstr ""
 
 #: apps/web/src/components/features/settings/panels/Functions/FunctionDetailsTab.tsx:152
 msgid "Miscellaneous"
+msgstr ""
+
+#. Label of a Tab Break field in DocType 'Raven Settings'
+#: raven/raven/doctype/raven_settings/raven_settings.json:197
+msgid "Mobile app"
 msgstr ""
 
 #. Label of a Data field in DocType 'Raven Bot'
@@ -4511,7 +4544,7 @@ msgstr ""
 msgid "Move to the previous one."
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:213
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:217
 msgid "Multiple choice"
 msgstr ""
 
@@ -4635,13 +4668,13 @@ msgstr ""
 msgid "No Nudge"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:688
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:741
 msgid "No actions available"
 msgstr ""
 
 #: apps/web/src/components/features/channel/CustomizeSidebar/ChannelTable.tsx:144
 #: apps/web/src/components/features/settings/panels/Channels/Channels.tsx:167
-#: raven/public/js/timeline_button.js:56
+#: raven/public/js/timeline_button.js:60
 msgid "No channels found"
 msgstr ""
 
@@ -4658,7 +4691,7 @@ msgstr ""
 msgid "No channels or people found."
 msgstr ""
 
-#: apps/web/src/components/channel-sidebar/ChannelSidebar.tsx:212
+#: apps/web/src/components/channel-sidebar/ChannelSidebar.tsx:214
 msgid "No channels yet"
 msgstr ""
 
@@ -4796,7 +4829,7 @@ msgstr ""
 msgid "No one will be able to send messages to this channel"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:335
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:341
 msgid "No one will be able to vote once it's closed, and this can't be undone."
 msgstr ""
 
@@ -4816,11 +4849,11 @@ msgstr ""
 msgid "No preview available"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:204
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:206
 msgid "No processors created yet. Select a type below to create your first processor."
 msgstr ""
 
-#: apps/web/src/components/common/LinkFieldComboBox/LinkFieldCombobox.tsx:372
+#: apps/web/src/components/common/LinkFieldComboBox/LinkFieldCombobox.tsx:378
 #: apps/web/src/components/features/cmdk/CommandMenu.tsx:281
 msgid "No results found."
 msgstr ""
@@ -4972,7 +5005,7 @@ msgstr ""
 
 #. Option for the 'Local LLM Provider' (Select) field in DocType 'Raven
 #. Settings'
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:145
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:146
 #: raven/raven/doctype/raven_settings/raven_settings.json:176
 msgid "Ollama"
 msgstr ""
@@ -5012,7 +5045,7 @@ msgstr ""
 msgid "Only Public or Private channels can be transferred"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:19
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:20
 #: apps/web/src/components/features/settings/panels/PushNotifications.tsx:72
 msgid "Only a System Manager can change these settings."
 msgstr ""
@@ -5088,7 +5121,7 @@ msgstr ""
 msgid "Open the search page. With the palette open, it carries the typed query along."
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:128
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:127
 #, python-brace-format
 msgid "Open until {0}"
 msgstr ""
@@ -5104,7 +5137,7 @@ msgid "OpenAI"
 msgstr ""
 
 #. Label of a Password field in DocType 'Raven Settings'
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:101
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:102
 #: raven/raven/doctype/raven_settings/raven_settings.json:148
 msgid "OpenAI API Key"
 msgstr ""
@@ -5121,7 +5154,7 @@ msgstr ""
 
 #. Option for the 'Local LLM Provider' (Select) field in DocType 'Raven
 #. Settings'
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:147
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:148
 #: raven/raven/doctype/raven_settings/raven_settings.json:176
 msgid "OpenAI Compatible"
 msgstr ""
@@ -5132,7 +5165,7 @@ msgid "OpenAI Compatible API Key"
 msgstr ""
 
 #. Label of a Data field in DocType 'Raven AI File Source'
-#: raven/raven_ai/doctype/raven_ai_file_source/raven_ai_file_source.json:40
+#: raven/raven_ai/doctype/raven_ai_file_source/raven_ai_file_source.json:42
 msgid "OpenAI File ID"
 msgstr ""
 
@@ -5141,17 +5174,17 @@ msgstr ""
 msgid "OpenAI Organisation ID"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:91
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:92
 msgid "OpenAI Organization ID"
 msgstr ""
 
 #. Label of a Data field in DocType 'Raven Settings'
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:108
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:109
 #: raven/raven/doctype/raven_settings/raven_settings.json:157
 msgid "OpenAI Project ID"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:116
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:117
 msgid "OpenAI Python SDK Version:"
 msgstr ""
 
@@ -5192,7 +5225,7 @@ msgstr ""
 msgid "Optional"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:171
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:172
 msgid "Optional — only if your provider requires it."
 msgstr ""
 
@@ -5222,18 +5255,18 @@ msgstr ""
 
 #. Label of a Section Break field in DocType 'Raven AI Function'
 #. Label of a Table field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:78
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:80
 msgid "Parameters"
 msgstr ""
 
 #. Label of a JSON field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:63
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:65
 msgid "Params"
 msgstr ""
 
 #. Label of a Check field in DocType 'Raven AI Function'
 #: apps/web/src/components/features/settings/panels/Functions/FunctionDetailsTab.tsx:240
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:38
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:40
 msgid "Pass parameters as JSON"
 msgstr ""
 
@@ -5332,7 +5365,7 @@ msgstr ""
 msgid "Pick when to be reminded about this message."
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:340
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:341
 msgid "Pin"
 msgstr ""
 
@@ -5384,11 +5417,11 @@ msgstr ""
 msgid "Please add the Google Service Account JSON Key"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:103
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:104
 msgid "Please add your OpenAI API Key"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:94
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:95
 msgid "Please add your OpenAI Organization ID"
 msgstr ""
 
@@ -5480,7 +5513,7 @@ msgstr ""
 #. Label of a Link field in DocType 'Raven Poll Vote'
 #: apps/web/src/components/common/MessageResultBlock/pollPreviewHtml.ts:13
 #: apps/web/src/components/features/ChatInput/MobileComposerActions.tsx:89
-#: apps/web/src/components/features/message/ChatContentView.tsx:182
+#: apps/web/src/components/features/message/ChatContentView.tsx:184
 #: apps/web/src/components/features/reminders/RemindersList.tsx:118
 #: apps/web/src/utils/messageUtils.ts:114
 #: raven/raven_messaging/doctype/raven_message/raven_message.json:74
@@ -5523,7 +5556,7 @@ msgstr ""
 msgid "Poll Votes"
 msgstr ""
 
-#: apps/web/src/components/features/message/ChatContentView.tsx:183
+#: apps/web/src/components/features/message/ChatContentView.tsx:185
 msgid "Poll details and votes"
 msgstr ""
 
@@ -5617,11 +5650,11 @@ msgstr ""
 msgid "Private workspaces can only be viewed or joined by invitation. Public workspaces are open to everyone."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:80
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:82
 msgid "Processor created successfully"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:95
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:97
 msgid "Processor deleted successfully"
 msgstr ""
 
@@ -5635,7 +5668,7 @@ msgid "Profile updated"
 msgstr ""
 
 #. Label of a Small Text field in DocType 'Raven Bot AI Prompt'
-#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:20
+#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:22
 msgid "Prompt"
 msgstr ""
 
@@ -5753,6 +5786,10 @@ msgstr ""
 msgid "Quote"
 msgstr ""
 
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:53
+msgid "Raise the limit or choose a smaller plan to end your trial."
+msgstr ""
+
 #. Option for the 'Push Notification Service' (Select) field in DocType 'Raven
 #. Settings'
 #: apps/web/src/components/features/setup/steps/HRStep.tsx:54
@@ -5766,12 +5803,12 @@ msgid "Raven AI Bot Files"
 msgstr ""
 
 #. Name of a DocType
-#: raven/raven_ai/doctype/raven_ai_file_source/raven_ai_file_source.json:55
+#: raven/raven_ai/doctype/raven_ai_file_source/raven_ai_file_source.json:57
 msgid "Raven AI File Source"
 msgstr ""
 
 #. Name of a DocType
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:111
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:113
 msgid "Raven AI Function"
 msgstr ""
 
@@ -5793,10 +5830,10 @@ msgstr ""
 #: raven/raven/doctype/raven_settings/raven_settings.json:390
 #: raven/raven/doctype/raven_workspace/raven_workspace.json:98
 #: raven/raven/doctype/raven_workspace_member/raven_workspace_member.json:87
-#: raven/raven_ai/doctype/raven_ai_file_source/raven_ai_file_source.json:79
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:135
-#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:77
-#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:70
+#: raven/raven_ai/doctype/raven_ai_file_source/raven_ai_file_source.json:81
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:137
+#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:80
+#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:73
 #: raven/raven_bot/doctype/raven_bot/raven_bot.json:281
 #: raven/raven_integrations/doctype/raven_document_notification/raven_document_notification.json:149
 #: raven/raven_integrations/doctype/raven_incoming_webhook/raven_incoming_webhook.json:74
@@ -5812,13 +5849,13 @@ msgstr ""
 
 #. Label of a Link field in DocType 'Raven Bot AI Prompt'
 #. Name of a DocType
-#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:29
+#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:31
 #: raven/raven_bot/doctype/raven_bot/raven_bot.json:257
 msgid "Raven Bot"
 msgstr ""
 
 #. Name of a DocType
-#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:53
+#: raven/raven_ai/doctype/raven_bot_ai_prompt/raven_bot_ai_prompt.json:56
 msgid "Raven Bot AI Prompt"
 msgstr ""
 
@@ -5828,7 +5865,7 @@ msgid "Raven Bot Functions"
 msgstr ""
 
 #. Name of a DocType
-#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:46
+#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:49
 msgid "Raven Bot Instruction Template"
 msgstr ""
 
@@ -5892,7 +5929,7 @@ msgid "Raven Link Preview"
 msgstr ""
 
 #. Name of a DocType
-#: raven/raven_messaging/doctype/raven_mention/raven_mention.json:33
+#: raven/raven_messaging/doctype/raven_mention/raven_mention.json:34
 msgid "Raven Mention"
 msgstr ""
 
@@ -6050,6 +6087,10 @@ msgstr ""
 msgid "Raven was updated"
 msgstr ""
 
+#: apps/web/src/components/features/settings/panels/DeprecatedBadge.tsx:13
+msgid "Raven will soon support AI integrations via Frappe Flow."
+msgstr ""
+
 #: apps/web/src/components/features/settings/panels/PushNotifications.tsx:180
 msgid "Re-Register Site on Raven Cloud"
 msgstr ""
@@ -6082,14 +6123,14 @@ msgstr ""
 
 #: apps/web/src/components/features/channel/ChannelSettingsDrawer/ChannelSettingsTab.tsx:171
 #: apps/web/src/components/features/channel/ChannelSettingsDrawer/ChannelSettingsTab.tsx:187
-#: apps/web/src/components/features/message/actions/dialogs/ReactionsDialog.tsx:147
-#: apps/web/src/components/features/message/actions/dialogs/ReactionsDialog.tsx:160
+#: apps/web/src/components/features/message/actions/dialogs/ReactionsDialog.tsx:148
+#: apps/web/src/components/features/message/actions/dialogs/ReactionsDialog.tsx:161
 msgid "Reactions"
 msgstr ""
 
 #: apps/web/src/components/features/message/actions/dialogs/ReadReceiptsDialog.tsx:39
 #: apps/web/src/components/features/message/actions/dialogs/ReadReceiptsDialog.tsx:57
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:439
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:440
 msgid "Read by"
 msgstr ""
 
@@ -6111,7 +6152,7 @@ msgstr ""
 msgid "Reasoning Effort"
 msgstr ""
 
-#: apps/web/src/components/common/LinkFieldComboBox/LinkFieldCombobox.tsx:374
+#: apps/web/src/components/common/LinkFieldComboBox/LinkFieldCombobox.tsx:380
 msgid "Recent"
 msgstr ""
 
@@ -6166,7 +6207,7 @@ msgstr ""
 msgid "Reload to pick up the latest version - everything will be right where you left it."
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:398
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:399
 msgid "Remind me"
 msgstr ""
 
@@ -6192,7 +6233,7 @@ msgstr ""
 msgid "Reminder deleted"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:393
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:394
 #: apps/web/src/components/features/reminders/ReminderDialog.tsx:95
 #: apps/web/src/components/features/reminders/RemindersList.tsx:251
 #, python-brace-format
@@ -6337,7 +6378,7 @@ msgstr ""
 
 #. Label of a Check field in DocType 'Raven AI Function'
 #: apps/web/src/components/features/settings/panels/Functions/FunctionDetailsTab.tsx:261
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:58
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:60
 msgid "Requires Write Permissions"
 msgstr ""
 
@@ -6357,11 +6398,11 @@ msgstr ""
 msgid "Restore the channel and allow new messages again"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:165
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:167
 msgid "Retract my vote"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:479
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:485
 msgid "Retract vote"
 msgstr ""
 
@@ -6400,12 +6441,12 @@ msgstr ""
 msgid "Save and finish"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/Instructions/InstructionListView.tsx:97
+#: apps/web/src/components/features/settings/panels/Instructions/InstructionListView.tsx:99
 msgid "Save commonly used instructions as templates for your AI bots."
 msgstr ""
 
 #: apps/web/src/components/features/settings/SettingsDialog.tsx:226
-#: apps/web/src/components/features/settings/panels/Instructions/InstructionListView.tsx:70
+#: apps/web/src/components/features/settings/panels/Instructions/InstructionListView.tsx:72
 msgid "Save commonly used instructions as templates for your bots."
 msgstr ""
 
@@ -6444,13 +6485,13 @@ msgstr ""
 msgid "Schedule messages and reminders to be sent to you at a specific date and time."
 msgstr ""
 
-#: apps/web/src/App.tsx:118
+#: apps/web/src/App.tsx:83
 #: apps/web/src/components/features/schedule-send/ScheduledMessagesDialog.tsx:46
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:183
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:191
 #: apps/web/src/components/features/settings/panels/ScheduledMessages/ScheduledMessageListView.tsx:107
 #: apps/web/src/components/features/settings/panels/ScheduledMessages/ScheduledMessageListView.tsx:125
-#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:135
 #: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:136
+#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:137
 #: apps/web/src/pages/scheduled-messages/ScheduledMessages.tsx:29
 msgid "Scheduled Messages"
 msgstr ""
@@ -6496,7 +6537,7 @@ msgstr ""
 msgid "Search Raven"
 msgstr ""
 
-#: apps/web/src/components/common/LinkFieldComboBox/LinkFieldCombobox.tsx:430
+#: apps/web/src/components/common/LinkFieldComboBox/LinkFieldCombobox.tsx:436
 msgid "Search and pick a document"
 msgstr ""
 
@@ -6682,7 +6723,7 @@ msgstr ""
 msgid "Select a notification to view the message."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:186
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:187
 msgid "Select a provider to see specific instructions."
 msgstr ""
 
@@ -6812,13 +6853,8 @@ msgid "Send Invite"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Send Message"
-msgstr ""
-
-#: raven/public/js/timeline_button.js:39 raven/public/js/timeline_button.js:56
-#: raven/public/js/timeline_button.js:74
-msgid "Send a Synk"
 msgstr ""
 
 #: apps/web/src/components/features/setup/steps/TeamStep.tsx:52
@@ -6869,6 +6905,11 @@ msgstr ""
 #. Label of a Select field in DocType 'Raven Scheduler Event'
 #: raven/raven_integrations/doctype/raven_scheduler_event/raven_scheduler_event.json:59
 msgid "Send to"
+msgstr ""
+
+#: raven/public/js/timeline_button.js:43 raven/public/js/timeline_button.js:60
+#: raven/public/js/timeline_button.js:78
+msgid "Send to the business messaging"
 msgstr ""
 
 #: apps/web/src/components/features/ChatInput/SendButton.tsx:74
@@ -7033,7 +7074,7 @@ msgstr ""
 msgid "Setup Completed"
 msgstr ""
 
-#: apps/web/src/components/features/setup/SetupPage.tsx:261
+#: apps/web/src/components/features/setup/SetupPage.tsx:262
 msgid "Setup progress"
 msgstr ""
 
@@ -7064,11 +7105,6 @@ msgstr ""
 msgid "Shortcut"
 msgstr ""
 
-#. Label of a Check field in DocType 'Raven Settings'
-#: raven/raven/doctype/raven_settings/raven_settings.json:68
-msgid "Show Synk on Desk"
-msgstr ""
-
 #: apps/web/src/components/features/settings/panels/Appearance.tsx:367
 msgid "Show a preview card under messages with links, or keep the stream compact and preview links on hover. On mobile, previews only appear as cards."
 msgstr ""
@@ -7089,6 +7125,11 @@ msgstr ""
 
 #: apps/web/src/components/features/message/renderers/MessageCodeBlock.tsx:141
 msgid "Show more"
+msgstr ""
+
+#. Label of a Check field in DocType 'Raven Settings'
+#: raven/raven/doctype/raven_settings/raven_settings.json:68
+msgid "Show the business messaging on the desk"
 msgstr ""
 
 #: apps/web/src/components/features/settings/panels/KeyboardShortcuts.tsx:163
@@ -7311,7 +7352,7 @@ msgid "Stores the ID of the last message sent"
 msgstr ""
 
 #. Label of a Check field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:103
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:105
 msgid "Strict"
 msgstr ""
 
@@ -7327,7 +7368,7 @@ msgid "String"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Submit Document"
 msgstr ""
 
@@ -7408,11 +7449,6 @@ msgstr ""
 msgid "Synk"
 msgstr ""
 
-#. Label of a Tab Break field in DocType 'Raven Settings'
-#: raven/raven/doctype/raven_settings/raven_settings.json:197
-msgid "Synk Mobile"
-msgstr ""
-
 #: apps/web/src/components/features/profile/PreferencesDrawer.tsx:204
 msgid "Tap a slot to change its emoji - these are your one-tap reactions."
 msgstr ""
@@ -7429,7 +7465,7 @@ msgstr ""
 
 #. Label of a Data field in DocType 'Raven Bot Instruction Template'
 #: apps/web/src/components/features/settings/panels/Instructions/InstructionTemplateForm.tsx:13
-#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:19
+#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:21
 msgid "Template Name"
 msgstr ""
 
@@ -7438,8 +7474,8 @@ msgstr ""
 msgid "Tenor API Key"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:132
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:164
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:133
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:165
 msgid "Test Connection"
 msgstr ""
 
@@ -7570,7 +7606,7 @@ msgstr ""
 msgid "The number of seconds until the request expires."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:81
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:83
 msgid "The processor has been created and is now available to use."
 msgstr ""
 
@@ -7688,7 +7724,7 @@ msgstr ""
 msgid "This channel is no longer available"
 msgstr ""
 
-#: raven/api/setup.py:142
+#: raven/api/setup.py:160
 msgid "This channel is not in the workspace."
 msgstr ""
 
@@ -7766,7 +7802,7 @@ msgstr ""
 msgid "This message will be sent to {0} immediately."
 msgstr ""
 
-#: raven/www/raven.py:147
+#: raven/www/raven.py:149
 msgid "This method is only meant for developer mode"
 msgstr ""
 
@@ -7886,7 +7922,7 @@ msgstr ""
 msgid "This will permanently delete {0}."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:251
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:253
 msgid "This will permanently remove the processor from your Google Cloud project. Any agents currently using this document processor will no longer be able to use it."
 msgstr ""
 
@@ -7914,7 +7950,7 @@ msgstr ""
 #: apps/web/src/components/features/header/AppMobileFooter.tsx:31
 #: apps/web/src/components/features/header/AppMobileFooter.tsx:147
 #: apps/web/src/components/layout/DocumentTitle.tsx:52
-#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:224
+#: apps/web/src/components/layout/PrimarySidebar/PrimarySidebar.tsx:225
 #: apps/web/src/pages/threads/Threads.tsx:69
 msgid "Threads"
 msgstr ""
@@ -8069,7 +8105,7 @@ msgstr ""
 msgid "Tue"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:73
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:74
 msgid "Turn on AI features across Raven."
 msgstr ""
 
@@ -8136,7 +8172,7 @@ msgstr ""
 msgid "Underline"
 msgstr ""
 
-#: raven/api/setup.py:223
+#: raven/api/setup.py:260
 #, python-brace-format
 msgid "Unknown setup event: {0}"
 msgstr ""
@@ -8146,7 +8182,7 @@ msgid "Unmute Channel"
 msgstr ""
 
 #: apps/web/src/components/features/channel/ChannelSettingsDrawer/ChannelPins.tsx:136
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:340
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:341
 msgid "Unpin"
 msgstr ""
 
@@ -8165,7 +8201,7 @@ msgstr ""
 msgid "Unreads First"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:363
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:364
 msgid "Unsave"
 msgstr ""
 
@@ -8178,12 +8214,12 @@ msgid "Upcoming"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Update Document"
 msgstr ""
 
 #. Option for the 'Type' (Select) field in DocType 'Raven AI Function'
-#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:51
+#: raven/raven_ai/doctype/raven_ai_function/raven_ai_function.json:53
 msgid "Update Multiple Documents"
 msgstr ""
 
@@ -8204,7 +8240,7 @@ msgstr ""
 msgid "Upload File"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:177
+#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:179
 msgid "Upload a file"
 msgstr ""
 
@@ -8234,7 +8270,7 @@ msgstr ""
 msgid "Upload your own or download from"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:106
+#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:108
 msgid "Uploaded"
 msgstr ""
 
@@ -8257,7 +8293,7 @@ msgstr ""
 msgid "Use Google Document/Vision AI to parse documents"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:84
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:85
 msgid "Use OpenAI models for AI features."
 msgstr ""
 
@@ -8266,11 +8302,11 @@ msgstr ""
 msgid "Use Website Favicon"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/AISettings.tsx:125
+#: apps/web/src/components/features/settings/panels/AISettings.tsx:126
 msgid "Use a self-hosted, OpenAI-compatible model."
 msgstr ""
 
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:202
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:153
 #: apps/web/src/components/features/settings/panels/Agents/AgentListView.tsx:75
 msgid "Use agents to send reminders, run AI assistants, and more."
 msgstr ""
@@ -8279,11 +8315,11 @@ msgstr ""
 msgid "Use five parts: minute, hour, day of month, month, day of week."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:108
+#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:110
 msgid "Use the no-code builder to create functions that allow AI bots to perform actions within the system when requested, like creating documents, or fetching reports to analyze."
 msgstr ""
 
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:178
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:186
 #: apps/web/src/components/features/settings/panels/MessageActions/MessageActionListView.tsx:76
 msgid "Use these to add custom actions - like creating an issue/task from a message."
 msgstr ""
@@ -8336,7 +8372,7 @@ msgstr ""
 msgid "User is already a member of the workspace"
 msgstr ""
 
-#: raven/raven/doctype/raven_user/raven_user.py:84
+#: raven/raven/doctype/raven_user/raven_user.py:90
 msgid "User is mandatory"
 msgstr ""
 
@@ -8429,7 +8465,7 @@ msgstr ""
 msgid "View profile"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/useMessageActions.tsx:417
+#: apps/web/src/components/features/message/actions/useMessageActions.tsx:418
 msgid "View reactions"
 msgstr ""
 
@@ -8442,12 +8478,12 @@ msgstr ""
 msgid "View who has read this message."
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/dialogs/ReactionsDialog.tsx:161
+#: apps/web/src/components/features/message/actions/dialogs/ReactionsDialog.tsx:162
 msgid "View who reacted to this message."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:108
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:139
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:110
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:141
 msgid "View your active document processors or select a processor type and create a new processor."
 msgstr ""
 
@@ -8517,7 +8553,7 @@ msgstr ""
 msgid "Webhook will trigger only if the message is sent on this channel."
 msgstr ""
 
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:191
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:199
 #: apps/web/src/components/features/settings/panels/Webhooks/WebhookListView.tsx:84
 #: apps/web/src/components/features/settings/panels/Webhooks/WebhookListView.tsx:101
 msgid "Webhooks"
@@ -8621,7 +8657,7 @@ msgstr ""
 msgid "Who has read this message"
 msgstr ""
 
-#: apps/web/src/components/features/message/actions/dialogs/ReactionsDialog.tsx:149
+#: apps/web/src/components/features/message/actions/dialogs/ReactionsDialog.tsx:150
 msgid "Who reacted to this message"
 msgstr ""
 
@@ -8636,7 +8672,7 @@ msgstr ""
 msgid "With the message box empty, open your last message for editing."
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:678
+#: apps/web/src/components/features/message/renderers/DocumentLinkRenderer.tsx:731
 msgid "Workflow updated"
 msgstr ""
 
@@ -8734,7 +8770,7 @@ msgstr ""
 msgid "Wrap text in double bars to hide it until clicked."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:70
+#: apps/web/src/components/features/settings/panels/Functions/FunctionListView.tsx:72
 msgid "Writes"
 msgstr ""
 
@@ -8778,7 +8814,7 @@ msgstr ""
 msgid "You are not a member of this channel"
 msgstr ""
 
-#: raven/api/workspaces.py:83
+#: raven/api/workspaces.py:90
 msgid "You are not a member of this workspace."
 msgstr ""
 
@@ -8798,7 +8834,7 @@ msgstr ""
 msgid "You are not an admin of this workspace, so you cannot manage its members."
 msgstr ""
 
-#: raven/api/workspaces.py:161
+#: raven/api/workspaces.py:168
 msgid "You are not an admin of this workspace."
 msgstr ""
 
@@ -8814,7 +8850,7 @@ msgstr ""
 msgid "You can archive this channel instead to preserve your messages"
 msgstr ""
 
-#: apps/web/src/components/features/settings/SettingsDialog.tsx:186
+#: apps/web/src/components/features/settings/SettingsDialog.tsx:194
 #: apps/web/src/components/features/settings/panels/ScheduledMessages/ScheduledMessageListView.tsx:108
 msgid "You can create a scheduled message & a bot will send it to you at the specified time."
 msgstr ""
@@ -8860,7 +8896,7 @@ msgstr ""
 msgid "You can specify a default value for this variable. If the AI does not fill this field, then the default value will be used."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:170
+#: apps/web/src/components/features/settings/panels/FileSources/FileSources.tsx:172
 msgid "You can upload files here and use them across multiple agents."
 msgstr ""
 
@@ -8871,7 +8907,7 @@ msgstr ""
 #. Description of the 'Instruction' (Long Text) field in DocType 'Raven Bot
 #. Instruction Template'
 #. Description of the 'Instruction' (Long Text) field in DocType 'Raven Bot'
-#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:33
+#: raven/raven_ai/doctype/raven_bot_instruction_template/raven_bot_instruction_template.json:35
 #: raven/raven_bot/doctype/raven_bot/raven_bot.json:141
 msgid "You can use Jinja variables here to customize the instruction to the bot at run time if dynamic instructions are enabled."
 msgstr ""
@@ -8880,7 +8916,7 @@ msgstr ""
 msgid "You cannot access Raven."
 msgstr ""
 
-#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:226
+#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:227
 msgid "You cannot change the name of a direct message channel"
 msgstr ""
 
@@ -8902,7 +8938,7 @@ msgstr ""
 msgid "You do not have a <b>Raven User</b> role. Please contact your administrator to add your user profile as a <b>Raven User</b>."
 msgstr ""
 
-#: raven/api/workspaces.py:20
+#: raven/api/workspaces.py:21
 msgid "You do not have access to Raven."
 msgstr ""
 
@@ -8921,7 +8957,7 @@ msgstr ""
 msgid "You do not have permission to access this channel"
 msgstr ""
 
-#: raven/api/document_link.py:106
+#: raven/api/document_link.py:113
 msgid "You do not have permission to access this document"
 msgstr ""
 
@@ -8958,7 +8994,7 @@ msgstr ""
 msgid "You don't have permission to access this message"
 msgstr ""
 
-#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:249
+#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:250
 msgid "You don't have permission to archive/unarchive this channel"
 msgstr ""
 
@@ -8967,7 +9003,7 @@ msgstr ""
 msgid "You don't have permission to assign admins to this channel. Please ask another admin to do this."
 msgstr ""
 
-#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:266
+#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:267
 msgid "You don't have permission to modify this channel"
 msgstr ""
 
@@ -9035,7 +9071,7 @@ msgstr ""
 msgid "You must be an admin of both workspaces"
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:114
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:116
 msgid "You need Raven Admin permissions to manage document processors."
 msgstr ""
 
@@ -9055,7 +9091,7 @@ msgstr ""
 msgid "You need to provide a default value for required parameters that are not asked by the AI."
 msgstr ""
 
-#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:233
+#: raven/raven_channel_management/doctype/raven_channel/raven_channel.py:234
 msgid "You need to specify a workspace for this channel"
 msgstr ""
 
@@ -9144,6 +9180,33 @@ msgstr ""
 
 #: apps/web/src/components/features/settings/panels/KeyboardShortcuts.tsx:183
 msgid "Your browser provides these. Raven keeps every channel and page in the history, so they work as you would expect."
+msgstr ""
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:52
+msgid "Your plan is over your spending limit"
+msgstr ""
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:43
+#, python-brace-format
+msgctxt "D MMM"
+msgid "Your site will be deleted on {0}. Choose a plan to keep it."
+msgstr ""
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:33
+#, python-brace-format
+msgid "Your trial ends in {0} days"
+msgstr ""
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:31
+msgid "Your trial ends today"
+msgstr ""
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:32
+msgid "Your trial ends tomorrow"
+msgstr ""
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:41
+msgid "Your trial has ended"
 msgstr ""
 
 #. Option for the 'Provider' (Select) field in DocType 'Raven Link Preview'
@@ -9501,7 +9564,7 @@ msgstr ""
 msgid "{0} gets their roles from a role profile. Add the Raven User role there."
 msgstr ""
 
-#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:96
+#: apps/web/src/components/features/settings/panels/DocumentProcessors/DocumentProcessors.tsx:98
 #, python-brace-format
 msgid "{0} has been deleted from your Google Cloud project."
 msgstr ""
@@ -9657,7 +9720,7 @@ msgstr ""
 msgid "{0} sites"
 msgstr ""
 
-#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:209
+#: apps/web/src/components/features/message/renderers/PollDrawer.tsx:213
 #: apps/web/src/components/features/message/renderers/PollMessageContent.tsx:157
 #: apps/web/src/components/features/message/renderers/SingleChoicePollVoting.tsx:76
 #: apps/web/src/components/features/message/renderers/polls/PollOptionBar.tsx:66
@@ -9701,7 +9764,7 @@ msgstr ""
 msgid "{0}, {1} reactions"
 msgstr ""
 
-#: raven/notification.py:354
+#: raven/notification.py:357
 msgid "⏰ Reminder"
 msgstr ""
 

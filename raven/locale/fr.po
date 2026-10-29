@@ -9681,3 +9681,59 @@ msgstr "{0} non lu(s)"
 #: raven/hooks.py:46
 msgid "Welcome to your business messaging. Let's set up your team's space."
 msgstr "Bienvenue dans votre messagerie d'entreprise. Configurons l'espace de votre équipe."
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:45
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:62
+msgid "Choose a plan"
+msgstr "Choisissez un plan"
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:44
+msgid "Choose a plan to keep using your site."
+msgstr "Choisissez un plan pour continuer à utiliser votre site."
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:61
+msgid "Choose a plan to keep your site after the trial."
+msgstr "Choisissez un plan pour conserver votre site après l'essai."
+
+#: apps/web/src/components/features/settings/panels/DeprecatedBadge.tsx:10
+msgid "Deprecated"
+msgstr "Obsolète"
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:54
+msgid "Manage billing"
+msgstr "Gérer la facturation"
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:53
+msgid "Raise the limit or choose a smaller plan to end your trial."
+msgstr "Augmentez la limite ou choisissez un plan plus petit pour terminer votre essai."
+
+#: apps/web/src/components/features/settings/panels/DeprecatedBadge.tsx:13
+msgid "Raven will soon support AI integrations via Frappe Flow."
+msgstr "Synk prendra bientôt en charge les intégrations d'IA via Frappe Flow."
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:52
+msgid "Your plan is over your spending limit"
+msgstr "Votre plan dépasse votre plafond de dépenses."
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:43
+#, python-brace-format
+msgctxt "D MMM"
+msgid "Your site will be deleted on {0}. Choose a plan to keep it."
+msgstr "Votre site sera supprimé le {0}. Choisissez un plan pour le conserver."
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:33
+#, python-brace-format
+msgid "Your trial ends in {0} days"
+msgstr "Votre essai se termine dans {0} jours"
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:31
+msgid "Your trial ends today"
+msgstr "Votre essai se termine aujourd'hui"
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:32
+msgid "Your trial ends tomorrow"
+msgstr "Votre essai se termine demain"
+
+#: apps/web/src/components/channel-sidebar/TrialCard.tsx:41
+msgid "Your trial has ended"
+msgstr "Votre essai est terminé"
