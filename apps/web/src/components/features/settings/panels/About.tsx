@@ -14,7 +14,7 @@ import { siteUrl } from "@lib/site"
 //// reaches it from the native app too), the one the cockpit and the sidebar show. Upstream bundled the Raven mark.
 const BRAND_ICON = "/assets/neoffice_theme/icons/streamline/chat-bubble-text.svg"
 
-const LINKS = [
+const links = () => [
     { label: _("Documentation"), href: "https://docs.frappe.io/raven" },
     { label: _("GitHub"), href: "https://github.com/frappe/raven" },
     { label: _("Website"), href: "https://ravenchat.ai" },
@@ -56,7 +56,7 @@ export const About = () => {
                 </div>
 
                 <ul className="flex flex-col gap-2">
-                    {LINKS.map((link) => (
+                    {links().map((link) => (
                         <li key={link.href}>
                             <a
                                 href={link.href}

@@ -31,7 +31,13 @@ def join_open_workspaces(
 			{"doctype": "Raven Workspace Member", "workspace": workspace, "user": user}
 		)
 		member.flags.ignore_cache_invalidation = not invalidate
-		member.insert(ignore_permissions=True)
+		# //// Neoffice - upstream 3.2 made (workspace, user) unique in the database: two processes that join the
+		# //// same person at the same moment (an invitation and the account's own insert) both pass the check
+		# //// above, and the second one hits the constraint. They are in the workspace either way.
+		try:
+			member.insert(ignore_permissions=True)
+		except frappe.DuplicateEntryError:
+			continue
 		joined.append(workspace)
 	return joined
 

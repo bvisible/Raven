@@ -165,6 +165,7 @@ doc_events = {
 		"after_insert": "raven.raven.doctype.raven_user.raven_user.add_user_to_raven",
 		"on_update": "raven.raven.doctype.raven_user.raven_user.add_user_to_raven",
 		"on_trash": "raven.raven.doctype.raven_user.raven_user.remove_user_from_raven",
+		"after_rename": "raven.raven.doctype.raven_user.raven_user.rename_raven_user",
 	},
 	"Department": {
 		"after_insert": "raven.raven_integrations.controllers.department.after_insert",
@@ -336,3 +337,7 @@ raven_document_link_override = "raven.api.document_link.get_new_app_document_lin
 ignore_translatable_strings_from = ["frappe"]
 
 sqlite_search = ["raven.api.search.RavenSearch"]
+
+# Expose method source code through the API discovery endpoints. Safe for open
+# source apps and helps API clients understand what a method does.
+expose_discovery_source = True

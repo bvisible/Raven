@@ -11,6 +11,19 @@ scan({
 
 
 import { initPushNotifications, isStandalone } from "@lib/push";
+import { loadTranslations } from "@lib/translations";
+
+const render = () => {
+  // After boot lands: the push config (firebase_client_config) comes from it.
+  initPushNotifications()
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    </StrictMode>,
+  )
+}
 
 //// Neoffice - the NeoCockpit menu translates through Frappe's global __(), which the desk defines
 //// and this app does not: its labels stayed English in Synk v3 (« Collapse menu », 30.09.2026).
@@ -34,18 +47,9 @@ if (import.meta.env.DEV) {
       const v = JSON.parse(values.message)
       if (!window.frappe) window.frappe = {};
       window.frappe.boot = v
-      window.frappe._messages = window.frappe.boot["__messages"];
-      // After boot lands — push config (firebase_client_config) comes from it
-      initPushNotifications()
-      createRoot(document.getElementById('root')!).render(
-        <StrictMode>
-          <ThemeProvider>
-            <App />
-          </ThemeProvider>
-        </StrictMode>,
-      )
-    }
-    )
+      return loadTranslations(v)
+    })
+    .then(render)
 } else {
   // Boot is inlined by the Jinja entry template. An OFFLINE (app-shell) load
   // serves the BUILT index.html from the service worker's cache instead — its
@@ -58,7 +62,6 @@ if (import.meta.env.DEV) {
       if (cached) {
         if (!window.frappe) window.frappe = {}
         window.frappe.boot = JSON.parse(cached)
-        window.frappe._messages = window.frappe.boot["__messages"]
       }
     } catch {
       // No usable cached boot — the shell still renders; boot readers degrade.
@@ -75,12 +78,8 @@ if (import.meta.env.DEV) {
       }
     }, 3000)
   }
-  initPushNotifications()
-  createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
-    </StrictMode>,
-  )
+  // Frappe 15 and 16 put the translations in the boot; develop serves them separately. Either
+  // way they are in place before the first render, so nothing shows in English first.
+  const boot = window.frappe?.boot
+  void (boot ? loadTranslations(boot) : Promise.resolve()).then(render)
 }

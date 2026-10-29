@@ -11,6 +11,8 @@ branch. Before that merge the base was `dfde9b1e4a8e1da526a63891e78b5d31404b38d7
 tagged **v2.7.1**). Everything on `origin/version-15` that is not in upstream `main` is Neoffice
 work; `fork_markers.py check --base e890308e96` maps it.
 
+**Merged a third time on 2026-10-29:** upstream `v3.2.0` (`5a5e4c48e`, 41 commits) went in; the common base is now `v3.2.0` and `fork_markers.py check --base v3.2.0` maps the divergence. Nothing we dropped or kept below changed; the unique (workspace, user) constraint of 3.2 is the reason `open_workspaces.join_open_workspaces` ignores a duplicate.
+
 **Merged again on 2026-10-25:** upstream `main` at `0de8cea54` (3.1.0, 200 commits) went into
 `version-15`; the common base is now `0de8cea54` and `fork_markers.py check --base 0de8cea54` maps
 the divergence. What the merge dropped on purpose: `apps/mobile/` (the mobile app lives in

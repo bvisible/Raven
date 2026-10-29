@@ -8,6 +8,7 @@ from frappe.tests import IntegrationTestCase
 
 from raven.open_workspaces import (
 	join_everyone_once,
+	join_open_workspaces,
 	join_open_workspaces_on_insert,
 	open_workspaces,
 )
@@ -97,6 +98,30 @@ class TestOpenWorkspaces(IntegrationTestCase):
 		# Run again, it adds nobody.
 		again = join_everyone_once()
 		self.assertEqual(again[self.open], 0)
+		self.assertEqual(
+			frappe.db.count("Raven Workspace Member", {"workspace": self.open, "user": person}), 1
+		)
+
+	def test_a_second_process_joining_the_same_person_meets_the_database_constraint_and_carries_on(self):
+		# Two processes pass the "is not a member yet" check together; the second insert hits the unique
+		# (workspace, user) constraint of upstream 3.2. Both checks are played blind here.
+		person = self._new_person()
+		self.assertTrue(self._is_member(self.open, person))
+		real_exists = frappe.db.exists
+
+		def blind(doctype, filters=None, *args, **kwargs):
+			if doctype == "Raven Workspace Member":
+				return None
+			return real_exists(doctype, filters, *args, **kwargs)
+
+		with (
+			patch("frappe.db.exists", side_effect=blind),
+			patch(
+				"raven.raven.doctype.raven_workspace_member.raven_workspace_member.RavenWorkspaceMember.validate"
+			),
+		):
+			joined = join_open_workspaces(person, [self.open])
+		self.assertEqual(joined, [])
 		self.assertEqual(
 			frappe.db.count("Raven Workspace Member", {"workspace": self.open, "user": person}), 1
 		)

@@ -43,7 +43,7 @@ const InstructionsPanel = lazy(() => import('./panels/Instructions/Instructions'
 const DocumentProcessorsPanel = lazy(() => import('./panels/DocumentProcessors/DocumentProcessors').then((m) => ({ default: m.DocumentProcessors })));
 const KeyboardShortcutsPanel = lazy(() => import('./panels/KeyboardShortcuts').then((m) => ({ default: m.KeyboardShortcuts })));
 
-const SETTINGS_TAB_GROUPS: { id: string, label: string }[] = [
+const settingsTabGroups = (): { id: string, label: string }[] => [
     { id: "settings", label: _("Settings") },
     { id: "workspace", label: _("Workspace") },
     { id: "integrations", label: _("Integrations") },
@@ -58,11 +58,11 @@ const HR_ICON = <svg width="61" height="61" viewBox="0 0 61 61" fill="none" xmln
 </svg>
 
 
-//// Neoffice — renamed from SETTINGS_TABS so the Neoffice filter below can keep that name and
+//// Neoffice — renamed from settingsTabs so the Neoffice filter below can keep that name and
 //// every consumer stays untouched. See NEOFFICE_HIDDEN_TABS for what we take out and why.
-const SETTINGS_TABS_UPSTREAM: {
+const settingsTabsUpstream = (): {
     id: string
-    group: (typeof SETTINGS_TAB_GROUPS)[number]["id"]
+    group: ReturnType<typeof settingsTabGroups>[number]["id"]
     label: string
     icon: React.ElementType
     /** The panel, as a LAZY component type (see the lazy() block above) —
@@ -75,7 +75,7 @@ const SETTINGS_TABS_UPSTREAM: {
     panelTitle?: string
     /** Panel header description (also shown by the loading fallback for built panels). */
     description?: string
-}[] = [
+}[] => [
         // Core settings
         {
             id: "profile",
@@ -145,6 +145,14 @@ const SETTINGS_TABS_UPSTREAM: {
         },
         // Integrations settings
         {
+            id: "agents",
+            group: "integrations",
+            label: _("Agents"),
+            icon: BotIcon,
+            component: AgentsPanel,
+            description: _("Use agents to send reminders, run AI assistants, and more."),
+        },
+        {
             id: "hr",
             group: "integrations",
             label: "Frappe HR",
@@ -192,14 +200,6 @@ const SETTINGS_TABS_UPSTREAM: {
             icon: WebhookIcon,
             component: WebhooksPanel,
             description: _("Fire webhooks on specific events like when a message is sent or channel is created."),
-        },
-        {
-            id: "agents",
-            group: "ai",
-            label: _("Agents"),
-            icon: BotIcon,
-            component: AgentsPanel,
-            description: _("Use agents to send reminders, run AI assistants, and more."),
         },
         {
             id: "functions",
@@ -292,16 +292,17 @@ const NEOFFICE_HIDDEN_TABS = new Set([
     "about",
 ])
 
-const SETTINGS_TABS = SETTINGS_TABS_UPSTREAM.filter((tab) => !NEOFFICE_HIDDEN_TABS.has(tab.id))
+//// Neoffice — upstream 3.2 made the list a function (translated at render time): the filter wraps it the same way.
+const settingsTabs = () => settingsTabsUpstream().filter((tab) => !NEOFFICE_HIDDEN_TABS.has(tab.id))
 
 //// Neoffice — a group whose every panel is hidden must not leave its header behind: filtering
 //// the panels alone left an empty "AI" heading in the sidebar, which advertises exactly what we
 //// took away. Derived from the panels, so it needs no maintenance when NEOFFICE_HIDDEN_TABS moves.
-const VISIBLE_SETTINGS_TAB_GROUPS = SETTINGS_TAB_GROUPS.filter(
-    (group) => SETTINGS_TABS.some((tab) => tab.group === group.id)
+const visibleSettingsTabGroups = () => settingsTabGroups().filter(
+    (group) => settingsTabs().some((tab) => tab.group === group.id)
 )
 
-export type SettingsTabId = (typeof SETTINGS_TABS)[number]["id"]
+export type SettingsTabId = ReturnType<typeof settingsTabs>[number]["id"]
 
 const RavenSettingsDialog = () => {
 
@@ -323,14 +324,14 @@ const RavenSettingsDialog = () => {
             <SettingsDialog
                 onClose={() => setOpenTab("")}
                 defaultValue={"profile"} value={openTab}
-                onValueChange={(value) => setOpenTab(value as (typeof SETTINGS_TABS)[number]["id"])}>
+                onValueChange={(value) => setOpenTab(value as SettingsTabId)}>
                 <SettingsTabs>
                     {/* //// Neoffice - only the groups that still show a panel ("fix(synk): hide a
                         settings group once every panel in it is hidden"): we hide the panels we
                         configure centrally, and upstream drew their group's header over nothing. */}
-                    {VISIBLE_SETTINGS_TAB_GROUPS.map((group) => (
+                    {visibleSettingsTabGroups().map((group) => (
                         <SettingsTabGroup key={group.id} header={group.label}>
-                            {SETTINGS_TABS.filter((tab) => tab.group === group.id).map((tab) => {
+                            {settingsTabs().filter((tab) => tab.group === group.id).map((tab) => {
 
                                 if (tab.id === "profile") {
                                     return <SettingsTabItem key={tab.id} value={tab.id}
@@ -357,7 +358,7 @@ const RavenSettingsDialog = () => {
                     ))}
                 </SettingsTabs>
                 <SettingsPanels>
-                    {SETTINGS_TABS.map((tab) => (
+                    {settingsTabs().map((tab) => (
                         <SettingsPanel key={tab.id} value={tab.id}>
                             <Suspense fallback={<PanelLoading title={tab.panelTitle ?? tab.label} description={tab.description} />}>
                                 {/* Every tab has a panel component now (built-out ones and
