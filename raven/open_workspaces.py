@@ -36,7 +36,7 @@ def join_open_workspaces(
 		# //// above, and the second one hits the constraint. They are in the workspace either way.
 		try:
 			member.insert(ignore_permissions=True)
-		except frappe.DuplicateEntryError:
+		except (frappe.DuplicateEntryError, frappe.UniqueValidationError):
 			continue
 		joined.append(workspace)
 	return joined

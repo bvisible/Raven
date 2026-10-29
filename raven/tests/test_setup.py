@@ -1,3 +1,5 @@
+import importlib.util
+import unittest  # //// Neoffice - see the cloud v2 test
 from unittest.mock import patch
 
 import frappe
@@ -110,6 +112,12 @@ class TestSetup(IntegrationTestCase):
 		)
 		self.assertEqual(frappe.db.get_single_value("Raven Settings", "setup_completed"), 1)
 
+	# //// Neoffice - a Frappe Cloud v2 signup needs frappe.integrations.frappe_providers.cloud_settings, which
+	# //// Frappe 15 does not have (it is a Frappe 16 module): there is no such site to try on it.
+	@unittest.skipUnless(
+		importlib.util.find_spec("frappe.integrations.frappe_providers.cloud_settings"),
+		"Frappe 15 has no cloud_settings",
+	)
 	def test_complete_setup_finishes_frappe_wizard_for_a_cloud_v2_signup(self):
 		with (
 			patch(
