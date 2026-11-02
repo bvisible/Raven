@@ -30,7 +30,7 @@
     "@capacitor/status-bar": "8.0.3",
     "@capawesome/capacitor-badge": "8.0.2",
     "@capawesome/capacitor-file-picker": "8.1.0",
-    "@neoffice/frappe-sidebar-react": "git+https://github.com/bvisible/frappe-sidebar-react.git#236a59e9dd306212547ec70059735c85b2d7412a",
+    "@neoffice/frappe-sidebar-react": "git+https://github.com/bvisible/frappe-sidebar-react.git#689b4a980c4211710542706e960b652b0745e2bf",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
