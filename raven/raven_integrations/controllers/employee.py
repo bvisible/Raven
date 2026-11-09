@@ -30,6 +30,14 @@ def on_update(doc, method):
 	# If it has, we need to remove the channel member from the existing department channel
 	# And add it to the new department's channel
 
+	# //// Neoffice — an insert runs after_insert, then on_update, and a document that was never saved
+	# //// counts every value as changed (has_value_changed is true when there is no previous version).
+	# //// The person was added to the department's channel twice; Raven Channel Member refused the
+	# //// second ("You are already a member of this channel") and the whole Employee insert failed.
+	# //// after_insert has done the work for a new document.
+	if doc.flags.in_insert:
+		return
+
 	if not doc.user_id:
 		return
 
@@ -70,6 +78,12 @@ def on_trash(doc, method):
 
 
 def create_channel_member(channel_id, raven_user_id, employee_id):
+	# //// Neoffice — a person who already belongs to the channel (a department changed back, or a member
+	# //// added by hand) stays in it: Raven Channel Member refuses a second row, and that refusal cancelled
+	# //// the save of the Employee (neoffice-maintenance#1717).
+	if frappe.db.exists("Raven Channel Member", {"channel_id": channel_id, "user_id": raven_user_id}):
+		return
+
 	channel_member = frappe.get_doc(
 		{
 			"doctype": "Raven Channel Member",
