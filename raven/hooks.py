@@ -1,3 +1,5 @@
+import frappe
+
 from . import __version__ as app_version
 
 app_name = "raven"
@@ -34,10 +36,10 @@ required_apps = ["bvisible/neoffice_theme"]
 app_include_css = "raven.bundle.css"
 app_include_js = "raven.bundle.js"
 # //// Neoffice - no app_include_icons: upstream loads raven/public/icons/raven.svg (the Raven mark) into the desk
-# //// sprite as "/assets/raven/icons/raven.svg", and frappe v15's app.html fetches `/assets/{{ path }}`, so the desk
-# //// asked for /assets//assets/… and got a 404 on every page (maintenance#1884). The Raven mark is not ours either:
-# //// the timeline button draws the brand's chat bubble (timeline_button.js). Restore the include, as
-# //// "raven/icons/raven.svg", only if a desk icon of Raven's own is wanted again.
+# //// sprite. Until 30.10 its path gave /assets//assets/… and a 404 on every desk page (maintenance#1884); upstream
+# //// fixed the path then (32270bca5, "raven/icons/raven.svg" on Frappe 15). We still leave it out: nothing in the
+# //// desk draws frappe.utils.icon("raven"), and the Raven mark is not ours (the timeline button draws the brand's
+# //// chat bubble, timeline_button.js). Take upstream's block back only if a desk icon of Raven's own is wanted.
 
 add_to_apps_screen = [
 	{
